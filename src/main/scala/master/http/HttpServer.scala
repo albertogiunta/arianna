@@ -1,4 +1,4 @@
-package http
+package master.http
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
@@ -35,7 +35,7 @@ abstract class AbstractHttpServer(name: String) extends HttpServer {
     
     protected implicit val config = ConfigFactory.parseString(
         """
-          http-akka-blocking-dispatcher {
+          master.http-akka-blocking-dispatcher {
             |type = Dispatcher
             |executor = "thread-pool-executor"
             |thread-pool-executor {
@@ -50,7 +50,7 @@ abstract class AbstractHttpServer(name: String) extends HttpServer {
     protected implicit val materializer = ActorMaterializer()
     
     protected implicit val blockingDispatcher =
-        akkaSubSystem.dispatchers.lookup("http-akka-blocking-dispatcher")
+        akkaSubSystem.dispatchers.lookup("master.http-akka-blocking-dispatcher")
     
     // All the Futures are going to be handled by the Blocking Dispatcher
     val aSyncRequestHandler: HttpRequest => Future[HttpResponse] = null

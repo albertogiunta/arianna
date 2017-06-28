@@ -1,9 +1,11 @@
-import spray.json.DefaultJsonProtocol
-import spray.json._
+import spray.json.{DefaultJsonProtocol, _}
+
 import scala.io.Source
 
 final case class InfoArea(id: Int, name: String, uri: String)
+
 final case class Sensor(id: Int, name: String, value: Double)
+
 final case class Area(infoArea: InfoArea,
                       sensors: List[Sensor],
                       neighbors: List[InfoArea],
@@ -13,6 +15,7 @@ final case class Area(infoArea: InfoArea,
                       squareMeters: Double,
                       currentPeople: Int,
                       practicabilityLevel: Double)
+
 final case class Maps(id: Int, areas: List[Area])
 
 object MyJsonProtocol extends DefaultJsonProtocol {
