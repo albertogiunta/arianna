@@ -20,7 +20,7 @@ final case class Maps(id: Int, areas: List[Cell])
 object MyJsonProtocol extends DefaultJsonProtocol {
      implicit val infoCellFormat = jsonFormat3(InfoCell)
      implicit val sensorFormat = jsonFormat3(Sensor)
-     implicit val areaFormat = jsonFormat9(Cell)
+     implicit val cellFormat = jsonFormat9(Cell)
      implicit val mapsFormat = jsonFormat2(Maps)
 }
 
