@@ -1,0 +1,42 @@
+{
+    "id": 1,
+    "areas": [
+        {
+            "infoArea": {
+                "id": 1,
+                "name": "name",
+                "uri": "uri/id"
+            },
+            "sensors": [
+                {
+                    "id": 1,
+                    "name": "name",
+                    "value": 0.847372
+                },
+                {
+                    "id": 2,
+                    "name": "name2",
+                    "value": 0.847372
+                }
+            ],
+            "neighbors": [
+                {
+                    "id": 1,
+                    "name": "name1",
+                    "uri": "uri/id"
+                },
+                {
+                    "id": 2,
+                    "name": "name2",
+                    "uri": "uri/id"
+                }
+            ],
+            "isEntryPoint": true,
+            "isExitPoint": false,
+            "capacity": 32,
+            "squareMeters": 23.5,
+            "currentPeople": 23,
+            "practicabilityLevel": 23.23
+        }
+    ]
+}

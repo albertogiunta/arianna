@@ -108,9 +108,9 @@ object AkkaServerBootstrap extends App{
             //Do Nothing, just hang in there
         }
         
-        bindingFuture
-            .flatMap(_.unbind()) // trigger unbinding from the port
-            .onComplete(_ => httpServer.terminate()) // and shutdown when done
+//        bindingFuture
+//            .flatMap(_.unbind()) // trigger unbinding from the port
+//            .onComplete(_ => httpServer.terminate()) // and shutdown when done
         
     }
 }
