@@ -1,32 +1,24 @@
 package master.cluster
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
-import akka.cluster.pubsub.DistributedPubSubMediator.{Put, Send}
-import akka.cluster.pubsub._
+import akka.cluster.pubsub.DistributedPubSub
+import akka.cluster.pubsub.DistributedPubSubMediator.{Publish, Put, Send}
 
 /**
   * Created by Alessandro on 28/06/2017.
   */
-class Subscriber extends Actor with ActorLogging {
+class Publisher extends Actor with ActorLogging {
     
-    import DistributedPubSubMediator.{Subscribe, SubscribeAck}
-    
+    // activate the extension
     val mediator: ActorRef = DistributedPubSub(context.system).mediator
-    
-    // subscribe to the topic named "content"
-    mediator ! Subscribe("content", self)
     mediator ! Put(self)
     
     def receive: PartialFunction[Any, Unit] = {
-        case msg: String =>
-            log.info("Got {}", msg)
-    
-        case msg@SubscribeAck(Subscribe("content", None, `self`)) =>
-            log.info("subscribing")
-    
+        case in: String =>
+            val out = in.toUpperCase
+            mediator ! Publish("content", out)
         case s: String =>
             log.info("Got {}", s)
-    
         case in: String ⇒
             val out = in.toUpperCase
             mediator ! Send(path = "/user/destination", msg = out, localAffinity = true)
