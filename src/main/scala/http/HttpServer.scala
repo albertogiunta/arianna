@@ -13,12 +13,12 @@ import scala.concurrent.Future
   * A simple Server trait which defines both Future oriented and Route/Stream oriented approach
   */
 trait HttpServer {
-    
-    def bindAsync(hostname: String, port: Int): Future[Http.ServerBinding]
-    
-    def bindBlocking(hostname: String, port: Int): Future[Http.ServerBinding]
-    
-    def terminate(): Unit
+
+     def bindAsync(hostname: String, port: Int): Future[Http.ServerBinding]
+
+     def bindBlocking(hostname: String, port: Int): Future[Http.ServerBinding]
+
+     def terminate(): Unit
 }
 
 /**
@@ -32,9 +32,9 @@ trait HttpServer {
   *
   */
 abstract class AbstractHttpServer(name: String) extends HttpServer {
-    
-    protected implicit val config = ConfigFactory.parseString(
-        """
+
+     protected implicit val config = ConfigFactory.parseString(
+          """
           http-akka-blocking-dispatcher {
             |type = Dispatcher
             |executor = "thread-pool-executor"
@@ -44,31 +44,31 @@ abstract class AbstractHttpServer(name: String) extends HttpServer {
             |throughput = 100
           }
         """.stripMargin).withFallback(ConfigFactory.load())
-    
-    implicit val akkaSubSystem = ActorSystem(name, config)
-    
-    protected implicit val materializer = ActorMaterializer()
-    
-    protected implicit val blockingDispatcher =
-        akkaSubSystem.dispatchers.lookup("http-akka-blocking-dispatcher")
-    
-    // All the Futures are going to be handled by the Blocking Dispatcher
-    val aSyncRequestHandler: HttpRequest => Future[HttpResponse] = null
-    
-    val streamRequestHandler: Route = null
-    
-    override def bindAsync(hostname: String, port: Int): Future[Http.ServerBinding] =
-        Http().bindAndHandleAsync(aSyncRequestHandler, hostname, port)
-    
-    override def bindBlocking(hostname: String, port: Int): Future[Http.ServerBinding] =
-        Http().bindAndHandle(streamRequestHandler, hostname, port)
-    
-    override def terminate(): Unit = akkaSubSystem.terminate()
+
+     implicit val akkaSubSystem = ActorSystem(name, config)
+
+     protected implicit val materializer = ActorMaterializer()
+
+     protected implicit val blockingDispatcher =
+          akkaSubSystem.dispatchers.lookup("http-akka-blocking-dispatcher")
+
+     // All the Futures are going to be handled by the Blocking Dispatcher
+     val aSyncRequestHandler: HttpRequest => Future[HttpResponse] = null
+
+     val streamRequestHandler: Route = null
+
+     override def bindAsync(hostname: String, port: Int): Future[Http.ServerBinding] =
+          Http().bindAndHandleAsync(aSyncRequestHandler, hostname, port)
+
+     override def bindBlocking(hostname: String, port: Int): Future[Http.ServerBinding] =
+          Http().bindAndHandle(streamRequestHandler, hostname, port)
+
+     override def terminate(): Unit = akkaSubSystem.terminate()
 }
 
 object HttpServer {
-    
-    def apply(name: String): HttpServer =
-        new AkkaHttpServer(name)
+
+     def apply(name: String): HttpServer =
+          new AkkaHttpServer(name)
 }
 
