@@ -14,15 +14,19 @@ class Subscriber extends Actor with ActorLogging {
     val mediator: ActorRef = DistributedPubSub(context.system).mediator
     
     // subscribe to the topic named "content"
-    mediator ! Subscribe("content", self)
+    mediator ! Subscribe(ontologies.Alarm.name, self)
+    mediator ! Subscribe(ontologies.SensorData.name, self)
+    mediator ! Subscribe(ontologies.Handshake.name, self)
+    mediator ! Subscribe(ontologies.CellData.name, self)
+    
     mediator ! Put(self)
     
     def receive: PartialFunction[Any, Unit] = {
         case msg: String =>
             log.info("Got {}", msg)
-    
-        case msg@SubscribeAck(Subscribe("content", None, `self`)) =>
-            log.info("subscribing")
+
+        case SubscribeAck(Subscribe(topic, None, `self`)) =>
+            log.info("subscribing to " + topic)
     
         case s: String =>
             log.info("Got {}", s)

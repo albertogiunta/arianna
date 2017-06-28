@@ -14,11 +14,14 @@ class Publisher extends Actor with ActorLogging {
     mediator ! Put(self)
     
     def receive: PartialFunction[Any, Unit] = {
+    
         case in: String =>
             val out = in.toUpperCase
             mediator ! Publish("content", out)
+    
         case s: String =>
             log.info("Got {}", s)
+    
         case in: String ⇒
             val out = in.toUpperCase
             mediator ! Send(path = "/user/destination", msg = out, localAffinity = true)
