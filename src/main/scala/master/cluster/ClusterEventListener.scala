@@ -5,9 +5,12 @@ import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
 
 /**
-  * Created by Alessandro on 29/06/2017.
+  * A simple listener for activities of members of the cluster
+  *
+  * Got it from the Akka Documentation
+  *
   */
-abstract class ClusterActor extends Actor with ActorLogging {
+class ClusterEventListener extends Actor with ActorLogging  {
     
     val cluster = Cluster(context.system)
     
@@ -18,9 +21,7 @@ abstract class ClusterActor extends Actor with ActorLogging {
     }
     
     override def postStop(): Unit = cluster.unsubscribe(self)
-}
-
-class ClusterEventListener extends ClusterActor {
+    
     def receive = {
         case MemberUp(member) =>
             log.info("Member is Up: {}", member.address)

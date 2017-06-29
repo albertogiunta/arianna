@@ -2,7 +2,8 @@ package master.cluster
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import akka.cluster.pubsub.DistributedPubSub
-import akka.cluster.pubsub.DistributedPubSubMediator.{Publish, Put, Send}
+import akka.cluster.pubsub.DistributedPubSubMediator._
+import ontologies.MyMessage
 
 /**
   * Created by Alessandro on 28/06/2017.
@@ -10,20 +11,36 @@ import akka.cluster.pubsub.DistributedPubSubMediator.{Publish, Put, Send}
 class Publisher extends Actor with ActorLogging {
     
     // activate the extension
-    val mediator: ActorRef = DistributedPubSub(context.system).mediator
-    mediator ! Put(self)
+    private val mediator: ActorRef = DistributedPubSub(context.system).mediator
     
-    def receive: PartialFunction[Any, Unit] = {
     
-        case in: String =>
-            val out = in.toUpperCase
-            mediator ! Publish("content", out)
+    override def preStart() = {
+        mediator ! Put(self) // Point 2 Point Messaging with other Actors of the cluster
+    }
     
-        case s: String =>
-            log.info("Got {}", s)
+    def receive = {
+        
+        case MyMessage(ontologies.Init, cnt) =>
+            log.info("Hello there from {}!", self.path.name)
     
-        case in: String ⇒
-            val out = in.toUpperCase
-            mediator ! Send(path = "/user/destination", msg = out, localAffinity = true)
+            this.context.become(receptive)
+            log.info("I've become receptive!")
+            
+            mediator ! Publish(ontologies.Alarm.typeName, MyMessage(ontologies.Alarm, cnt))
+            
+            log.info(s"Message sent to Mediator for Publishing...")
+            
+            // The Mediator Hierarchy is always /user/<Username>
+            mediator ! Send(path = "/user/Subscriber",
+                msg = MyMessage(ontologies.Alarm, cnt + "2" ), localAffinity = true)
+    
+            log.info(s"Message sent to Mediator for Point2Point relay...")
+            
+        case _ => // Ignore
+    }
+    
+    private val receptive: Actor.Receive = {
+        
+        case _: Any => // Ignore
     }
 }
