@@ -9,6 +9,10 @@ trait MessageType {
 
 }
 
+object Init extends MessageType {
+  override def typeName: String = "Init"
+}
+
 object Alarm extends MessageType {
   override def typeName: String = "Alarm"
 }
