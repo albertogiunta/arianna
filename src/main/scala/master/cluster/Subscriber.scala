@@ -47,7 +47,16 @@ class Subscriber extends Actor with ActorLogging {
         
         case MyMessage(ontologies.Alarm, cnt) =>
             log.info("Got {}", cnt)
-        
+
+        case MyMessage(ontologies.SensorData, cnt) =>
+            log.info("Got {}", cnt)
+
+        case MyMessage(ontologies.Handshake, cnt) =>
+            log.info("Got {}", cnt)
+
+        case MyMessage(ontologies.CellData, cnt) =>
+            log.info("Got {}", cnt)
+            
         case msg => log.info("Unhandled message while receptive... {}", msg) // Ignore
     }
 }
