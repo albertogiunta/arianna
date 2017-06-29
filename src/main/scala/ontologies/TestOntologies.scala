@@ -3,17 +3,6 @@ package ontologies
 /**
   * Created by Alessandro on 28/06/2017.
   */
-
-//object Message {
-//
-//    def apply(contentType : String, content: Any) : Message = MyMessage(contentType, content)
-//
-//    def unapply(msg: Message) : Option[(String, Any)] = Some(msg.contentType, msg.content)
-//}
-
-/**
-  * Created by Alessandro on 28/06/2017.
-  */
 object TestOntologies extends App {
     val msg = MyMessage(Alarm, 666)
     

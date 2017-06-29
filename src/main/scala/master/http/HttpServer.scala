@@ -35,22 +35,22 @@ abstract class AbstractHttpServer(name: String) extends HttpServer {
     
     protected implicit val config = ConfigFactory.parseString(
         """
-          master.http-akka-blocking-dispatcher {
-            |type = Dispatcher
-            |executor = "thread-pool-executor"
-            |thread-pool-executor {
-                |fixed-pool-size = 16
-            }
-            |throughput = 100
-          }
-        """.stripMargin).withFallback(ConfigFactory.load())
+          http-akka-blocking-dispatcher {
+          |  type = Dispatcher
+          |  executor = "thread-pool-executor"
+          |  thread-pool-executor {
+          |    fixed-pool-size = 16
+          |  }
+          |  throughput = 100
+          |}
+        """.stripMargin).withFallback(ConfigFactory.load()).resolve()
     
     implicit val akkaSubSystem = ActorSystem(name, config)
     
     protected implicit val materializer = ActorMaterializer()
     
     protected implicit val blockingDispatcher =
-        akkaSubSystem.dispatchers.lookup("master.http-akka-blocking-dispatcher")
+        akkaSubSystem.dispatchers.lookup("http-akka-blocking-dispatcher")
     
     // All the Futures are going to be handled by the Blocking Dispatcher
     val aSyncRequestHandler: HttpRequest => Future[HttpResponse] = null

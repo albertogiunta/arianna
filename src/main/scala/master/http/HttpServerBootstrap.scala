@@ -11,7 +11,7 @@ object HttpServerBootstrap extends App {
     override def main(args: Array[String]) {
         val hostname = "localhost"
         val port = 8080
-        val name = "Arianna-Master-master.http"
+        val name = "Arianna-Master-master"
         val httpServer = HttpServer(name)
         //val bindingFuture = httpServer.bindWithFuture(hostname, port)
         
