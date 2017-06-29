@@ -13,7 +13,6 @@ class Publisher extends Actor with ActorLogging {
     // activate the extension
     private val mediator: ActorRef = DistributedPubSub(context.system).mediator
     
-    
     override def preStart() = {
         mediator ! Put(self) // Point 2 Point Messaging with other Actors of the cluster
     }
@@ -25,16 +24,16 @@ class Publisher extends Actor with ActorLogging {
     
             this.context.become(receptive)
             log.info("I've become receptive!")
-            
-            mediator ! Publish(ontologies.Alarm.typeName, MyMessage(ontologies.Alarm, cnt))
+    
+            mediator ! Publish(topic = ontologies.Alarm.typeName, MyMessage(ontologies.Alarm, cnt))
             
             log.info(s"Message sent to Mediator for Publishing...")
             
             // The Mediator Hierarchy is always /user/<Username>
-            mediator ! Send(path = "/user/Subscriber",
-                msg = MyMessage(ontologies.Alarm, cnt + "2" ), localAffinity = true)
-    
-            log.info(s"Message sent to Mediator for Point2Point relay...")
+        //            mediator ! Send(path = "/user/Subscriber-Master",
+        //                msg = MyMessage(ontologies.Alarm, cnt + "2" ), localAffinity = true)
+        //
+        //            log.info(s"Message sent to Mediator for Point2Point relay...")
             
         case _ => // Ignore
     }

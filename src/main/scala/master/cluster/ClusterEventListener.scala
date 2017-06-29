@@ -24,12 +24,12 @@ class ClusterEventListener extends Actor with ActorLogging  {
     
     def receive = {
         case MemberUp(member) =>
-            log.info("Member is Up: {}", member.address)
+            log.info("Member is Up @ {}", member.address)
         case UnreachableMember(member) =>
-            log.info("Member detected as unreachable: {}", member)
+            log.info("Member detected as unreachable @ {}", member)
         case MemberRemoved(member, previousStatus) =>
             log.info(
-                "Member is Removed: {} after {}",
+                "Member @ {} is Removed after {}",
                 member.address, previousStatus)
         case _: MemberEvent => // ignore
     }

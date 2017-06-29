@@ -17,14 +17,14 @@ class Subscriber extends Actor with ActorLogging {
     
     override def preStart() = {
         // Accept Alarms from other Actors, then broadcast to every other Actor.
-        mediator ! Subscribe(ontologies.Alarm.typeName, self)
+        mediator ! Subscribe(topic = ontologies.Alarm.typeName, self)
         // Accept Data from Cells sensors, those data are useful for computing Practicability of those Cells.
-        mediator ! Subscribe(ontologies.SensorData.typeName, self)
+        mediator ! Subscribe(topic = ontologies.SensorData.typeName, self)
         // Accept Handshakes from other Actors (Cells) and save Map them into the actual Topology,
         // broadcast the new topology to the other inhabitant of the cluster.
-        mediator ! Subscribe(ontologies.Handshake.typeName, self)
+        mediator ! Subscribe(topic = ontologies.Handshake.typeName, self)
         // Accept Cells' Data to update the map.
-        mediator ! Subscribe(ontologies.CellData.typeName, self)
+        mediator ! Subscribe(topic = ontologies.CellData.typeName, self)
     
         mediator ! Put(self) // Point 2 Point Messaging with other Actors of the cluster
     }
@@ -33,7 +33,7 @@ class Subscriber extends Actor with ActorLogging {
         
         case MyMessage(ontologies.Init, _) =>
             log.info("Hello there from {}!", self.path.name)
-            
+    
             this.context.become(receptive)
             log.info("I've become receptive!")
             
@@ -56,6 +56,9 @@ class Subscriber extends Actor with ActorLogging {
 
         case MyMessage(ontologies.CellData, cnt) =>
             log.info("Got {}", cnt)
+
+        case SubscribeAck(Subscribe(topic, None, `self`)) =>
+            log.info("Subscribing to " + topic)
             
         case msg => log.info("Unhandled message while receptive... {}", msg) // Ignore
     }

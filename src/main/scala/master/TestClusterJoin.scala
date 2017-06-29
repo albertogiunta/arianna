@@ -5,13 +5,15 @@ import java.nio.file.Paths
 
 import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
-import master.cluster.{ClusterEventListener, Subscriber}
+import master.cluster.Publisher
 import ontologies.MyMessage
 
-object TestMaster extends App {
-    
+/**
+  * Created by Alessandro on 29/06/2017.
+  */
+object TestClusterJoin extends App {
     val path2Project = Paths.get("").toFile.getAbsolutePath
-    val path2Config = path2Project + "/conf/master.conf"
+    val path2Config = path2Project + "/conf/cell.conf"
     
     implicit val config = ConfigFactory.parseFile(new File(path2Config))
         .withFallback(ConfigFactory.load()).resolve()
@@ -22,13 +24,13 @@ object TestMaster extends App {
     
     println("ActorSystem {} is now Active...", system.name)
     
-    val listener = system.actorOf(Props[ClusterEventListener], "Listener-Master")
+    //    val listener = system.actorOf(Props[ClusterEventListener], "Listener-Cell")
     
-    val subscriber = system.actorOf(Props[Subscriber], "Subscriber-Master")
+    //    val subscriber = system.actorOf(Props[Subscriber], "Subscriber-Cell")
+    //    subscriber ! MyMessage(ontologies.Init, null)
     
-    subscriber ! MyMessage(ontologies.Init, null)
+    val publisher = system.actorOf(Props[Publisher], "Publisher-Cell")
     
-    //    val publisher = system.actorOf(Props[Publisher], "Publisher-Master")
-    //
-    //    publisher ! MyMessage(ontologies.Init, "Hello baby.")
+    Thread.sleep(5000)
+    publisher ! MyMessage(ontologies.Init, "Hello baby.")
 }
