@@ -3,7 +3,7 @@ package cell.cluster
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import akka.cluster.pubsub.DistributedPubSubMediator.Put
 import akka.cluster.pubsub._
-import ontologies.{AlarmTopic, MyMessage, TopologyTopic}
+import ontologies._
 
 /**
   * An actor that models a Cell receiver for the Cells-MasterServer
@@ -27,8 +27,10 @@ class CellSubscriber extends Actor with ActorLogging {
     }
 
     def receive: PartialFunction[Any, Unit] = {
-        case msg: MyMessage =>
-            println("[" + self.path.name + "]  I received " + msg)
+        case msg@MyMessage(Alarm, _) =>
+            println("[" + self.path.name + "]  I received an Alarm signal")
+        case msg@MyMessage(Topology, _) =>
+            print("[" + self.path.name + "] I received a topology")
         case SubscribeAck(Subscribe(topic, None, `self`)) =>
             println("[" + self.path.name + "] Subscribing to " + topic + " topic")
     }
