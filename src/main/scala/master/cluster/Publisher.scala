@@ -3,7 +3,7 @@ package master.cluster
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator._
-import ontologies.MyMessage
+import ontologies.{AlarmTopic, MyMessage, TopologyTopic}
 
 /**
   * Created by Alessandro on 28/06/2017.
@@ -41,7 +41,10 @@ class Publisher extends Actor with ActorLogging {
     }
     
     private val receptive: Actor.Receive = {
-        
+        case msg@MyMessage(ontologies.Alarm, cnt) =>
+            mediator ! Publish(AlarmTopic.topicName, msg)
+        case msg@MyMessage(ontologies.Topology, cnt) =>
+            mediator ! Publish(TopologyTopic.topicName, msg)
         case _: Any => // Ignore
     }
 }

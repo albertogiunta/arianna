@@ -21,7 +21,7 @@ object TestPubSubCells extends App {
   implicit val config = ConfigFactory.parseFile(new File(path2Config))
     .withFallback(ConfigFactory.load()).resolve()
 
-  val system1 = ActorSystem("Arianna-Cluster-Master", config)
+  val system1 = ActorSystem("Arianna-Cluster", config)
 
   println("ActorSystem " + system1.name + " activeted...")
 

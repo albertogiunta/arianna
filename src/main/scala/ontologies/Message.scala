@@ -29,7 +29,7 @@ object Handshake extends MessageType {
     override def typeName: String = "Handshake"
 }
 
-object WeightData extends MessageType {
+object Practicability extends MessageType {
     override def typeName: String = "WeightData"
 }
 
