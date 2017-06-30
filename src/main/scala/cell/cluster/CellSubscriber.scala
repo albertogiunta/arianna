@@ -18,21 +18,33 @@ class CellSubscriber extends Actor with ActorLogging {
     val mediator: ActorRef = DistributedPubSub(context.system).mediator
     
     override def preStart(): Unit = {
-        // subscribe to the topic named "content"
+
         mediator ! Subscribe(Topic.Alarm, self)
     
         mediator ! Subscribe(Topic.Topology, self)
         
         mediator ! Put(self)
     }
-    
-    def receive: PartialFunction[Any, Unit] = {
+
+
+    def receive = {
+        case SubscribeAck(Subscribe(topic, None, `self`)) =>
+            log.info("Successfully Subscribed to " + topic)
+        case AriadneMessage(MessageType.Init, _) => {
+            log.info("Hello there from {}!", self.path.name)
+
+            this.context.become(receptive)
+            log.info("[" + self.path.name + "] I've become receptive!")
+        }
+        case msg => log.info("Unhandled message while initializing... {}", msg)
+    }
+
+
+    private val receptive: Actor.Receive = {
         case msg@AriadneMessage(MessageType.Alarm, _) =>
             println("[" + self.path.name + "]  I received an Alarm signal")
         case msg@AriadneMessage(MessageType.Topology, _) =>
             print("[" + self.path.name + "] I received a topology")
-        case SubscribeAck(Subscribe(topic, None, `self`)) =>
-            println("[" + self.path.name + "] Subscribing to " + topic + " topic")
     }
 }
 

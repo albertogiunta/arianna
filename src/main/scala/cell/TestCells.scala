@@ -4,7 +4,7 @@ import java.io.File
 import java.nio.file.Paths
 
 import akka.actor.{ActorSystem, Props}
-import cell.cluster.{CellPublisher, CellSubscriber}
+import cell.cluster.{CellPublisher, CellSubscriber, ClusterMembersListener}
 import com.typesafe.config.ConfigFactory
 import ontologies.{AriadneMessage, MessageType}
 
@@ -17,20 +17,24 @@ object TestCells extends App {
     
     implicit val config = ConfigFactory.parseFile(new File(path2Config))
         .withFallback(ConfigFactory.load()).resolve()
-    
-    val system1 = ActorSystem("Arianna-Cluster", config)
-    
-    println("ActorSystem " + system1.name + " where cells running on is activeted...")
-    
-    val subscriber = system1.actorOf(Props[CellSubscriber], "Subscriber")
-    
-    //subscriber ! MyMessage(ontologies.Init, null)
-    
-    val publisher = system1.actorOf(Props[CellPublisher], "Publisher")
+
+    val system = ActorSystem("Arianna-Cluster", config)
+
+    println("ActorSystem " + system.name + " where cells running on is activeted...")
+
+
+    val publisher = system.actorOf(Props[CellPublisher], "CellPublisher")
+    val subscriber = system.actorOf(Props[CellSubscriber], "CellSubscriber")
+    val actorsToInitialize = List(publisher, subscriber)
+
+
+    //create and start the listener
+    val clusterListener = system.actorOf(Props(new ClusterMembersListener(List(publisher, subscriber))), "CellClusterListener")
+    println("ClusterListener created")
 
     Thread.sleep(5000)
-
+    //subscriber ! MyMessage(ontologies.Init, null)
     //Simulate a handshake message sending to the server
-    publisher ! AriadneMessage(ontologies.Handshake, "Hello baby.")
+    publisher ! AriadneMessage(MessageType.Handshake, "Hello baby.")
     println("[Cell] message sended!")
 }

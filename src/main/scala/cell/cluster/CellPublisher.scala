@@ -12,9 +12,20 @@ import ontologies._
 class CellPublisher extends Actor with ActorLogging {
     
     private val mediator: ActorRef = DistributedPubSub(context.system).mediator
-    
-    
+
+
     def receive = {
+
+        case AriadneMessage(MessageType.Init, _) =>
+            log.info("Hello there from {}!", self.path.name)
+
+            this.context.become(receptive)
+            log.info("[" + self.path.name + "] I've become receptive!")
+
+        case msg => log.info("Unhandled message while initializing... {}", msg)
+    }
+
+    private val receptive: Actor.Receive = {
         case msg@AriadneMessage(MessageType.Handshake, _) =>
             mediator ! Publish(Topic.HandShake, msg)
     
