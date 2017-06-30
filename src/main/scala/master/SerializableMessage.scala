@@ -1,7 +1,6 @@
 package master
 
 import akka.serialization._
-import master.DataTypeLengthConverter._
 
 /**
   * Created by Matteo Gabellini on 28/06/2017.
@@ -38,64 +37,91 @@ object CellData extends MyMessageType {
     override def typeName: String = "CellData"
 }
 
-/**
-  * A Custom Serializable that defines methods for an Object to be Serialized.
-  *
-  * This will let the object itself serialize and deserialize itself
-  */
-trait SerializableMessage extends Serializable {
-    
-    def serialize: Array[Byte]
-    
-    def deserialize(array: Array[Byte]): Message
+object VariableType extends MyMessageType {
+    override def typeName: String = "aaaaaaaaaaaaaaa"
 }
 
-trait Message extends SerializableMessage {
+object MyMessageTypeFactory {
+    def apply(typeName: String): MyMessageType = typeName match {
+        case t if t.equals(Init.typeName) => Init
+        case t if t.equals(Alarm.typeName) => Alarm
+        case t if t.equals(Topology.typeName) => Topology
+        case t if t.equals(SensorData.typeName) => SensorData
+        case t if t.equals(Handshake.typeName) => Handshake
+        case t if t.equals(WeightData.typeName) => WeightData
+        case t if t.equals(CellData.typeName) => CellData
+        case t if t.equals(VariableType.typeName) => VariableType
+        case _ => null
+    }
+}
+
+trait Message {
     
     def messageType: MyMessageType
     
     def content: String
+    
+    override def toString =
+        "Message Type is " + messageType.typeName + "\n" +
+            "Content is " + content
 }
 
-case class MySerializableMessage(messageType: MyMessageType, content: String) extends Message {
+case class MySerializableMessage(messageType: MyMessageType, content: String) extends Message
+
+/**
+  * A Custom Serializer that defines methods for an Object to be Serialized.
+  *
+  */
+trait MessageSerializer {
+    def serialize(message: Message): Array[Byte]
     
-    override def serialize: Array[Byte] = {
+    def deserialize(array: Array[Byte]): Message
+}
+
+object MessageSerializer extends MessageSerializer {
+    
+    override def serialize(message: Message): Array[Byte] = {
+        
+        val char2byte: Char => Byte = c => {
+            c.toByte
+        }
         
         // Create an Array[Byte] of the same length of the sum of the length in Byte of the fields
         // the first byte are intLengthInByte that are needed in order to get the length of the messageType,
         // which is variable
         // This is always recoverable since Int are always of fixed length 8 Byte / 32 bit
-        Array.concat[Byte](
-            Array.fill(intLengthInByte + 1) {
-                messageType.typeName.length.toByte
+        Array.concat(
+            Array.fill(1) {
+                message.messageType.typeName.length.toByte
             },
-            messageType.typeName.toStream.map(c => c.toByte).toArray,
-            content.toStream.map(c => c.toByte).toArray
+            message.messageType.typeName.toStream.map(char2byte).toArray,
+            message.content.toStream.map(char2byte).toArray
         )
     }
     
-    override def deserialize(array: Array[Byte]): Message = ???
-}
-
-class MessageSerializer extends Serializer {
-    
-    override def identifier: Int = 70504012
-    
-    override def toBinary(o: AnyRef): Array[Byte] = ???
-    
-    override def includeManifest: Boolean = ???
-    
-    override def fromBinary(bytes: Array[Byte], manifest: Option[Class[_]]): AnyRef = ???
+    override def deserialize(array: Array[Byte]): Message = {
+        
+        MySerializableMessage(
+            MyMessageTypeFactory(
+                (for {
+                    i <- 1 until array(0) + 1
+                } yield array(i).toChar).toStream.mkString
+            ),
+            (for {
+                j <- array(0) + 1 until array.length
+            } yield array(j).toChar).toStream.mkString
+        )
+    }
 }
 
 object DataTypeLengthConverter {
     
-    val charLengthInByte = 4
-    val intLengthInByte = 8
-    val shortLengthInByte = 4
-    val longLengthInByte = 16
-    val floatLengthInByte = 32
-    val doubleLengthInByte = 64
+    val charLengthInByte = 2
+    val intLengthInByte = 4
+    val shortLengthInByte = 2
+    val longLengthInByte = 8
+    val floatLengthInByte = 4
+    val doubleLengthInByte = 8
     val booleanLengthInByte = 1
     val stringLengthInByte: Int => Int = _ * charLengthInByte
 }
@@ -104,31 +130,35 @@ object DataTypeLengthConverter {
   * A Custom Serializer for Message(s) to be handled by the ActorSystem itself
   *
   */
-trait MySerializer extends Serializer {
-    
-    // The manifest (type hint) that will be provided in the fromBinary method
-    // Use `""` if manifest is not needed.
-    def manifest(obj: AnyRef): String
-    
-}
-
-class MessageSerializerWithManifest extends MySerializer {
+class MessageSerializerWithManifest extends SerializerWithStringManifest {
     
     override def identifier = 21040507
     
-    override def includeManifest: Boolean = true
-    
     override def manifest(obj: AnyRef): String = obj match {
-        case MySerializableMessage => "MyMessage"
+        case MySerializableMessage => MySerializableMessage.getClass.getName
         case _ => null
     }
     
-    override def toBinary(obj: AnyRef): Array[Byte] = ???
+    override def toBinary(obj: AnyRef): Array[Byte] = obj match {
+        case msg: MySerializableMessage => MessageSerializer.serialize(msg)
+        case _ => null
+    }
     
-    override def fromBinary(bytes: Array[Byte], manifest: Option[Class[_]]): AnyRef = ???
+    override def fromBinary(bytes: Array[Byte], manifest: String): AnyRef = manifest match {
+        case msgClassType if msgClassType.equals(MySerializableMessage.getClass.getName) =>
+            MessageSerializer.deserialize(bytes)
+        case _ => null
+    }
     
 }
 
 object TestSerializer extends App {
-    MySerializableMessage(Init, "ciaone").serialize.foreach(b => print(b))
+    
+    println(MySerializableMessage.getClass.getName)
+    
+    println(MessageSerializer.deserialize(
+        MessageSerializer.serialize(
+            MySerializableMessage(VariableType, "ciao")
+        )
+    ))
 }

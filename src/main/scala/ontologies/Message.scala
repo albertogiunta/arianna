@@ -9,19 +9,8 @@ trait MessageType {
     
 }
 
-//object Message {
-//
-//    def apply(contentType : String, content: Any) : Message = MyMessage(contentType, content)
-//
-//    def unapply(msg: Message) : Option[(String, Any)] = Some(msg.contentType, msg.content)
-//}
-
 object Init extends MessageType {
     override def typeName: String = "Init"
-}
-
-object Init extends MessageType {
-  override def typeName: String = "Init"
 }
 
 object Alarm extends MessageType {
