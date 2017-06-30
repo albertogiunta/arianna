@@ -6,7 +6,7 @@ import java.nio.file.Paths
 import akka.actor.{ActorSystem, Props}
 import cell.cluster.{CellPublisher, CellSubscriber}
 import com.typesafe.config.ConfigFactory
-import ontologies.AriadneMessage
+import ontologies.{AriadneMessage, MessageType}
 
 /**
   * Created by Alessandro on 28/06/2017.
@@ -29,5 +29,5 @@ object TestCells extends App {
     val publisher = system1.actorOf(Props[CellPublisher], "Publisher")
     
     //Simulate a handshake message sending to the server
-    publisher ! AriadneMessage(ontologies.Handshake, "Hello baby.")
+    publisher ! AriadneMessage(MessageType.Handshake, "Hello baby.")
 }

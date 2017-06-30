@@ -21,20 +21,20 @@ class TestPublisher extends Actor with ActorLogging {
 
   def receive = {
     
-      case AriadneMessage(ontologies.Init, cnt) =>
+      case AriadneMessage(MessageType.Init, cnt) =>
       println("[" + self.path.name + "] Hello there from {}!", self.path.name)
 
       println("[" + self.path.name + "] I've become receptive!")
-
-      val topicName = AlarmTopic.topicName
-          mediator ! Publish(topicName, AriadneMessage(ontologies.Alarm, cnt))
-
-      println(s"[" + self.path.name + "] Message published on " + AlarmTopic.topicName)
+        
+          val topicName = Topic.Alarm.toString
+          mediator ! Publish(topicName, AriadneMessage(MessageType.Alarm, cnt))
+        
+          println(s"[" + self.path.name + "] Message published on " + Topic.Alarm)
 
       // The Mediator Hierarchy is always /user/<Username>
       val subName = "Subscriber1"
       mediator ! Send(path = "/user/" + subName,
-          msg = AriadneMessage(ontologies.Topology, cnt + "2"), localAffinity = true)
+          msg = AriadneMessage(MessageType.Topology, cnt + "2"), localAffinity = true)
 
       println(s"[" + self.path.name + "] Message sent directly to " + subName)
 

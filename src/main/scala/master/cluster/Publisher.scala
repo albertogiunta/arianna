@@ -3,7 +3,7 @@ package master.cluster
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator._
-import ontologies.{AlarmTopic, AriadneMessage, TopologyTopic}
+import ontologies._
 
 /**
   * Created by Alessandro on 28/06/2017.
@@ -19,13 +19,13 @@ class Publisher extends Actor with ActorLogging {
     
     def receive = {
     
-        case AriadneMessage(ontologies.Init, cnt) =>
+        case AriadneMessage(MessageType.Init, cnt) =>
             log.info("Hello there from {}!", self.path.name)
     
             this.context.become(receptive)
             log.info("I've become receptive!")
-    
-            mediator ! Publish(topic = ontologies.Alarm.typeName, cnt)
+        
+            mediator ! Publish(Topic.Alarm, AriadneMessage(MessageType.Alarm, cnt))
             //
             //            log.info(s"Message sent to Mediator for Publishing...")
             //            // Point 2 Point communication using Akka Remoting service -- Orrible to see but practical
@@ -41,10 +41,11 @@ class Publisher extends Actor with ActorLogging {
     }
     
     private val receptive: Actor.Receive = {
-        case msg@AriadneMessage(ontologies.Alarm, cnt) =>
-            mediator ! Publish(AlarmTopic.topicName, msg)
-        case msg@AriadneMessage(ontologies.Topology, cnt) =>
-            mediator ! Publish(TopologyTopic.topicName, msg)
+        case msg@AriadneMessage(MessageType.Alarm, _) =>
+            mediator ! Publish(Topic.Alarm, msg)
+    
+        case msg@AriadneMessage(MessageType.Topology, _) =>
+            mediator ! Publish(Topic.Topology, msg)
         case _: Any => // Ignore
     }
 }

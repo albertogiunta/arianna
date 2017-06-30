@@ -4,51 +4,45 @@ package ontologies
   * Created by Matteo Gabellini on 28/06/2017.
   */
 trait MessageType {
-    def typeName: String
+    
+    def toString: String
+    
+    override def equals(obj: scala.Any) = obj match {
+        case o: MessageType => o.toString == this.toString
+        case o: String => o == this.toString
+    }
 }
 
-object Init extends MessageType {
-    override def typeName: String = "Init"
-}
+case class AriadneMessageType(override val toString: String) extends MessageType
 
-object Alarm extends MessageType {
-    override def typeName: String = "Alarm"
-}
+object MessageType {
+    
+    val Init = AriadneMessageType("Init")
+    val Alarm = AriadneMessageType("Alarm")
+    val Topology = AriadneMessageType("Topology")
+    val SensorData = AriadneMessageType("SensorData")
+    val Handshake = AriadneMessageType("Handshake")
+    val Practicability = AriadneMessageType("Practicability")
+    val CellData = AriadneMessageType("CellData")
+    val VariableType = AriadneMessageType("VariableType")
+    
+    implicit def MessageType2String(msg: MessageType): String = msg.toString
+    
+    implicit def String2MessageType(str: String): MessageType = AriadneMessageType(str)
 
-object Topology extends MessageType {
-    override def typeName: String = "Topology"
-}
-
-object SensorData extends MessageType {
-    override def typeName: String = "SensorData"
-}
-
-object Handshake extends MessageType {
-    override def typeName: String = "Handshake"
-}
-
-object Practicability extends MessageType {
-    override def typeName: String = "WeightData"
-}
-
-object CellData extends MessageType {
-    override def typeName: String = "CellData"
-}
-
-object VariableType extends MessageType {
-    override def typeName: String = "aaaaaaaaaaaaaaa"
 }
 
 object MessageTypeFactory {
+    
     def apply(typeName: String): MessageType = typeName match {
-        case t if t == Init.typeName => Init
-        case t if t == Alarm.typeName => Alarm
-        case t if t == Topology.typeName => Topology
-        case t if t == SensorData.typeName => SensorData
-        case t if t == Handshake.typeName => Handshake
-        case t if t == Practicability.typeName => Practicability
-        case t if t == CellData.typeName => CellData
-        case t if t == VariableType.typeName => VariableType
+        case MessageType.Init.toString => MessageType.Init
+        case MessageType.Alarm.toString => MessageType.Alarm
+        case MessageType.Topology.toString => MessageType.Topology
+        case MessageType.SensorData.toString => MessageType.SensorData
+        case MessageType.Handshake.toString => MessageType.Handshake
+        case MessageType.Practicability.toString => MessageType.Practicability
+        case MessageType.CellData.toString => MessageType.CellData
+        case MessageType.VariableType.toString => MessageType.VariableType
         case _ => null
     }
 }
@@ -60,7 +54,7 @@ trait Message {
     def content: String
     
     override def toString =
-        "Message Type is " + messageType.typeName + "\n" +
+        "Message Type is " + messageType.toString + "\n" +
             "Content is " + content
     
     override def equals(obj: Any) = obj match {
@@ -71,3 +65,9 @@ trait Message {
 }
 
 case class AriadneMessage(messageType: MessageType, content: String) extends Message
+
+object TestMessageType extends App {
+    val s: String = MessageType.Init
+    
+    println(MessageType.Init == "Init")
+}

@@ -19,17 +19,17 @@ class CellSubscriber extends Actor with ActorLogging {
     
     override def preStart(): Unit = {
         // subscribe to the topic named "content"
-        mediator ! Subscribe(AlarmTopic.topicName, self)
-        
-        mediator ! Subscribe(TopologyTopic.topicName, self)
+        mediator ! Subscribe(Topic.Alarm, self)
+    
+        mediator ! Subscribe(Topic.Topology, self)
         
         mediator ! Put(self)
     }
     
     def receive: PartialFunction[Any, Unit] = {
-        case msg@AriadneMessage(Alarm, _) =>
+        case msg@AriadneMessage(MessageType.Alarm, _) =>
             println("[" + self.path.name + "]  I received an Alarm signal")
-        case msg@AriadneMessage(Topology, _) =>
+        case msg@AriadneMessage(MessageType.Topology, _) =>
             print("[" + self.path.name + "] I received a topology")
         case SubscribeAck(Subscribe(topic, None, `self`)) =>
             println("[" + self.path.name + "] Subscribing to " + topic + " topic")

@@ -15,17 +15,20 @@ class CellPublisher extends Actor with ActorLogging {
     
     
     def receive = {
-        
-        case msg@AriadneMessage(Handshake, _) =>
-            mediator ! Publish(HandShakeTopic.topicName, msg)
-        case msg@AriadneMessage(SensorData, _) =>
-            mediator ! Publish(SensorUpdateTopic.topicName, msg)
-        case msg@AriadneMessage(Handshake, _) =>
-            mediator ! Publish(HandShakeTopic.topicName, msg)
-        case msg@AriadneMessage(Practicability, _) =>
-            mediator ! Publish(PracticabilityTopic.topicName, msg)
-        case msg@AriadneMessage(CellData, _) =>
-            mediator ! Publish(CellDataTopic.topicName, msg)
+        case msg@AriadneMessage(MessageType.Handshake, _) =>
+            mediator ! Publish(Topic.HandShake, msg)
+    
+        case msg@AriadneMessage(MessageType.SensorData, _) =>
+            mediator ! Publish(Topic.SensorUpdate, msg)
+    
+        case msg@AriadneMessage(MessageType.Handshake, _) =>
+            mediator ! Publish(Topic.HandShake, msg)
+    
+        case msg@AriadneMessage(MessageType.Practicability, _) =>
+            mediator ! Publish(Topic.Practicability, msg)
+    
+        case msg@AriadneMessage(MessageType.CellData, _) =>
+            mediator ! Publish(Topic.CellData, msg)
         case _ => // Ignore
     }
 }

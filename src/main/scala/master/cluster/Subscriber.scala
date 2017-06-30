@@ -3,7 +3,7 @@ package master.cluster
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator._
-import ontologies.AriadneMessage
+import ontologies.{AriadneMessage, MessageType, Topic}
 
 /**
   * A Simple Subscriber for a Clustered Publish-Subscribe Model
@@ -16,14 +16,16 @@ class Subscriber extends Actor with ActorLogging {
     
     override def preStart() = {
         // Accept Alarms from other Actors, then broadcast to every other Actor.
-        mediator ! Subscribe(topic = ontologies.Alarm.typeName, self)
+        mediator ! Subscribe(Topic.Alarm, self)
         // Accept Data from Cells sensors, those data are useful for computing Practicability of those Cells.
-        mediator ! Subscribe(topic = ontologies.SensorData.typeName, self)
+        mediator ! Subscribe(Topic.SensorUpdate, self)
         // Accept Handshakes from other Actors (Cells) and save Map them into the actual Topology,
         // broadcast the new topology to the other inhabitant of the cluster.
-        mediator ! Subscribe(topic = ontologies.Handshake.typeName, self)
+        mediator ! Subscribe(Topic.HandShake, self)
         // Accept Cells' Data to update the map.
-        mediator ! Subscribe(topic = ontologies.CellData.typeName, self)
+        mediator ! Subscribe(Topic.CellData, self)
+    
+        mediator ! Subscribe(Topic.Practicability, self)
     
         mediator ! Put(self) // Point 2 Point Messaging with other Actors of the cluster
     }
@@ -33,7 +35,7 @@ class Subscriber extends Actor with ActorLogging {
         case SubscribeAck(Subscribe(topic, None, `self`)) =>
             log.info("Successfully Subscribed to " + topic)
 
-        case AriadneMessage(ontologies.Init, _) =>
+        case AriadneMessage(MessageType.Init, _) =>
             log.info("Hello there from {}!", self.path.name)
     
             this.context.become(receptive)
@@ -44,20 +46,20 @@ class Subscriber extends Actor with ActorLogging {
     
     private val receptive: Actor.Receive = {
     
-        case AriadneMessage(ontologies.Alarm, cnt) =>
-            log.info("Got {}", cnt)
+        case AriadneMessage(MessageType.Alarm, cnt) =>
+            log.info("Got {} from {}", cnt, sender.path.name)
     
-        case AriadneMessage(ontologies.SensorData, cnt) =>
-            log.info("Got {}", cnt)
+        case AriadneMessage(MessageType.SensorData, cnt) =>
+            log.info("Got {} from {}", cnt, sender.path.name)
     
-        case AriadneMessage(ontologies.Handshake, cnt) =>
-            log.info("Got {}", cnt)
+        case AriadneMessage(MessageType.Handshake, cnt) =>
+            log.info("Got {} from {}", cnt, sender.path.name)
     
-        case AriadneMessage(ontologies.CellData, cnt) =>
-            log.info("Got {}", cnt)
+        case AriadneMessage(MessageType.CellData, cnt) =>
+            log.info("Got {} from {}", cnt, sender.path.name)
     
-        case AriadneMessage(ontologies.Practicability, cnt) =>
-            log.info("Got {}", cnt)
+        case AriadneMessage(MessageType.Practicability, cnt) =>
+            log.info("Got {} from {}", cnt, sender.path.name)
     
         case SubscribeAck(Subscribe(topic, None, `self`)) =>
             log.info("Successfully Subscribed to " + topic)
