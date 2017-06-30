@@ -1,7 +1,7 @@
 package serialization
 
 import akka.serialization._
-import ontologies.{AriadneMessage, Message, MessageTypeFactory, VariableType}
+import ontologies._
 
 /**
   * A Custom Serializer for Message(s) to be handled by the ActorSystem itself
@@ -28,7 +28,6 @@ class AriadneMessageSerializer extends SerializerWithStringManifest {
             MessageSerializer.deserialize(bytes)
         case _ => null
     }
-    
 }
 
 /**
@@ -49,10 +48,8 @@ trait MessageSerializer {
 object MessageSerializer extends MessageSerializer {
     
     override def serialize(message: Message): Array[Byte] = {
-        
-        val char2byte: Char => Byte = c => {
-            c.toByte
-        }
+    
+        val char2byte: Char => Byte = c => c.toByte
         
         // Create an Array[Byte] of the same length of the sum of the length in Byte of the fields
         // the first byte are intLengthInByte that are needed in order to get the length of the messageType,
@@ -60,9 +57,9 @@ object MessageSerializer extends MessageSerializer {
         // This is always recoverable since Int are always of fixed length 8 Byte / 32 bit
         Array.concat(
             Array.fill(1) {
-                message.messageType.typeName.length.toByte
+                message.messageType.toString.length.toByte
             },
-            message.messageType.typeName.toStream.map(char2byte).toArray,
+            message.messageType.toString.toStream.map(char2byte).toArray,
             message.content.toStream.map(char2byte).toArray
         )
     }
@@ -96,11 +93,9 @@ object DataTypeLengthConverter {
 
 object TestSerializer extends App {
     
-    println(AriadneMessage.getClass.getName)
-    
     println(MessageSerializer.deserialize(
         MessageSerializer.serialize(
-            AriadneMessage(VariableType, "ciao")
+            AriadneMessage(MessageType.VariableType, "ciao")
         )
     ))
 }

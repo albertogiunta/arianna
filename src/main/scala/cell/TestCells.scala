@@ -6,7 +6,7 @@ import java.nio.file.Paths
 import akka.actor.{ActorSystem, Props}
 import cell.cluster.{CellPublisher, CellSubscriber}
 import com.typesafe.config.ConfigFactory
-import ontologies.AriadneMessage
+import ontologies.{AriadneMessage, MessageType}
 
 /**
   * Created by Alessandro on 28/06/2017.
