@@ -20,7 +20,7 @@ object TestMaster extends App {
     
     //    Cluster(system).join(Cluster(system).selfAddress)
     
-    println("ActorSystem {} is now Active...", system.name)
+    println("ActorSystem " + system.name + " is now Active...")
     
     val listener = system.actorOf(Props[ClusterEventListener], "Listener-Master")
     

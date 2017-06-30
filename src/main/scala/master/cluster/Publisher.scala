@@ -25,15 +25,17 @@ class Publisher extends Actor with ActorLogging {
             this.context.become(receptive)
             log.info("I've become receptive!")
     
-            mediator ! Publish(topic = ontologies.Alarm.typeName, MyMessage(ontologies.Alarm, cnt))
-            
-            log.info(s"Message sent to Mediator for Publishing...")
-            
-            // The Mediator Hierarchy is always /user/<Username>
-        //            mediator ! Send(path = "/user/Subscriber-Master",
-        //                msg = MyMessage(ontologies.Alarm, cnt + "2" ), localAffinity = true)
-        //
-        //            log.info(s"Message sent to Mediator for Point2Point relay...")
+            mediator ! Publish(topic = ontologies.Alarm.typeName, cnt)
+            //
+            //            log.info(s"Message sent to Mediator for Publishing...")
+            //            // Point 2 Point communication using Akka Remoting service -- Orrible to see but practical
+            //            this.context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/Subscriber-Master") ! "Ciao"
+    
+            //             // The Mediator Hierarchy is always /user/<Username>
+            //                    mediator ! Send(path = "/user/Subscriber-Master",
+            //                        msg = MyMessage(ontologies.Alarm, cnt + "2" ), localAffinity = true)
+    
+            log.info(s"Message sent to Mediator for Point2Point relay...")
             
         case _ => // Ignore
     }

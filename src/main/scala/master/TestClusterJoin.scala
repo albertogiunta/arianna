@@ -22,7 +22,7 @@ object TestClusterJoin extends App {
     
     //    Cluster(system).join(Cluster(system).selfAddress)
     
-    println("ActorSystem {} is now Active...", system.name)
+    println("ActorSystem " + system.name + " is now Active...")
     
     //    val listener = system.actorOf(Props[ClusterEventListener], "Listener-Cell")
     
@@ -33,4 +33,6 @@ object TestClusterJoin extends App {
     
     Thread.sleep(5000)
     publisher ! MyMessage(ontologies.Init, "Hello baby.")
+    
+    
 }

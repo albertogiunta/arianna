@@ -14,7 +14,6 @@ class Subscriber extends Actor with ActorLogging {
     
     private val mediator: ActorRef = DistributedPubSub(context.system).mediator
     
-    
     override def preStart() = {
         // Accept Alarms from other Actors, then broadcast to every other Actor.
         mediator ! Subscribe(topic = ontologies.Alarm.typeName, self)
@@ -30,15 +29,15 @@ class Subscriber extends Actor with ActorLogging {
     }
     
     def receive = {
-        
+    
+        case SubscribeAck(Subscribe(topic, None, `self`)) =>
+            log.info("Successfully Subscribed to " + topic)
+            
         case MyMessage(ontologies.Init, _) =>
             log.info("Hello there from {}!", self.path.name)
     
             this.context.become(receptive)
             log.info("I've become receptive!")
-            
-        case SubscribeAck(Subscribe(topic, None, `self`)) =>
-            log.info("Subscribing to " + topic)
         
         case msg => log.info("Unhandled message while initializing... {}", msg) // Ignore
     }
@@ -58,7 +57,7 @@ class Subscriber extends Actor with ActorLogging {
             log.info("Got {}", cnt)
 
         case SubscribeAck(Subscribe(topic, None, `self`)) =>
-            log.info("Subscribing to " + topic)
+            log.info("Successfully Subscribed to " + topic)
             
         case msg => log.info("Unhandled message while receptive... {}", msg) // Ignore
     }
