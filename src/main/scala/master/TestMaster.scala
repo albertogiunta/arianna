@@ -11,14 +11,14 @@ import ontologies.MyMessage
 object TestMaster extends App {
     
     val path2Project = Paths.get("").toFile.getAbsolutePath
-    val path2Config = path2Project + "/src/main/scala/master.conf"
+    val path2Config = path2Project + "/conf/master.conf" //"/src/main/scala/master.conf"
     
     implicit val config = ConfigFactory.parseFile(new File(path2Config))
         .withFallback(ConfigFactory.load()).resolve()
-    
-    implicit val system = ActorSystem("Arianna-Cluster-Master", config)
-    
-    println("ActorSystem $system.name is now Active...")
+
+    implicit val system = ActorSystem("Arianna-Cluster", config)
+
+    println("ActorSystem $system.name of master is now Active...")
     
     val subscriber = system.actorOf(Props[Subscriber], "Subscriber")
     

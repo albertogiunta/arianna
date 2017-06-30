@@ -20,10 +20,6 @@ object Init extends MessageType {
     override def typeName: String = "Init"
 }
 
-object Init extends MessageType {
-  override def typeName: String = "Init"
-}
-
 object Alarm extends MessageType {
     override def typeName: String = "Alarm"
 }
@@ -40,7 +36,7 @@ object Handshake extends MessageType {
     override def typeName: String = "Handshake"
 }
 
-object WeightData extends MessageType {
+object Practicability extends MessageType {
     override def typeName: String = "WeightData"
 }
 

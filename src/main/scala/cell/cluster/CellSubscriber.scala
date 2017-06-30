@@ -13,24 +13,24 @@ import ontologies.{AlarmTopic, MyMessage, TopologyTopic}
   */
 class CellSubscriber extends Actor with ActorLogging {
 
-  import DistributedPubSubMediator.{Subscribe, SubscribeAck}
+    import DistributedPubSubMediator.{Subscribe, SubscribeAck}
 
-  val mediator: ActorRef = DistributedPubSub(context.system).mediator
+    val mediator: ActorRef = DistributedPubSub(context.system).mediator
 
-  override def preStart(): Unit = {
-    // subscribe to the topic named "content"
-    mediator ! Subscribe(AlarmTopic.topicName, self)
+    override def preStart(): Unit = {
+        // subscribe to the topic named "content"
+        mediator ! Subscribe(AlarmTopic.topicName, self)
 
-    mediator ! Subscribe(TopologyTopic.topicName, self)
+        mediator ! Subscribe(TopologyTopic.topicName, self)
 
-    mediator ! Put(self)
-  }
+        mediator ! Put(self)
+    }
 
-  def receive: PartialFunction[Any, Unit] = {
-    case msg: MyMessage =>
-      println("[" + self.path.name + "]  I received " + msg)
-    case SubscribeAck(Subscribe(topic, None, `self`)) =>
-      println("[" + self.path.name + "] Subscribing to " + topic + " topic")
-  }
+    def receive: PartialFunction[Any, Unit] = {
+        case msg: MyMessage =>
+            println("[" + self.path.name + "]  I received " + msg)
+        case SubscribeAck(Subscribe(topic, None, `self`)) =>
+            println("[" + self.path.name + "] Subscribing to " + topic + " topic")
+    }
 }
 
