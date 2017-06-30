@@ -3,7 +3,7 @@ package master.cluster
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator._
-import ontologies.MyMessage
+import ontologies.AriadneMessage
 
 /**
   * A Simple Subscriber for a Clustered Publish-Subscribe Model
@@ -32,8 +32,8 @@ class Subscriber extends Actor with ActorLogging {
     
         case SubscribeAck(Subscribe(topic, None, `self`)) =>
             log.info("Successfully Subscribed to " + topic)
-            
-        case MyMessage(ontologies.Init, _) =>
+
+        case AriadneMessage(ontologies.Init, _) =>
             log.info("Hello there from {}!", self.path.name)
     
             this.context.become(receptive)
@@ -43,19 +43,22 @@ class Subscriber extends Actor with ActorLogging {
     }
     
     private val receptive: Actor.Receive = {
-        
-        case MyMessage(ontologies.Alarm, cnt) =>
+    
+        case AriadneMessage(ontologies.Alarm, cnt) =>
             log.info("Got {}", cnt)
-
-        case MyMessage(ontologies.SensorData, cnt) =>
+    
+        case AriadneMessage(ontologies.SensorData, cnt) =>
             log.info("Got {}", cnt)
-
-        case MyMessage(ontologies.Handshake, cnt) =>
+    
+        case AriadneMessage(ontologies.Handshake, cnt) =>
             log.info("Got {}", cnt)
-
-        case MyMessage(ontologies.CellData, cnt) =>
+    
+        case AriadneMessage(ontologies.CellData, cnt) =>
             log.info("Got {}", cnt)
-
+    
+        case AriadneMessage(ontologies.Practicability, cnt) =>
+            log.info("Got {}", cnt)
+    
         case SubscribeAck(Subscribe(topic, None, `self`)) =>
             log.info("Successfully Subscribed to " + topic)
             

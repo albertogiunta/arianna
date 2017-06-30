@@ -5,9 +5,9 @@ import java.nio.file.Paths
 
 import akka.actor.{ActorSystem, Props}
 import akka.cluster.Cluster
-import cell.cluster.{CellSubscriber, TestPublisher}
+import cell.cluster.CellSubscriber
 import com.typesafe.config.ConfigFactory
-import ontologies.MyMessage
+import ontologies.AriadneMessage
 ;
 
 /**
@@ -20,8 +20,8 @@ object TestPubSubCells extends App {
 
   implicit val config = ConfigFactory.parseFile(new File(path2Config))
     .withFallback(ConfigFactory.load()).resolve()
-
-  val system1 = ActorSystem("Arianna-Cluster", config)
+    
+    val system1 = ActorSystem("Arianna-Cluster", config)
 
   println("ActorSystem " + system1.name + " activeted...")
 
@@ -36,6 +36,6 @@ object TestPubSubCells extends App {
   //implicit val system2 = ActorSystem("Arianna-Cluster-Master", config)
   //Cluster(system2).join(joinAddress)
   val publisher = system1.actorOf(Props[TestPublisher], "Publisher")
-  publisher ! MyMessage(ontologies.Init, "Hello baby.")
+    publisher ! AriadneMessage(ontologies.Init, "Hello baby.")
 
 }

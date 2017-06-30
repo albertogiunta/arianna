@@ -1,9 +1,9 @@
-package cell.cluster
+package cell.cluster.test
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator.{Publish, Put, Send}
-import ontologies.{AlarmTopic, MyMessage}
+import ontologies._
 
 /**
   * A generic publisher actor to test the message delivery to CellSubscriber actor in the cluster
@@ -20,21 +20,21 @@ class TestPublisher extends Actor with ActorLogging {
   }
 
   def receive = {
-
-    case MyMessage(ontologies.Init, cnt) =>
+    
+      case AriadneMessage(ontologies.Init, cnt) =>
       println("[" + self.path.name + "] Hello there from {}!", self.path.name)
 
       println("[" + self.path.name + "] I've become receptive!")
 
       val topicName = AlarmTopic.topicName
-      mediator ! Publish(topicName, MyMessage(ontologies.Alarm, cnt))
+          mediator ! Publish(topicName, AriadneMessage(ontologies.Alarm, cnt))
 
       println(s"[" + self.path.name + "] Message published on " + AlarmTopic.topicName)
 
       // The Mediator Hierarchy is always /user/<Username>
       val subName = "Subscriber1"
       mediator ! Send(path = "/user/" + subName,
-        msg = MyMessage(ontologies.Topology, cnt + "2"), localAffinity = true)
+          msg = AriadneMessage(ontologies.Topology, cnt + "2"), localAffinity = true)
 
       println(s"[" + self.path.name + "] Message sent directly to " + subName)
 

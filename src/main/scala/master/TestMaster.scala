@@ -6,7 +6,7 @@ import java.nio.file.Paths
 import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
 import master.cluster.{ClusterEventListener, Subscriber}
-import ontologies.MyMessage
+import ontologies.AriadneMessage
 
 object TestMaster extends App {
     
@@ -26,7 +26,7 @@ object TestMaster extends App {
     
     val subscriber = system.actorOf(Props[Subscriber], "Subscriber-Master")
     
-    subscriber ! MyMessage(ontologies.Init, null)
+    subscriber ! AriadneMessage(ontologies.Init, null)
     
     //    val publisher = system.actorOf(Props[Publisher], "Publisher-Master")
     //

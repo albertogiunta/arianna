@@ -6,7 +6,7 @@ import java.nio.file.Paths
 import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
 import master.cluster.Publisher
-import ontologies.MyMessage
+import ontologies.AriadneMessage
 
 /**
   * Created by Alessandro on 29/06/2017.
@@ -32,7 +32,7 @@ object TestClusterJoin extends App {
     val publisher = system.actorOf(Props[Publisher], "Publisher-Cell")
     
     Thread.sleep(5000)
-    publisher ! MyMessage(ontologies.Init, "Hello baby.")
+    publisher ! AriadneMessage(ontologies.Init, "Hello baby.")
     
     
 }

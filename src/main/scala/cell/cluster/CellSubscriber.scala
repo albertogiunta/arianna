@@ -12,24 +12,24 @@ import ontologies._
   * Created by Matteo Gabellini on 29/06/2017.
   */
 class CellSubscriber extends Actor with ActorLogging {
-
+    
     import DistributedPubSubMediator.{Subscribe, SubscribeAck}
-
+    
     val mediator: ActorRef = DistributedPubSub(context.system).mediator
-
+    
     override def preStart(): Unit = {
         // subscribe to the topic named "content"
         mediator ! Subscribe(AlarmTopic.topicName, self)
-
+        
         mediator ! Subscribe(TopologyTopic.topicName, self)
-
+        
         mediator ! Put(self)
     }
-
+    
     def receive: PartialFunction[Any, Unit] = {
-        case msg@MyMessage(Alarm, _) =>
+        case msg@AriadneMessage(Alarm, _) =>
             println("[" + self.path.name + "]  I received an Alarm signal")
-        case msg@MyMessage(Topology, _) =>
+        case msg@AriadneMessage(Topology, _) =>
             print("[" + self.path.name + "] I received a topology")
         case SubscribeAck(Subscribe(topic, None, `self`)) =>
             println("[" + self.path.name + "] Subscribing to " + topic + " topic")

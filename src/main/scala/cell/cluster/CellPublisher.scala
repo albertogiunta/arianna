@@ -10,21 +10,21 @@ import ontologies._
   * Created by Matteo Gabellini on 29/06/2017.
   */
 class CellPublisher extends Actor with ActorLogging {
-
+    
     private val mediator: ActorRef = DistributedPubSub(context.system).mediator
-
-
+    
+    
     def receive = {
-
-        case msg@MyMessage(Handshake, _) =>
+        
+        case msg@AriadneMessage(Handshake, _) =>
             mediator ! Publish(HandShakeTopic.topicName, msg)
-        case msg@MyMessage(SensorData, _) =>
+        case msg@AriadneMessage(SensorData, _) =>
             mediator ! Publish(SensorUpdateTopic.topicName, msg)
-        case msg@MyMessage(Handshake, _) =>
+        case msg@AriadneMessage(Handshake, _) =>
             mediator ! Publish(HandShakeTopic.topicName, msg)
-        case msg@MyMessage(Practicability, _) =>
+        case msg@AriadneMessage(Practicability, _) =>
             mediator ! Publish(PracticabilityTopic.topicName, msg)
-        case msg@MyMessage(CellData, _) =>
+        case msg@AriadneMessage(CellData, _) =>
             mediator ! Publish(CellDataTopic.topicName, msg)
         case _ => // Ignore
     }
