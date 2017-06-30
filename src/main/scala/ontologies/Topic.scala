@@ -31,5 +31,5 @@ object PracticabilityTopic extends Topic {
 }
 
 object CellDataTopic extends Topic {
-    override def topicName: String = "weight"
+    override def topicName: String = "cellData"
 }

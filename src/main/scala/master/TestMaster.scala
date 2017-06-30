@@ -27,8 +27,8 @@ object TestMaster extends App {
     val subscriber = system.actorOf(Props[Subscriber], "Subscriber-Master")
     
     subscriber ! AriadneMessage(ontologies.Init, null)
-    
-    //    val publisher = system.actorOf(Props[Publisher], "Publisher-Master")
-    //
-    //    publisher ! MyMessage(ontologies.Init, "Hello baby.")
+
+    //subscriber ! AriadneMessage(ontologies.Alarm, "prova")
+    //val publisher = system.actorOf(Props[Publisher], "Publisher-Master")
+    //publisher ! AriadneMessage(ontologies.Init, "Hello baby.")
 }

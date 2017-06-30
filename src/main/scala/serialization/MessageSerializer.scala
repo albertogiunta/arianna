@@ -10,19 +10,21 @@ import ontologies.{AriadneMessage, Message, MessageTypeFactory, VariableType}
 class AriadneMessageSerializer extends SerializerWithStringManifest {
     
     override def identifier = 21040507
-    
+
     override def manifest(obj: AnyRef): String = obj match {
-        case AriadneMessage => AriadneMessage.getClass.getName
+        case _: AriadneMessage => AriadneMessage.getClass.getName
+        case _: Message => "ontologies.Message$"
         case _ => null
     }
-    
+
     override def toBinary(obj: AnyRef): Array[Byte] = obj match {
         case msg: AriadneMessage => MessageSerializer.serialize(msg)
+        case msg: Message => MessageSerializer.serialize(msg)
         case _ => null
     }
-    
+
     override def fromBinary(bytes: Array[Byte], manifest: String): AnyRef = manifest match {
-        case msgClassType if msgClassType.equals(AriadneMessage.getClass.getName) =>
+        case man if man == AriadneMessage.getClass.getName || man == "ontologies.Message$" =>
             MessageSerializer.deserialize(bytes)
         case _ => null
     }

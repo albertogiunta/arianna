@@ -27,7 +27,10 @@ object TestCells extends App {
     //subscriber ! MyMessage(ontologies.Init, null)
     
     val publisher = system1.actorOf(Props[CellPublisher], "Publisher")
-    
+
+    Thread.sleep(5000)
+
     //Simulate a handshake message sending to the server
     publisher ! AriadneMessage(ontologies.Handshake, "Hello baby.")
+    println("[Cell] message sended!")
 }
