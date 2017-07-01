@@ -10,10 +10,13 @@ import ontologies._
 class MasterPublisher extends BasicPublisher {
     
     override protected def init(args: Any): Unit = {
-        log.info("Hello there from {}!", self.path.name)
-        
-        mediator ! Publish(Topic.Alarm, AriadneMessage(MessageType.Alarm, args.toString))
-        log.info(s"Message sent to Mediator for Publishing...")
+        log.info("Hello there from {}!", name)
+    
+        Thread.sleep(500)
+    
+        mediator ! Publish(Topic.HandShake, AriadneMessage(MessageType.Handshake, args.toString))
+    
+        log.info(s"Message {} sent to Mediator for Publishing...", args.toString)
         
         //        // Point 2 Point communication using Akka Remoting service -- Orrible to see but practical
         //        this.context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/Subscriber-Master") ! "Ciao"

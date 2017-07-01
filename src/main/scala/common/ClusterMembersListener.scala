@@ -14,6 +14,8 @@ import ontologies.{AriadneMessage, MessageType}
   */
 class ClusterMembersListener extends CustomActor {
     
+    private val greetings: String = "Hello there, it's time to dress-up"
+    
     implicit val system: ActorSystem = context.system
     
     val cluster = Cluster(system)
@@ -29,8 +31,10 @@ class ClusterMembersListener extends CustomActor {
             if (system.settings.config.getStringList("akka.cluster.seed-nodes")
                 .contains(Cluster(system).selfAddress.toString)) {
                 log.info("Awakening Actors on Master Actor-System")
-                siblings ! AriadneMessage(MessageType.Init, "Hello there, it's time to dress-up")
+                Thread.sleep(300)
+                siblings ! AriadneMessage(MessageType.Init, greetings)
             }
+    
         } catch {
             case ex: Exception => ex.printStackTrace()
             case _: Throwable => // Ignore
@@ -57,7 +61,7 @@ class ClusterMembersListener extends CustomActor {
 
             if (member.address == Cluster(system).selfAddress) {
                 //init actors of current node that must interact in the cluster
-                siblings ! AriadneMessage(MessageType.Init, "")
+                siblings ! AriadneMessage(MessageType.Init, greetings)
             }
 
         case MemberRemoved(member, _) =>

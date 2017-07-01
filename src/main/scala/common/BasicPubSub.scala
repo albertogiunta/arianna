@@ -24,8 +24,8 @@ abstract class BasicSubscriber extends BasicActor {
     override protected def resistive = {
         case SubscribeAck(Subscribe(topic, None, `self`)) =>
             log.info("{} Successfully Subscribed to {}", name, topic)
-        
-        case _ => super.resistive(_)
+
+        case msg => super.resistive(msg)
     }
 }
 

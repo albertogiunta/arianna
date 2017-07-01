@@ -27,15 +27,6 @@ trait CustomActor extends Actor with Stash with ActorLogging {
     
     def children: ActorSelection = context.actorSelection("../" + name + "/*")
     
-    /**
-      * Broadcast the given message to all its children
-      * that satisfies the given filter predicate
-      *
-      * @param msg The message to broadcast
-      * @param to  The ActorSelection to Broadcast To
-      */
-    def broadcast(msg: Message, to: ActorSelection): Unit = to ! msg
-    
 }
 
 /**
@@ -62,7 +53,7 @@ abstract class BasicActor extends CustomActor {
         case _ => desist _
     }
     
-    protected def init(args: Any)
+    protected def init(args: Any): Unit
     
     protected def receptive: Actor.Receive
     

@@ -32,5 +32,5 @@ object TestClusterJoin extends App {
     
     //    Thread.sleep(5000)
     
-    //    publisher ! AriadneMessage(MessageType.Init, "Ciao")
+    //publisher ! AriadneMessage(MessageType.Alarm, "Ciao")
 }

@@ -1,5 +1,6 @@
 package master.cluster
 
+import akka.cluster.pubsub.DistributedPubSubMediator.{Subscribe, SubscribeAck}
 import common.BasicSubscriber
 import ontologies._
 
@@ -18,21 +19,23 @@ class MasterSubscriber extends BasicSubscriber {
         log.info("Hello there from {}!", name)
     
     override protected def receptive = {
+        case SubscribeAck(Subscribe(topic, None, `self`)) =>
+            log.info("{} Successfully Subscribed to {}", name, topic)
         
         case msg@AriadneMessage(MessageType.Alarm, cnt) =>
-            log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.messageType)
+            log.info("Got \"{}\" from {} of Type {}", cnt, sender.path.name, msg.messageType)
         
         case msg@AriadneMessage(MessageType.SensorData, cnt) =>
-            log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.messageType)
+            log.info("Got \"{}\" from {} of Type {}", cnt, sender.path.name, msg.messageType)
         
         case msg@AriadneMessage(MessageType.Handshake, cnt) =>
-            log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.messageType)
+            log.info("Got \"{}\" from {} of Type {}", cnt, sender.path.name, msg.messageType)
         
         case msg@AriadneMessage(MessageType.CellData, cnt) =>
-            log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.messageType)
+            log.info("Got \"{}\" from {} of Type {}", cnt, sender.path.name, msg.messageType)
         
         case msg@AriadneMessage(MessageType.Practicability, cnt) =>
-            log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.messageType)
+            log.info("Got \"{}\" from {} of Type {}", cnt, sender.path.name, msg.messageType)
         
         case _ => desist _
     }
