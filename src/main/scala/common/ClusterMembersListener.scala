@@ -1,6 +1,6 @@
-package cell.cluster
+package common
 
-import akka.actor.{Actor, ActorLogging, ActorRef, Address}
+import akka.actor.{ActorSystem, Address}
 import akka.cluster.ClusterEvent.{CurrentClusterState, MemberEvent, MemberRemoved, MemberUp}
 import akka.cluster.{Cluster, MemberStatus}
 import ontologies.{AriadneMessage, MessageType}
@@ -12,24 +12,43 @@ import ontologies.{AriadneMessage, MessageType}
   * Code based on akka code from official documentation
   * [link: http://doc.akka.io/docs/akka/current/scala/cluster-usage.html]
   */
-class ClusterMembersListener(val actorsToInitialize: List[ActorRef]) extends Actor with ActorLogging {
-
-    implicit val system = context.system
+class ClusterMembersListener extends CustomActor {
+    
+    implicit val system: ActorSystem = context.system
+    
     val cluster = Cluster(system)
-
-    override def preStart(): Unit =
-        cluster.subscribe(self, classOf[MemberUp], classOf[MemberEvent])
-
-    override def postStop(): Unit =
-        cluster unsubscribe self
-
+    
     var nodes = Set.empty[Address]
+    
+    override def preStart: Unit = {
+        
+        cluster.subscribe(self, classOf[MemberUp], classOf[MemberEvent])
+        
+        // If this is the master node, Actors should be already Initialized
+        try {
+            if (system.settings.config.getStringList("akka.cluster.seed-nodes")
+                .contains(Cluster(system).selfAddress.toString)) {
+                log.info("Awakening Actors on Master Actor-System")
+                siblings ! AriadneMessage(MessageType.Init, "Hello there, it's time to dress-up")
+            }
+        } catch {
+            case ex: Exception => ex.printStackTrace()
+            case _: Throwable => // Ignore
+        }
+        
+    }
+    
+    override def postStop: Unit =
+        cluster unsubscribe self
 
     def receive = {
         case state: CurrentClusterState =>
-            nodes = state.members.collect {
-                case m if m.status == MemberStatus.Up => m.address
-            }
+            nodes = state.members.toStream
+                .filter(m => m.status == MemberStatus.Up)
+                .map(m => m.address).toSet
+    
+            log.info(nodes.toString)
+            
         case MemberUp(member) =>
             //Node connected to the cluster
             nodes += member.address
@@ -38,14 +57,13 @@ class ClusterMembersListener(val actorsToInitialize: List[ActorRef]) extends Act
 
             if (member.address == Cluster(system).selfAddress) {
                 //init actors of current node that must interact in the cluster
-                actorsToInitialize.foreach(X => {
-                    X ! AriadneMessage(MessageType.Init, "")
-                })
+                siblings ! AriadneMessage(MessageType.Init, "")
             }
+
         case MemberRemoved(member, _) =>
             nodes -= member.address
             log.info("[ClusterMemebersListener] Member is Removed: {}. {} nodes cluster",
                 member.address, nodes.size)
-        case _: MemberEvent => // ignore
+        case msg => log.info("Unhandled message {} ", msg.toString)
     }
 }

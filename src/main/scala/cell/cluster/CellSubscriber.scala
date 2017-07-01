@@ -1,8 +1,6 @@
 package cell.cluster
 
-import akka.actor.{Actor, ActorLogging, ActorRef}
-import akka.cluster.pubsub.DistributedPubSubMediator.Put
-import akka.cluster.pubsub._
+import common.BasicSubscriber
 import ontologies._
 
 /**
@@ -11,40 +9,21 @@ import ontologies._
   *
   * Created by Matteo Gabellini on 29/06/2017.
   */
-class CellSubscriber extends Actor with ActorLogging {
+class CellSubscriber extends BasicSubscriber {
     
-    import DistributedPubSubMediator.{Subscribe, SubscribeAck}
+    override val topics = Set(Topic.Alarm, Topic.Topology)
     
-    val mediator: ActorRef = DistributedPubSub(context.system).mediator
+    override protected def init(args: Any): Unit = {
+        log.info("Hello there from {}!", name)
+    }
     
-    override def preStart(): Unit = {
-
-        mediator ! Subscribe(Topic.Alarm, self)
-    
-        mediator ! Subscribe(Topic.Topology, self)
+    override protected def receptive = {
         
-        mediator ! Put(self)
-    }
-
-
-    def receive = {
-        case SubscribeAck(Subscribe(topic, None, `self`)) =>
-            log.info("Successfully Subscribed to " + topic)
-        case AriadneMessage(MessageType.Init, _) => {
-            log.info("Hello there from {}!", self.path.name)
-
-            this.context.become(receptive)
-            log.info("[" + self.path.name + "] I've become receptive!")
-        }
-        case msg => log.info("Unhandled message while initializing... {}", msg)
-    }
-
-
-    private val receptive: Actor.Receive = {
-        case msg@AriadneMessage(MessageType.Alarm, _) =>
-            println("[" + self.path.name + "]  I received an Alarm signal")
-        case msg@AriadneMessage(MessageType.Topology, _) =>
-            print("[" + self.path.name + "] I received a topology")
+        case msg@AriadneMessage(MessageType.Alarm, cnt) =>
+            log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.messageType)
+        case msg@AriadneMessage(MessageType.Topology, cnt) =>
+            log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.messageType)
+        case _ => desist _
     }
 }
 

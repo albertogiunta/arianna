@@ -5,8 +5,8 @@ import java.nio.file.Paths
 
 import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
-import master.cluster.Publisher
-import ontologies.{AriadneMessage, MessageType}
+import common.ClusterMembersListener
+import master.cluster.{MasterPublisher, MasterSubscriber}
 
 /**
   * Created by Alessandro on 29/06/2017.
@@ -20,19 +20,17 @@ object TestClusterJoin extends App {
     
     implicit val system = ActorSystem("Arianna-Cluster", config)
     
-    //    Cluster(system).join(Cluster(system).selfAddress)
-    
     println("ActorSystem " + system.name + " is now Active...")
     
-    //    val listener = system.actorOf(Props[ClusterEventListener], "Listener-Cell")
+    val listener = system.actorOf(Props[ClusterMembersListener], "Listener-Cell")
     
-    //    val subscriber = system.actorOf(Props[Subscriber], "Subscriber-Cell")
-    //    subscriber ! MyMessage(ontologies.Init, null)
+    val subscriber = system.actorOf(Props[MasterSubscriber], "Subscriber-Cell")
     
-    val publisher = system.actorOf(Props[Publisher], "Publisher-Cell")
+    //    subscriber ! AriadneMessage(MessageType.Init, "Ciao")
     
-    Thread.sleep(5000)
-    publisher ! AriadneMessage(MessageType.Init, "Hello baby-girl.")
+    val publisher = system.actorOf(Props[MasterPublisher], "Publisher-Cell")
     
+    //    Thread.sleep(5000)
     
+    //    publisher ! AriadneMessage(MessageType.Init, "Ciao")
 }

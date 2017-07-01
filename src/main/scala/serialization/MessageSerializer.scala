@@ -33,7 +33,7 @@ class AriadneMessageSerializer extends SerializerWithStringManifest {
 /**
   * A Custom Serializer that defines methods for an Object to be Serialized.
   *
-  * The actual implementation statically provided by the Object companion MessageSerializer
+  * The actual implementation is statically provided by the Object companion MessageSerializer
   *
   */
 trait MessageSerializer {

@@ -13,7 +13,7 @@ trait MessageType {
     }
 }
 
-case class AriadneMessageType(override val toString: String) extends MessageType
+final case class AriadneMessageType(override val toString: String) extends MessageType
 
 object MessageType {
     
@@ -54,8 +54,7 @@ trait Message {
     def content: String
     
     override def toString =
-        "Message Type is " + messageType.toString + "\n" +
-            "Content is " + content
+        "Message of Type(" + messageType.toString + ") and Content was " + content.toString
     
     override def equals(obj: Any) = obj match {
         case msg: Message =>
@@ -64,7 +63,7 @@ trait Message {
     }
 }
 
-case class AriadneMessage(messageType: MessageType, content: String) extends Message
+final case class AriadneMessage(messageType: MessageType, content: String) extends Message
 
 object TestMessageType extends App {
     val s: String = MessageType.Init

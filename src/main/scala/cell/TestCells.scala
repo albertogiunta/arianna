@@ -4,8 +4,9 @@ import java.io.File
 import java.nio.file.Paths
 
 import akka.actor.{ActorSystem, Props}
-import cell.cluster.{CellPublisher, CellSubscriber, ClusterMembersListener}
+import cell.cluster.{CellPublisher, CellSubscriber}
 import com.typesafe.config.ConfigFactory
+import common.ClusterMembersListener
 import ontologies.{AriadneMessage, MessageType}
 
 /**
@@ -29,7 +30,7 @@ object TestCells extends App {
 
 
     //create and start the listener
-    val clusterListener = system.actorOf(Props(new ClusterMembersListener(List(publisher, subscriber))), "CellClusterListener")
+    val clusterListener = system.actorOf(Props[ClusterMembersListener], "CellClusterListener")
     println("ClusterListener created")
 
     Thread.sleep(5000)
