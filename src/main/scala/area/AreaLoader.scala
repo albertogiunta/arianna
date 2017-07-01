@@ -1,5 +1,12 @@
+package area
+
+class AreaLoader {
+}
+
+import akka.actor.ActorRef
 import spray.json.{DefaultJsonProtocol, _}
 
+import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
 final case class NorthWest(x: Int, y: Int)
@@ -43,7 +50,33 @@ final case class Cell(infoCell: InfoCell,
                       currentPeople: Int,
                       practicabilityLevel: Double)
 
-final case class Area(cells: List[Cell])
+final case class Area(cells: ListBuffer[Cell])
+
+final case class CellForUser(cell: Cell, cellActorRef: ActorRef) {
+
+    val actorRef: ActorRef = cellActorRef
+    val infoCell: InfoCell = cell.infoCell
+    val neighbors: List[InfoNeighbor] = cell.neighbors
+    val passages: List[Passage] = cell.passages
+
+}
+
+final case class CellForCell(cell: Cell) {
+
+    val infoCell: InfoCell = cell.infoCell
+    val neighbors: List[InfoNeighbor] = cell.neighbors
+    val passages: List[Passage] = cell.passages
+    val isEntryPoint: Boolean = cell.isEntryPoint
+    val isExitPoint: Boolean = cell.isExitPoint
+    val practicabilityLevel: Double = cell.practicabilityLevel
+
+}
+
+final case class AreaForCell(area: Area) {
+
+    val cells: ListBuffer[CellForCell] = area.cells.map(c => CellForCell(c))
+
+}
 
 object MyJsonProtocol extends DefaultJsonProtocol {
     implicit val northWestFormat = jsonFormat2(NorthWest)
@@ -58,15 +91,33 @@ object MyJsonProtocol extends DefaultJsonProtocol {
     implicit val passageFormat = jsonFormat3(Passage)
     implicit val sensorFormat = jsonFormat2(Sensor)
     implicit val cellFormat = jsonFormat10(Cell)
-    implicit val areaFormat = jsonFormat1(Area)
+    //    implicit val areaFormat = jsonFormat1(Area)
+    //    implicit val cellForUserFormat = jsonFormat2(CellForUser)
 }
 
-import MyJsonProtocol._
+import area.MyJsonProtocol._
 
-object MainScala extends App {
-    private val filename = "res/map.json"
-    private val source = Source.fromFile(filename).getLines.mkString
-    private val json = source.parseJson
-    val area = json.convertTo[Area]
-    println(area)
+object AreaLoader {
+
+    var area: Area = loadArea
+
+    private def readJson(filename: String): JsValue = {
+        val source = Source.fromFile(filename).getLines.mkString
+        source.parseJson
+    }
+
+    def loadCell(cellName: String): Cell = {
+        val cell = readJson(s"res/json/cell/$cellName.json").convertTo[Cell]
+        cell
+    }
+
+    def loadArea: Area = {
+        //        area = readJson("res/json/map.json").convertTo[Area]
+        area = Area(new ListBuffer[Cell])
+        area
+    }
+
+    def areaForCell: AreaForCell = {
+        AreaForCell(area)
+    }
 }
