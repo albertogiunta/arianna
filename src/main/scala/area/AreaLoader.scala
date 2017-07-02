@@ -9,7 +9,7 @@ import spray.json.{DefaultJsonProtocol, _}
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
-final case class Point(x: Int, y: Int)
+final case class Point(var x: Int, var y: Int)
 
 final case class Coordinates(northWest: Point,
                              northEast: Point,

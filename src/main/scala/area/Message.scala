@@ -18,17 +18,24 @@ object Message {
 
         object ToAdmin {
             val SEND_ALARM_TO_ADMIN = "sendAlarmToAdmin"
+
             final case class STATUS_UPDATE(updateForAdmin: UpdateForAdmin)
+
             final case class SAMPLE_UPDATE(sampleUpdate: SampleUpdate)
+
         }
 
     }
 
     object FromAdmin {
+
         object ToServer {
             val ALARM = "alarm"
-            final case class MAP_CONFIG(area : Area)
+
+            final case class MAP_CONFIG(area: Area)
+
         }
+
     }
 
     object FromCell {
@@ -70,5 +77,51 @@ object Message {
 
         }
 
+        object ToMovement {
+            val START = "start"
+        }
+
+        object ToPowerSupply {
+
+            final case class CURRENT_ROOM_ANTENNA_POSITION(antennaPosition: Point)
+
+        }
+
     }
+
+    object FromMovementGenerator {
+
+        object ToMovement {
+            val UP = "up"
+            val DOWN = "down"
+            val LEFT = "left"
+            val RIGHT = "right"
+        }
+
+    }
+
+    object FromMovement {
+
+        object ToMovementGenerator {
+            val START = "START"
+        }
+
+        object ToPowerSupply {
+
+            final case class NEW_USER_POSITION(userPosition: Point)
+
+        }
+
+    }
+
+    object FromPowerSupply {
+
+        object ToUser {
+            val SIGNAL_STRONG = "strong"
+            val SIGNAL_MEDIUM = "medium"
+            val SIGNAL_LOW = "low"
+        }
+
+    }
+
 }
