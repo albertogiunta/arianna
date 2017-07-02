@@ -13,24 +13,28 @@ class ServerRemote extends Actor with ActorLogging {
 
     def greetingCells: Receive = {
         case msg: Message.FromCell.ToServer.CELL_FOR_SERVER =>
-            AreaLoader.area.cells += msg.cell
-            log.info("Loaded new cell into area. ID: {}", msg.cell.infoCell.id)
-            if (AreaLoader.area.cells.size == nCells) {
-                log.info("Sending area for cell to each cell")
-                AreaLoader.area.cells.foreach(c => actorSelection(c.infoCell.uri) ! AreaLoader.areaForCell)
-                become(operational)
-            }
+        //TODO "handshaking" with all cells and update of URI value in map
+        /*AreaLoader.area.cells += msg.cell
+        log.info("Loaded new cell into area. ID: {}", msg.cell.infoCell.id)
+        if (AreaLoader.area.cells.size == nCells) {
+            log.info("Sending area for cell to each cell")
+            AreaLoader.area.cells.foreach(c => actorSelection(c.infoCell.uri) ! AreaLoader.areaForCell)
+            become(operational)
+        }*/
     }
 
     def operational: Receive = {
         // TODO cases for sensors, people, alarm etc.
+        case Message.FromAdmin.ToServer.ALARM =>
+            //TODO Reaction to alarm
+            println("Alarm from Interface")
         case _ =>
     }
 
     override def receive: Receive = {
         case msg: Message.FromAdmin.ToServer.MAP_CONFIG =>
-            AreaLoader.loadArea(msg.area)
-            log.info("Loaded area")
+            println("Received map")
+            println(msg.area.toString)
             become(greetingCells)
     }
 }
@@ -52,7 +56,7 @@ object ServerRun {
         server ! Message.FromServer.ToSelf.START
 
         while (true) {
-            Thread.sleep(10)
+            Thread.sleep(4000)
             notifier ! Message.FromServer.ToNotifier.START
         }
     }
