@@ -1,14 +1,18 @@
 package common
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSelection, Stash}
+import akka.extension._
 import ontologies._
 
 /**
-  * A CustomActor Rich Interface that ease the use of few overkilled methods
+  * A CustomActor that ease the use of few overkilled methods
   *
   * Created by Alessandro on 01/07/2017.
   */
-trait CustomActor extends Actor with Stash with ActorLogging {
+abstract class CustomActor extends Actor with Stash with ActorLogging {
+    
+    protected val config = ConfigurationManager(context.system)
+    protected val builder = ConfigPathBuilder()
     
     def name: String = self.path.name
     

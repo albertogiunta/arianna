@@ -3,7 +3,6 @@ package common
 import akka.actor.Address
 import akka.cluster.ClusterEvent.{CurrentClusterState, MemberEvent, MemberRemoved, MemberUp}
 import akka.cluster.{Cluster, MemberStatus}
-import akka.extension.ConfigurationManager
 import ontologies.{AriadneMessage, MessageType}
 
 /**
@@ -17,20 +16,19 @@ class ClusterMembersListener extends CustomActor {
     
     private val greetings: String = "Hello there, it's time to dress-up"
     
-    private val config = ConfigurationManager(context.system)
-    
     private val cluster = Cluster(context.system)
     
-    var nodes = Set.empty[Address]
+    private var nodes = Set.empty[Address]
     
-    override def preStart: Unit = {
+    override def preStart = {
         
         cluster.subscribe(self, classOf[MemberUp], classOf[MemberEvent])
         
         // If this is the master node, Actors should be already Initialized
+        
         try {
-            if (config.property("akka.cluster.seed-nodes").stringList
-                .contains(cluster.selfAddress.toString)) {
+            if (config.property(builder.akka.cluster.get("seed-nodes"))
+                .stringList.contains(cluster.selfAddress.toString)) {
                 
                 log.info("Awakening Actors on Master Actor-System")
                 Thread.sleep(300)
