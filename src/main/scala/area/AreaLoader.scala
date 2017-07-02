@@ -9,39 +9,30 @@ import spray.json.{DefaultJsonProtocol, _}
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
-final case class NorthWest(x: Int, y: Int)
+final case class Point(x: Int, y: Int)
 
-final case class NorthEast(x: Int, y: Int)
-
-final case class SouthWest(x: Int, y: Int)
-
-final case class SouthEast(x: Int, y: Int)
-
-final case class Start(x: Int, y: Int)
-
-final case class End(x: Int, y: Int)
-
-final case class Coordinates(northWest: NorthWest,
-                             northEast: NorthEast,
-                             southWest: SouthWest,
-                             southEast: SouthEast)
+final case class Coordinates(northWest: Point,
+                             northEast: Point,
+                             southWest: Point,
+                             southEast: Point)
 
 final case class InfoCell(id: Int,
                           uri: String,
                           name: String,
-                          coordinates: Coordinates)
+                          roomVertices: Coordinates,
+                          antennaPosition: Point)
 
 final case class InfoNeighbor(id: Int, uri: String)
 
 final case class Passage(neighborId: Int,
-                         startCoordinates: Start,
-                         endCoordinates: End)
+                         startCoordinates: Point,
+                         endCoordinates: Point)
 
 final case class Sensor(category: Int, value: Double)
 
 final case class Cell(infoCell: InfoCell,
                       sensors: List[Sensor],
-                      neighbors: List[InfoNeighbor],
+                      neighbors: List[InfoCell],
                       passages: List[Passage],
                       isEntryPoint: Boolean,
                       isExitPoint: Boolean,
@@ -56,7 +47,7 @@ final case class CellForUser(cell: Cell, cellActorRef: ActorRef) {
 
     val actorRef: ActorRef = cellActorRef
     val infoCell: InfoCell = cell.infoCell
-    val neighbors: List[InfoNeighbor] = cell.neighbors
+    val neighbors: List[InfoCell] = cell.neighbors
     val passages: List[Passage] = cell.passages
 
 }
@@ -64,7 +55,7 @@ final case class CellForUser(cell: Cell, cellActorRef: ActorRef) {
 final case class CellForCell(cell: Cell) {
 
     val infoCell: InfoCell = cell.infoCell
-    val neighbors: List[InfoNeighbor] = cell.neighbors
+    val neighbors: List[InfoCell] = cell.neighbors
     val passages: List[Passage] = cell.passages
     val isEntryPoint: Boolean = cell.isEntryPoint
     val isExitPoint: Boolean = cell.isExitPoint
@@ -88,14 +79,14 @@ final case class UpdateForAdmin(list: ListBuffer[CellUpdate])
 final case class SampleUpdate(people : Int, temperature : Double)
 
 object MyJsonProtocol extends DefaultJsonProtocol {
-    implicit val northWestFormat = jsonFormat2(NorthWest)
-    implicit val northEasatFormat = jsonFormat2(NorthEast)
-    implicit val southWestFormat = jsonFormat2(SouthWest)
-    implicit val southEastFormat = jsonFormat2(SouthEast)
-    implicit val startFormat = jsonFormat2(Start)
-    implicit val endFormat = jsonFormat2(End)
+    implicit val northWestFormat = jsonFormat2(Point)
+    implicit val northEasatFormat = jsonFormat2(Point)
+    implicit val southWestFormat = jsonFormat2(Point)
+    implicit val southEastFormat = jsonFormat2(Point)
+    implicit val startFormat = jsonFormat2(Point)
+    implicit val endFormat = jsonFormat2(Point)
     implicit val coordinatesFormat = jsonFormat4(Coordinates)
-    implicit val infoCellFormat = jsonFormat4(InfoCell)
+    implicit val infoCellFormat = jsonFormat5(InfoCell)
     implicit val infoNeighborFormat = jsonFormat2(InfoNeighbor)
     implicit val passageFormat = jsonFormat3(Passage)
     implicit val sensorFormat = jsonFormat2(Sensor)
