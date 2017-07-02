@@ -3,7 +3,6 @@ package area
 import java.io.File
 
 import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
-import area.Message.FromServer
 import com.typesafe.config.ConfigFactory
 
 class ServerRemote extends Actor with ActorLogging {
@@ -29,7 +28,7 @@ class ServerRemote extends Actor with ActorLogging {
     }
 
     override def receive: Receive = {
-        case msg : Message.FromAdmin.ToServer.MAP_CONFIG =>
+        case msg: Message.FromAdmin.ToServer.MAP_CONFIG =>
             AreaLoader.loadArea(msg.area)
             log.info("Loaded area")
             become(greetingCells)
@@ -38,10 +37,9 @@ class ServerRemote extends Actor with ActorLogging {
 
 class ServerNotifier extends Actor {
     override def receive: Receive = {
-        case "Go" =>  {
+        case Message.FromServer.ToNotifier.START =>
             val adminRef = context.actorSelection("akka.tcp://adminSystem@127.0.0.1:4550/user/admin")
-            adminRef ! new FromServer.ToAdmin.SAMPLE_UPDATE(new SampleUpdate((Math.random()*50).toInt, Math.random()*15))
-        }
+            adminRef ! Message.FromServer.ToAdmin.SAMPLE_UPDATE(SampleUpdate((Math.random() * 50).toInt, Math.random() * 15))
     }
 }
 
@@ -53,10 +51,9 @@ object ServerRun {
         val notifier = system.actorOf(Props.create(classOf[ServerNotifier]), "notifier")
         server ! Message.FromServer.ToSelf.START
 
-        while(true){
-            Thread.sleep(1000)
-            notifier ! "Go"
+        while (true) {
+            Thread.sleep(10)
+            notifier ! Message.FromServer.ToNotifier.START
         }
-
     }
 }

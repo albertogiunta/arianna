@@ -8,21 +8,18 @@ import scalafx.scene.Scene
 import scalafx.scene.control.Label
 import scalafx.scene.layout.{GridPane, Priority, VBox}
 
-/**
-  * Created by lisamazzini on 01/07/17.
-  */
 class InterfaceView extends Application {
 
-    var label : Label = new Label("Temperature")
-    var label1 : Label = new Label()
-    var label2 : Label = new Label("People")
-    var label3 : Label = new Label()
+    var label: Label = new Label("Temperature")
+    var label1: Label = new Label()
+    var label2: Label = new Label("People")
+    var label3: Label = new Label()
 
     override def start(primaryStage: Stage): Unit = {
         primaryStage.setTitle("Admin Interface")
         primaryStage.setHeight(150)
         primaryStage.setWidth(250)
-        var scene : Scene = new Scene {
+        val scene: Scene = new Scene {
             root = {
                 label.alignmentInParent = Pos.BaselineRight
 
@@ -64,11 +61,11 @@ class InterfaceView extends Application {
         primaryStage.show()
     }
 
-    def setText1(s: String): Unit ={
+    def setText1(s: String): Unit = {
         label1.setText(s)
     }
 
-    def setText2(s: String): Unit ={
+    def setText2(s: String): Unit = {
         label3.setText(s)
     }
 

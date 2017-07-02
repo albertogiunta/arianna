@@ -29,12 +29,12 @@ class CellRemote extends Actor with ActorLogging {
         case Message.FromUser.ToCell.CONNECT =>
             users += sender()
             log.info("Connected new user")
-            sender() ! Message.ToUser.FromCell.CELL_FOR_USER(CellForUser(cellSelfInfo, self))
+            sender() ! Message.FromCell.ToUser.CELL_FOR_USER(CellForUser(cellSelfInfo, self))
         case Message.FromUser.ToCell.DISCONNECT =>
             users.remove(sender())
             log.info("Removed user")
         case Message.FromUser.ToCell.FIND_ROUTE => // TODO calculate route
-        case Message.FromServer.ToCell.SEND_ALARM_TO_USERS => users.foreach(u => u ! Message.ToUser.FromCell.ALARM)
+        case Message.FromServer.ToCell.SEND_ALARM_TO_USERS => users.foreach(u => u ! Message.FromCell.ToUser.ALARM)
     }
 
     override def receive: Receive = {
