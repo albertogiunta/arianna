@@ -37,10 +37,33 @@
         }
     ],
     "neighbors": [
-        {
-            "id": 1,
-            "uri": "uri/id"
+      {
+        "id": 1,
+        "uri": "uri1",
+        "name": "cell1",
+        "roomVertices": {
+          "northWest": {
+            "x": 0,
+            "y": 10
+          },
+          "northEast": {
+            "x": 10,
+            "y": 10
+          },
+          "southWest": {
+            "x": 0,
+            "y": 0
+          },
+          "southEast": {
+            "x": 10,
+            "y": 0
+          }
+        },
+        "antennaPosition": {
+          "x": 5,
+          "y": 5
         }
+      }
     ],
     "passages": [
         {
