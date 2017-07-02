@@ -78,6 +78,15 @@ final case class AreaForCell(area: Area) {
 
 }
 
+final case class CellUpdate(cell: Cell){
+    val infoCell = cell.infoCell
+    val currentPeople = cell.currentPeople
+    val sensors = cell.sensors
+}
+final case class UpdateForAdmin(list: ListBuffer[CellUpdate])
+
+final case class SampleUpdate(people : Int, temperature : Double)
+
 object MyJsonProtocol extends DefaultJsonProtocol {
     implicit val northWestFormat = jsonFormat2(NorthWest)
     implicit val northEasatFormat = jsonFormat2(NorthEast)
@@ -99,7 +108,7 @@ import area.MyJsonProtocol._
 
 object AreaLoader {
 
-    var area: Area = loadArea
+    var area: Area = null
 
     private def readJson(filename: String): JsValue = {
         val source = Source.fromFile(filename).getLines.mkString
@@ -111,13 +120,14 @@ object AreaLoader {
         cell
     }
 
-    def loadArea: Area = {
+    def loadArea(a : Area): Unit = {
         //        area = readJson("res/json/map.json").convertTo[Area]
-        area = Area(new ListBuffer[Cell])
-        area
+        //area = Area(new ListBuffer[Cell])
+        area = a
     }
 
     def areaForCell: AreaForCell = {
         AreaForCell(area)
     }
+
 }

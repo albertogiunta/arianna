@@ -12,6 +12,19 @@ object Message {
             val SEND_ALARM_TO_USERS = "sendAlarmToUsers"
         }
 
+        object ToAdmin {
+            val SEND_ALARM_TO_ADMIN = "sendAlarmToAdmin"
+            final case class STATUS_UPDATE(updateForAdmin: UpdateForAdmin)
+            final case class SAMPLE_UPDATE(sampleUpdate: SampleUpdate)
+        }
+
+    }
+
+    object FromAdmin {
+        object ToServer {
+            val ALARM = "alarm"
+            final case class MAP_CONFIG(area : Area)
+        }
     }
 
     object FromCell {
