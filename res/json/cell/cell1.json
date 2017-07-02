@@ -3,7 +3,7 @@
         "id": 1,
         "uri": "akka.tcp://cellSystem@127.0.0.1:4552/user/cell1",
         "name": "name",
-        "coordinates": {
+      "roomVertices": {
             "northWest": {
                 "x": 0,
                 "y": 5
@@ -20,6 +20,10 @@
                 "x": 2,
                 "y": 3
             }
+      },
+      "antennaPosition": {
+        "x": 0,
+        "y": 1
         }
     },
     "sensors": [

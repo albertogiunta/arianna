@@ -22,8 +22,6 @@ final case class InfoCell(id: Int,
                           roomVertices: Coordinates,
                           antennaPosition: Point)
 
-final case class InfoNeighbor(id: Int, uri: String)
-
 final case class Passage(neighborId: Int,
                          startCoordinates: Point,
                          endCoordinates: Point)
@@ -79,15 +77,9 @@ final case class UpdateForAdmin(list: ListBuffer[CellUpdate])
 final case class SampleUpdate(people : Int, temperature : Double)
 
 object MyJsonProtocol extends DefaultJsonProtocol {
-    implicit val northWestFormat = jsonFormat2(Point)
-    implicit val northEasatFormat = jsonFormat2(Point)
-    implicit val southWestFormat = jsonFormat2(Point)
-    implicit val southEastFormat = jsonFormat2(Point)
-    implicit val startFormat = jsonFormat2(Point)
-    implicit val endFormat = jsonFormat2(Point)
+    implicit val pointFormat = jsonFormat2(Point)
     implicit val coordinatesFormat = jsonFormat4(Coordinates)
     implicit val infoCellFormat = jsonFormat5(InfoCell)
-    implicit val infoNeighborFormat = jsonFormat2(InfoNeighbor)
     implicit val passageFormat = jsonFormat3(Passage)
     implicit val sensorFormat = jsonFormat2(Sensor)
     implicit val cellFormat = jsonFormat10(Cell)
