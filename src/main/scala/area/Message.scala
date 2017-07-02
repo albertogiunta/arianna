@@ -76,16 +76,6 @@ object Message {
             final case class FIND_ROUTE(startingRoomId: Int, endingRoomId: Int)
 
         }
-    }
-
-    object FromInterface {
-
-        object ToAdmin {
-
-            final case class MAP_CONFIG(area: Area)
-
-            val ALARM = "alarm"
-        }
 
         object ToMovement {
             val START = "start"
@@ -95,6 +85,17 @@ object Message {
 
             final case class CURRENT_ROOM_ANTENNA_POSITION(antennaPosition: Point)
 
+        }
+
+    }
+
+    object FromInterface {
+
+        object ToAdmin {
+
+            final case class MAP_CONFIG(area: Area)
+
+            val ALARM = "alarm"
         }
 
     }

@@ -1,5 +1,7 @@
 package area
 
+import akka.actor.ActorRef
+
 import scala.collection.mutable.ListBuffer
 
 final case class Point(var x: Int, var y: Int)
