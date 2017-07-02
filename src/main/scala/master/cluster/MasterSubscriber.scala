@@ -10,6 +10,9 @@ import ontologies._
   * Created by Alessandro on 28/06/2017.
   */
 class MasterSubscriber extends BasicSubscriber {
+    type Cell = Any
+    
+    private var topology: Map[String, Cell] = Map.empty
     
     override val topics: Set[Topic] =
         Set(Topic.Alarm, Topic.SensorUpdate, Topic.HandShake,
@@ -24,19 +27,39 @@ class MasterSubscriber extends BasicSubscriber {
         
         case msg@AriadneMessage(MessageType.Alarm, cnt) =>
             log.info("Got \"{}\" from {} of Type {}", cnt, sender.path.name, msg.messageType)
+    
+            if (sibling("Publisher-Master").nonEmpty) {
+                sibling("Publisher-Master").get ! msg
+            }
         
         case msg@AriadneMessage(MessageType.SensorData, cnt) =>
             log.info("Got \"{}\" from {} of Type {}", cnt, sender.path.name, msg.messageType)
-        
+    
+            if (sibling("Publisher-Master").nonEmpty) {
+                sibling("Publisher-Master").get ! msg
+            }
+            
         case msg@AriadneMessage(MessageType.Handshake, cnt) =>
             log.info("Got \"{}\" from {} of Type {}", cnt, sender.path.name, msg.messageType)
-        
+    
+            if (sibling("Publisher-Master").nonEmpty) {
+                sibling("Publisher-Master").get ! msg
+            }
+            
         case msg@AriadneMessage(MessageType.CellData, cnt) =>
             log.info("Got \"{}\" from {} of Type {}", cnt, sender.path.name, msg.messageType)
-        
+    
+            if (sibling("Publisher-Master").nonEmpty) {
+                sibling("Publisher-Master").get ! msg
+            }
+            
         case msg@AriadneMessage(MessageType.Practicability, cnt) =>
             log.info("Got \"{}\" from {} of Type {}", cnt, sender.path.name, msg.messageType)
-        
+    
+            if (sibling("Publisher-Master").nonEmpty) {
+                sibling("Publisher-Master").get ! msg
+            }
+            
         case _ => desist _
     }
 }

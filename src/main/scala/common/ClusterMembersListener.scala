@@ -36,8 +36,7 @@ class ClusterMembersListener extends CustomActor {
             }
     
         } catch {
-            case ex: Exception => ex.printStackTrace()
-            case _: Throwable => // Ignore
+            case ex: Throwable => ex.printStackTrace()
         }
         
     }
