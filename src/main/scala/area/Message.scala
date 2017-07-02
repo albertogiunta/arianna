@@ -81,9 +81,13 @@ object Message {
             val START = "start"
         }
 
-        object ToPowerSupply {
+        object ToSwitcher {
 
-            final case class CURRENT_ROOM_ANTENNA_POSITION(antennaPosition: Point)
+            final case class SETUP_FIRST_ANTENNA_POSITION(antennaPosition: Point)
+
+            final case class GET_BEST_NEW_CANDIDATE(bestCandidate: InfoCell)
+
+            case class ASK_BEST_NEW_CANDIDATE(neighbors: List[InfoCell])
 
         }
 
@@ -100,6 +104,20 @@ object Message {
 
     }
 
+    object FromMovement {
+
+        object ToMovementGenerator {
+            val START = "START"
+        }
+
+        object ToSwitcher {
+
+            final case class NEW_USER_POSITION(userPosition: Point)
+
+        }
+
+    }
+
     object FromMovementGenerator {
 
         object ToMovement {
@@ -111,26 +129,28 @@ object Message {
 
     }
 
-    object FromMovement {
+    object FromSwitcher {
 
-        object ToMovementGenerator {
-            val START = "START"
+        object ToUser {
+
+            final case class SWITCH_CELL(newCellInfo: InfoCell)
         }
 
         object ToPowerSupply {
 
-            final case class NEW_USER_POSITION(userPosition: Point)
+            final case class CALCULATE_STRENGTH_AFTER_POSITION_CHANGED(userPosition: Point, antennaPosition: Point)
 
+            final case class CONNECT_TO_CLOSEST_SOURCE(userPosition: Point, antennaPositions: List[InfoCell])
         }
-
     }
 
     object FromPowerSupply {
 
-        object ToUser {
+        object ToSwitcher {
             val SIGNAL_STRONG = "strong"
             val SIGNAL_MEDIUM = "medium"
             val SIGNAL_LOW = "low"
+            val SIGNAL_ABSENT = "absent"
         }
 
     }

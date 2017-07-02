@@ -9,37 +9,36 @@ class UserRemote extends Actor with ActorLogging {
 
     // local actors
     val movementActor: ActorRef = context.actorOf(Props.create(classOf[MovementActor]), "movement")
-    val powerSupplyActor: ActorRef = context.actorOf(Props.create(classOf[PowerSupplyActor]), "power")
+    val switcherActor: ActorRef = context.actorOf(Props.create(classOf[MovementActor]), "switcher")
 
     // remote actors
-    val cellAddress: String = "akka.tcp://cellSystem@127.0.0.1:4552/user/cell1"
+    var cellAddress: String = "akka.tcp://cellSystem@127.0.0.1:4552/user/cell1"
     val cell: ActorSelection = context.actorSelection(cellAddress)
 
     var currentCell: CellForUser = _
 
     def operational: Receive = {
+        case msg: Message.FromCell.ToUser.CELL_FOR_USER =>
+            currentCell = msg.cell
+            log.info("Received info from my new cell")
         case Message.FromUser.ToSelf.STOP =>
             cell ! Message.FromUser.ToCell.DISCONNECT
         case Message.FromCell.ToUser.ALARM =>
             log.info("received alarm")
-        // TODO make object for alarm with route to exit
         case msg: Message.FromUser.ToSelf.ASK_ROUTE =>
             cell ! Message.FromUser.ToCell.FIND_ROUTE(0, msg.toRoomId)
             log.info("asked cell for route to ID: {}", msg.toRoomId)
-        case Message.FromPowerSupply.ToUser.SIGNAL_STRONG => log.info("Signal: STRONG")
-        case Message.FromPowerSupply.ToUser.SIGNAL_MEDIUM => log.info("Signal: MEDIUM")
-        case Message.FromPowerSupply.ToUser.SIGNAL_LOW => log.info("Signal: LOW")
+        case msg: Message.FromSwitcher.ToUser.SWITCH_CELL =>
+            cellAddress = "akka.tcp://cellSystem@127.0.0.1:4552/user/" + msg.newCellInfo.uri
+            cell ! Message.FromUser.ToCell.CONNECT
     }
 
     override def receive: Receive = {
         case Message.FromUser.ToSelf.START =>
             cell ! Message.FromUser.ToCell.CONNECT
-            powerSupplyActor ! Message.FromUser.ToPowerSupply.CURRENT_ROOM_ANTENNA_POSITION(Point(0, 0))
+            switcherActor ! Message.FromUser.ToSwitcher.SETUP_FIRST_ANTENNA_POSITION(Point(0, 0))
             movementActor ! Message.FromUser.ToMovement.START
             log.info("Asked cell for connection")
-        case msg: Message.FromCell.ToUser.CELL_FOR_USER =>
-            currentCell = msg.cell
-            log.info("Received info from my cell")
             context.become(operational)
     }
 }
@@ -59,19 +58,19 @@ class MovementActor extends Actor with ActorLogging {
         case Message.FromMovementGenerator.ToMovement.UP =>
             log.info("Moved: UP")
             currentUserPosition.y += 1
-            powerSupplyActor ! Message.FromMovement.ToPowerSupply.NEW_USER_POSITION(currentUserPosition)
+            powerSupplyActor ! Message.FromMovement.ToSwitcher.NEW_USER_POSITION(currentUserPosition)
         case Message.FromMovementGenerator.ToMovement.DOWN =>
             log.info("Moved: DOWN")
             currentUserPosition.y -= 1
-            powerSupplyActor ! Message.FromMovement.ToPowerSupply.NEW_USER_POSITION(currentUserPosition)
+            powerSupplyActor ! Message.FromMovement.ToSwitcher.NEW_USER_POSITION(currentUserPosition)
         case Message.FromMovementGenerator.ToMovement.LEFT =>
             log.info("Moved: LEFT")
             currentUserPosition.x += 1
-            powerSupplyActor ! Message.FromMovement.ToPowerSupply.NEW_USER_POSITION(currentUserPosition)
+            powerSupplyActor ! Message.FromMovement.ToSwitcher.NEW_USER_POSITION(currentUserPosition)
         case Message.FromMovementGenerator.ToMovement.RIGHT =>
             log.info("Moved: RIGHT")
             currentUserPosition.x -= 1
-            powerSupplyActor ! Message.FromMovement.ToPowerSupply.NEW_USER_POSITION(currentUserPosition)
+            powerSupplyActor ! Message.FromMovement.ToSwitcher.NEW_USER_POSITION(currentUserPosition)
     }
 }
 
@@ -86,26 +85,52 @@ class MovementGeneratorActor extends Actor with ActorLogging {
     }
 }
 
-class PowerSupplyActor extends Actor with ActorLogging {
+class SwitcherActor extends Actor with ActorLogging {
+
+    val powerSupplyActor: ActorRef = context.actorOf(Props.create(classOf[PowerSupplyActor]), "power")
 
     var currentAntennaPosition: Point = _
 
     override def receive: Receive = {
-        case msg: Message.FromUser.ToPowerSupply.CURRENT_ROOM_ANTENNA_POSITION => currentAntennaPosition = msg.antennaPosition // TODO make different behaviour?
-        case msg: Message.FromMovement.ToPowerSupply.NEW_USER_POSITION =>
-            context.parent ! getStrength(getDistanceFromSource(msg.userPosition))
+        case msg: Message.FromUser.ToSwitcher.SETUP_FIRST_ANTENNA_POSITION =>
+            currentAntennaPosition = msg.antennaPosition
+        case msg: Message.FromUser.ToSwitcher.GET_BEST_NEW_CANDIDATE =>
+            currentAntennaPosition = msg.bestCandidate.antennaPosition
+            context.parent ! Message.FromSwitcher.ToUser.SWITCH_CELL(msg.bestCandidate)
+        // TODO tell main user that will have to ask for all info about this new cell
+        case msg: Message.FromMovement.ToSwitcher.NEW_USER_POSITION =>
+            powerSupplyActor ! Message.FromSwitcher.ToPowerSupply.CALCULATE_STRENGTH_AFTER_POSITION_CHANGED(msg.userPosition, currentAntennaPosition)
+        case Message.FromPowerSupply.ToSwitcher.SIGNAL_STRONG => log.info("Signal: STRONG")
+        case Message.FromPowerSupply.ToSwitcher.SIGNAL_MEDIUM => log.info("Signal: MEDIUM")
+        case Message.FromPowerSupply.ToSwitcher.SIGNAL_LOW => log.info("Signal: LOW")
+            powerSupplyActor ! Message.FromSwitcher.ToPowerSupply.CONNECT_TO_CLOSEST_SOURCE
+        case Message.FromPowerSupply.ToSwitcher.SIGNAL_ABSENT => log.info("Signal: ABSENT")
     }
 
-    def getDistanceFromSource(userPosition: Point): Double = Math.sqrt((userPosition.x - currentAntennaPosition.x) + (userPosition.y - currentAntennaPosition.y))
+}
+
+class PowerSupplyActor extends Actor with ActorLogging {
+
+
+    override def receive: Receive = {
+        case msg: Message.FromSwitcher.ToPowerSupply.CALCULATE_STRENGTH_AFTER_POSITION_CHANGED =>
+            context.parent ! getStrength(getDistanceFromSource(msg.userPosition, msg.antennaPosition))
+        case msg: Message.FromSwitcher.ToPowerSupply.CONNECT_TO_CLOSEST_SOURCE =>
+            context.parent ! Message.FromUser.ToSwitcher.GET_BEST_NEW_CANDIDATE(msg.antennaPositions.map(p => (p, getDistanceFromSource(msg.userPosition, p.antennaPosition))).minBy(_._2)._1)
+    }
+
+    def getDistanceFromSource(userPosition: Point, antennaPosition: Point): Double = Math.sqrt((userPosition.x - antennaPosition.x) + (userPosition.y - antennaPosition.y))
 
     def getStrength(distance: Double): String = {
         distance match {
             case _ if distance <= 3 =>
-                Message.FromPowerSupply.ToUser.SIGNAL_STRONG
+                Message.FromPowerSupply.ToSwitcher.SIGNAL_STRONG
             case _ if distance <= 6 =>
-                Message.FromPowerSupply.ToUser.SIGNAL_MEDIUM
+                Message.FromPowerSupply.ToSwitcher.SIGNAL_MEDIUM
+            case _ if distance <= 9 =>
+                Message.FromPowerSupply.ToSwitcher.SIGNAL_LOW
             case _ =>
-                Message.FromPowerSupply.ToUser.SIGNAL_LOW
+                Message.FromPowerSupply.ToSwitcher.SIGNAL_ABSENT
         }
     }
 }
