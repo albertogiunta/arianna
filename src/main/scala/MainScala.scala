@@ -2,12 +2,13 @@ import spray.json.{DefaultJsonProtocol, _}
 
 import scala.io.Source
 
-final case class InfoCell(id: Int, name: String, uri: String)
+final case class InfoArea(id: Int, name: String, uri: String)
+
 final case class Sensor(id: Int, name: String, value: Double)
 
-final case class Cell(infoCell: InfoCell,
+final case class Area(infoArea: InfoArea,
                       sensors: List[Sensor],
-                      neighbors: List[InfoCell],
+                      neighbors: List[InfoArea],
                       isEntryPoint: Boolean,
                       isExitPoint: Boolean,
                       capacity: Int,
@@ -15,12 +16,12 @@ final case class Cell(infoCell: InfoCell,
                       currentPeople: Int,
                       practicabilityLevel: Double)
 
-final case class Maps(id: Int, areas: List[Cell])
+final case class Maps(id: Int, areas: List[Area])
 
 object MyJsonProtocol extends DefaultJsonProtocol {
-     implicit val infoCellFormat = jsonFormat3(InfoCell)
+     implicit val infoAreaFormat = jsonFormat3(InfoArea)
      implicit val sensorFormat = jsonFormat3(Sensor)
-     implicit val cellFormat = jsonFormat9(Cell)
+     implicit val areaFormat = jsonFormat9(Area)
      implicit val mapsFormat = jsonFormat2(Maps)
 }
 
