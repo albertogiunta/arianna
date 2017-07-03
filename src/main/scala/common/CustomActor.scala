@@ -44,9 +44,9 @@ abstract class BasicActor extends CustomActor {
     override def receive = resistive
 
     protected def resistive: Actor.Receive = {
-        case AriadneMessage(MessageType.Init, content) =>
+        case AriadneRemoteMessage(MessageType.Init, _, content) =>
             try {
-                this.init(content)
+                this.init(content :: Nil)
             } catch {
                 case ex: Throwable => ex.printStackTrace()
             } finally {
@@ -56,9 +56,9 @@ abstract class BasicActor extends CustomActor {
 
         case _ => desist _
     }
-
-    protected def init(args: Any): Unit
-
+    
+    protected def init(args: List[Any])
+    
     protected def receptive: Actor.Receive
 
     protected def desist(msg: Any): Unit =

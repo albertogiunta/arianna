@@ -15,50 +15,24 @@ class MasterSubscriber extends BasicSubscriber {
     private var topology: Map[String, Cell] = Map.empty
 
     override val topics: Set[Topic] =
-        Set(Topic.Alarm, Topic.SensorUpdate, Topic.HandShake,
-            Topic.CellData, Topic.Practicability)
-
-    override protected def init(args: Any): Unit =
+        Set(Topic.Alarm, Topic.Update, Topic.HandShake,
+            Topic.Update, Topic.Practicability)
+    
+    override protected def init(args: List[Any]) =
         log.info("Hello there from {}!", name)
 
     override protected def receptive = {
-        case SubscribeAck(Subscribe(topic, None, `self`)) =>
+        case SubscribeAck(Subscribe(topic, None, this.self)) =>
             log.info("{} Successfully Subscribed to {}", name, topic)
-
-        case msg@AriadneMessage(MessageType.Alarm, cnt) =>
-            log.info("Got \"{}\" from {} of Type {}", cnt, sender.path.name, msg.messageType)
-
-            if (sibling("Publisher-Master").nonEmpty) {
-                sibling("Publisher-Master").get ! msg
-            }
-
-        case msg@AriadneMessage(MessageType.SensorData, cnt) =>
-            log.info("Got \"{}\" from {} of Type {}", cnt, sender.path.name, msg.messageType)
-
-            if (sibling("Publisher-Master").nonEmpty) {
-                sibling("Publisher-Master").get ! msg
-            }
-
-        case msg@AriadneMessage(MessageType.Handshake, cnt) =>
-            log.info("Got \"{}\" from {} of Type {}", cnt, sender.path.name, msg.messageType)
-
-            if (sibling("Publisher-Master").nonEmpty) {
-                sibling("Publisher-Master").get ! msg
-            }
-
-        case msg@AriadneMessage(MessageType.CellData, cnt) =>
-            log.info("Got \"{}\" from {} of Type {}", cnt, sender.path.name, msg.messageType)
-
-            if (sibling("Publisher-Master").nonEmpty) {
-                sibling("Publisher-Master").get ! msg
-            }
-
-        case msg@AriadneMessage(MessageType.Practicability, cnt) =>
-            log.info("Got \"{}\" from {} of Type {}", cnt, sender.path.name, msg.messageType)
-
-            if (sibling("Publisher-Master").nonEmpty) {
-                sibling("Publisher-Master").get ! msg
-            }
+    
+        case msg@AriadneRemoteMessage(MessageType.Alarm, _, cnt: String) =>
+            log.info("Got \"{}\" from {} of Type {}", cnt, sender.path.name, msg.supertype)
+    
+        case msg@AriadneRemoteMessage(MessageType.Update, _, cnt) =>
+            log.info("Got \"{}\" from {} of Type {}", cnt, sender.path.name, msg.supertype)
+    
+        case msg@AriadneRemoteMessage(MessageType.Handshake, _, cnt) =>
+            log.info("Got \"{}\" from {} of Type {}", cnt, sender.path.name, msg.supertype)
 
         case _ => desist _
     }

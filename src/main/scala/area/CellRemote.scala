@@ -1,6 +1,7 @@
 package area
 
 import java.io.File
+import java.nio.file.Paths
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSelection, ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
@@ -79,7 +80,9 @@ object CellLoader {
 }
 object CellRun {
     def main(args: Array[String]): Unit = {
-        val config = ConfigFactory.parseFile(new File("src/main/scala/application.conf"))
+        val path2Project = Paths.get("").toFile.getAbsolutePath
+        val path2Config = path2Project + "/conf/application.conf"
+        val config = ConfigFactory.parseFile(new File(path2Config))
         val system = ActorSystem.create("cellSystem", config.getConfig("cell"))
         val cell = system.actorOf(Props.create(classOf[CellRemote]), "cell1")
         cell ! Message.FromCell.ToSelf.START

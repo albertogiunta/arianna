@@ -1,6 +1,7 @@
 package area
 
 import java.io.File
+import java.nio.file.Paths
 
 import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
@@ -49,7 +50,9 @@ class ServerNotifier extends Actor {
 
 object ServerRun {
     def main(args: Array[String]): Unit = {
-        val config = ConfigFactory.parseFile(new File("src/main/scala/application.conf"))
+        val path2Project = Paths.get("").toFile.getAbsolutePath
+        val path2Config = path2Project + "/conf/application.conf"
+        val config = ConfigFactory.parseFile(new File(path2Config))
         val system = ActorSystem.create("serverSystem", config.getConfig("server"))
         val server = system.actorOf(Props.create(classOf[ServerRemote]), "server")
         val notifier = system.actorOf(Props.create(classOf[ServerNotifier]), "notifier")

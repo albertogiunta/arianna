@@ -7,7 +7,8 @@ import akka.actor.{ActorSystem, Props}
 import cell.cluster.{CellPublisher, CellSubscriber}
 import com.typesafe.config.ConfigFactory
 import common.ClusterMembersListener
-import ontologies.{AriadneMessage, MessageType}
+import ontologies.AriadneRemoteMessage
+import ontologies.MessageType._
 
 /**
   * Created by Alessandro on 28/06/2017.
@@ -36,6 +37,6 @@ object TestCells extends App {
     Thread.sleep(5000)
     //subscriber ! MyMessage(ontologies.Init, null)
     //Simulate a handshake message sending to the server
-    publisher ! AriadneMessage(MessageType.Handshake, "Hello baby.")
+    publisher ! AriadneRemoteMessage(Handshake, Handshake.Subtype.Basic, "Hello baby.")
     println("[Cell] message sended!")
 }

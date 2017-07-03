@@ -8,13 +8,14 @@ import ontologies._
   * Created by Alessandro on 28/06/2017.
   */
 class MasterPublisher extends BasicPublisher {
-
-    override protected def init(args: Any): Unit = {
+    
+    override protected def init(args: List[Any]) = {
         log.info("Hello there from {}!", name)
 
         Thread.sleep(500)
-
-        mediator ! Publish(Topic.HandShake, AriadneMessage(MessageType.Handshake, args.toString))
+        
+        mediator ! Publish(Topic.HandShake,
+            AriadneRemoteMessage(MessageType.Handshake, MessageType.Handshake.Subtype.Basic, args.toString))
 
         log.info(s"Message {} sent to Mediator for Publishing...", args.toString)
 
@@ -29,11 +30,11 @@ class MasterPublisher extends BasicPublisher {
     }
 
     override protected val receptive = {
-
-        case msg@AriadneMessage(MessageType.Alarm, _) =>
+    
+        case msg@AriadneRemoteMessage(MessageType.Alarm, _, _) =>
             mediator ! Publish(Topic.Alarm, msg)
-
-        case msg@AriadneMessage(MessageType.Topology, _) =>
+    
+        case msg@AriadneRemoteMessage(MessageType.Topology, _, _) =>
             mediator ! Publish(Topic.Topology, msg)
         case _ => desist _
     }

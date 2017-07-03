@@ -2,6 +2,7 @@ package cell.cluster
 
 import akka.cluster.pubsub.DistributedPubSubMediator.Publish
 import common.BasicPublisher
+import ontologies.MessageType._
 import ontologies._
 
 /**
@@ -9,23 +10,23 @@ import ontologies._
   * Created by Matteo Gabellini on 29/06/2017.
   */
 class CellPublisher extends BasicPublisher {
-
-    override protected def init(args: Any): Unit = {
+    
+    override protected def init(args: List[Any]) = {
         log.info("Hello there from {}!", name)
     }
 
     override protected def receptive = {
-        case msg@AriadneMessage(MessageType.Handshake, _) =>
+        case msg@AriadneRemoteMessage(Handshake, Handshake.Subtype.Basic, _) =>
             mediator ! Publish(Topic.HandShake, msg)
-
-        case msg@AriadneMessage(MessageType.SensorData, _) =>
-            mediator ! Publish(Topic.SensorUpdate, msg)
-
-        case msg@AriadneMessage(MessageType.Practicability, _) =>
-            mediator ! Publish(Topic.Practicability, msg)
-
-        case msg@AriadneMessage(MessageType.CellData, _) =>
-            mediator ! Publish(Topic.CellData, msg)
+    
+        case msg@AriadneRemoteMessage(Update, Update.Subtype.Sensors, _) =>
+            mediator ! Publish(Topic.Update, msg)
+    
+        case msg@AriadneRemoteMessage(Update, Update.Subtype.Practicability, _) =>
+            mediator ! Publish(Topic.Update, msg)
+    
+        case msg@AriadneRemoteMessage(MessageType.Update, Update.Subtype.CellOccupation, _) =>
+            mediator ! Publish(Topic.Update, msg)
         case _ => // Ignore
     }
 }

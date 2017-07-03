@@ -1,6 +1,7 @@
 package admin
 
 import java.io.File
+import java.nio.file.Paths
 import javafx.embed.swing.JFXPanel
 import javafx.stage.Stage
 
@@ -34,8 +35,10 @@ class AdminActor(interfaceView: InterfaceView) extends Actor {
 object App {
     def main(args: Array[String]): Unit = {
         new JFXPanel
+        val path2Project = Paths.get("").toFile.getAbsolutePath
+        val path2Config = path2Project + "/conf/application.conf"
         var interfaceView: InterfaceView = new InterfaceView
-        val config = ConfigFactory.parseFile(new File("src/main/scala/application.conf"))
+        val config = ConfigFactory.parseFile(new File(path2Config))
         val system = ActorSystem.create("adminSystem", config.getConfig("admin"))
         var admin = system.actorOf(Props(new AdminActor(interfaceView)), "admin")
 

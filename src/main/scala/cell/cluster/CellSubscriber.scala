@@ -2,6 +2,7 @@ package cell.cluster
 
 import akka.cluster.pubsub.DistributedPubSubMediator.{Subscribe, SubscribeAck}
 import common.BasicSubscriber
+import ontologies.MessageType._
 import ontologies._
 
 /**
@@ -13,18 +14,18 @@ import ontologies._
 class CellSubscriber extends BasicSubscriber {
 
     override val topics = Set(Topic.Alarm, Topic.Topology)
-
-    override protected def init(args: Any): Unit = {
+    
+    override protected def init(args: List[Any]) = {
         log.info("Hello there from {}!", name)
     }
 
     override protected def receptive = {
         case SubscribeAck(Subscribe(topic, None, `self`)) =>
             log.info("{} Successfully Subscribed to {}", name, topic)
-        case msg@AriadneMessage(MessageType.Alarm, cnt) =>
-            log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.messageType)
-        case msg@AriadneMessage(MessageType.Topology, cnt) =>
-            log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.messageType)
+        case msg@AriadneRemoteMessage(Alarm, Alarm.Subtype.Basic, cnt) =>
+            log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
+        case msg@AriadneRemoteMessage(Topology, Topology.Subtype.RealTopology, cnt) =>
+            log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
         case _ => desist _
     }
 }

@@ -1,6 +1,7 @@
 package area
 
 import java.io.File
+import java.nio.file.Paths
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSelection, ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
@@ -138,7 +139,9 @@ class PowerSupplyActor extends Actor with ActorLogging {
 
 object UserRun {
     def main(args: Array[String]): Unit = {
-        val config = ConfigFactory.parseFile(new File("src/main/scala/application.conf"))
+        val path2Project = Paths.get("").toFile.getAbsolutePath
+        val path2Config = path2Project + "/conf/application.conf"
+        val config = ConfigFactory.parseFile(new File(path2Config))
         val system = ActorSystem.create("userSystem", config.getConfig("user"))
         val userActor = system.actorOf(Props.create(classOf[UserRemote]), "user")
         userActor ! Message.FromUser.ToSelf.START

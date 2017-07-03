@@ -7,24 +7,24 @@ import ontologies._
   * A Custom Serializer for Message(s) to be handled by the ActorSystem itself
   *
   */
-class AriadneMessageSerializer extends SerializerWithStringManifest {
-
+class AriadneRemoteMessageSerializer extends SerializerWithStringManifest {
+    
     override def identifier = 21040507
-
+    
     override def manifest(obj: AnyRef): String = obj match {
-        case _: AriadneMessage => AriadneMessage.getClass.getName
-        case _: Message => "ontologies.Message$"
+        case _: AriadneRemoteMessage => AriadneRemoteMessage.getClass.getName
+        case _: Message[_] => "ontologies.Message$"
         case _ => null
     }
-
+    
     override def toBinary(obj: AnyRef): Array[Byte] = obj match {
-        case msg: AriadneMessage => MessageSerializer.serialize(msg)
-        case msg: Message => MessageSerializer.serialize(msg)
+        case msg: AriadneRemoteMessage => MessageSerializer.serialize(msg)
+        case msg: Message[String] => MessageSerializer.serialize(msg)
         case _ => null
     }
-
+    
     override def fromBinary(bytes: Array[Byte], manifest: String): AnyRef = manifest match {
-        case man if man == AriadneMessage.getClass.getName || man == "ontologies.Message$" =>
+        case man if man == AriadneRemoteMessage.getClass.getName || man == "ontologies.Message$" =>
             MessageSerializer.deserialize(bytes)
         case _ => null
     }
@@ -36,51 +36,69 @@ class AriadneMessageSerializer extends SerializerWithStringManifest {
   * The actual implementation is statically provided by the Object companion MessageSerializer
   *
   */
-trait MessageSerializer {
-    def serialize(message: Message): Array[Byte]
-
-    def deserialize(array: Array[Byte]): Message
+trait MessageSerializer[T] {
+    def serialize(message: Message[T]): Array[Byte]
+    
+    def deserialize(array: Array[Byte]): Message[T]
 }
 
 /**
   * An Utility Companion Object that provides the logic to Serialize any object that implements the trait Message
   */
-object MessageSerializer extends MessageSerializer {
-
-    override def serialize(message: Message): Array[Byte] = {
-
-        val char2byte: Char => Byte = c => c.toByte
-
+object MessageSerializer extends MessageSerializer[String] {
+    
+    override def serialize(message: Message[String]): Array[Byte] = {
+        
+        val char2byte: Char => Byte = { c =>
+            //            println(c.toString + "=>" + c.toByte)
+            c.toByte
+        }
+        
         // Create an Array[Byte] of the same length of the sum of the length in Byte of the fields
         // the first byte are intLengthInByte that are needed in order to get the length of the messageType,
         // which is variable
         // This is always recoverable since Int are always of fixed length 8 Byte / 32 bit
         Array.concat(
             Array.fill(1) {
-                message.messageType.toString.length.toByte
+                message.supertype.toString.length.toByte
             },
-            message.messageType.toString.toStream.map(char2byte).toArray,
+            message.supertype.toString.toStream.map(char2byte).toArray,
+            Array.fill(1) {
+                message.subtype.toString.length.toByte
+            },
+            message.subtype.toString.toStream.map(char2byte).toArray,
             message.content.toStream.map(char2byte).toArray
         )
     }
-
-    override def deserialize(array: Array[Byte]): Message = {
-
-        AriadneMessage(
-            MessageTypeFactory(
-                (for {
-                    i <- 1 until array(0) + 1
-                } yield array(i).toChar).toStream.mkString
-            ),
-            (for {
-                j <- array(0) + 1 until array.length
-            } yield array(j).toChar).toStream.mkString
+    
+    override def deserialize(array: Array[Byte]): Message[String] = {
+        
+        val typeLen = array(0)
+        val subtypeLen = array(typeLen + 1)
+        val contentOffset = typeLen + subtypeLen
+        
+        val supertype = for {
+            i <- 1 until typeLen + 1
+        } yield array(i).toChar
+        
+        val subtype = for {
+            k <- typeLen + 2 until contentOffset + 2
+        } yield array(k).toChar
+        
+        val content = for {
+            j <- contentOffset + 2 until array.length
+        } yield array(j).toChar
+        
+        AriadneRemoteMessage(
+            MessageTypeFactory(supertype.mkString),
+            MessageSubtypeFactory(subtype.mkString),
+            content.mkString
         )
     }
 }
 
 object DataTypeLengthConverter {
-
+    
     val charLengthInByte = 2
     val intLengthInByte = 4
     val shortLengthInByte = 2
@@ -92,10 +110,14 @@ object DataTypeLengthConverter {
 }
 
 object TestSerializer extends App {
-
-    println(MessageSerializer.deserialize(
-        MessageSerializer.serialize(
-            AriadneMessage(MessageType.VariableType, "ciao")
-        )
-    ))
+    
+    val serial = MessageSerializer.serialize(
+        AriadneRemoteMessage(MessageType.Init, MessageType.Init.Subtype.Basic, "Se2i v21eramente orribb123ile")
+    )
+    
+    println(serial.mkString("-"))
+    
+    val deserial = MessageSerializer.deserialize(serial)
+    
+    println(deserial)
 }
