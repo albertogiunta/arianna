@@ -1,4 +1,4 @@
-package http
+package master.http
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
@@ -36,14 +36,14 @@ abstract class AbstractHttpServer(name: String) extends HttpServer {
     protected implicit val config = ConfigFactory.parseString(
         """
           http-akka-blocking-dispatcher {
-            |type = Dispatcher
-            |executor = "thread-pool-executor"
-            |thread-pool-executor {
-                |fixed-pool-size = 16
-            }
-            |throughput = 100
-          }
-        """.stripMargin).withFallback(ConfigFactory.load())
+          |  type = Dispatcher
+          |  executor = "thread-pool-executor"
+          |  thread-pool-executor {
+          |    fixed-pool-size = 16
+          |  }
+          |  throughput = 100
+          |}
+        """.stripMargin).withFallback(ConfigFactory.load()).resolve()
     
     implicit val akkaSubSystem = ActorSystem(name, config)
     

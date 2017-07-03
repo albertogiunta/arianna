@@ -1,4 +1,4 @@
-package http
+package master.http
 
 import akka.http.scaladsl.model.HttpMethods.GET
 import akka.http.scaladsl.model._

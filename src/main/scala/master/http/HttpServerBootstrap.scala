@@ -1,4 +1,4 @@
-package http
+package master.http
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.StdIn
@@ -11,13 +11,13 @@ object HttpServerBootstrap extends App {
     override def main(args: Array[String]) {
         val hostname = "localhost"
         val port = 8080
-        val name = "Arianna-Master-http"
+        val name = "Arianna-Master-master"
         val httpServer = HttpServer(name)
         //val bindingFuture = httpServer.bindWithFuture(hostname, port)
         
         val bindingFuture = httpServer.bindBlocking(hostname, port)
-        
-        println(s"$name server is online at http://$hostname:$port\n")
+
+        println(s"$name server is online at master.http://$hostname:$port\n")
         
         while (StdIn.readLine().toLowerCase != "exit") {
             //Do Nothing, just hang in there
