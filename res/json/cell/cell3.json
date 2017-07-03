@@ -1,0 +1,98 @@
+{
+    "infoCell": {
+        "id": 1,
+        "uri": "uri/id",
+        "name": "name",
+        "roomVertices": {
+            "northWest": {
+                "x": 0,
+                "y": 5
+            },
+            "northEast": {
+                "x": 2,
+                "y": 5
+            },
+            "southWest": {
+                "x": 0,
+                "y": 3
+            },
+            "southEast": {
+                "x": 2,
+                "y": 3
+            }
+        },
+        "antennaPosition": {
+            "x": 0,
+            "y": 1
+        }
+    },
+    "sensors": [
+        {
+            "category": 1,
+            "value": 21.4
+        },
+        {
+            "category": 2,
+            "value": 0.3
+        }
+    ],
+    "neighbors": [
+      {
+        "id": 1,
+        "uri": "uri1",
+        "name": "cell1",
+        "roomVertices": {
+          "northWest": {
+            "x": 0,
+            "y": 10
+          },
+          "northEast": {
+            "x": 10,
+            "y": 10
+          },
+          "southWest": {
+            "x": 0,
+            "y": 0
+          },
+          "southEast": {
+            "x": 10,
+            "y": 0
+          }
+        },
+        "antennaPosition": {
+          "x": 5,
+          "y": 5
+        }
+      }
+    ],
+    "passages": [
+        {
+            "neighborId": 0,
+            "startCoordinates": {
+                "x": 0,
+                "y": 4
+            },
+            "endCoordinates": {
+                "x": 0,
+                "y": 4
+            }
+        },
+        {
+            "neighborId": 1,
+            "startCoordinates": {
+                "x": 3,
+                "y": 4
+            },
+            "endCoordinates": {
+                "x": 3,
+                "y": 4
+            }
+        }
+    ],
+    "isEntryPoint": true,
+    "isExitPoint": false,
+    "capacity": 32,
+    "squareMeters": 23.5,
+    "currentPeople": 23,
+    "practicabilityLevel": 23.23
+}

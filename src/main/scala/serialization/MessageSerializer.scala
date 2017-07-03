@@ -8,7 +8,7 @@ import ontologies._
   *
   */
 class AriadneMessageSerializer extends SerializerWithStringManifest {
-    
+
     override def identifier = 21040507
 
     override def manifest(obj: AnyRef): String = obj match {
@@ -38,7 +38,7 @@ class AriadneMessageSerializer extends SerializerWithStringManifest {
   */
 trait MessageSerializer {
     def serialize(message: Message): Array[Byte]
-    
+
     def deserialize(array: Array[Byte]): Message
 }
 
@@ -46,11 +46,11 @@ trait MessageSerializer {
   * An Utility Companion Object that provides the logic to Serialize any object that implements the trait Message
   */
 object MessageSerializer extends MessageSerializer {
-    
+
     override def serialize(message: Message): Array[Byte] = {
-    
+
         val char2byte: Char => Byte = c => c.toByte
-        
+
         // Create an Array[Byte] of the same length of the sum of the length in Byte of the fields
         // the first byte are intLengthInByte that are needed in order to get the length of the messageType,
         // which is variable
@@ -63,9 +63,9 @@ object MessageSerializer extends MessageSerializer {
             message.content.toStream.map(char2byte).toArray
         )
     }
-    
+
     override def deserialize(array: Array[Byte]): Message = {
-    
+
         AriadneMessage(
             MessageTypeFactory(
                 (for {
@@ -80,7 +80,7 @@ object MessageSerializer extends MessageSerializer {
 }
 
 object DataTypeLengthConverter {
-    
+
     val charLengthInByte = 2
     val intLengthInByte = 4
     val shortLengthInByte = 2
@@ -92,7 +92,7 @@ object DataTypeLengthConverter {
 }
 
 object TestSerializer extends App {
-    
+
     println(MessageSerializer.deserialize(
         MessageSerializer.serialize(
             AriadneMessage(MessageType.VariableType, "ciao")

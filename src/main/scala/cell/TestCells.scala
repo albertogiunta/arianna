@@ -15,7 +15,7 @@ import ontologies.{AriadneMessage, MessageType}
 object TestCells extends App {
     val path2Project = Paths.get("").toFile.getAbsolutePath
     val path2Config = path2Project + "/conf/cell.conf"
-    
+
     implicit val config = ConfigFactory.parseFile(new File(path2Config))
         .withFallback(ConfigFactory.load()).resolve()
 

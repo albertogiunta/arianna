@@ -13,34 +13,34 @@ import ontologies.{AriadneMessage, MessageType}
   * [link: http://doc.akka.io/docs/akka/current/scala/cluster-usage.html]
   */
 class ClusterMembersListener extends CustomActor {
-    
+
     private val greetings: String = "Hello there, it's time to dress-up"
-    
+
     private val cluster = Cluster(context.system)
-    
+
     private var nodes = Set.empty[Address]
-    
+
     override def preStart = {
-        
+
         cluster.subscribe(self, classOf[MemberUp], classOf[MemberEvent])
-        
+
         // If this is the master node, Actors should be already Initialized
-        
+
         try {
             if (config.property(builder.akka.cluster.get("seed-nodes"))
                 .stringList.contains(cluster.selfAddress.toString)) {
-                
+
                 log.info("Awakening Actors on Master Actor-System")
                 Thread.sleep(300)
                 siblings ! AriadneMessage(MessageType.Init, greetings)
             }
-    
+
         } catch {
             case ex: Throwable => ex.printStackTrace()
         }
-        
+
     }
-    
+
     override def postStop: Unit =
         cluster unsubscribe self
 
@@ -49,15 +49,15 @@ class ClusterMembersListener extends CustomActor {
             nodes = state.members.toStream
                 .filter(m => m.status == MemberStatus.Up)
                 .map(m => m.address).toSet
-    
+
             log.info(nodes.toString)
-            
+
         case MemberUp(member) =>
             //Node connected to the cluster
             nodes += member.address
             log.info("[ClusterMembersListener] Member is Up: {}. {} nodes in cluster",
                 member.address, nodes.size)
-    
+
             if (member.address == cluster.selfAddress) {
                 //init actors of current node that must interact in the cluster
                 siblings ! AriadneMessage(MessageType.Init, greetings)

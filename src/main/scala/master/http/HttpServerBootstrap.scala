@@ -16,7 +16,7 @@ object HttpServerBootstrap extends App {
         //val bindingFuture = httpServer.bindWithFuture(hostname, port)
         
         val bindingFuture = httpServer.bindBlocking(hostname, port)
-    
+
         println(s"$name server is online at master.http://$hostname:$port\n")
         
         while (StdIn.readLine().toLowerCase != "exit") {

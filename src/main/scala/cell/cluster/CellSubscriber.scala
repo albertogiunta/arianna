@@ -11,13 +11,13 @@ import ontologies._
   * Created by Matteo Gabellini on 29/06/2017.
   */
 class CellSubscriber extends BasicSubscriber {
-    
+
     override val topics = Set(Topic.Alarm, Topic.Topology)
-    
+
     override protected def init(args: Any): Unit = {
         log.info("Hello there from {}!", name)
     }
-    
+
     override protected def receptive = {
         case SubscribeAck(Subscribe(topic, None, `self`)) =>
             log.info("{} Successfully Subscribed to {}", name, topic)
