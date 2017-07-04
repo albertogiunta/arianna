@@ -16,7 +16,7 @@ final case class Coordinates(northWest: Point,
                              southWest: Point,
                              southEast: Point)
 
-final case class Area(id : Int,
+final case class Area(id: Int,
                       cells: List[Cell]) extends MessageContent
 
 final case class Cell(infoCell: InfoCell,

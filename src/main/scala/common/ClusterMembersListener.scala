@@ -32,7 +32,7 @@ class ClusterMembersListener extends CustomActor {
                 .stringList.contains(cluster.selfAddress.toString)) {
 
                 log.info("Awakening Actors on Master Actor-System")
-    
+
                 siblings ! AriadneLocalMessage[String](Init, Init.Subtype.Basic,
                     Location.Server >> Location.Self, greetings)
             }

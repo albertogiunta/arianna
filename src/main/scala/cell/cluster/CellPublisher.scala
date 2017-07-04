@@ -19,13 +19,13 @@ class CellPublisher extends BasicPublisher {
     override protected def receptive = {
         case msg@AriadneRemoteMessage(Handshake, Handshake.Subtype.Basic, _, _) =>
             mediator ! Publish(Topic.HandShake, msg)
-    
+
         case msg@AriadneRemoteMessage(Update, Update.Subtype.Sensors, _, _) =>
             mediator ! Publish(Topic.Update, msg)
-    
+
         case msg@AriadneRemoteMessage(Update, Update.Subtype.Practicability, _, _) =>
             mediator ! Publish(Topic.Update, msg)
-    
+
         case msg@AriadneRemoteMessage(MessageType.Update, Update.Subtype.CellOccupation, _, _) =>
             mediator ! Publish(Topic.Update, msg)
         case _ => // Ignore

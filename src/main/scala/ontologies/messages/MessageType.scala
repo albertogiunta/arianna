@@ -1,14 +1,12 @@
-package ontologies
+package ontologies.messages
 
-import ontologies.MessageType._
-import ontologies.messages._
 import spray.json.{DefaultJsonProtocol, _}
 
 /**
   * Created by Xander_C on 03/07/2017.
   */
 
-object MyJsonProtocol extends DefaultJsonProtocol {
+object AriannaJsonProtocol extends DefaultJsonProtocol {
     implicit val pointFormat = jsonFormat2(Point)
     implicit val coordinatesFormat = jsonFormat4(Coordinates)
     implicit val infoCellFormat = jsonFormat5(InfoCell)
@@ -18,12 +16,12 @@ object MyJsonProtocol extends DefaultJsonProtocol {
     implicit val areaFormat = jsonFormat2(Area)
     implicit val cellForUserFormat = jsonFormat4(CellForUser.apply)
     implicit val cellForCellFormat = jsonFormat6(CellForCell.apply)
-    implicit val areaForCellFormat = jsonFormat1(AreaForCell.apply)
+    implicit val areaForCellFormat = jsonFormat2(AreaForCell.apply)
     implicit val cellUpdateFormat = jsonFormat3(CellUpdate.apply)
     implicit val updateForAdminFormat = jsonFormat1(UpdateForAdmin)
 }
 
-import ontologies.MyJsonProtocol._
+import ontologies.messages.AriannaJsonProtocol._
 
 trait MessageType {
 
@@ -84,6 +82,15 @@ object MessageType {
         override val typeName = "Handshake"
 
         object Subtype {
+
+            object Basic extends MessageSubtype {
+
+                override val subtypeName = "Basic"
+
+                def unmarshal(json: String): Int = json.parseJson.convertTo[Int]
+
+                def marshal(obj: Int): String = obj.toJson.toString()
+            }
 
             object Cell2User extends MessageSubtype {
 
@@ -240,23 +247,25 @@ object MessageType {
 
     implicit def MessageType2String(msg: MessageType): String = msg.toString
 
-    implicit def String2MessageType(str: String): MessageType = MessageTypeFactory(str)
+    implicit def String2MessageType(str: String): MessageType = MessageType.Factory(str)
 
-}
+    object Factory {
 
-object MessageTypeFactory {
+        def apply(typeName: String): MessageType = typeName.toLowerCase match {
+            case t if t == Init.toString.toLowerCase => Init
+            case t if t == Route.toString.toLowerCase => Route
+            case t if t == Alarm.toString.toLowerCase => Alarm
+            case t if t == Topology.toString.toLowerCase => Topology
+            case t if t == Handshake.toString.toLowerCase => Handshake
+            case t if t == Update.toString.toLowerCase => Update
 
-    def apply(typeName: String): MessageType = typeName.toLowerCase match {
-        case t if t == Init.toString.toLowerCase => Init
-        case t if t == Route.toString.toLowerCase => Route
-        case t if t == Alarm.toString.toLowerCase => Alarm
-        case t if t == Topology.toString.toLowerCase => Topology
-        case t if t == Handshake.toString.toLowerCase => Handshake
-        case t if t == Update.toString.toLowerCase => Update
-
-        case _ => null
+            case _ => null
+        }
     }
+
 }
+
+
 
 object TestMessageType extends App {
 
@@ -264,5 +273,10 @@ object TestMessageType extends App {
 
     //MessageType.Update.Subtype.Sensors
 
+    var sensor: List[Sensor] = MessageType.Update.Subtype.Sensors.unmarshal("[{\"category\" : 1,\"value\" : 2.0}, {\"category\" : 1,\"value\" : 2.0}]")
+
+    var str: String = MessageType.Update.Subtype.Sensors.marshal(sensor)
+
+    println(str)
 
 }

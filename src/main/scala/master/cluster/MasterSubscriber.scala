@@ -13,7 +13,7 @@ import ontologies.messages.MessageType._
   */
 class MasterSubscriber extends BasicSubscriber {
     type Cell = Any
-    
+
     private var topology: Map[String, Cell] = Map.empty
 
     override val topics: Set[Topic] =

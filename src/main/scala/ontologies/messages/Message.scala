@@ -11,7 +11,7 @@ trait Message[T] {
     def supertype: MessageType
     
     def subtype: MessageSubtype
-    
+
     def direction: MessageDirection
     
     def content: T
@@ -42,6 +42,6 @@ object TestMessage extends App {
     val s: String = Init
     
     println(Init == "Init")
-    
+
     println(MessageType.Factory("INIT"))
 }

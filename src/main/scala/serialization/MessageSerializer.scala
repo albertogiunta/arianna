@@ -55,7 +55,7 @@ object MessageSerializer extends MessageSerializer[String] {
             //            println(c.toString + "=>" + c.toByte)
             c.toByte
         }
-    
+
         //         Create an Array[Byte] of the same length of the sum of the length in Byte of the fields
         //         the first byte are intLengthInByte that are needed in order to get the length of the messageType,
         //         which is variable
@@ -70,49 +70,49 @@ object MessageSerializer extends MessageSerializer[String] {
                 message.subtype.toString.length.toByte
             },
             message.subtype.toString.map(char2byte).toArray,
-    
+
             Array.fill(1) {
                 message.direction.iter.from.length.toByte
             },
             message.direction.iter.from.map(char2byte).toArray,
-    
+
             Array.fill(1) {
                 message.direction.iter.to.length.toByte
             },
             message.direction.iter.to.map(char2byte).toArray,
-    
+
             message.content.map(char2byte).toArray
         )
     }
     
     override def deserialize(array: Array[Byte]): Message[String] = {
-    
+
         val retrieveHeader: (Int, Int) => Seq[Char] =
             (from, to) => {
                 for {
                     j <- from until to
                 } yield array(j).toChar
             }
-    
+
         val typeLen = array(0)
         val typeOffset = 1
-    
+
         val subtypeLen = array(typeOffset + typeLen)
         val subtypeOffset = typeOffset + typeLen + 1
-    
+
         val fromLen = array(subtypeOffset + subtypeLen)
         val fromOffset = subtypeOffset + subtypeLen + 1
-    
+
         val toLen = array(fromOffset + fromLen)
         val toOffset = fromOffset + fromLen + 1
-    
+
         val contentOffset = toOffset + toLen
-    
+
         /** ************************************************************/
-    
+
         val supertype = retrieveHeader(typeOffset, subtypeOffset - 1)
         //println(supertype)
-    
+
         val subtype = retrieveHeader(subtypeOffset, fromOffset - 1)
         //println(subtype)
         val from = retrieveHeader(fromOffset, toOffset - 1)
@@ -129,8 +129,8 @@ object MessageSerializer extends MessageSerializer[String] {
             content.mkString
         )
     }
-    
-    
+
+
 }
 
 object DataTypeLengthConverter {
@@ -152,7 +152,7 @@ object TestSerializer extends App {
     )
     
     println(serial.mkString("-"))
-    
+
     println(serial.length)
     
     val deserial = MessageSerializer.deserialize(serial)
