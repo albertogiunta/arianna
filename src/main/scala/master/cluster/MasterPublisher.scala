@@ -14,8 +14,6 @@ class MasterPublisher extends BasicPublisher {
     
     override protected def init(args: List[Any]) = {
         log.info("Hello there from {}!", name)
-
-        Thread.sleep(500)
         
         mediator ! Publish(Topic.HandShake,
             AriadneRemoteMessage(Handshake, Handshake.Subtype.Basic, Server >> Self, args.toString))

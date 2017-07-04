@@ -1,7 +1,5 @@
 package ontologies.messages
 
-import ontologies.messages.Location._
-
 /**
   * Created by Alessandro on 04/07/2017.
   */
@@ -61,23 +59,23 @@ final case class Direction(from: String, to: String) {
 
 object Location {
     
-    private final case class DirectionImpl(loc: String) extends Location
+    private final case class LocationImpl(loc: String) extends Location
     
-    val Admin: Location = DirectionImpl("Admin")
+    val Admin: Location = LocationImpl("Admin")
     
-    val Server: Location = DirectionImpl("Server")
+    val Server: Location = LocationImpl("Server")
     
-    val Cell: Location = DirectionImpl("Cell")
+    val Cell: Location = LocationImpl("Cell")
     
-    val User: Location = DirectionImpl("User")
+    val User: Location = LocationImpl("User")
     
-    val Notifier: Location = DirectionImpl("Notifier")
+    val Notifier: Location = LocationImpl("Notifier")
     
-    val Self: Location = DirectionImpl("Self")
+    val Self: Location = LocationImpl("Self")
     
-    val Switcher: Location = DirectionImpl("Switcher")
+    val Switcher: Location = LocationImpl("Switcher")
     
-    val MovGenerator: Location = DirectionImpl("MovGenerator")
+    val MovGenerator: Location = LocationImpl("MovGenerator")
     
     implicit def location2String(d: Location): String = d.toString
     
@@ -103,9 +101,11 @@ object Location {
 
 object TestMessageDirection extends App {
     
-    println(Admin >> Cell)
+    println(Location.Server >> Location.Cell)
     
-    val msgDir: MessageDirection = Server << Admin
+    val msgDir: MessageDirection = Location.Server << Location.Admin
     
     println(msgDir)
+    
+    println(Location.Factory("ADMIN"))
 }

@@ -2,7 +2,7 @@ package common
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSelection, Stash}
 import akka.extension._
-import ontologies.messages.MessageType
+import ontologies.messages.{AriadneLocalMessage, MessageType}
 
 /**
   * A CustomActor that ease the use of few overkilled methods
@@ -44,7 +44,7 @@ abstract class BasicActor extends CustomActor {
     override def receive = resistive
 
     protected def resistive: Actor.Receive = {
-        case AriadneRemoteMessage(MessageType.Init, _, content) =>
+        case AriadneLocalMessage(MessageType.Init, _, _, content: Any) =>
             try {
                 this.init(content :: Nil)
             } catch {

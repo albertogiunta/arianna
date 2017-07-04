@@ -26,11 +26,6 @@ object TestClusterJoin extends App {
 
     val subscriber = system.actorOf(Props[MasterSubscriber], "Subscriber-Cell")
 
-    //    subscriber ! AriadneMessage(MessageType.Init, "Ciao")
-
     val publisher = system.actorOf(Props[MasterPublisher], "Publisher-Cell")
 
-    //    Thread.sleep(5000)
-
-    //publisher ! AriadneMessage(MessageType.Alarm, "Ciao")
 }

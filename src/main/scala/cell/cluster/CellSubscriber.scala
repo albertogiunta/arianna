@@ -3,6 +3,7 @@ package cell.cluster
 import akka.cluster.pubsub.DistributedPubSubMediator.{Subscribe, SubscribeAck}
 import common.BasicSubscriber
 import ontologies._
+import ontologies.messages.AriadneRemoteMessage
 import ontologies.messages.MessageType._
 
 /**
@@ -22,9 +23,9 @@ class CellSubscriber extends BasicSubscriber {
     override protected def receptive = {
         case SubscribeAck(Subscribe(topic, None, `self`)) =>
             log.info("{} Successfully Subscribed to {}", name, topic)
-        case msg@AriadneRemoteMessage(Alarm, Alarm.Subtype.Basic, cnt) =>
+        case msg@AriadneRemoteMessage(Alarm, Alarm.Subtype.Basic, _, cnt) =>
             log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
-        case msg@AriadneRemoteMessage(Topology, Topology.Subtype.RealTopology, cnt) =>
+        case msg@AriadneRemoteMessage(Topology, Topology.Subtype.RealTopology, _, cnt) =>
             log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
         case _ => desist _
     }
