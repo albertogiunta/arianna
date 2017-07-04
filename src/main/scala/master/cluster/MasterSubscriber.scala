@@ -28,16 +28,16 @@ class MasterSubscriber extends BasicSubscriber {
             log.info("{} Successfully Subscribed to {}", name, topic)
 
         case msg@AriadneRemoteMessage(Alarm, _, _, _: String) =>
-            log.info("Got {} from {}", msg.toString, sender.path.name)
+            println("Got {} from {}", msg.toString, sender.path.name)
 
         case msg@AriadneRemoteMessage(Update, _, _, _) =>
-            log.info("Got {} from {}", msg.toString, sender.path.name)
+            println("Got {} from {}", msg.toString, sender.path.name)
 
         case msg@AriadneRemoteMessage(Handshake, _, _, _) =>
-            log.info("Got {} from {}", msg.toString, sender.path.name)
+            println("Got {} from {}", msg.toString, sender.path.name)
 
         case msg@AriadneRemoteMessage(Topology, _, _, _) =>
-            log.info("Got {} from {}", msg.toString, sender.path.name)
+            println("Got {} from {}", msg.toString, sender.path.name)
 
         case _ => desist _
     }

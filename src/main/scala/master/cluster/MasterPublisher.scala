@@ -14,11 +14,17 @@ class MasterPublisher extends BasicPublisher {
     
     override protected def init(args: List[Any]) = {
         log.info("Hello there from {}!", name)
+    
+        (1 to 1000).foreach(x => print(x + "=>"));
+        println()
         
         mediator ! Publish(Topic.HandShake,
             AriadneRemoteMessage(Handshake, Handshake.Subtype.Basic, Server >> Self, args.toString))
-
-        log.info(s"Message {} sent to Mediator for Publishing...", args.toString)
+    
+        mediator ! Publish(Topic.Alarm,
+            AriadneRemoteMessage(Alarm, Alarm.Subtype.Basic, Cell >> Self, args.toString))
+    
+        println(s"Message {} sent to Mediator for Publishing...", args.toString)
 
         //        // Point 2 Point communication using Akka Remoting service -- Orrible to see but practical
         //        this.context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/Subscriber-Master") ! "Ciao"

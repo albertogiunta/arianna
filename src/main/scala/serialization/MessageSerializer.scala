@@ -111,14 +111,16 @@ object MessageSerializer extends MessageSerializer[String] {
         /** ************************************************************/
     
         val supertype = retrieveHeader(typeOffset, subtypeOffset - 1)
+        //println(supertype)
     
         val subtype = retrieveHeader(subtypeOffset, fromOffset - 1)
-    
+        //println(subtype)
         val from = retrieveHeader(fromOffset, toOffset - 1)
-    
-        val to = retrieveHeader(toOffset, contentOffset - 1)
-    
+        //println(from)
+        val to = retrieveHeader(toOffset, contentOffset)
+        //println(to)
         val content = retrieveHeader(contentOffset, array.length)
+        //println(content)
         
         AriadneRemoteMessage(
             MessageType.Factory(supertype.mkString),

@@ -52,8 +52,6 @@ class ClusterMembersListener extends CustomActor {
                 .filter(m => m.status == MemberStatus.Up)
                 .map(m => m.address).toSet
 
-            log.info(nodes.toString)
-
         case MemberUp(member) =>
             //Node connected to the cluster
             nodes += member.address
@@ -62,6 +60,7 @@ class ClusterMembersListener extends CustomActor {
 
             if (member.address == cluster.selfAddress) {
                 //init actors of current node that must interact in the cluster
+                log.info("Awakening Actors on Cell Actor-System")
                 siblings ! AriadneLocalMessage[String](Init, Init.Subtype.Basic,
                     Location.Cell >> Location.Self, greetings)
             }
