@@ -28,10 +28,10 @@ trait Message[T] {
     }
 }
 
-final case class AriadneLocalMessage[T](supertype: MessageType,
-                                        subtype: MessageSubtype,
-                                        direction: MessageDirection,
-                                        content: T) extends Message[T]
+final case class AriadneLocalMessage[T <: MessageContent](supertype: MessageType,
+                                                          subtype: MessageSubtype,
+                                                          direction: MessageDirection,
+                                                          content: T) extends Message[T]
 
 final case class AriadneRemoteMessage(supertype: MessageType,
                                       subtype: MessageSubtype,

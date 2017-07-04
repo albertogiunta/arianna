@@ -17,7 +17,7 @@ trait MessageSubtype {
     }
 }
 
-final case class AriadneMessageSubtype(override val subtypeName: String) extends MessageSubtype
+//final case class AriadneMessageSubtype(override val subtypeName: String) extends MessageSubtype
 
 object MessageSubtype {
     implicit def subtype2String(st: MessageSubtype): String = st.subtypeName
