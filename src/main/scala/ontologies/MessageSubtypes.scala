@@ -24,8 +24,10 @@ object MessageSubtypeFactory {
             Init.Subtype.Basic
         case st if st == Alarm.Subtype.Basic.toString.toLowerCase =>
             Alarm.Subtype.Basic
-        case st if st == Handshake.Subtype.Basic.toString.toLowerCase =>
-            Handshake.Subtype.Basic
+        case st if st == Handshake.Subtype.Cell2User.toString.toLowerCase =>
+            Handshake.Subtype.Cell2User
+        case st if st == Handshake.Subtype.Cell2Master.toString.toLowerCase =>
+            Handshake.Subtype.Cell2Master
         case st if st == Route.Subtype.Basic.toString.toLowerCase =>
             Route.Subtype.Basic
         case st if st == Route.Subtype.Escape.toString.toLowerCase =>
