@@ -2,8 +2,9 @@ package cell.cluster
 
 import akka.cluster.pubsub.DistributedPubSubMediator.Publish
 import common.BasicPublisher
-import ontologies.MessageType._
 import ontologies._
+import ontologies.messages.MessageType._
+import ontologies.messages.{AriadneRemoteMessage, MessageType}
 
 /**
   * Actor that manages the sending of messages to the main server
@@ -16,16 +17,16 @@ class CellPublisher extends BasicPublisher {
     }
 
     override protected def receptive = {
-        case msg@AriadneRemoteMessage(Handshake, Handshake.Subtype.Basic, _) =>
+        case msg@AriadneRemoteMessage(Handshake, Handshake.Subtype.Basic, _, _) =>
             mediator ! Publish(Topic.HandShake, msg)
     
-        case msg@AriadneRemoteMessage(Update, Update.Subtype.Sensors, _) =>
+        case msg@AriadneRemoteMessage(Update, Update.Subtype.Sensors, _, _) =>
             mediator ! Publish(Topic.Update, msg)
     
-        case msg@AriadneRemoteMessage(Update, Update.Subtype.Practicability, _) =>
+        case msg@AriadneRemoteMessage(Update, Update.Subtype.Practicability, _, _) =>
             mediator ! Publish(Topic.Update, msg)
     
-        case msg@AriadneRemoteMessage(MessageType.Update, Update.Subtype.CellOccupation, _) =>
+        case msg@AriadneRemoteMessage(MessageType.Update, Update.Subtype.CellOccupation, _, _) =>
             mediator ! Publish(Topic.Update, msg)
         case _ => // Ignore
     }

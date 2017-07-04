@@ -2,8 +2,8 @@ package cell.cluster
 
 import akka.cluster.pubsub.DistributedPubSubMediator.{Subscribe, SubscribeAck}
 import common.BasicSubscriber
-import ontologies.MessageType._
 import ontologies._
+import ontologies.messages.MessageType._
 
 /**
   * An actor that models a Cell receiver for the Cells-MasterServer

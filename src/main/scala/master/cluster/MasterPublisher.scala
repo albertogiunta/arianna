@@ -3,6 +3,9 @@ package master.cluster
 import akka.cluster.pubsub.DistributedPubSubMediator._
 import common.BasicPublisher
 import ontologies._
+import ontologies.messages.AriadneRemoteMessage
+import ontologies.messages.Location._
+import ontologies.messages.MessageType._
 
 /**
   * Created by Alessandro on 28/06/2017.
@@ -15,7 +18,7 @@ class MasterPublisher extends BasicPublisher {
         Thread.sleep(500)
         
         mediator ! Publish(Topic.HandShake,
-            AriadneRemoteMessage(MessageType.Handshake, MessageType.Handshake.Subtype.Basic, args.toString))
+            AriadneRemoteMessage(Handshake, Handshake.Subtype.Basic, Server >> Self, args.toString))
 
         log.info(s"Message {} sent to Mediator for Publishing...", args.toString)
 
@@ -31,10 +34,10 @@ class MasterPublisher extends BasicPublisher {
 
     override protected val receptive = {
     
-        case msg@AriadneRemoteMessage(MessageType.Alarm, _, _) =>
+        case msg@AriadneRemoteMessage(Alarm, _, _, _) =>
             mediator ! Publish(Topic.Alarm, msg)
     
-        case msg@AriadneRemoteMessage(MessageType.Topology, _, _) =>
+        case msg@AriadneRemoteMessage(Topology, _, _, _) =>
             mediator ! Publish(Topic.Topology, msg)
         case _ => desist _
     }

@@ -2,7 +2,7 @@ package common
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSelection, Stash}
 import akka.extension._
-import ontologies._
+import ontologies.messages.MessageType
 
 /**
   * A CustomActor that ease the use of few overkilled methods

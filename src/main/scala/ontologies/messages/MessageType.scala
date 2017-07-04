@@ -1,6 +1,4 @@
-package ontologies
-
-import ontologies.MessageType._
+package ontologies.messages
 
 /**
   * Created by Xander_C on 03/07/2017.
@@ -200,22 +198,21 @@ object MessageType {
     
     implicit def MessageType2String(msg: MessageType): String = msg.toString
     
-    implicit def String2MessageType(str: String): MessageType = MessageTypeFactory(str)
+    implicit def String2MessageType(str: String): MessageType = MessageType.Factory(str)
     
-}
-
-object MessageTypeFactory {
-    
-    def apply(typeName: String): MessageType = typeName.toLowerCase match {
-        case t if t == Init.toString.toLowerCase => Init
-        case t if t == Route.toString.toLowerCase => Route
-        case t if t == Alarm.toString.toLowerCase => Alarm
-        case t if t == Topology.toString.toLowerCase => Topology
-        case t if t == Handshake.toString.toLowerCase => Handshake
-        case t if t == Update.toString.toLowerCase => Update
-        
-        case _ => null
+    object Factory {
+        def apply(typeName: String): MessageType = typeName.toLowerCase match {
+            case t if t == Init.toLowerCase => Init
+            case t if t == Route.toLowerCase => Route
+            case t if t == Alarm.toLowerCase => Alarm
+            case t if t == Topology.toLowerCase => Topology
+            case t if t == Handshake.toLowerCase => Handshake
+            case t if t == Update.toLowerCase => Update
+            
+            case _ => null
+        }
     }
+    
 }
 
 object TestMessageType extends App {
