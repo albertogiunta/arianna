@@ -5,7 +5,7 @@ import java.nio.file.Paths
 import javafx.embed.swing.JFXPanel
 import javafx.stage.Stage
 
-import akka.actor.{Actor, ActorSystem, Props}
+import akka.actor.{Actor, ActorSystem, Address, Props, RootActorPath}
 import area.Message
 import com.typesafe.config.ConfigFactory
 
@@ -41,7 +41,6 @@ object App {
         val config = ConfigFactory.parseFile(new File(path2Config))
         val system = ActorSystem.create("adminSystem", config.getConfig("admin"))
         var admin = system.actorOf(Props(new AdminActor(interfaceView)), "admin")
-
         Platform.runLater {
             interfaceView.start(new Stage())
         }

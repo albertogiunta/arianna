@@ -10,11 +10,11 @@ package ontologies.messages
   *
   */
 trait MessageDirection {
-    
+
     val iter: Direction
-    
+
     override def toString = "Message is coming " + iter.toString
-    
+
     override def equals(obj: scala.Any) = obj match {
         case that: MessageDirection => that.iter == this.iter
         case _ => false
@@ -24,11 +24,11 @@ trait MessageDirection {
 final case class MessageDirectionImpl(iter: Direction) extends MessageDirection
 
 object MessageDirection {
-    
+
     implicit def messageDirection2String(d: MessageDirection): String = d.iter.toString
-    
+
     implicit def string2Message(d: Direction): MessageDirection = MessageDirectionImpl(d)
-    
+
     implicit def message2Direction(md: MessageDirection): Direction = md.iter
 }
 
@@ -39,15 +39,15 @@ object MessageDirection {
   *
   */
 trait Location {
-    
+
     val loc: String
-    
+
     def >>(that: Location): Direction = Direction(from = this.loc, to = that.loc)
-    
+
     def <<(that: Location): Direction = Direction(from = that.loc, to = this.loc)
-    
+
     override def toString = loc
-    
+
     override def equals(obj: scala.Any) = obj match {
         case that: Location => that.loc == this.loc
     }
@@ -58,31 +58,31 @@ final case class Direction(from: String, to: String) {
 }
 
 object Location {
-    
+
     private final case class LocationImpl(loc: String) extends Location
-    
+
     val Admin: Location = LocationImpl("Admin")
-    
+
     val Server: Location = LocationImpl("Server")
-    
+
     val Cell: Location = LocationImpl("Cell")
-    
+
     val User: Location = LocationImpl("User")
-    
+
     val Notifier: Location = LocationImpl("Notifier")
-    
+
     val Self: Location = LocationImpl("Self")
-    
+
     val Switcher: Location = LocationImpl("Switcher")
-    
+
     val MovGenerator: Location = LocationImpl("MovGenerator")
-    
+
     implicit def location2String(d: Location): String = d.toString
-    
+
     implicit def direction2String(d: Direction): String = d.toString
-    
+
     implicit def string2MessageDirection(d: Direction): MessageDirection = MessageDirectionImpl(d)
-    
+
     object Factory {
         def apply(s: String): Location = s.toLowerCase match {
             case loc if loc == Admin.toLowerCase => Admin
@@ -96,16 +96,16 @@ object Location {
             case _ => null
         }
     }
-    
+
 }
 
 object TestMessageDirection extends App {
-    
+
     println(Location.Server >> Location.Cell)
-    
+
     val msgDir: MessageDirection = Location.Server << Location.Admin
-    
+
     println(msgDir)
-    
+
     println(Location.Factory("ADMIN"))
 }

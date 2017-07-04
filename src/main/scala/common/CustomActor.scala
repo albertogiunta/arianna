@@ -45,7 +45,7 @@ abstract class BasicActor extends CustomActor {
 
     protected def resistive: Actor.Receive = {
         case AriadneLocalMessage(MessageType.Init, _, _, content: Any) =>
-    
+
             this.context.become(receptive, discardOld = true)
             log.info("[{}] I've become receptive!", name)
             
@@ -61,6 +61,6 @@ abstract class BasicActor extends CustomActor {
     protected def init(args: List[Any])
     
     protected def receptive: Actor.Receive
-    
+
     protected def desist(msg: Any): Unit = null //log.info("Unhandled message... {}", msg.toString) // Ignore
 }

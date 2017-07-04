@@ -22,7 +22,7 @@ class TestPublisher extends Actor with ActorLogging {
     }
 
     def receive = {
-    
+
         case AriadneRemoteMessage(Init, Init.Subtype.Basic, dir, cnt) =>
             println("[" + self.path.name + "] Hello there from {}!", self.path.name)
 
