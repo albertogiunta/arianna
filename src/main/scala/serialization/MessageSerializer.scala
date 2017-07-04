@@ -1,7 +1,9 @@
 package serialization
 
 import akka.serialization._
-import ontologies._
+import ontologies.messages.Location._
+import ontologies.messages.MessageType._
+import ontologies.messages._
 
 /**
   * A Custom Serializer for Message(s) to be handled by the ActorSystem itself
@@ -53,48 +55,82 @@ object MessageSerializer extends MessageSerializer[String] {
             //            println(c.toString + "=>" + c.toByte)
             c.toByte
         }
-        
-        // Create an Array[Byte] of the same length of the sum of the length in Byte of the fields
-        // the first byte are intLengthInByte that are needed in order to get the length of the messageType,
-        // which is variable
-        // This is always recoverable since Int are always of fixed length 8 Byte / 32 bit
+    
+        //         Create an Array[Byte] of the same length of the sum of the length in Byte of the fields
+        //         the first byte are intLengthInByte that are needed in order to get the length of the messageType,
+        //         which is variable
+        //         This is always recoverable since Int are always of fixed length 8 Byte / 32 bit
         Array.concat(
             Array.fill(1) {
                 message.supertype.toString.length.toByte
             },
-            message.supertype.toString.toStream.map(char2byte).toArray,
+            message.supertype.toString.map(char2byte).toArray,
+            
             Array.fill(1) {
                 message.subtype.toString.length.toByte
             },
-            message.subtype.toString.toStream.map(char2byte).toArray,
-            message.content.toStream.map(char2byte).toArray
+            message.subtype.toString.map(char2byte).toArray,
+    
+            Array.fill(1) {
+                message.direction.iter.from.length.toByte
+            },
+            message.direction.iter.from.map(char2byte).toArray,
+    
+            Array.fill(1) {
+                message.direction.iter.to.length.toByte
+            },
+            message.direction.iter.to.map(char2byte).toArray,
+    
+            message.content.map(char2byte).toArray
         )
     }
     
     override def deserialize(array: Array[Byte]): Message[String] = {
-        
+    
+        val retrieveHeader: (Int, Int) => Seq[Char] =
+            (from, to) => {
+                for {
+                    j <- from until to
+                } yield array(j).toChar
+            }
+    
         val typeLen = array(0)
-        val subtypeLen = array(typeLen + 1)
-        val contentOffset = typeLen + subtypeLen
-        
-        val supertype = for {
-            i <- 1 until typeLen + 1
-        } yield array(i).toChar
-        
-        val subtype = for {
-            k <- typeLen + 2 until contentOffset + 2
-        } yield array(k).toChar
-        
-        val content = for {
-            j <- contentOffset + 2 until array.length
-        } yield array(j).toChar
+        val typeOffset = 1
+    
+        val subtypeLen = array(typeOffset + typeLen)
+        val subtypeOffset = typeOffset + typeLen + 1
+    
+        val fromLen = array(subtypeOffset + subtypeLen)
+        val fromOffset = subtypeOffset + subtypeLen + 1
+    
+        val toLen = array(fromOffset + fromLen)
+        val toOffset = fromOffset + fromLen + 1
+    
+        val contentOffset = toOffset + toLen
+    
+        /** ************************************************************/
+    
+        val supertype = retrieveHeader(typeOffset, subtypeOffset - 1)
+        //println(supertype)
+    
+        val subtype = retrieveHeader(subtypeOffset, fromOffset - 1)
+        //println(subtype)
+        val from = retrieveHeader(fromOffset, toOffset - 1)
+        //println(from)
+        val to = retrieveHeader(toOffset, contentOffset)
+        //println(to)
+        val content = retrieveHeader(contentOffset, array.length)
+        //println(content)
         
         AriadneRemoteMessage(
-            MessageTypeFactory(supertype.mkString),
-            MessageSubtypeFactory(subtype.mkString),
+            MessageType.Factory(supertype.mkString),
+            MessageSubtype.Factory(subtype.mkString),
+            Location.Factory(from.mkString) >> Location.Factory(to.mkString),
             content.mkString
         )
     }
+    
+    
 }
 
 object DataTypeLengthConverter {
@@ -112,10 +148,12 @@ object DataTypeLengthConverter {
 object TestSerializer extends App {
     
     val serial = MessageSerializer.serialize(
-        AriadneRemoteMessage(MessageType.Init, MessageType.Init.Subtype.Basic, "Se2i v21eramente orribb123ile")
+        AriadneRemoteMessage(Init, Init.Subtype.Basic, Self >> Self, "Ciaone")
     )
     
     println(serial.mkString("-"))
+    
+    println(serial.length)
     
     val deserial = MessageSerializer.deserialize(serial)
     

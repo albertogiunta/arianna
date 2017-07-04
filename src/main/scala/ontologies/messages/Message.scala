@@ -1,6 +1,6 @@
-package ontologies
+package ontologies.messages
 
-import ontologies.MessageType._
+import ontologies.messages.MessageType._
 
 /**
   * Created by Matteo Gabellini on 28/06/2017.
@@ -12,11 +12,14 @@ trait Message[T] {
     
     def subtype: MessageSubtype
     
+    def direction: MessageDirection
+    
     def content: T
     
     override def toString =
         "Message of type(" + supertype.toString + "." + subtype.toString + ") " +
-            "and Content was " + content.toString
+            direction.toString +
+            " Message Content is \"" + content.toString + "\""
     
     override def equals(obj: Any) = obj match {
         case msg: Message[_] =>
@@ -27,10 +30,12 @@ trait Message[T] {
 
 final case class AriadneLocalMessage[T](supertype: MessageType,
                                         subtype: MessageSubtype,
+                                        direction: MessageDirection,
                                         content: T) extends Message[T]
 
 final case class AriadneRemoteMessage(supertype: MessageType,
                                       subtype: MessageSubtype,
+                                      direction: MessageDirection,
                                       content: String) extends Message[String]
 
 object TestMessage extends App {
@@ -38,5 +43,5 @@ object TestMessage extends App {
     
     println(Init == "Init")
     
-    println(MessageTypeFactory("INIT"))
+    println(MessageType.Factory("INIT"))
 }

@@ -23,7 +23,6 @@ object TestMaster extends App {
 
     system.settings.config.getStringList("akka.cluster.seed-nodes").forEach(s => println(s))
     println()
-    //entrySet.stream.filter(e => e.getKey.contains("akka.cluster")).forEach( e => println(e.getKey + " => " + e.getValue))
 
     println("ActorSystem " + system.name + " is now Active...")
 
@@ -31,11 +30,5 @@ object TestMaster extends App {
 
     val subscriber = system.actorOf(Props[MasterSubscriber], "Subscriber-Master")
 
-    //    subscriber ! AriadneMessage(MessageType.Init, "Ciao")
-
     val publisher = system.actorOf(Props[MasterPublisher], "Publisher-Master")
-
-    Thread.sleep(1000)
-
-    //    publisher ! AriadneMessage(MessageType.Init, "Ciao")
 }

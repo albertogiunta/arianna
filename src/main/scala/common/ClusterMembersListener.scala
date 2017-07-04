@@ -3,7 +3,8 @@ package common
 import akka.actor.Address
 import akka.cluster.ClusterEvent.{CurrentClusterState, MemberEvent, MemberRemoved, MemberUp}
 import akka.cluster.{Cluster, MemberStatus}
-import ontologies.{AriadneRemoteMessage, MessageType}
+import ontologies.messages.MessageType.Init
+import ontologies.messages.{AriadneLocalMessage, Location}
 
 /**
   * This actor implements a listener for members event when nodes interact each other into the cluster
@@ -31,8 +32,9 @@ class ClusterMembersListener extends CustomActor {
                 .stringList.contains(cluster.selfAddress.toString)) {
 
                 log.info("Awakening Actors on Master Actor-System")
-                Thread.sleep(300)
-                siblings ! AriadneRemoteMessage(MessageType.Init, MessageType.Init.Subtype.Basic, greetings)
+    
+                siblings ! AriadneLocalMessage[String](Init, Init.Subtype.Basic,
+                    Location.Server >> Location.Self, greetings)
             }
 
         } catch {
@@ -50,8 +52,6 @@ class ClusterMembersListener extends CustomActor {
                 .filter(m => m.status == MemberStatus.Up)
                 .map(m => m.address).toSet
 
-            log.info(nodes.toString)
-
         case MemberUp(member) =>
             //Node connected to the cluster
             nodes += member.address
@@ -60,7 +60,9 @@ class ClusterMembersListener extends CustomActor {
 
             if (member.address == cluster.selfAddress) {
                 //init actors of current node that must interact in the cluster
-                siblings ! AriadneRemoteMessage(MessageType.Init, MessageType.Init.Subtype.Basic, greetings)
+                log.info("Awakening Actors on Cell Actor-System")
+                siblings ! AriadneLocalMessage[String](Init, Init.Subtype.Basic,
+                    Location.Cell >> Location.Self, greetings)
             }
 
         case MemberRemoved(member, _) =>

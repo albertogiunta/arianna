@@ -2,7 +2,7 @@ package common
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSelection, Stash}
 import akka.extension._
-import ontologies._
+import ontologies.messages.{AriadneLocalMessage, MessageType}
 
 /**
   * A CustomActor that ease the use of few overkilled methods
@@ -44,14 +44,15 @@ abstract class BasicActor extends CustomActor {
     override def receive = resistive
 
     protected def resistive: Actor.Receive = {
-        case AriadneRemoteMessage(MessageType.Init, _, content) =>
+        case AriadneLocalMessage(MessageType.Init, _, _, content: Any) =>
+    
+            this.context.become(receptive, discardOld = true)
+            log.info("[{}] I've become receptive!", name)
+            
             try {
                 this.init(content :: Nil)
             } catch {
                 case ex: Throwable => ex.printStackTrace()
-            } finally {
-                this.context.become(receptive, discardOld = true)
-                log.info("[{}] I've become receptive!", name)
             }
 
         case _ => desist _
@@ -60,7 +61,6 @@ abstract class BasicActor extends CustomActor {
     protected def init(args: List[Any])
     
     protected def receptive: Actor.Receive
-
-    protected def desist(msg: Any): Unit =
-        log.info("Unhandled message... {}", msg.toString) // Ignore
+    
+    protected def desist(msg: Any): Unit = null //log.info("Unhandled message... {}", msg.toString) // Ignore
 }

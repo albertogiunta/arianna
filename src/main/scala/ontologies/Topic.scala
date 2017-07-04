@@ -1,13 +1,17 @@
 package ontologies
 
+import ontologies.messages.MessageType
+
 /**
   * Created by Matteo Gabellini on 28/06/2017.
   */
 trait Topic {
     
-    def messageType: MessageType
+    def associatedMessageType: MessageType
     
-    def toString: String
+    val topicName: String
+    
+    override def toString: String = topicName
 
     override def equals(obj: scala.Any) = obj match {
         case o: Topic => o.toString == this.toString
@@ -16,21 +20,21 @@ trait Topic {
     }
 }
 
-case class AriadneTopic(override val toString: String) extends Topic {
-    override def messageType = MessageTypeFactory(toString)
+case class AriadneTopic(override val topicName: String) extends Topic {
+    override def associatedMessageType = MessageType.Factory(toString)
 }
 
 object Topic {
-    // Alarms from other Actors
-    val Alarm = AriadneTopic("Alarm")
-    val Topology = AriadneTopic("Topology")
-    // Accept Handshakes from other Actors (Cells) and save Map them into the actual Topology,
-    // broadcast the new topology to the other inhabitant of the cluster.
-    val HandShake = AriadneTopic("Handshake")
-    // Accept Data from Cells sensors, those data are useful for computing Practicability of those Cells.
-    val Practicability = AriadneTopic("Practicability")
-    // Accept Cells' Data to update the map.
-    val Update = AriadneTopic("Update")
+    
+    val Alarm = AriadneTopic(MessageType.Alarm)
+    
+    val Topology = AriadneTopic(MessageType.Topology)
+    
+    val HandShake = AriadneTopic(MessageType.Handshake)
+    
+    val Route = AriadneTopic(MessageType.Route)
+    
+    val Update = AriadneTopic(MessageType.Update)
 
     implicit def Topic2String(topic: Topic): String = topic.toString
 
@@ -38,7 +42,5 @@ object Topic {
 }
 
 object TestTopic extends App {
-
-    val s: String = Topic.Alarm
 
 }
