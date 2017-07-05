@@ -117,10 +117,10 @@ object MessageType {
         override val typeName = "Route"
 
         object Subtype {
-
-            object Basic extends MessageSubtype {
-
-                override val subtypeName = "Basic"
+    
+            object Normal extends MessageSubtype {
+        
+                override val subtypeName = "Normal"
 
                 def unmarshal(json: String): Any = null
 

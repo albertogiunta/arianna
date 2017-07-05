@@ -33,9 +33,9 @@ final case class Cell(infoCell: InfoCell,
 
 final case class Passage(neighborId: Int,
                          startCoordinates: Point,
-                         endCoordinates: Point)
+                         endCoordinates: Point) extends MessageContent
 
-final case class Sensor(category: Int, value: Double)
+final case class Sensor(category: Int, value: Double) extends MessageContent
 
 final case class CellForUser(actorPath: String,
                              infoCell: InfoCell,
@@ -52,7 +52,7 @@ final case class CellForCell(infoCell: InfoCell,
                              passages: List[Passage],
                              isEntryPoint: Boolean,
                              isExitPoint: Boolean,
-                             practicabilityLevel: Double)
+                             practicabilityLevel: Double) extends MessageContent
 
 object CellForCell {
     def apply(cell: Cell): CellForCell =
@@ -61,17 +61,17 @@ object CellForCell {
 }
 
 final case class AreaForCell(id: Int,
-                             cells: List[CellForCell])
+                             cells: List[CellForCell]) extends MessageContent
 
 object AreaForCell {
     def apply(area: Area): AreaForCell = new AreaForCell(area.id, area.cells.map(c => CellForCell(c)))
 }
 
-final case class UpdateForAdmin(list: List[CellUpdate])
+final case class UpdateForAdmin(list: List[CellUpdate]) extends MessageContent
 
 final case class CellUpdate(infoCell: InfoCell,
                             currentPeople: Int,
-                            sensors: List[Sensor])
+                            sensors: List[Sensor]) extends MessageContent
 
 object CellUpdate {
     def apply(cell: Cell): CellUpdate = new CellUpdate(cell.infoCell, cell.currentPeople, cell.sensors)

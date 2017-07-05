@@ -1,5 +1,6 @@
-package ontologies
+package ontologies.test
 
+import ontologies.messages
 import ontologies.messages.{AriadneRemoteMessage, Message, MessageType}
 
 /**
@@ -7,13 +8,13 @@ import ontologies.messages.{AriadneRemoteMessage, Message, MessageType}
   */
 object TestOntologies extends App {
     val msg = AriadneRemoteMessage(
-        MessageType.Alarm,
-        MessageType.Alarm.Subtype.Basic,
+        MessageTypeForTest.Alarm,
+        MessageTypeForTest.Alarm.Subtype.Basic,
         messages.Location.Self >> messages.Location.Self,
         "666")
     
-    val checker: Message[_] => Unit = {
-        case msg@AriadneRemoteMessage(MessageType.Alarm, _, _, _) => println(msg.supertype.toString)
+    val checker: MessageForTest[_] => Unit = {
+        case msg@AriadneRemoteMessage(MessageTypeForTest.Alarm, _, _, _) => println(msg.supertype.toString)
         case AriadneRemoteMessage(_, _, _, _) => println("Fuck-off")
         case _ => println("Ciao.")
     }
