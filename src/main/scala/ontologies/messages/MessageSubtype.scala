@@ -32,14 +32,14 @@ object MessageSubtype {
                 Handshake.Subtype.Cell2Master
             case st if st == Handshake.Subtype.Cell2User.toLowerCase =>
                 Handshake.Subtype.Cell2User
-            case st if st == Route.Subtype.Normal.toLowerCase =>
-                Route.Subtype.Normal
+            case st if st == Route.Subtype.Basic.toLowerCase =>
+                Route.Subtype.Basic
             case st if st == Route.Subtype.Escape.toLowerCase =>
                 Route.Subtype.Escape
             case st if st == Topology.Subtype.Planimetrics.toLowerCase =>
                 Topology.Subtype.Planimetrics
-            case st if st == Topology.Subtype.RealTopology.toLowerCase =>
-                Topology.Subtype.RealTopology
+            case st if st == Topology.Subtype.Topology4CellLight.toLowerCase =>
+                Topology.Subtype.Topology4CellLight
             case st if st == Topology.Subtype.Topology4Cell.toLowerCase =>
                 Topology.Subtype.Topology4Cell
             case st if st == Topology.Subtype.Topology4User.toLowerCase =>
@@ -50,10 +50,10 @@ object MessageSubtype {
                 Update.Subtype.Practicability
             case st if st == Update.Subtype.Position.toLowerCase =>
                 Update.Subtype.Position
-            case st if st == Update.Subtype.CellOccupation.toLowerCase =>
-                Update.Subtype.CellOccupation
-            case st if st == Update.Subtype.CellUpdate.toLowerCase =>
-                Update.Subtype.CellUpdate
+            case st if st == Update.Subtype.ActualLoad.toLowerCase =>
+                Update.Subtype.ActualLoad
+            case st if st == Update.Subtype.AdminUpdate.toLowerCase =>
+                Update.Subtype.AdminUpdate
             case _ => null
         }
     }

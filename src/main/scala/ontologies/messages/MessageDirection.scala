@@ -55,6 +55,8 @@ trait Location {
 
 final case class Direction(from: String, to: String) {
     override def toString = "from " + from + " to " + to
+    
+    def reverse: Direction = Direction(from = this.to, to = this.from)
 }
 
 object Location {

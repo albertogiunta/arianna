@@ -2,7 +2,7 @@ package common
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSelection, Stash}
 import akka.extension._
-import ontologies.messages.{AriadneLocalMessage, MessageType}
+import ontologies.messages.{AriadneLocalMessage, Greetings, MessageType}
 
 /**
   * A CustomActor that ease the use of few overkilled methods
@@ -30,7 +30,7 @@ abstract class CustomActor extends Actor with Stash with ActorLogging {
         Option(context.actorSelection("../" + this.name + "/" + name))
 
     def children: ActorSelection = context.actorSelection("../" + name + "/*")
-
+    
 }
 
 /**
@@ -44,13 +44,13 @@ abstract class BasicActor extends CustomActor {
     override def receive = resistive
 
     protected def resistive: Actor.Receive = {
-        case AriadneLocalMessage(MessageType.Init, _, _, content: Any) =>
+        case AriadneLocalMessage(MessageType.Init, _, _, content: Greetings) =>
 
             this.context.become(receptive, discardOld = true)
             log.info("[{}] I've become receptive!", name)
             
             try {
-                this.init(content :: Nil)
+                this.init(content.args)
             } catch {
                 case ex: Throwable => ex.printStackTrace()
             }
@@ -61,6 +61,6 @@ abstract class BasicActor extends CustomActor {
     protected def init(args: List[Any])
     
     protected def receptive: Actor.Receive
-
-    protected def desist(msg: Any): Unit = null //log.info("Unhandled message... {}", msg.toString) // Ignore
+    
+    protected def desist(msg: Any): Unit = log.info("Unhandled message... {}", msg.toString) // Ignore
 }
