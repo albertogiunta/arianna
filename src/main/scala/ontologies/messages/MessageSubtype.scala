@@ -52,6 +52,8 @@ object MessageSubtype {
                 Update.Subtype.Position
             case st if st == Update.Subtype.CellOccupation.toLowerCase =>
                 Update.Subtype.CellOccupation
+            case st if st == Update.Subtype.CellUpdate.toLowerCase =>
+                Update.Subtype.CellUpdate
             case _ => null
         }
     }
