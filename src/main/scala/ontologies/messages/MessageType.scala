@@ -45,7 +45,7 @@ object MessageType {
 
             object Basic extends MessageSubtype {
 
-                override val subtypeName = "Basic"
+                override val subtypeName = "Init"
 
                 //def unmarshal(json: String): Any = null
 
@@ -64,7 +64,7 @@ object MessageType {
 
             object Basic extends MessageSubtype {
 
-                override val subtypeName = "Basic"
+                override val subtypeName = "Alarm"
 
                 def unmarshal(json: String): Int = json.parseJson.convertTo[Int]
 
@@ -83,7 +83,7 @@ object MessageType {
 
             object Basic extends MessageSubtype {
 
-                override val subtypeName = "Basic"
+                override val subtypeName = "Handshake"
 
                 def unmarshal(json: String): Int = json.parseJson.convertTo[Int]
 
@@ -117,10 +117,10 @@ object MessageType {
         override val typeName = "Route"
 
         object Subtype {
-    
-            object Normal extends MessageSubtype {
-        
-                override val subtypeName = "Normal"
+
+            object Basic extends MessageSubtype {
+
+                override val subtypeName = "SimpleRoute"
 
                 def unmarshal(json: String): Any = null
 
@@ -129,7 +129,7 @@ object MessageType {
 
             object Escape extends MessageSubtype {
 
-                override val subtypeName = "Escape"
+                override val subtypeName = "EscapeRoute"
 
                 def unmarshal(json: String): Any = null
 
