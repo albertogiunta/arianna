@@ -5,7 +5,7 @@ import common.{BasicActor, Counter}
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Handshake.Subtype.Cell2Master
 import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, Topology4Cell, Topology4CellLight}
-import ontologies.messages.MessageType.Update.Subtype.{ActualLoad, AdminUpdate, Sensors}
+import ontologies.messages.MessageType.Update.Subtype.{ActualLoad, Sensors}
 import ontologies.messages.MessageType.{Alarm, Handshake, Topology, Update}
 import ontologies.messages._
 
@@ -28,88 +28,88 @@ class TopologySupervisor extends BasicActor {
     private val admin2Server: MessageDirection = Location.Admin >> Location.Server
     private val server2Admin: MessageDirection = admin2Server.reverse
     
-    private var requestHandler: ActorSelection = _
+    //private var requestHandler: ActorSelection = _
     private var publisher: ActorSelection = _
     private var subscriber: ActorSelection = _
     
-    private val synched: Counter = Counter()
+    private val synced: Counter = Counter()
     
     override protected def init(args: List[Any]) = {
         log.info("Hello there from {}!", name)
-        requestHandler = sibling("PINCO-PALLO").get
+        //requestHandler = sibling("PINCO-PALLO").get
         publisher = sibling("Publisher-Master").get
         subscriber = sibling("Subscriber-Master").get
     }
     
     override protected def receptive = {
-        
-        case msg@AriadneRemoteMessage(Alarm, _, _, _) => triggerAlarm(msg)
+    
+        case msg@AriadneLocalMessage(Alarm, _, _, _) => triggerAlarm(msg)
         
         case msg@AriadneLocalMessage(Topology, Planimetrics, `admin2Server`, map: Area) =>
             log.info("A topology has been loaded in the server...")
-            
-            if (topology == null) {
+    
+            if (topology.isEmpty) {
                 topology = mutable.HashMap(map.cells.map(c => (c.infoCell.name, c)): _*)
                 
                 context.become(behavior = sociable, discardOld = true)
-                println("I've become Sociable")
-                subscriber ! msg
-                
+                log.info("I've become Sociable...")
+    
                 unstashAll
+        
+                log.info("Notifying the Subscriber...")
+                subscriber ! msg
             }
         case _ => stash
     }
     
     private def sociable: Receive = {
+    
+        case msg@AriadneLocalMessage(Alarm, _, _, _) => triggerAlarm(msg)
+    
+        case AriadneLocalMessage(Handshake, Cell2Master, `cell2Server`, cell: InfoCell) =>
         
-        case msg@AriadneRemoteMessage(Alarm, _, _, _) => triggerAlarm(msg)
-        
-        case AriadneRemoteMessage(Handshake, Cell2Master, `cell2Server`, info: String) =>
+            if (topology.get(cell.name).nonEmpty) {
+                log.info("Found a match into the loaded Topology for {}", cell.name)
+                topology.put(cell.name, topology(cell.name).copy(infoCell = cell))
             
-            val newCell: InfoCell = Cell2Master.unmarshal(info)
-            
-            if (topology.get(newCell.name).nonEmpty) {
-                
-                topology.put(newCell.name, topology(newCell.name).copy(infoCell = newCell))
-                
-                if ((synched ++) == topology.size) {
+                if ((synced ++) == topology.size) {
                     
                     context.become(behavior = proactive, discardOld = true)
-                    println("I've become ProActive")
+                    log.info("I've become ProActive")
+                
+                    unstashAll
                     
                     // Update all the Cells
-                    publisher ! AriadneLocalMessage(
+                    subscriber ! AriadneLocalMessage(
                         Topology, Topology4Cell, server2Cell,
                         AreaForCell(Random.nextInt(),
                             topology.map(e => CellForCell(e._2)).toList)
                     )
                 }
             }
-        case _ => desist _
+        case _ => stash
     }
     
     private def proactive: Receive = {
-        case msg@AriadneRemoteMessage(Alarm, _, _, _) => triggerAlarm(msg)
+        case msg@AriadneLocalMessage(Alarm, _, _, _) => triggerAlarm(msg)
+    
+        case AriadneLocalMessage(Update, ActualLoad, `cell2Server`, pkg: ActualLoadUpdate) =>
         
-        case AriadneRemoteMessage(Update, ActualLoad, `cell2Server`, pkg) =>
-            val up = ActualLoad.unmarshal(pkg)
+            if (topology.get(pkg.info.name).nonEmpty) {
+                val old = topology(pkg.info.name)
             
-            if (topology.get(up.info.name).nonEmpty) {
-                val old = topology(up.info.name)
-                val practicability = weight(old.capacity, up.actualLoad, old.passages.length)
-                
-                topology.put(up.info.name,
-                    topology(up.info.name).copy(
-                        currentPeople = up.actualLoad,
-                        practicabilityLevel = practicability
+                topology.put(pkg.info.name,
+                    topology(pkg.info.name).copy(
+                        currentPeople = pkg.actualLoad,
+                        practicabilityLevel = weight(old.capacity, pkg.actualLoad, old.passages.length)
                     )
                 )
                 
                 // Send the updated Map to the Admin
-                requestHandler ! AriadneLocalMessage(
-                    Topology, AdminUpdate, server2Admin,
-                    UpdateForAdmin(topology.values.map(c => CellUpdate(c)).toList)
-                )
+                //                requestHandler ! AriadneLocalMessage(
+                //                    Topology, AdminUpdate, server2Admin,
+                //                    UpdateForAdmin(topology.values.map(c => CellUpdate(c)).toList)
+                //                )
                 
                 // Update all the Cells
                 publisher ! AriadneLocalMessage(
@@ -118,21 +118,21 @@ class TopologySupervisor extends BasicActor {
                         topology.values.map(b => LightCell(b)).toList)
                 )
             }
+    
+        case AriadneLocalMessage(Update, Sensors, `cell2Server`, pkg: SensorList) =>
         
-        case AriadneRemoteMessage(Update, Sensors, `cell2Server`, pkg) =>
-            val up = Sensors.unmarshal(pkg)
+            if (topology.get(pkg.info.name).nonEmpty) {
+                val news = topology(pkg.info.name).copy(sensors = pkg.sensors)
             
-            if (topology.get(up.info.name).nonEmpty) {
-                val news = topology(up.info.name).copy(sensors = up.sensors)
-                
-                topology.put(up.info.name, news)
+                topology.put(pkg.info.name, news)
                 
                 // Send the updated Map to the Admin
-                requestHandler ! AriadneLocalMessage(
-                    Topology, AdminUpdate, server2Admin,
-                    UpdateForAdmin(topology.values.map(c => CellUpdate(c)).toList)
-                )
+                //                requestHandler ! AriadneLocalMessage(
+                //                    Topology, AdminUpdate, server2Admin,
+                //                    UpdateForAdmin(topology.values.map(c => CellUpdate(c)).toList)
+                //                )
             }
+    
         case _ => desist _
     }
     
@@ -159,7 +159,6 @@ object TestSupervisor extends App {
         
         (load * 1.05) / capacity * (100.0 / log_b(4.0, flows))
     }
-    
     
     println(calculatePracticability(50, 50, 2))
 }

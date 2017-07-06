@@ -45,15 +45,15 @@ abstract class BasicActor extends CustomActor {
 
     protected def resistive: Actor.Receive = {
         case AriadneLocalMessage(MessageType.Init, _, _, content: Greetings) =>
-
-            this.context.become(receptive, discardOld = true)
-            log.info("[{}] I've become receptive!", name)
             
             try {
                 this.init(content.args)
             } catch {
                 case ex: Throwable => ex.printStackTrace()
             }
+    
+            this.context.become(receptive, discardOld = true)
+            log.info("[{}] I've become receptive!", name)
 
         case _ => desist _
     }
