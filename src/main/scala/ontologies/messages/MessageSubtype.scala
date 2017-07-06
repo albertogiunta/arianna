@@ -38,8 +38,8 @@ object MessageSubtype {
                 Route.Subtype.Escape
             case st if st == Topology.Subtype.Planimetrics.toLowerCase =>
                 Topology.Subtype.Planimetrics
-            case st if st == Topology.Subtype.RealTopology.toLowerCase =>
-                Topology.Subtype.RealTopology
+            case st if st == Topology.Subtype.Topology4CellLight.toLowerCase =>
+                Topology.Subtype.Topology4CellLight
             case st if st == Topology.Subtype.Topology4Cell.toLowerCase =>
                 Topology.Subtype.Topology4Cell
             case st if st == Topology.Subtype.Topology4User.toLowerCase =>
@@ -50,8 +50,10 @@ object MessageSubtype {
                 Update.Subtype.Practicability
             case st if st == Update.Subtype.Position.toLowerCase =>
                 Update.Subtype.Position
-            case st if st == Update.Subtype.CellOccupation.toLowerCase =>
-                Update.Subtype.CellOccupation
+            case st if st == Update.Subtype.ActualLoad.toLowerCase =>
+                Update.Subtype.ActualLoad
+            case st if st == Update.Subtype.AdminUpdate.toLowerCase =>
+                Update.Subtype.AdminUpdate
             case _ => null
         }
     }

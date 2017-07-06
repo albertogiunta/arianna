@@ -26,8 +26,8 @@ final case class MessageDirectionImpl(iter: Direction) extends MessageDirection
 object MessageDirection {
 
     implicit def messageDirection2String(d: MessageDirection): String = d.iter.toString
-
-    implicit def string2Message(d: Direction): MessageDirection = MessageDirectionImpl(d)
+    
+    //implicit def direction2Message(d: Direction): MessageDirection = MessageDirectionImpl(d)
 
     implicit def message2Direction(md: MessageDirection): Direction = md.iter
 }
@@ -55,11 +55,13 @@ trait Location {
 
 final case class Direction(from: String, to: String) {
     override def toString = "from " + from + " to " + to
+    
+    def reverse: Direction = Direction(from = this.to, to = this.from)
 }
 
 object Location {
-
-    private final case class LocationImpl(loc: String) extends Location
+    
+    final case class LocationImpl(loc: String) extends Location
 
     val Admin: Location = LocationImpl("Admin")
 
@@ -76,12 +78,14 @@ object Location {
     val Switcher: Location = LocationImpl("Switcher")
 
     val MovGenerator: Location = LocationImpl("MovGenerator")
-
+    
     implicit def location2String(d: Location): String = d.toString
-
+    
+    implicit def location2Direction(d: Location => Direction, l: Location): Direction = d(l)
+    
     implicit def direction2String(d: Direction): String = d.toString
-
-    implicit def string2MessageDirection(d: Direction): MessageDirection = MessageDirectionImpl(d)
+    
+    implicit def direction2Message(d: Direction): MessageDirection = MessageDirectionImpl(d)
 
     object Factory {
         def apply(s: String): Location = s.toLowerCase match {
@@ -102,10 +106,10 @@ object Location {
 object TestMessageDirection extends App {
 
     println(Location.Server >> Location.Cell)
-
-    val msgDir: MessageDirection = Location.Server << Location.Admin
-
-    println(msgDir)
+    
+    //val msgDir: MessageDirection = Location.Server << Location.Admin
+    
+    //println(msgDir)
 
     println(Location.Factory("ADMIN"))
 }

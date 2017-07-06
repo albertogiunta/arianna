@@ -15,18 +15,22 @@ class AriadneRemoteMessageSerializer extends SerializerWithStringManifest {
     
     override def manifest(obj: AnyRef): String = obj match {
         case _: AriadneRemoteMessage => AriadneRemoteMessage.getClass.getName
-        case _: Message[_] => "ontologies.Message$"
+        case _: AriadneLocalMessage[_] => AriadneLocalMessage.getClass.getName
+        case _: Message[_] => "ontologies.messages.Message$"
         case _ => null
     }
     
     override def toBinary(obj: AnyRef): Array[Byte] = obj match {
         case msg: AriadneRemoteMessage => MessageSerializer.serialize(msg)
+        //case msg : AriadneLocalMessage[_] => MessageSerializer.serialize(msg)
         case msg: Message[String] => MessageSerializer.serialize(msg)
         case _ => null
     }
     
     override def fromBinary(bytes: Array[Byte], manifest: String): AnyRef = manifest match {
-        case man if man == AriadneRemoteMessage.getClass.getName || man == "ontologies.Message$" =>
+        case man if man == AriadneRemoteMessage.getClass.getName ||
+            man == AriadneLocalMessage.getClass.getName ||
+            man == "ontologies.Message$" =>
             MessageSerializer.deserialize(bytes)
         case _ => null
     }
@@ -147,15 +151,38 @@ object DataTypeLengthConverter {
 
 object TestSerializer extends App {
     
-    val serial = MessageSerializer.serialize(
-        AriadneRemoteMessage(Init, Init.Subtype.Basic, Self >> Self, "Ciaone")
+    var jsonStr: String = MessageType.Update.Subtype.Sensors
+        .marshal(
+            SensorList(
+                InfoCell(0, "uri", "name",
+                    Coordinates(Point(1, 1), Point(-1, -1), Point(-1, 1), Point(1, -1)),
+                    Point(0, 0)
+                ),
+                List(Sensor(1, 2.0), Sensor(2, 1.55))
+            )
+        )
+    
+    //    var toJsonObj: String => SensorList = s => MessageType.Update.Subtype.Sensors.unmarshal(s)
+    //
+    //    val localmsg = AriadneLocalMessage(
+    //        Update,
+    //        Update.Subtype.Sensors,
+    //        Location.Cell >> Location.Server,
+    //        toJsonObj(jsonStr)
+    //    )
+    
+    val remotemsg = AriadneRemoteMessage(
+        Update,
+        Update.Subtype.Sensors,
+        Location.Cell >> Location.Server,
+        jsonStr
     )
     
-    println(serial.mkString("-"))
-
-    println(serial.length)
+    println(remotemsg)
+    
+    val serial = MessageSerializer.serialize(remotemsg)
     
     val deserial = MessageSerializer.deserialize(serial)
     
-    println(deserial)
+    println(deserial.content == jsonStr)
 }

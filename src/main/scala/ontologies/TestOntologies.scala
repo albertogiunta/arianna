@@ -1,7 +1,7 @@
 package ontologies
 
+import ontologies.messages.Location._
 import ontologies.messages.{AriadneRemoteMessage, Message, MessageType}
-
 /**
   * Created by Alessandro on 28/06/2017.
   */
