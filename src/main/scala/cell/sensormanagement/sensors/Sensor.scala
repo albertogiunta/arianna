@@ -17,6 +17,12 @@ trait Sensor[T] {
 }
 
 trait ObservableSensor[T] extends Sensor[T] {
-    def createObservable: Flowable[T]
+    /**
+      * Create a Flowable for the sensor values
+      *
+      * @param refreshPeriod milliseconds between each refresh
+      * @return
+      */
+    def createObservable(refreshPeriod: Long): Flowable[T]
 }
 

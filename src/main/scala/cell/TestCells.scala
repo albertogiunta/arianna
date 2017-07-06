@@ -7,9 +7,9 @@ import akka.actor.{ActorSystem, Props}
 import cell.cluster.{CellPublisher, CellSubscriber}
 import com.typesafe.config.ConfigFactory
 import common.ClusterMembersListener
-import ontologies.messages.MessageType._
+import ontologies.messages.Location._
+import ontologies.messages.MessageType.Handshake
 import ontologies.messages.{AriadneRemoteMessage, Location}
-
 /**
   * Created by Alessandro on 28/06/2017.
   */
@@ -37,7 +37,10 @@ object TestCells extends App {
     Thread.sleep(5000)
     //subscriber ! MyMessage(ontologies.Init, null)
     //Simulate a handshake message sending to the server
-    publisher ! AriadneRemoteMessage(Handshake, Handshake.Subtype.Basic,
-        Location.Cell >> Location.Self, "Hello baby.")
+    publisher ! AriadneRemoteMessage(
+        Handshake,
+        Handshake.Subtype.Basic,
+        Location.Cell >> Location.Server,
+        "Hello baby.")
     println("[Cell] message sended!")
 }
