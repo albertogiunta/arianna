@@ -28,7 +28,7 @@ class MasterSubscriber extends BasicSubscriber {
     
     override protected def init(args: List[Any]) = {
         log.info("Hello there from {}!", name)
-        publisher = sibling("Publisher-Master").get
+        publisher = sibling("Publisher").get
         topologySupervisor = sibling("TopologySupervisor").get
     }
     

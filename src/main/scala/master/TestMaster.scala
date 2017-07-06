@@ -5,18 +5,38 @@ import java.nio.file.Paths
 
 import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
-import common.ClusterMembersListener
-import master.cluster.{MasterPublisher, MasterSubscriber, TopologySupervisor}
-import ontologies.messages.{AriadneLocalMessage, Location}
+import common.{ClusterMembersListener, CustomActor}
+import master.cluster.{DataStreamer, MasterPublisher, MasterSubscriber, TopologySupervisor}
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology
 import ontologies.messages.MessageType.Topology.Subtype.Planimetrics
+import ontologies.messages.{AriadneLocalMessage, Location}
 
 import scala.io.Source
 
 /**
   * Created by Alessandro on 29/06/2017.
   */
+class Master extends CustomActor {
+    
+    override def preStart = {
+        
+        val listener = context.actorOf(Props[ClusterMembersListener], "ClusterListener")
+        
+        val subscriber = context.actorOf(Props[MasterSubscriber], "Subscriber")
+        
+        val publisher = context.actorOf(Props[MasterPublisher], "Publisher")
+        
+        val topologySupervisor = context.actorOf(Props[TopologySupervisor], "TopologySupervisor")
+        
+        val dataStreamer = context.actorOf(Props[DataStreamer], "DataStreamer")
+    }
+    
+    override def receive: Receive = {
+        case _ => log.info("Cazzo mi invii messaggi, stronzo!")
+    }
+}
+
 object TestMaster extends App {
 
     val path2Project = Paths.get("").toFile.getAbsolutePath
@@ -27,29 +47,15 @@ object TestMaster extends App {
 
     implicit val system = ActorSystem("Arianna-Cluster", config)
     
-    //    system.settings.config.getStringList("akka.cluster.seed-nodes").forEach(s => println(s))
-    //    println()
-    //
-    //    println("ActorSystem " + system.name + " is now Active...")
-
-    val listener = system.actorOf(Props[ClusterMembersListener], "Listener-Master")
-
-    val subscriber = system.actorOf(Props[MasterSubscriber], "Subscriber-Master")
-
-    val publisher = system.actorOf(Props[MasterPublisher], "Publisher-Master")
-    
-    val topologySupervisor = system.actorOf(Props[TopologySupervisor], "TopologySupervisor")
+    val master = system.actorOf(Props[Master], "Master")
     
     val path2map = path2Project + "/res/json/map4test.json"
     
     val topology = Source.fromFile(new File(path2map)).getLines.mkString
     
-    //    println(topology)
-    //    println(Planimetrics.unmarshal(topology))
-    
     Thread.sleep(500)
     
-    topologySupervisor ! AriadneLocalMessage(
+    system.actorSelection("user/Master/TopologySupervisor") ! AriadneLocalMessage(
         Topology,
         Planimetrics,
         Location.Admin >> Location.Server,

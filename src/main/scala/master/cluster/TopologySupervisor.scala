@@ -5,7 +5,7 @@ import common.{BasicActor, Counter}
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Handshake.Subtype.Cell2Master
 import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, Topology4Cell, Topology4CellLight}
-import ontologies.messages.MessageType.Update.Subtype.{ActualLoad, Sensors}
+import ontologies.messages.MessageType.Update.Subtype.{ActualLoad, AdminUpdate, Sensors}
 import ontologies.messages.MessageType.{Alarm, Handshake, Topology, Update}
 import ontologies.messages._
 
@@ -28,7 +28,7 @@ class TopologySupervisor extends BasicActor {
     private val admin2Server: MessageDirection = Location.Admin >> Location.Server
     private val server2Admin: MessageDirection = admin2Server.reverse
     
-    //private var requestHandler: ActorSelection = _
+    private var requestHandler: ActorSelection = _
     private var publisher: ActorSelection = _
     private var subscriber: ActorSelection = _
     
@@ -36,9 +36,9 @@ class TopologySupervisor extends BasicActor {
     
     override protected def init(args: List[Any]) = {
         log.info("Hello there from {}!", name)
-        //requestHandler = sibling("PINCO-PALLO").get
-        publisher = sibling("Publisher-Master").get
-        subscriber = sibling("Subscriber-Master").get
+        requestHandler = sibling("DataStreamer").get
+        publisher = sibling("Publisher").get
+        subscriber = sibling("Subscriber").get
     }
     
     override protected def receptive = {
@@ -78,8 +78,8 @@ class TopologySupervisor extends BasicActor {
                     log.info("I've become ProActive")
                 
                     unstashAll
-                    
-                    // Update all the Cells
+    
+                    // Update all the Cellsbut first notify the subscriber
                     subscriber ! AriadneLocalMessage(
                         Topology, Topology4Cell, server2Cell,
                         AreaForCell(Random.nextInt(),
@@ -91,6 +91,7 @@ class TopologySupervisor extends BasicActor {
     }
     
     private def proactive: Receive = {
+    
         case msg@AriadneLocalMessage(Alarm, _, _, _) => triggerAlarm(msg)
     
         case AriadneLocalMessage(Update, ActualLoad, `cell2Server`, pkg: ActualLoadUpdate) =>
@@ -106,10 +107,10 @@ class TopologySupervisor extends BasicActor {
                 )
                 
                 // Send the updated Map to the Admin
-                //                requestHandler ! AriadneLocalMessage(
-                //                    Topology, AdminUpdate, server2Admin,
-                //                    UpdateForAdmin(topology.values.map(c => CellUpdate(c)).toList)
-                //                )
+                requestHandler ! AriadneLocalMessage(
+                    Topology, AdminUpdate, server2Admin,
+                    UpdateForAdmin(topology.values.map(c => CellUpdate(c)).toList)
+                )
                 
                 // Update all the Cells
                 publisher ! AriadneLocalMessage(
@@ -127,10 +128,10 @@ class TopologySupervisor extends BasicActor {
                 topology.put(pkg.info.name, news)
                 
                 // Send the updated Map to the Admin
-                //                requestHandler ! AriadneLocalMessage(
-                //                    Topology, AdminUpdate, server2Admin,
-                //                    UpdateForAdmin(topology.values.map(c => CellUpdate(c)).toList)
-                //                )
+                requestHandler ! AriadneLocalMessage(
+                    Topology, AdminUpdate, server2Admin,
+                    UpdateForAdmin(topology.values.map(c => CellUpdate(c)).toList)
+                )
             }
     
         case _ => desist _

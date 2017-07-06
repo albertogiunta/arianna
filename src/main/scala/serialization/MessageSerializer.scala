@@ -90,8 +90,8 @@ object MessageSerializer extends MessageSerializer[String] {
     }
     
     override def deserialize(array: Array[Byte]): Message[String] = {
-
-        val retrieveHeader: (Int, Int) => Seq[Char] =
+    
+        val retrieveBlock: (Int, Int) => Seq[Char] =
             (from, to) => {
                 for {
                     j <- from until to
@@ -114,16 +114,16 @@ object MessageSerializer extends MessageSerializer[String] {
 
         /** ************************************************************/
 
-        val supertype = retrieveHeader(typeOffset, subtypeOffset - 1)
+        val supertype = retrieveBlock(typeOffset, subtypeOffset - 1)
         //println(supertype)
-
-        val subtype = retrieveHeader(subtypeOffset, fromOffset - 1)
+    
+        val subtype = retrieveBlock(subtypeOffset, fromOffset - 1)
         //println(subtype)
-        val from = retrieveHeader(fromOffset, toOffset - 1)
+        val from = retrieveBlock(fromOffset, toOffset - 1)
         //println(from)
-        val to = retrieveHeader(toOffset, contentOffset)
+        val to = retrieveBlock(toOffset, contentOffset)
         //println(to)
-        val content = retrieveHeader(contentOffset, array.length)
+        val content = retrieveBlock(contentOffset, array.length)
         //println(content)
         
         AriadneRemoteMessage(
@@ -133,20 +133,7 @@ object MessageSerializer extends MessageSerializer[String] {
             content.mkString
         )
     }
-
-
-}
-
-object DataTypeLengthConverter {
     
-    val charLengthInByte = 2
-    val intLengthInByte = 4
-    val shortLengthInByte = 2
-    val longLengthInByte = 8
-    val floatLengthInByte = 4
-    val doubleLengthInByte = 8
-    val booleanLengthInByte = 1
-    val stringLengthInByte: Int => Int = _ * charLengthInByte
 }
 
 object TestSerializer extends App {
