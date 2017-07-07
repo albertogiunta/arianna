@@ -1,15 +1,14 @@
 package master.cluster
 
-import akka.actor.{ActorSelection, ActorSystem, Cancellable, Props}
+import akka.actor.{ActorSelection, ActorSystem, Props}
 import akka.stream._
-import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.scaladsl.{Flow, Sink, Source, SourceQueueWithComplete}
 import common.CustomActor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Update
 import ontologies.messages.MessageType.Update.Subtype.Sensors
 import ontologies.messages._
 
-import scala.collection.mutable
 import scala.concurrent.duration._
 import scala.util.Random
 
@@ -22,47 +21,35 @@ class DataStreamer extends CustomActor {
     
     implicit private val system = context.system
     implicit private val executionContext = system.dispatcher
-    implicit private val materializer: ActorMaterializer = ActorMaterializer()
+    implicit private val materializer: ActorMaterializer = ActorMaterializer.create(system)
     
-    private val queue: mutable.Queue[AriadneLocalMessage[SensorList]] = mutable.Queue.empty
-    private val messageHandler: AriadneLocalMessage[SensorList] => Unit = msg => println(msg.content.info)
+    private val messageHandler: AriadneLocalMessage[_] => Unit = msg => println(Thread.currentThread().getName + " - " + msg.content)
     
-    private val timeout = 500 millisecond
-    private val delay = 1 seconds
+    private val dataSource = Source.queue[AriadneLocalMessage[_]](1000, OverflowStrategy.backpressure)
     
-    private val time =
-        Source.tick(delay, timeout, messageHandler)
-            .to(Sink.foreach(t => {
-                if (queue.nonEmpty) {
-                    t(queue.dequeue)
-                }
-            }))
+    private val dataStream = Flow[AriadneLocalMessage[_]]
+        .throttle(1, 1000 milliseconds, 5, ThrottleMode.Shaping)
+        .to(Sink.foreach(msg => messageHandler(msg)))
     
-    //    private val data: Source[Message4Admin, SourceQueueWithComplete[Message4Admin]] =
-    //        Source.queue[Message4Admin](1000, OverflowStrategy.backpressure)
-    //
-    //    private val dataFlow: SourceQueueWithComplete[Message4Admin] =
-    //        Flow[Message4Admin].to(Sink.foreach(e => println(e.content.list))).runWith(data)
-    
-    private var cancel: Cancellable = _
+    private var streamer: SourceQueueWithComplete[AriadneLocalMessage[_]] = _
     private var admin: ActorSelection = _
     
     override def preStart = {
         admin = sibling("AdminManager").get
-        cancel = time.async.run()
+        streamer = dataStream.async.runWith(dataSource)
         super.preStart
     }
     
     override def postStop = {
-        cancel.cancel
+        streamer.complete()
         super.postStop
     }
     
     override def receive: Receive = {
         
         case msg@AriadneLocalMessage(Update, Sensors, _, _: SensorList) =>
-            //            println("Saving for Later... " + msg.supertype)
-            queue += msg.asInstanceOf[AriadneLocalMessage[SensorList]]
+            log.info(Thread.currentThread().getName + " - Streaming to handler...")
+            streamer offer msg
         case _ =>
     }
 }
@@ -87,7 +74,6 @@ object TestDataStreamer extends App {
                 )
             )
         Thread.sleep(100)
-        
         streamer ! AriadneLocalMessage(
             Update,
             Sensors,
