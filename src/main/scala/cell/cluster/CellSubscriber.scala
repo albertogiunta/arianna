@@ -25,7 +25,7 @@ class CellSubscriber extends BasicSubscriber {
             log.info("{} Successfully Subscribed to {}", name, topic)
         case msg@AriadneRemoteMessage(Alarm, Alarm.Subtype.Basic, _, cnt) =>
             log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
-        case msg@AriadneRemoteMessage(Topology, Topology.Subtype.RealTopology, _, cnt) =>
+        case msg@AriadneRemoteMessage(Topology, Topology.Subtype.Topology4Cell, _, cnt) =>
             log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
         case _ => desist _
     }

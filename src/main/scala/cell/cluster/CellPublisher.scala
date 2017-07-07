@@ -26,7 +26,7 @@ class CellPublisher extends BasicPublisher {
         case msg@AriadneRemoteMessage(Update, Update.Subtype.Practicability, _, _) =>
             mediator ! Publish(Topic.Update, msg)
 
-        case msg@AriadneRemoteMessage(MessageType.Update, Update.Subtype.CellOccupation, _, _) =>
+        case msg@AriadneRemoteMessage(MessageType.Update, Update.Subtype.Practicability, _, _) =>
             mediator ! Publish(Topic.Update, msg)
         case _ => // Ignore
     }
