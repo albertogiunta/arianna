@@ -26,11 +26,11 @@ object TestClusterJoin extends App {
 
     implicit val system = ActorSystem("Arianna-Cluster", config)
     
-    val listener = system.actorOf(Props[ClusterMembersListener], "Listener-Cell")
-
-    val subscriber = system.actorOf(Props[MasterSubscriber], "Subscriber-Cell")
-
-    val publisher = system.actorOf(Props[MasterPublisher], "Publisher-Cell")
+    val listener = system.actorOf(Props[ClusterMembersListener], "ClusterMemberListener")
+    
+    val subscriber = system.actorOf(Props[MasterSubscriber], "CellSubscriber")
+    
+    val publisher = system.actorOf(Props[MasterPublisher], "CellPublisher")
     
     var jsonStr: String = MessageType.Update.Subtype.Sensors
         .marshal(
