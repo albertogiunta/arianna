@@ -5,6 +5,7 @@ import java.nio.file.Paths
 
 import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
+import ontologies.messages.SampleUpdate
 
 class ServerRemote extends Actor with ActorLogging {
 

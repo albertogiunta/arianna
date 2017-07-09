@@ -47,6 +47,14 @@ object CellForUser {
         new CellForUser(actorPath, cell.infoCell, cell.neighbors, cell.passages)
 }
 
+final case class CellForSwitcher(infoCell: InfoCell,
+                                 neighbors: List[InfoCell]) extends MessageContent
+
+object CellForSwitcher {
+    def apply(cell: CellForUser): CellForSwitcher =
+        new CellForSwitcher(cell.infoCell, cell.neighbors)
+}
+
 final case class CellForCell(infoCell: InfoCell,
                              neighbors: List[InfoCell],
                              passages: List[Passage],
@@ -72,6 +80,12 @@ final case class UpdateForAdmin(list: List[CellUpdate])
 final case class CellUpdate(infoCell: InfoCell,
                             currentPeople: Int,
                             sensors: List[Sensor])
+
+final case class UserAndAntennaPositionUpdate(userPosition: Point, antennaPosition: Point)
+
+final case class AntennaPositions(userPosition: Point, antennaPositions: List[InfoCell])
+
+final case class Empty()
 
 object CellUpdate {
     def apply(cell: Cell): CellUpdate = new CellUpdate(cell.infoCell, cell.currentPeople, cell.sensors)
