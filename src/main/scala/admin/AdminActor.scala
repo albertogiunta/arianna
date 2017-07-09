@@ -25,16 +25,16 @@ class AdminActor(interfaceView: InterfaceView) extends CustomActor {
         case msg@AriadneRemoteMessage(MessageType.Update, MessageType.Update.Subtype.UpdateForAdmin, _, _) => {
             val adminUpdate: UpdateForAdmin = MessageType.Update.Subtype.UpdateForAdmin.unmarshal(msg.content)
             val updateCells: ListBuffer[CellForView] = new ListBuffer[CellForView]
-            adminUpdate.list.foreach(c => updateCells += new CellForView(c.infoCell.name, c.currentPeople, c.sensors))
+            adminUpdate.list.foreach(c => updateCells += new CellForView(c.infoCell.id, c.infoCell.name, c.currentPeople, c.sensors))
             interfaceController.updateView(updateCells.toList)
         }
         //TODO Update view
         case msg@AriadneLocalMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, _, _) => {
             area = MessageType.Topology.Subtype.Planimetrics.unmarshal(msg.content.toString)
             val initialConfiguration: ListBuffer[CellForView] = new ListBuffer[CellForView]
-            area.cells.foreach(c => initialConfiguration += new CellForView(c.infoCell.name, c.currentPeople, c.sensors))
+            area.cells.foreach(c => initialConfiguration += new CellForView(c.infoCell.id, c.infoCell.name, c.currentPeople, c.sensors))
             interfaceController.createCells(initialConfiguration.toList)
-            serverActor ! AriadneRemoteMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, Location.Admin >> Location.Server, msg.content.toString)
+            //serverActor ! AriadneRemoteMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, Location.Admin >> Location.Server, msg.content.toString)
         }
         case _ => println("none")
 

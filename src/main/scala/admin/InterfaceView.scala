@@ -26,11 +26,4 @@ class InterfaceView extends Application {
         primaryStage.show()
     }
 
-
-
-    def handleAlarm(): Unit = {
-        //controller.triggerAlarm
-    }
-
-
 }
