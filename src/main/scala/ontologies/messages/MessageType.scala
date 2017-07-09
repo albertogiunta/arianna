@@ -228,7 +228,7 @@ object MessageType {
             
             object ActualLoad extends MessageSubtype {
                 
-                override val subtypeName = "CellOccupation"
+                override val subtypeName = "ActualCellOccupation"
                 
                 def unmarshal(json: String): ActualLoadUpdate = json.parseJson.convertTo[ActualLoadUpdate]
                 
@@ -237,9 +237,9 @@ object MessageType {
             
             object AdminUpdate extends MessageSubtype {
                 
-                override val subtypeName = "CellUpdate"
+                override val subtypeName = "AdminUpdate"
                 
-                def unmarshal(json: String): CellUpdate = json.parseJson.convertTo[CellUpdate]
+                def unmarshal(json: String): UpdateForAdmin = json.parseJson.convertTo[UpdateForAdmin]
                 
                 def marshal(obj: UpdateForAdmin): String = obj.toJson.toString()
             }

@@ -107,10 +107,7 @@ class TopologySupervisor extends BasicActor {
                 )
                 
                 // Send the updated Map to the Admin
-                requestHandler ! AriadneLocalMessage(
-                    Topology, AdminUpdate, server2Admin,
-                    UpdateForAdmin(topology.values.map(c => CellUpdate(c)).toList)
-                )
+                requestHandler ! topology.values
                 
                 // Update all the Cells
                 publisher ! AriadneLocalMessage(
@@ -151,15 +148,4 @@ class TopologySupervisor extends BasicActor {
         (load * 1.05) / capacity * (100.0 / log_b(4.0, flows))
     }
     
-}
-
-object TestSupervisor extends App {
-    
-    def calculatePracticability(capacity: Double, load: Double, flows: Double): Double = {
-        val log_b: (Double, Double) => Double = (b, n) => Math.log(n) / Math.log(b)
-        
-        (load * 1.05) / capacity * (100.0 / log_b(4.0, flows))
-    }
-    
-    println(calculatePracticability(50, 50, 2))
 }

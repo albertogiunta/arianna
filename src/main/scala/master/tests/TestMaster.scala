@@ -1,42 +1,21 @@
-package master
+package master.tests
 
 import java.io.File
 import java.nio.file.Paths
 
 import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
-import common.{ClusterMembersListener, CustomActor}
-import master.cluster.{DataStreamer, MasterPublisher, MasterSubscriber, TopologySupervisor}
-import ontologies.messages.Location._
+import master.Master
 import ontologies.messages.MessageType.Topology
 import ontologies.messages.MessageType.Topology.Subtype.Planimetrics
 import ontologies.messages.{AriadneLocalMessage, Location}
+import ontologies.messages.Location._
 
 import scala.io.Source
 
 /**
-  * Created by Alessandro on 29/06/2017.
+  * Created by Xander_C on 09/07/2017.
   */
-class Master extends CustomActor {
-    
-    override def preStart = {
-        
-        val listener = context.actorOf(Props[ClusterMembersListener], "ClusterListener")
-        
-        val subscriber = context.actorOf(Props[MasterSubscriber], "Subscriber")
-        
-        val publisher = context.actorOf(Props[MasterPublisher], "Publisher")
-        
-        val topologySupervisor = context.actorOf(Props[TopologySupervisor], "TopologySupervisor")
-        
-        val dataStreamer = context.actorOf(Props[DataStreamer], "DataStreamer")
-    }
-    
-    override def receive: Receive = {
-        case _ => log.info("Cazzo mi invii messaggi, stronzo!")
-    }
-}
-
 object TestMaster extends App {
 
     val path2Project = Paths.get("").toFile.getAbsolutePath
