@@ -30,28 +30,12 @@ class MasterPublisher extends BasicPublisher {
     }
 
     override protected val receptive = {
-    
-        case msg@AriadneLocalMessage(Alarm, _, _, cnt: AlarmContent) =>
-    
-            mediator ! Publish(Topic.Updates,
-                AriadneRemoteMessage(
-                    msg.supertype,
-                    msg.subtype,
-                    msg.direction,
-                    msg.subtype.marshal(cnt)
-                )
-            )
-    
-        case msg@AriadneLocalMessage(Topology, _, _, cnt: AreaForCell) =>
-            mediator ! Publish(
-                Topic.Topologies,
-                AriadneRemoteMessage(
-                    msg.supertype,
-                    msg.subtype,
-                    msg.direction,
-                    msg.subtype.marshal(cnt)
-                )
-            )
+
+        case msg@AriadneLocalMessage(Alarm, _, _, _) =>
+            mediator ! Publish(Topic.Updates, Message.local2remote(msg))
+
+        case msg@AriadneLocalMessage(Topology, _, _, _) =>
+            mediator ! Publish(Topic.Topologies, Message.local2remote(msg))
         case _ => desist _
     }
 }
