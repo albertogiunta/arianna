@@ -1,4 +1,4 @@
-package serialization
+package serialization.tests
 
 import akka.serialization._
 import ontologies.messages.Location._
@@ -9,24 +9,24 @@ import ontologies.messages._
   * A Custom Serializer for Message(s) to be handled by the ActorSystem itself
   *
   */
-class AriadneRemoteMessageSerializer extends SerializerWithStringManifest {
+class AriadneMessageSerializer extends SerializerWithStringManifest {
     
     override def identifier = 21040507
     
     override def manifest(obj: AnyRef): String = obj match {
-        case _: AriadneRemoteMessage => AriadneRemoteMessage.getClass.getName
-        case _: Message[_] => "ontologies.messages.Message$"
+        case _: AriadneMessage[MessageContent] => AriadneMessage.getClass.getName
+        case _: Message[MessageContent] => "ontologies.messages.Message$"
         case _ => null
     }
     
     override def toBinary(obj: AnyRef): Array[Byte] = obj match {
-        case msg: AriadneRemoteMessage => MessageSerializer.serialize(msg)
-        case msg: Message[String] => MessageSerializer.serialize(msg)
+        case msg: AriadneMessage[MessageContent] => MessageSerializer.serialize(msg)
+        case msg: Message[MessageContent] => MessageSerializer.serialize(msg)
         case _ => null
     }
     
     override def fromBinary(bytes: Array[Byte], manifest: String): AnyRef = manifest match {
-        case man if man == AriadneRemoteMessage.getClass.getName ||
+        case man if man == AriadneMessage.getClass.getName ||
             man == "ontologies.Message$" =>
             MessageSerializer.deserialize(bytes)
         case _ => null
@@ -48,92 +48,84 @@ trait MessageSerializer[T] {
 /**
   * An Utility Companion Object that provides the logic to Serialize any object that implements the trait Message
   */
-object MessageSerializer extends MessageSerializer[String] {
+object MessageSerializer extends MessageSerializer[MessageContent] {
     
-    override def serialize(message: Message[String]): Array[Byte] = {
+    override def serialize(message: Message[MessageContent]): Array[Byte] = {
         
         val char2byte: Char => Byte = { c =>
-            //            println(c.toString + "=>" + c.toByte)
+            //println(c.toString + "=>" + c.toByte)
             c.toByte
         }
-
-        //         Create an Array[Byte] of the same length of the sum of the length in Byte of the fields
-        //         the first byte are intLengthInByte that are needed in order to get the length of the messageType,
-        //         which is variable
-        //         This is always recoverable since Int are always of fixed length 8 Byte / 32 bit
+        
+        /*
+            Create an Array[Byte] of the same length of the sum of the length in Byte of the fields
+            the first byte are intLengthInByte that are needed in order to get the length of the messageType,
+            which is variable. This is always recoverable since Int are always of fixed length 8 Byte / 32 bit
+        */
         Array.concat(
-            Array.fill(1) {
-                message.supertype.toString.length.toByte
-            },
-            message.supertype.toString.map(char2byte).toArray,
-            
             Array.fill(1) {
                 message.subtype.toString.length.toByte
             },
             message.subtype.toString.map(char2byte).toArray,
-
+            
             Array.fill(1) {
                 message.direction.iter.from.length.toByte
             },
             message.direction.iter.from.map(char2byte).toArray,
-
+            
             Array.fill(1) {
                 message.direction.iter.to.length.toByte
             },
             message.direction.iter.to.map(char2byte).toArray,
-
-            message.content.map(char2byte).toArray
+            
+            message.subtype.marshal(message.content).map(char2byte).toArray
         )
     }
     
-    override def deserialize(array: Array[Byte]): Message[String] = {
-    
+    override def deserialize(array: Array[Byte]): Message[MessageContent] = {
+        
         val retrieveBlock: (Int, Int) => Seq[Char] =
             (from, to) => {
                 for {
                     j <- from until to
                 } yield array(j).toChar
             }
-
-        val typeLen = array(0)
-        val typeOffset = 1
-
-        val subtypeLen = array(typeOffset + typeLen)
-        val subtypeOffset = typeOffset + typeLen + 1
-
+        
+        val subtypeLen = array(0)
+        val subtypeOffset = 1
+        
         val fromLen = array(subtypeOffset + subtypeLen)
         val fromOffset = subtypeOffset + subtypeLen + 1
-
+        
         val toLen = array(fromOffset + fromLen)
         val toOffset = fromOffset + fromLen + 1
-
+        
         val contentOffset = toOffset + toLen
-
+        
         /** ************************************************************/
-
-        val supertype = retrieveBlock(typeOffset, subtypeOffset - 1)
-        //println(supertype)
-    
-        val subtype = retrieveBlock(subtypeOffset, fromOffset - 1)
+        
+        val subtypeBytes = retrieveBlock(subtypeOffset, fromOffset - 1)
         //println(subtype)
-        val from = retrieveBlock(fromOffset, toOffset - 1)
+        val fromBytes = retrieveBlock(fromOffset, toOffset - 1)
         //println(from)
-        val to = retrieveBlock(toOffset, contentOffset)
+        val toBytes = retrieveBlock(toOffset, contentOffset)
         //println(to)
-        val content = retrieveBlock(contentOffset, array.length)
+        val contentBytes = retrieveBlock(contentOffset, array.length)
         //println(content)
         
-        AriadneRemoteMessage(
-            MessageType.Factory(supertype.mkString),
-            MessageSubtype.Factory(subtype.mkString),
-            Location.Factory(from.mkString) >> Location.Factory(to.mkString),
-            content.mkString
+        val subtype = MessageSubtype.Factory(subtypeBytes.mkString)
+        
+        AriadneMessage(
+            subtype.superType,
+            subtype,
+            Location.Factory(fromBytes.mkString) >> Location.Factory(toBytes.mkString),
+            subtype.unmarshal(contentBytes.mkString)
         )
     }
     
 }
 
-object TestSerializer extends App {
+object TestMessageSerializer extends App {
     
     var jsonStr: String = MessageType.Update.Subtype.Sensors
         .marshal(
@@ -146,27 +138,28 @@ object TestSerializer extends App {
             )
         )
     
-    //    var toJsonObj: String => SensorList = s => MessageType.Update.Subtype.Sensors.unmarshal(s)
-    //
-    //    val localmsg = AriadneLocalMessage(
-    //        Update,
-    //        Update.Subtype.Sensors,
-    //        Location.Cell >> Location.Server,
-    //        toJsonObj(jsonStr)
-    //    )
+    var toJsonObj: String => MessageContent = s => MessageType.Update.Subtype.Sensors.unmarshal(s)
     
-    val remotemsg = AriadneRemoteMessage(
+    val serializer = new AriadneMessageSerializer
+    
+    val message = AriadneMessage(
         Update,
         Update.Subtype.Sensors,
         Location.Cell >> Location.Server,
-        jsonStr
+        toJsonObj(jsonStr)
     )
     
-    println(remotemsg)
-    
-    val serial = MessageSerializer.serialize(remotemsg)
-    
+    println(message)
+    println("Testing Serialization Utility...")
+    val serial = MessageSerializer.serialize(message)
     val deserial = MessageSerializer.deserialize(serial)
     
-    println(deserial.content == jsonStr)
+    println(deserial == message)
+    
+    val serializedMessage = serializer.toBinary(message)
+    val deserializedMessage = serializer.fromBinary(serializedMessage, serializer.manifest(message))
+    println("Testing Binary Serializer...")
+    println(serializedMessage.mkString("-"))
+    println(deserializedMessage == message)
+    println(deserializedMessage == deserial)
 }

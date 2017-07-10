@@ -17,9 +17,9 @@ trait Message[T] {
     def content: T
     
     override def toString =
-        "Message of type(" + supertype.toString + "." + subtype.toString + ") " +
-            direction.toString +
-            " Message Content is \"" + content.toString + "\""
+        "Message of type(" + supertype.toString + "/" + subtype.toString + ") \n" +
+            direction.toString + "\n" +
+            "Message Content is \"" + content.toString + "\"\n"
     
     override def equals(obj: Any) = obj match {
         case msg: Message[_] =>
@@ -32,6 +32,11 @@ final case class AriadneLocalMessage[T <: MessageContent](supertype: MessageType
                                                           subtype: MessageSubtype,
                                                           direction: MessageDirection,
                                                           content: T) extends Message[T]
+
+final case class AriadneMessage[T <: MessageContent](supertype: MessageType,
+                                                     subtype: MessageSubtype,
+                                                     direction: MessageDirection,
+                                                     content: T) extends Message[T]
 
 final case class AriadneRemoteMessage(supertype: MessageType,
                                       subtype: MessageSubtype,
