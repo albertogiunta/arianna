@@ -39,8 +39,8 @@ class MasterSubscriber extends BasicSubscriber {
             log.info("{} Successfully Subscribed to {}", name, topic)
     
         case msg@AriadneRemoteMessage(Alarm, _, _, _) => triggerAlarm(msg)
-    
-        case AriadneRemoteMessage(Handshake, _, `cell2Server`, _) =>
+
+        case AriadneRemoteMessage(Handshake, Cell2Master, `cell2Server`, _) =>
             log.info("Stashing handshake from {} for later administration...", sender.path)
             stash
     
