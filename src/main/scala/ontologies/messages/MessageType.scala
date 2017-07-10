@@ -211,10 +211,10 @@ object MessageType {
             object Practicability extends MessageSubtype {
                 
                 override val subtypeName = "Practicability"
-                
-                def unmarshal(json: String): Double = json.parseJson.convertTo[Double]
-                
-                def marshal(obj: Double): String = obj.toJson.toString()
+
+                def unmarshal(json: String): LightCell = json.parseJson.convertTo[LightCell]
+
+                def marshal(obj: LightCell): String = obj.toJson.toString()
             }
             
             object Position extends MessageSubtype {
