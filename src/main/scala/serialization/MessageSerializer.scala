@@ -63,14 +63,14 @@ object MessageSerializer extends MessageSerializer[String] {
         //         This is always recoverable since Int are always of fixed length 8 Byte / 32 bit
         Array.concat(
             Array.fill(1) {
-                message.supertype.toString.length.toByte
+                message.supertype.typeName.length.toByte
             },
-            message.supertype.toString.map(char2byte).toArray,
+            message.supertype.typeName.map(char2byte).toArray,
             
             Array.fill(1) {
-                message.subtype.toString.length.toByte
+                message.subtype.subtypeName.length.toByte
             },
-            message.subtype.toString.map(char2byte).toArray,
+            message.subtype.subtypeName.map(char2byte).toArray,
 
             Array.fill(1) {
                 message.direction.iter.from.length.toByte

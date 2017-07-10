@@ -15,7 +15,7 @@ trait MessageSubtype {
     
     def marshal(jso: MessageContent): String
     
-    override def toString: String = subtypeName
+    override def toString: String = superType.typeName + "/" + subtypeName
     
     override def equals(obj: Any) = obj match {
         case that: MessageSubtype => that.toString == this.toString
@@ -23,7 +23,10 @@ trait MessageSubtype {
 }
 
 object MessageSubtype {
+    
     implicit def subtype2String(st: MessageSubtype): String = st.subtypeName
+    
+    implicit def string2Subtype(st: String): MessageSubtype = MessageSubtype.Factory(st)
     
     object Factory {
         def apply(subtypeName: String): MessageSubtype = subtypeName.toLowerCase match {

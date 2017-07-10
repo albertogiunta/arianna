@@ -273,7 +273,7 @@ object MessageType {
         
     }
     
-    implicit def MessageType2String(msg: MessageType): String = msg.toString
+    implicit def MessageType2String(msg: MessageType): String = msg.typeName
     
     implicit def String2MessageType(str: String): MessageType = MessageType.Factory(str)
     
