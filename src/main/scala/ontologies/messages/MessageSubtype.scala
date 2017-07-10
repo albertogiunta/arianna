@@ -7,25 +7,28 @@ import ontologies.messages.MessageType._
   * Created by Xander_C on 03/07/2017.
   */
 trait MessageSubtype {
-
+    
+    val superType: MessageType
     val subtypeName: String
-
+    
+    def unmarshal(json: String): MessageContent
+    
+    def marshal(jso: MessageContent): String
+    
     override def toString: String = subtypeName
-
+    
     override def equals(obj: Any) = obj match {
         case that: MessageSubtype => that.toString == this.toString
     }
 }
 
-//final case class AriadneMessageSubtype(override val subtypeName: String) extends MessageSubtype
-
 object MessageSubtype {
     implicit def subtype2String(st: MessageSubtype): String = st.subtypeName
-
+    
     object Factory {
         def apply(subtypeName: String): MessageSubtype = subtypeName.toLowerCase match {
-            case st if st == Init.Subtype.Basic.toLowerCase =>
-                Init.Subtype.Basic
+            case st if st == Init.Subtype.Greetings.toLowerCase =>
+                Init.Subtype.Greetings
             case st if st == Alarm.Subtype.Basic.toLowerCase =>
                 Alarm.Subtype.Basic
             case st if st == Handshake.Subtype.Cell2Master.toLowerCase =>
@@ -46,8 +49,6 @@ object MessageSubtype {
                 Topology.Subtype.Topology4User
             case st if st == Update.Subtype.Sensors.toLowerCase =>
                 Update.Subtype.Sensors
-            case st if st == Update.Subtype.Practicability.toLowerCase =>
-                Update.Subtype.Practicability
             case st if st == Update.Subtype.Position.toLowerCase =>
                 Update.Subtype.Position
             case st if st == Update.Subtype.ActualLoad.toLowerCase =>
@@ -57,5 +58,5 @@ object MessageSubtype {
             case _ => null
         }
     }
-
+    
 }

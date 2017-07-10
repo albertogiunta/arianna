@@ -1,5 +1,7 @@
 package ontologies.messages
 
+import ontologies.messages.Location._
+import ontologies.messages.MessageType._
 import spray.json.{DefaultJsonProtocol, _}
 
 /**
@@ -13,7 +15,7 @@ object AriannaJsonProtocol extends DefaultJsonProtocol {
     implicit val passageFormat: RootJsonFormat[Passage] = jsonFormat3(Passage)
     implicit val sensorFormat: RootJsonFormat[Sensor] = jsonFormat2(Sensor)
     implicit val sensorListFormat: RootJsonFormat[SensorList] = jsonFormat2(SensorList.apply)
-    implicit val cellFormat: RootJsonFormat[Cell] = jsonFormat10(Cell)
+    implicit val cellFormat: RootJsonFormat[Cell] = jsonFormat10(ontologies.messages.Cell)
     implicit val areaFormat: RootJsonFormat[Area] = jsonFormat2(Area)
     implicit val cellForUserFormat: RootJsonFormat[CellForUser] = jsonFormat4(CellForUser.apply)
     implicit val cellForCellFormat: RootJsonFormat[CellForCell] = jsonFormat6(CellForCell.apply)
@@ -48,14 +50,16 @@ object MessageType {
         override val typeName = "Init"
         
         object Subtype {
-            
-            object Basic extends MessageSubtype { // To be renamed Greetings
-                
-                override val subtypeName = "Init" // Greetings
-                
-                def unmarshal(json: String): Greetings = null
-                
-                def marshal(obj: Greetings): String = null
+    
+            object Greetings extends MessageSubtype { // To be renamed Greetings
+        
+                override val subtypeName = "Greetings" // Greetings
+        
+                override val superType = Init
+        
+                override def unmarshal(json: String): Greetings = null
+        
+                override def marshal(obj: MessageContent): String = null
             }
             
         }
@@ -71,10 +75,14 @@ object MessageType {
             object Basic extends MessageSubtype {
                 
                 override val subtypeName = "Alarm"
-                
-                def unmarshal(json: String): AlarmContent = json.parseJson.convertTo[AlarmContent]
-                
-                def marshal(obj: AlarmContent): String = obj.toJson.toString()
+    
+                override val superType = Alarm
+    
+                override def unmarshal(json: String): AlarmContent =
+                    json.parseJson.convertTo[AlarmContent]
+    
+                override def marshal(obj: MessageContent): String =
+                    obj.asInstanceOf[AlarmContent].toJson.toString()
             }
             
         }
@@ -87,31 +95,26 @@ object MessageType {
         
         object Subtype {
             
-            object Basic extends MessageSubtype {
-                
-                override val subtypeName = "Handshake"
-                
-                def unmarshal(json: String): Int = json.parseJson.convertTo[Int]
-                
-                def marshal(obj: Int): String = obj.toJson.toString()
-            }
-            
             object Cell2User extends MessageSubtype {
                 
                 override val subtypeName = "Cell2User"
-                
-                def unmarshal(json: String): CellForUser = json.parseJson.convertTo[CellForUser]
-                
-                def marshal(obj: CellForUser): String = obj.toJson.toString()
+    
+                override val superType = Handshake
+    
+                override def unmarshal(json: String): CellForUser = json.parseJson.convertTo[CellForUser]
+    
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[CellForUser].toJson.toString()
             }
             
             object Cell2Master extends MessageSubtype {
                 
                 override val subtypeName = "Cell2Master"
-                
-                def unmarshal(json: String): InfoCell = json.parseJson.convertTo[InfoCell]
-                
-                def marshal(obj: InfoCell): String = obj.toJson.toString()
+    
+                override val superType = Handshake
+    
+                override def unmarshal(json: String): InfoCell = json.parseJson.convertTo[InfoCell]
+    
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[InfoCell].toJson.toString()
             }
             
         }
@@ -125,21 +128,25 @@ object MessageType {
         object Subtype {
             
             object Basic extends MessageSubtype {
-                
-                override val subtypeName = "SimpleRoute"
-                
-                def unmarshal(json: String): Any = null
-                
-                def marshal(obj: Any): String = null
+    
+                override val subtypeName = "Simple"
+    
+                override val superType = Route
+    
+                override def unmarshal(json: String): MessageContent = null
+    
+                override def marshal(obj: MessageContent): String = null
             }
             
             object Escape extends MessageSubtype {
-                
-                override val subtypeName = "EscapeRoute"
-                
-                def unmarshal(json: String): Any = null
-                
-                def marshal(obj: Any): String = null
+    
+                override val subtypeName = "Escape"
+    
+                override val superType = Route
+    
+                override def unmarshal(json: String): MessageContent = null
+    
+                override def marshal(obj: MessageContent): String = null
             }
             
         }
@@ -155,38 +162,46 @@ object MessageType {
             object Planimetrics extends MessageSubtype {
                 
                 override val subtypeName = "Planimetrics"
-                
-                def unmarshal(json: String): Area = json.parseJson.convertTo[Area]
-                
-                def marshal(obj: Area): String = obj.toJson.toString()
+    
+                override val superType = Topology
+    
+                override def unmarshal(json: String): Area = json.parseJson.convertTo[Area]
+    
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[InfoCell].toJson.toString()
             }
             
             
             object Topology4CellLight extends MessageSubtype {
                 
                 override val subtypeName = "LightweightTopology4Cell"
-                
-                def unmarshal(json: String): LightArea = json.parseJson.convertTo[LightArea]
-                
-                def marshal(obj: LightArea): String = obj.toJson.toString()
+    
+                override val superType = Topology
+    
+                override def unmarshal(json: String): LightArea = json.parseJson.convertTo[LightArea]
+    
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[LightArea].toJson.toString()
             }
             
             object Topology4Cell extends MessageSubtype {
                 
                 override val subtypeName = "Topology4Cell"
-                
-                def unmarshal(json: String): AreaForCell = json.parseJson.convertTo[AreaForCell]
-                
-                def marshal(obj: AreaForCell): String = obj.toJson.toString()
+    
+                override val superType = Topology
+    
+                override def unmarshal(json: String): AreaForCell = json.parseJson.convertTo[AreaForCell]
+    
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[AreaForCell].toJson.toString()
             }
             
             object Topology4User extends MessageSubtype {
                 
                 override val subtypeName = "Topology4User"
-                
-                def unmarshal(json: String): CellForUser = json.parseJson.convertTo[CellForUser]
-                
-                def marshal(obj: CellForUser): String = obj.toJson.toString()
+    
+                override val superType = Topology
+    
+                override def unmarshal(json: String): CellForUser = json.parseJson.convertTo[CellForUser]
+    
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[CellForUser].toJson.toString()
             }
             
         }
@@ -202,46 +217,56 @@ object MessageType {
             object Sensors extends MessageSubtype {
                 
                 override val subtypeName = "Sensors"
-                
-                def unmarshal(json: String): SensorList = json.parseJson.convertTo[SensorList]
-                
-                def marshal(obj: SensorList): String = obj.toJson.toString()
+    
+                override val superType = Update
+    
+                override def unmarshal(json: String): SensorList = json.parseJson.convertTo[SensorList]
+    
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[SensorList].toJson.toString()
             }
-            
+    
             object Practicability extends MessageSubtype {
-                
+        
                 override val subtypeName = "Practicability"
-
-                def unmarshal(json: String): LightCell = json.parseJson.convertTo[LightCell]
-
-                def marshal(obj: LightCell): String = obj.toJson.toString()
+        
+                override val superType = Update
+        
+                override def unmarshal(json: String): LightCell = json.parseJson.convertTo[LightCell]
+        
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[LightCell].toJson.toString()
             }
             
             object Position extends MessageSubtype {
                 
                 override val subtypeName = "Position"
-                
-                def unmarshal(json: String): Point = json.parseJson.convertTo[Point]
-                
-                def marshal(obj: Point): String = obj.toJson.toString()
+    
+                override val superType = Update
+    
+                override def unmarshal(json: String): Point = json.parseJson.convertTo[Point]
+    
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[Point].toJson.toString()
             }
             
             object ActualLoad extends MessageSubtype {
-                
-                override val subtypeName = "ActualCellOccupation"
-                
-                def unmarshal(json: String): ActualLoadUpdate = json.parseJson.convertTo[ActualLoadUpdate]
-                
-                def marshal(obj: ActualLoadUpdate): String = obj.toJson.toString()
+    
+                override val subtypeName = "CellOccupation"
+    
+                override val superType = Update
+    
+                override def unmarshal(json: String): ActualLoadUpdate = json.parseJson.convertTo[ActualLoadUpdate]
+    
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[ActualLoadUpdate].toJson.toString()
             }
             
             object AdminUpdate extends MessageSubtype {
-                
-                override val subtypeName = "AdminUpdate"
-                
-                def unmarshal(json: String): UpdateForAdmin = json.parseJson.convertTo[UpdateForAdmin]
-                
-                def marshal(obj: UpdateForAdmin): String = obj.toJson.toString()
+    
+                override val subtypeName = "CellUpdate"
+    
+                override val superType = Update
+    
+                override def unmarshal(json: String): UpdateForAdmin = json.parseJson.convertTo[UpdateForAdmin]
+    
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[UpdateForAdmin].toJson.toString()
             }
             
         }
@@ -270,41 +295,28 @@ object MessageType {
 
 object TestMessageType extends App {
     
-    var sensors: SensorList = MessageType.Update.Subtype.Sensors
-        .unmarshal(
-            "{" +
-                "\"info\" : {" +
-                "\"id\": 1, " +
-                "\"uri\": \"akka.tcp://cellSystem@127.0.0.1:4552/user/cell1\", " +
-                "\"name\": \"name\"," +
-                "\"roomVertices\": { " +
-                "\"northWest\": { " +
-                "\"x\": 0, " +
-                "\"y\": 5" +
-                "}," +
-                "\"northEast\": { " +
-                "\"x\": 2, " +
-                "\"y\": 5" +
-                "}, " +
-                "\"southWest\": {" +
-                "\"x\": 0, " +
-                "\"y\": 3" +
-                "}, " +
-                "\"southEast\": {" +
-                "\"x\": 2, " +
-                "\"y\": 3" +
-                "}" +
-                "}, " +
-                "\"antennaPosition\": { \"x\": 0, \"y\": 1} " +
-                "}, " +
-                "\"sensors\": [" +
-                "{\"category\" : 1,\"value\" : 2.0}, " +
-                "{\"category\" : 1,\"value\" : 2.0}" +
-                "]" +
-                "}")
+    var jsonStr = MessageType.Update.Subtype.Sensors
+        .marshal(SensorList(
+            InfoCell(0, "uri", "name",
+                Coordinates(Point(1, 1), Point(-1, -1), Point(-1, 1), Point(1, -1)),
+                Point(0, 0)
+            ),
+            List(Sensor(1, 2.0), Sensor(2, 1.55))
+        ))
     
-    var str: String = MessageType.Update.Subtype.Sensors.marshal(sensors)
+    println(jsonStr)
     
-    println(str)
+    var jsonObj = MessageType.Update.Subtype.Sensors.unmarshal(jsonStr)
+    
+    println(jsonObj)
+    
+    val msg = AriadneLocalMessage(
+        Update,
+        Update.Subtype.Sensors,
+        Location.Cell >> Location.Server,
+        jsonObj
+    )
+    
+    println(msg.subtype.marshal(msg.content))
     
 }

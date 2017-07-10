@@ -38,7 +38,7 @@ object TestPubSubCells extends App {
     val publisher = system1.actorOf(Props[TestPublisher], "Publisher")
     publisher ! AriadneRemoteMessage(
         MessageType.Init,
-        MessageType.Init.Subtype.Basic,
+        MessageType.Init.Subtype.Greetings,
         Location.Cell >> Location.Server,
         "Hello baby.")
 

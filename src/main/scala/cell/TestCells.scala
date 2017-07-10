@@ -39,7 +39,7 @@ object TestCells extends App {
     //Simulate a handshake message sending to the server
     publisher ! AriadneRemoteMessage(
         Handshake,
-        Handshake.Subtype.Basic,
+        Handshake.Subtype.Cell2Master,
         Location.Cell >> Location.Server,
         "Hello baby.")
     println("[Cell] message sended!")

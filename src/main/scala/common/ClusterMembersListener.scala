@@ -34,7 +34,7 @@ class ClusterMembersListener extends CustomActor {
 
                 log.info("Awakening Actors on Master Actor-System")
     
-                siblings ! AriadneLocalMessage(Init, Init.Subtype.Basic,
+                siblings ! AriadneLocalMessage(Init, Init.Subtype.Greetings,
                     Location.Server >> Location.Self, Greetings(List(greetings)))
             }
 
@@ -62,7 +62,7 @@ class ClusterMembersListener extends CustomActor {
             if (member.address == cluster.selfAddress) {
                 //init actors of current node that must interact in the cluster
                 log.info("Awakening Actors on Cell Actor-System")
-                siblings ! AriadneLocalMessage(Init, Init.Subtype.Basic,
+                siblings ! AriadneLocalMessage(Init, Init.Subtype.Greetings,
                     Location.Cell >> Location.Self, Greetings(List(greetings)))
             }
 
