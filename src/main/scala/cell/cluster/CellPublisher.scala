@@ -25,9 +25,10 @@ class CellPublisher extends BasicPublisher {
         Point(-1, 1),
         Point(1, -1))
     private val antennaPosition: Point = Point(0, 0)
+    
     override protected def init(args: List[Any]) = {
         log.info("Hello there from {}!", name)
-        mediator ! Publish(Topic.HandShake,
+        mediator ! Publish(Topic.HandShakes,
             AriadneRemoteMessage(
                 Handshake,
                 Handshake.Subtype.Cell2Master,
@@ -42,16 +43,14 @@ class CellPublisher extends BasicPublisher {
 
     override protected def receptive = {
         case msg@AriadneRemoteMessage(Handshake, Handshake.Subtype.Basic, _, _) =>
-            mediator ! Publish(Topic.HandShake, msg)
+            mediator ! Publish(Topic.HandShakes, msg)
 
         case msg@AriadneRemoteMessage(Update, Update.Subtype.Sensors, _, _) =>
-            mediator ! Publish(Topic.Update, msg)
+            mediator ! Publish(Topic.Updates, msg)
 
         case msg@AriadneRemoteMessage(Update, Update.Subtype.Practicability, _, _) =>
-            mediator ! Publish(Topic.Update, msg)
+            mediator ! Publish(Topic.Updates, msg)
 
-        case msg@AriadneRemoteMessage(MessageType.Update, Update.Subtype.Practicability, _, _) =>
-            mediator ! Publish(Topic.Update, msg)
         case _ => // Ignore
     }
 }

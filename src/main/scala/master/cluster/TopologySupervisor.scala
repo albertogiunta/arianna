@@ -5,7 +5,7 @@ import common.{BasicActor, Counter}
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Handshake.Subtype.Cell2Master
 import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, Topology4Cell, Topology4CellLight}
-import ontologies.messages.MessageType.Update.Subtype.{ActualLoad, AdminUpdate, Sensors}
+import ontologies.messages.MessageType.Update.Subtype.{ActualLoad, Sensors}
 import ontologies.messages.MessageType.{Alarm, Handshake, Topology, Update}
 import ontologies.messages._
 
@@ -108,27 +108,24 @@ class TopologySupervisor extends BasicActor {
                 
                 // Send the updated Map to the Admin
                 requestHandler ! topology.values
-                
-                // Update all the Cells
-                publisher ! AriadneLocalMessage(
-                    Topology, Topology4CellLight, server2Cell,
-                    LightArea(Random.nextInt(),
-                        topology.values.map(b => LightCell(b)).toList)
-                )
+    
+                //                // Update all the Cells -- Cells Updates their references by themselves
+                //                publisher ! AriadneLocalMessage(
+                //                    Topology, Topology4CellLight, server2Cell,
+                //                    LightArea(Random.nextInt(),
+                //                        topology.values.map(b => LightCell(b)).toList)
+                //                )
             }
     
         case AriadneLocalMessage(Update, Sensors, `cell2Server`, pkg: SensorList) =>
         
             if (topology.get(pkg.info.name).nonEmpty) {
                 val news = topology(pkg.info.name).copy(sensors = pkg.sensors)
-            
+    
                 topology.put(pkg.info.name, news)
                 
                 // Send the updated Map to the Admin
-                requestHandler ! AriadneLocalMessage(
-                    Topology, AdminUpdate, server2Admin,
-                    UpdateForAdmin(topology.values.map(c => CellUpdate(c)).toList)
-                )
+                requestHandler ! topology.values
             }
     
         case _ => desist _

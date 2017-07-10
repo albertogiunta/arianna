@@ -27,8 +27,8 @@ class DataStreamer extends CustomActor {
     private val source = Source.queue[Iterable[Cell]](1000, OverflowStrategy.backpressure)
     
     private val stream = Flow[Iterable[Cell]]
-            .map(map => UpdateForAdmin(map.map(c => CellUpdate(c)).toList))
-            .map(updates => AriadneLocalMessage(Update, AdminUpdate, Location.Server >> Location.Admin, updates))
+        .map(map => UpdateForAdmin(map.map(c => CellUpdate(c)).toList))
+        .map(updates => AriadneLocalMessage(Update, AdminUpdate, Location.Server >> Location.Admin, updates))
         .throttle(1, 1000 milliseconds, 1, ThrottleMode.Shaping)
         .to(Sink.foreach(msg => handler(msg)))
     
@@ -47,9 +47,9 @@ class DataStreamer extends CustomActor {
     }
     
     override def receive: Receive = {
-        
-        case msg : Iterable[Cell] =>
-//            log.info(Thread.currentThread().getName + " - Streaming to handler...")
+    
+        case msg: Iterable[Cell] =>
+            //            log.info(Thread.currentThread().getName + " - Streaming to handler...")
             streamer offer msg
         case _ =>
     }

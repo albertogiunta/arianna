@@ -7,6 +7,7 @@ import ontologies._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Handshake.Subtype.Cell2Master
 import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, Topology4Cell}
+import ontologies.messages.MessageType.Update.Subtype.{ActualLoad, Sensors}
 import ontologies.messages.MessageType._
 import ontologies.messages._
 
@@ -17,7 +18,7 @@ import ontologies.messages._
   */
 class MasterSubscriber extends BasicSubscriber {
     
-    override val topics: Set[Topic] = Set(Topic.Alarm, Topic.Update, Topic.HandShake)
+    override val topics: Set[Topic] = Set(Topic.Alarms, Topic.Updates, Topic.HandShakes)
     
     private val cell2Server: MessageDirection = Location.Server << Location.Cell
     private val server2Cell: MessageDirection = Location.Server >> Location.Cell
@@ -86,24 +87,24 @@ class MasterSubscriber extends BasicSubscriber {
         
         case msg@AriadneRemoteMessage(Alarm, _, _, _) => triggerAlarm(msg)
 
-        case msg@AriadneRemoteMessage(Update, _, _, _) =>
+        case msg@AriadneRemoteMessage(Update, ActualLoad, _, _) =>
             log.info("Forwarding message {} from {} to TopologySupervisor", msg.subtype, sender.path)
-
-        //            topologySupervisor ! AriadneLocalMessage(
-        //                msg.supertype,
-        //                msg.subtype,
-        //                msg.direction,
-        //                ActualLoad.unmarshal(msg.content)
-        //            )
-        //        case msg@AriadneRemoteMessage(Update, Sensors, _, _) =>
-        //            log.info("Forwarding message {} from {} to TopologySupervisor", msg.subtype, sender.path)
-        //
-        //            topologySupervisor ! AriadneLocalMessage(
-        //                msg.supertype,
-        //                msg.subtype,
-        //                msg.direction,
-        //                Sensors.unmarshal(msg.content)
-        //            )
+    
+            topologySupervisor ! AriadneLocalMessage(
+                msg.supertype,
+                msg.subtype,
+                msg.direction,
+                ActualLoad.unmarshal(msg.content)
+            )
+        case msg@AriadneRemoteMessage(Update, Sensors, _, _) =>
+            log.info("Forwarding message {} from {} to TopologySupervisor", msg.subtype, sender.path)
+    
+            topologySupervisor ! AriadneLocalMessage(
+                msg.supertype,
+                msg.subtype,
+                msg.direction,
+                Sensors.unmarshal(msg.content)
+            )
         case _ => desist _
     }
     

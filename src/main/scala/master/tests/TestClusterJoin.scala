@@ -65,5 +65,5 @@ object TestClusterJoin extends App {
     
     system.log.info("Publishing {}", remotemsg)
     
-    mediator ! Publish(Topic.Update, remotemsg)
+    mediator ! Publish(Topic.Updates, remotemsg)
 }

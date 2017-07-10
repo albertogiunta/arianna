@@ -15,7 +15,7 @@ class MasterPublisher extends BasicPublisher {
     override protected def init(args: List[Any]) = {
         log.info("Hello there from {}!", name)
     
-        mediator ! Publish(Topic.HandShake,
+        mediator ! Publish(Topic.HandShakes,
             AriadneRemoteMessage(
                 Handshake,
                 Handshake.Subtype.Cell2Master,
@@ -34,8 +34,8 @@ class MasterPublisher extends BasicPublisher {
     override protected val receptive = {
     
         case AriadneLocalMessage(Alarm, _, dir, cnt: AlarmContent) =>
-        
-            mediator ! Publish(Topic.Update,
+    
+            mediator ! Publish(Topic.Updates,
                 AriadneRemoteMessage(
                     Alarm,
                     Alarm.Subtype.Basic,
@@ -46,7 +46,7 @@ class MasterPublisher extends BasicPublisher {
     
         case msg@AriadneLocalMessage(Topology, Topology4Cell, _, cnt: AreaForCell) =>
             mediator ! Publish(
-                Topic.Topology,
+                Topic.Topologies,
                 AriadneRemoteMessage(
                     msg.supertype,
                     msg.subtype,
@@ -56,7 +56,7 @@ class MasterPublisher extends BasicPublisher {
             )
         case msg@AriadneLocalMessage(Topology, Topology4CellLight, _, cnt: LightArea) =>
             mediator ! Publish(
-                Topic.Topology,
+                Topic.Topologies,
                 AriadneRemoteMessage(
                     msg.supertype,
                     msg.subtype,

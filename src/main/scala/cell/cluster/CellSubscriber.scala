@@ -14,8 +14,8 @@ import ontologies.messages.{AriadneRemoteMessage, Location, MessageDirection}
   * Created by Matteo Gabellini on 29/06/2017.
   */
 class CellSubscriber extends BasicSubscriber {
-
-    override val topics = Set(Topic.Alarm, Topic.Topology)
+    
+    override val topics = Set(Topic.Alarms, Topic.Topologies, Topic.Practicabilities)
 
     private val cell2Server: MessageDirection = Location.Server << Location.Cell
     private val server2Cell: MessageDirection = Location.Server >> Location.Cell
@@ -40,13 +40,13 @@ class CellSubscriber extends BasicSubscriber {
     }
 
     private def cultured: Receive = {
-        case msg@AriadneRemoteMessage(Alarm, Alarm.Subtype.Basic, _, cnt) =>
+        case msg@AriadneRemoteMessage(Alarm, _, _, cnt) =>
             log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
         case msg@AriadneRemoteMessage(Update, Update.Subtype.Practicability, _, cnt) =>
             log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
-        case msg@AriadneRemoteMessage(Route, Route.Subtype.Basic, _, cnt) =>
+        case msg@AriadneRemoteMessage(Route, _, _, cnt) =>
             log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
-        case msg@AriadneRemoteMessage(Handshake, Handshake.Subtype.Basic, _, cnt) =>
+        case msg@AriadneRemoteMessage(Handshake, Handshake.Subtype.Cell2Master, _, cnt) =>
             log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
         case _ => desist _
     }
