@@ -1,5 +1,6 @@
 package ontologies.messages
 
+import ontologies.test.MessageTypeForTest
 import ontologies.test.MessageTypeForTest._
 
 
@@ -8,6 +9,7 @@ import ontologies.test.MessageTypeForTest._
   */
 trait MessageSubtypeForTest {
     
+    val superType: MessageTypeForTest
     val subtypeName: String
     
     def unmarshal(json: String): MessageContent
@@ -28,8 +30,8 @@ object MessageSubtypeForTest {
     
     object Factory {
         def apply(subtypeName: String): MessageSubtypeForTest = subtypeName.toLowerCase match {
-            case st if st == InitForTest.Subtype.BasicForTest.toLowerCase =>
-                InitForTest.Subtype.BasicForTest
+            case st if st == InitForTest.Subtype.GreetingsForTest.toLowerCase =>
+                InitForTest.Subtype.GreetingsForTest
             case st if st == AlarmForTest.Subtype.BasicForTest.toLowerCase =>
                 AlarmForTest.Subtype.BasicForTest
             case st if st == HandshakeForTest.Subtype.Cell2MasterForTest.toLowerCase =>
@@ -50,8 +52,6 @@ object MessageSubtypeForTest {
                 TopologyForTest.Subtype.Topology4UserForTest
             case st if st == UpdateForTest.Subtype.SensorsForTest.toLowerCase =>
                 UpdateForTest.Subtype.SensorsForTest
-            //            case st if st == UpdateForTest.Subtype.PracticabilityForTest.toLowerCase =>
-            //                UpdateForTest.Subtype.PracticabilityForTest
             case st if st == UpdateForTest.Subtype.PositionForTest.toLowerCase =>
                 UpdateForTest.Subtype.PositionForTest
             case st if st == UpdateForTest.Subtype.ActualLoadForTest.toLowerCase =>

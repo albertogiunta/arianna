@@ -43,15 +43,6 @@ object TestClusterJoin extends App {
             )
         )
     
-    var toJsonObj: String => SensorList = s => MessageType.Update.Subtype.Sensors.unmarshal(s)
-    
-    val localmsg = AriadneLocalMessage(
-        Update,
-        Update.Subtype.Sensors,
-        Location.Cell >> Location.Server,
-        toJsonObj(jsonStr)
-    )
-    
     val remotemsg = AriadneRemoteMessage(
         Update,
         Update.Subtype.Sensors,
