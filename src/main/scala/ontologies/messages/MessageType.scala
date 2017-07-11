@@ -187,6 +187,155 @@ object MessageType {
 
     }
 
+    object Movement extends MessageType {
+
+        override val typeName = "Movement"
+
+        object Subtype {
+
+            object Up extends MessageSubtype {
+
+                override val subtypeName = "Up"
+
+                //                def unmarshal(json: String): List[Sensor] = json.parseJson.convertTo[List[Sensor]]
+                //
+                //                def marshal(obj: List[Sensor]): String = obj.toJson.toString()
+            }
+
+            object Down extends MessageSubtype {
+
+                override val subtypeName = "Down"
+
+                //                def unmarshal(json: String): List[Sensor] = json.parseJson.convertTo[List[Sensor]]
+                //
+                //                def marshal(obj: List[Sensor]): String = obj.toJson.toString()
+            }
+
+            object Left extends MessageSubtype {
+
+                override val subtypeName = "Left"
+
+                //                def unmarshal(json: String): List[Sensor] = json.parseJson.convertTo[List[Sensor]]
+                //
+                //                def marshal(obj: List[Sensor]): String = obj.toJson.toString()
+            }
+
+            object Right extends MessageSubtype {
+
+                override val subtypeName = "Right"
+
+                //                def unmarshal(json: String): List[Sensor] = json.parseJson.convertTo[List[Sensor]]
+                //
+                //                def marshal(obj: List[Sensor]): String = obj.toJson.toString()
+            }
+
+        }
+
+    }
+
+    object SwitcherMsg extends MessageType {
+
+        override val typeName = "SwitcherMsg"
+
+        object Subtype {
+
+            object SetupFirstAntennaPosition extends MessageSubtype {
+
+                override val subtypeName = "SetupFirstAntennaPosition"
+
+                //                def unmarshal(json: String): List[Sensor] = json.parseJson.convertTo[List[Sensor]]
+                //
+                //                def marshal(obj: List[Sensor]): String = obj.toJson.toString()
+            }
+
+            object BestNexHost extends MessageSubtype {
+
+                override val subtypeName = "GetBestNewCandidate"
+
+                //                def unmarshal(json: String): List[Sensor] = json.parseJson.convertTo[List[Sensor]]
+                //
+                //                def marshal(obj: List[Sensor]): String = obj.toJson.toString()
+            }
+
+            object SwitchCell extends MessageSubtype {
+
+                override val subtypeName = "SwtichCell"
+
+                //                def unmarshal(json: String): List[Sensor] = json.parseJson.convertTo[List[Sensor]]
+                //
+                //                def marshal(obj: List[Sensor]): String = obj.toJson.toString()
+            }
+
+            object CalculateStrength extends MessageSubtype {
+
+                override val subtypeName = "CalculateStrengthAfterPositionChanged"
+
+                //                def unmarshal(json: String): List[Sensor] = json.parseJson.convertTo[List[Sensor]]
+                //
+                //                def marshal(obj: List[Sensor]): String = obj.toJson.toString()
+            }
+
+            object ScanAndFind extends MessageSubtype {
+
+                override val subtypeName = "ConnectTOTheClosestSource"
+
+                //                def unmarshal(json: String): List[Sensor] = json.parseJson.convertTo[List[Sensor]]
+                //
+                //                def marshal(obj: List[Sensor]): String = obj.toJson.toString()
+            }
+
+
+        }
+
+    }
+
+
+    object SignalStrength extends MessageType {
+
+        override val typeName = "SignalStrength"
+
+        object Subtype {
+
+            object Strong extends MessageSubtype {
+
+                override val subtypeName = "Strong"
+
+                //                def unmarshal(json: String): List[Sensor] = json.parseJson.convertTo[List[Sensor]]
+                //
+                //                def marshal(obj: List[Sensor]): String = obj.toJson.toString()
+            }
+
+            object Medium extends MessageSubtype {
+
+                override val subtypeName = "Medium"
+
+                //                def unmarshal(json: String): List[Sensor] = json.parseJson.convertTo[List[Sensor]]
+                //
+                //                def marshal(obj: List[Sensor]): String = obj.toJson.toString()
+            }
+
+            object Low extends MessageSubtype {
+
+                override val subtypeName = "Low"
+
+                //                def unmarshal(json: String): List[Sensor] = json.parseJson.convertTo[List[Sensor]]
+                //
+                //                def marshal(obj: List[Sensor]): String = obj.toJson.toString()
+            }
+
+            object VeryLow extends MessageSubtype {
+
+                override val subtypeName = "None"
+
+                //                def unmarshal(json: String): List[Sensor] = json.parseJson.convertTo[List[Sensor]]
+                //
+                //                def marshal(obj: List[Sensor]): String = obj.toJson.toString()
+            }
+
+        }
+
+    }
+
 
     object Update extends MessageType {
 
@@ -212,7 +361,7 @@ object MessageType {
                 def marshal(obj: Double): String = obj.toJson.toString()
             }
 
-            object Position extends MessageSubtype {
+            object UserPosition extends MessageSubtype {
 
                 override val subtypeName = "Position"
 
@@ -237,6 +386,15 @@ object MessageType {
                 def unmarshal(json: String): UpdateForAdmin = json.parseJson.convertTo[UpdateForAdmin]
 
                 def marshal(obj: UpdateForAdmin): String = obj.toJson.toString()
+            }
+
+            object AntennaPosition extends MessageSubtype {
+
+                override val subtypeName = "AntennaPosition"
+
+                def unmarshal(json: String): Point = json.parseJson.convertTo[Point]
+
+                def marshal(obj: Point): String = obj.toJson.toString()
             }
 
         }

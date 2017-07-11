@@ -1,5 +1,7 @@
 package area
 
+import ontologies.messages._
+
 object Message {
 
     object FromServer {

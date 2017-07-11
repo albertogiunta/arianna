@@ -5,6 +5,7 @@ import java.nio.file.Paths
 
 import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
+import ontologies.messages.SampleUpdate
 import common.CustomActor
 import ontologies.messages._
 

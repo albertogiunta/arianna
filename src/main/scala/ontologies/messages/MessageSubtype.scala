@@ -48,8 +48,8 @@ object MessageSubtype {
                 Update.Subtype.Sensors
             case st if st == Update.Subtype.Practicability.toLowerCase =>
                 Update.Subtype.Practicability
-            case st if st == Update.Subtype.Position.toLowerCase =>
-                Update.Subtype.Position
+            case st if st == Update.Subtype.UserPosition.toLowerCase =>
+                Update.Subtype.UserPosition
             case st if st == Update.Subtype.CellOccupation.toLowerCase =>
                 Update.Subtype.CellOccupation
             case st if st == Update.Subtype.CellUpdate.toLowerCase =>

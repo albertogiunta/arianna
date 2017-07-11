@@ -41,7 +41,7 @@ abstract class CustomActor extends Actor with Stash with ActorLogging {
   */
 abstract class BasicActor extends CustomActor {
 
-    override def receive = resistive
+    override def receive: Receive = resistive
 
     protected def resistive: Actor.Receive = {
         case AriadneLocalMessage(MessageType.Init, _, _, content: Any) =>
