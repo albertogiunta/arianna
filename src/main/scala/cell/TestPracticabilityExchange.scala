@@ -8,12 +8,14 @@ import cell.cluster.{CellPublisher, CellSubscriber}
 import com.typesafe.config.ConfigFactory
 import common.ClusterMembersListener
 import ontologies.messages.Location._
-import ontologies.messages.MessageType.Handshake
-import ontologies.messages.{AriadneRemoteMessage, Location}
+import ontologies.messages.MessageType.Update
+import ontologies.messages._
+
 /**
-  * Created by Alessandro on 28/06/2017.
+  * Created by Matteo Gabellini on 10/07/2017.
   */
-object TestCells extends App {
+class TestPracticabilityExchange extends App {
+
     val path2Project = Paths.get("").toFile.getAbsolutePath
     val path2Config = path2Project + "/conf/cell.conf"
 
@@ -27,20 +29,32 @@ object TestCells extends App {
 
     val publisher = system.actorOf(Props[CellPublisher], "CellPublisher")
     val subscriber = system.actorOf(Props[CellSubscriber], "CellSubscriber")
-    //val actorsToInitialize = List(publisher, subscriber)
 
-
-    //create and start the listener
     val clusterListener = system.actorOf(Props[ClusterMembersListener], "CellClusterListener")
     println("ClusterListener created")
 
-    Thread.sleep(5000)
-    //subscriber ! MyMessage(ontologies.Init, null)
-    //Simulate a handshake message sending to the server
-    publisher ! AriadneRemoteMessage(
-        Handshake,
-        Handshake.Subtype.Cell2Master,
+
+    private val cellID: Int = 12345
+    private val cellUri: String = "uri"
+    private val cellName: String = "Gondor"
+    private val roomVertices: Coordinates = Coordinates(Point(1, 1),
+        Point(-1, -1),
+        Point(-1, 1),
+        Point(1, -1))
+    private val antennaPosition: Point = Point(0, 0)
+
+
+    publisher ! AriadneLocalMessage(
+        Update,
+        Update.Subtype.Practicability,
         Location.Cell >> Location.Server,
-        "Hello baby.")
-    println("[Cell] message sended!")
+        LightCell(
+            InfoCell(cellID,
+                cellUri,
+                cellName,
+                roomVertices,
+                antennaPosition),
+            10,
+            50.0)
+    )
 }

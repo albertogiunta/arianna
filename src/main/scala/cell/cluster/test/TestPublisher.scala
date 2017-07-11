@@ -22,17 +22,17 @@ class TestPublisher extends Actor with ActorLogging {
     }
 
     def receive = {
-
-        case AriadneRemoteMessage(Init, Init.Subtype.Basic, dir, cnt) =>
+    
+        case AriadneRemoteMessage(Init, Init.Subtype.Greetings, dir, cnt) =>
             println("[" + self.path.name + "] Hello there from {}!", self.path.name)
 
             println("[" + self.path.name + "] I've become receptive!")
-
-            val topicName = Topic.Alarm.toString
+    
+            val topicName = Topic.Alarms.toString
             mediator ! Publish(topicName,
                 AriadneRemoteMessage(Alarm, Alarm.Subtype.Basic, dir, cnt))
-
-            println(s"[" + self.path.name + "] Message published on " + Topic.Alarm)
+    
+            println(s"[" + self.path.name + "] Message published on " + Topic.Alarms)
 
             // The Mediator Hierarchy is always /user/<Username>
             val subName = "Subscriber1"
