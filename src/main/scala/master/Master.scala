@@ -2,7 +2,7 @@ package master
 
 import akka.actor.Props
 import common.{ClusterMembersListener, CustomActor}
-import master.cluster.{DataStreamer, MasterPublisher, MasterSubscriber, TopologySupervisor}
+import master.cluster._
 
 /**
   * Created by Alessandro on 29/06/2017.
@@ -20,6 +20,8 @@ class Master extends CustomActor {
         val topologySupervisor = context.actorOf(Props[TopologySupervisor], "TopologySupervisor")
         
         val dataStreamer = context.actorOf(Props[DataStreamer], "DataStreamer")
+    
+        val alarmSupervisor = context.actorOf(Props[AlarmSupervisor], "AlarmSupervisor")
     }
     
     override def receive: Receive = {

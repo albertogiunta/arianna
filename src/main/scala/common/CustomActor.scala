@@ -45,7 +45,7 @@ abstract class BasicActor extends CustomActor {
 
     protected def resistive: Actor.Receive = {
         case AriadneMessage(MessageType.Init, _, _, content: Greetings) =>
-            println("bohbohbohbohboh bohbohbohbohboh")
+    
             try {
                 this.init(content.args)
             } catch {
@@ -62,5 +62,5 @@ abstract class BasicActor extends CustomActor {
     
     protected def receptive: Actor.Receive
     
-    protected def desist(msg: Any): Unit = log.info("Unhandled message... {}", msg.toString) // Ignore
+    protected def desist(msg: Any): Unit = log.info("Unhandled... {}", msg.toString) // Ignore
 }

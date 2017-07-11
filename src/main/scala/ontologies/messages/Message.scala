@@ -17,7 +17,7 @@ trait Message[T] {
     def content: T
     
     override def toString =
-        "Message of type(" + supertype.toString + "/" + subtype.toString + ") \n" +
+        "Message of type(" + subtype.toString + ") \n" +
             direction.toString + "\n" +
             "Message Content is \"" + content.toString + "\"\n"
     

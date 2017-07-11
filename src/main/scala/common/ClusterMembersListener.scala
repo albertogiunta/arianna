@@ -70,6 +70,6 @@ class ClusterMembersListener extends CustomActor {
             nodes -= member.address
             log.info("[ClusterMemebersListener] Member is Removed: {}. {} nodes cluster",
                 member.address, nodes.size)
-        case msg => log.info("Unhandled message {} ", msg.toString)
+        case msg => log.info("Unhandled... {} ", msg.toString)
     }
 }

@@ -21,10 +21,10 @@ class DataStreamer extends CustomActor {
     implicit private val system = context.system
     implicit private val executionContext = system.dispatcher
     implicit private val materializer: ActorMaterializer = ActorMaterializer.create(system)
-
-    private val handler: AriadneMessage[_] => Unit = msg => println(Thread.currentThread().getName + " - " + msg)
-
-    private val source = Source.queue[Iterable[Cell]](1000, OverflowStrategy.dropHead)
+    
+    private val handler: AriadneMessage[_] => Unit = msg => admin ! msg //println(Thread.currentThread().getName + " - " + msg)
+    
+    private val source = Source.queue[Iterable[Cell]](100, OverflowStrategy.dropHead)
     
     private val stream = Flow[Iterable[Cell]]
         .map(map => UpdateForAdmin(map.map(c => CellUpdate(c)).toList))

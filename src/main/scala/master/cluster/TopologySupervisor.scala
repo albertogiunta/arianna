@@ -66,8 +66,10 @@ class TopologySupervisor extends BasicActor {
 
         case msg@AriadneMessage(Alarm, _, _, _) => triggerAlarm(msg)
 
-        case AriadneMessage(Handshake, Cell2Master, `cell2Server`, cell: InfoCell) =>
-        
+        case msg@AriadneMessage(Handshake, Cell2Master, `cell2Server`, cell: InfoCell) =>
+    
+            log.info(msg.toString)
+            
             if (topology.get(cell.name).nonEmpty) {
                 log.info("Found a match into the loaded Topology for {}", cell.name)
                 topology.put(cell.name, topology(cell.name).copy(infoCell = cell))
@@ -79,7 +81,7 @@ class TopologySupervisor extends BasicActor {
                 
                     unstashAll
     
-                    // Update all the Cellsbut first notify the subscriber
+                    // Update all the Cells but first notify the subscriber
                     subscriber ! AriadneMessage(
                         Topology, Topology4Cell, server2Cell,
                         AreaForCell(Random.nextInt(),
@@ -109,12 +111,6 @@ class TopologySupervisor extends BasicActor {
                 // Send the updated Map to the Admin
                 requestHandler ! topology.values
     
-                //                // Update all the Cells -- Cells Updates their references by themselves
-                //                publisher ! AriadneMessage(
-                //                    Topology, Topology4CellLight, server2Cell,
-                //                    LightArea(Random.nextInt(),
-                //                        topology.values.map(b => LightCell(b)).toList)
-                //                )
             }
 
         case AriadneMessage(Update, Sensors, `cell2Server`, pkg: SensorList) =>

@@ -20,7 +20,6 @@ class MasterSubscriber extends BasicSubscriber {
     override val topics: Set[Topic] = Set(Topic.Alarms, Topic.Updates, Topic.HandShakes)
     
     private val cell2Server: MessageDirection = Location.Server << Location.Cell
-    private val server2Cell: MessageDirection = Location.Server >> Location.Cell
     private val admin2Server: MessageDirection = Location.Admin >> Location.Server
     
     private var topologySupervisor: ActorSelection = _
@@ -36,8 +35,6 @@ class MasterSubscriber extends BasicSubscriber {
     
         case SubscribeAck(Subscribe(topic, None, `self`)) =>
             log.info("{} Successfully Subscribed to {}", name, topic)
-
-        case msg@AriadneMessage(Alarm, _, _, _) => triggerAlarm(msg)
 
         case AriadneMessage(Handshake, Cell2Master, `cell2Server`, _) =>
             log.info("Stashing handshake from {} for later administration...", sender.path)
@@ -56,9 +53,7 @@ class MasterSubscriber extends BasicSubscriber {
     }
     
     private def sociable: Receive = {
-
-        case msg@AriadneMessage(Alarm, _, _, _) => triggerAlarm(msg)
-
+    
         case msg@AriadneMessage(Handshake, Cell2Master, `cell2Server`, _) =>
             log.info("Resolving Handshake from {}", sender.path)
 
@@ -78,25 +73,12 @@ class MasterSubscriber extends BasicSubscriber {
     }
     
     private def proactive: Receive = {
-
-        case msg@AriadneMessage(Alarm, _, _, _) => triggerAlarm(msg)
-
+    
         case msg@AriadneMessage(Update, _, _, _) =>
             log.info("Forwarding message {} from {} to TopologySupervisor", msg.subtype, sender.path)
 
             topologySupervisor ! msg
         
         case _ => desist _
-    }
-
-    private def triggerAlarm(msg: Message[MessageContent]) = {
-        log.info("Got {} from {}", msg.toString, sender.path.name)
-        // Do Your Shit
-        // Non c'è bisogno di fare ciò! L'attore dell'Admin manderà l'Allarme sul
-        // Sul Topic Alarm e lo riceverà anche il subscriber che informerà
-        // il TopologySupervisor
-        //sibling("Publisher-Master").get.forward(msg)
-        // Il topologySupervisor deve contattare
-        topologySupervisor ! msg
     }
 }
