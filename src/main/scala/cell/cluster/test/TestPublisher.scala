@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorLogging, ActorRef}
 import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator.{Publish, Put, Send}
 import ontologies.Topic
-import ontologies.messages.AriadneRemoteMessage
+import ontologies.messages.AriadneMessage
 import ontologies.messages.MessageType._
 
 /**
@@ -22,22 +22,22 @@ class TestPublisher extends Actor with ActorLogging {
     }
 
     def receive = {
-    
-        case AriadneRemoteMessage(Init, Init.Subtype.Greetings, dir, cnt) =>
+
+        case AriadneMessage(Init, Init.Subtype.Greetings, dir, cnt) =>
             println("[" + self.path.name + "] Hello there from {}!", self.path.name)
 
             println("[" + self.path.name + "] I've become receptive!")
     
             val topicName = Topic.Alarms.toString
             mediator ! Publish(topicName,
-                AriadneRemoteMessage(Alarm, Alarm.Subtype.Basic, dir, cnt))
+                AriadneMessage(Alarm, Alarm.Subtype.Basic, dir, cnt))
     
             println(s"[" + self.path.name + "] Message published on " + Topic.Alarms)
 
             // The Mediator Hierarchy is always /user/<Username>
             val subName = "Subscriber1"
             mediator ! Send(path = "/user/" + subName,
-                msg = AriadneRemoteMessage(Topology, Topology.Subtype.Topology4User, dir, cnt + "2"),
+                msg = AriadneMessage(Topology, Topology.Subtype.Topology4User, dir, cnt),
                 localAffinity = true)
 
             println(s"[" + self.path.name + "] Message sent directly to " + subName)

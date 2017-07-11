@@ -42,10 +42,10 @@ class TopologySupervisor extends BasicActor {
     }
     
     override protected def receptive = {
-    
-        case msg@AriadneLocalMessage(Alarm, _, _, _) => triggerAlarm(msg)
-        
-        case msg@AriadneLocalMessage(Topology, Planimetrics, `admin2Server`, map: Area) =>
+
+        case msg@AriadneMessage(Alarm, _, _, _) => triggerAlarm(msg)
+
+        case msg@AriadneMessage(Topology, Planimetrics, `admin2Server`, map: Area) =>
             log.info("A topology has been loaded in the server...")
     
             if (topology.isEmpty) {
@@ -63,10 +63,10 @@ class TopologySupervisor extends BasicActor {
     }
     
     private def sociable: Receive = {
-    
-        case msg@AriadneLocalMessage(Alarm, _, _, _) => triggerAlarm(msg)
-    
-        case AriadneLocalMessage(Handshake, Cell2Master, `cell2Server`, cell: InfoCell) =>
+
+        case msg@AriadneMessage(Alarm, _, _, _) => triggerAlarm(msg)
+
+        case AriadneMessage(Handshake, Cell2Master, `cell2Server`, cell: InfoCell) =>
         
             if (topology.get(cell.name).nonEmpty) {
                 log.info("Found a match into the loaded Topology for {}", cell.name)
@@ -80,7 +80,7 @@ class TopologySupervisor extends BasicActor {
                     unstashAll
     
                     // Update all the Cellsbut first notify the subscriber
-                    subscriber ! AriadneLocalMessage(
+                    subscriber ! AriadneMessage(
                         Topology, Topology4Cell, server2Cell,
                         AreaForCell(Random.nextInt(),
                             topology.map(e => CellForCell(e._2)).toList)
@@ -91,10 +91,10 @@ class TopologySupervisor extends BasicActor {
     }
     
     private def proactive: Receive = {
-    
-        case msg@AriadneLocalMessage(Alarm, _, _, _) => triggerAlarm(msg)
-    
-        case AriadneLocalMessage(Update, ActualLoad, `cell2Server`, pkg: ActualLoadUpdate) =>
+
+        case msg@AriadneMessage(Alarm, _, _, _) => triggerAlarm(msg)
+
+        case AriadneMessage(Update, ActualLoad, `cell2Server`, pkg: ActualLoadUpdate) =>
         
             if (topology.get(pkg.info.name).nonEmpty) {
                 val old = topology(pkg.info.name)
@@ -110,14 +110,14 @@ class TopologySupervisor extends BasicActor {
                 requestHandler ! topology.values
     
                 //                // Update all the Cells -- Cells Updates their references by themselves
-                //                publisher ! AriadneLocalMessage(
+                //                publisher ! AriadneMessage(
                 //                    Topology, Topology4CellLight, server2Cell,
                 //                    LightArea(Random.nextInt(),
                 //                        topology.values.map(b => LightCell(b)).toList)
                 //                )
             }
-    
-        case AriadneLocalMessage(Update, Sensors, `cell2Server`, pkg: SensorList) =>
+
+        case AriadneMessage(Update, Sensors, `cell2Server`, pkg: SensorList) =>
         
             if (topology.get(pkg.info.name).nonEmpty) {
                 val news = topology(pkg.info.name).copy(sensors = pkg.sensors)
@@ -133,7 +133,7 @@ class TopologySupervisor extends BasicActor {
     
     private def triggerAlarm(msg: Message[_]): Unit = {
         // Update all the Cells
-        publisher ! AriadneLocalMessage(
+        publisher ! AriadneMessage(
             Topology, Topology4CellLight, server2Cell,
             LightArea(Random.nextInt(),
                 topology.values.map(b => LightCell(b)).toList)

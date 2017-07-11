@@ -38,6 +38,8 @@ object MessageSubtype {
                 Handshake.Subtype.Cell2Master
             case st if st == Handshake.Subtype.Cell2User.toLowerCase =>
                 Handshake.Subtype.Cell2User
+            case st if st == Handshake.Subtype.User2Cell.toLowerCase =>
+                Handshake.Subtype.User2Cell
             case st if st == Route.Subtype.Basic.toLowerCase =>
                 Route.Subtype.Basic
             case st if st == Route.Subtype.Escape.toLowerCase =>
@@ -52,20 +54,18 @@ object MessageSubtype {
                 Topology.Subtype.Topology4User
             case st if st == Update.Subtype.Sensors.toLowerCase =>
                 Update.Subtype.Sensors
-            case st if st == Update.Subtype.Position.toLowerCase =>
-                Update.Subtype.Position
+            case st if st == Update.Subtype.Position.UserPosition.toLowerCase =>
+                Update.Subtype.Position.UserPosition
+            case st if st == Update.Subtype.Position.AntennaPosition.toLowerCase =>
+                Update.Subtype.Position.AntennaPosition
             case st if st == Update.Subtype.ActualLoad.toLowerCase =>
                 Update.Subtype.ActualLoad
-            case st if st == Update.Subtype.AdminUpdate.toLowerCase =>
-                Update.Subtype.AdminUpdate
+            case st if st == Update.Subtype.UpdateForAdmin.toLowerCase =>
+                Update.Subtype.UpdateForAdmin
             case st if st == Update.Subtype.Practicability.toLowerCase =>
                 Update.Subtype.Practicability
-            case st if st == Update.Subtype.UserPosition.toLowerCase =>
-                Update.Subtype.UserPosition
-            case st if st == Update.Subtype.CellOccupation.toLowerCase =>
-                Update.Subtype.CellOccupation
-            case st if st == Update.Subtype.CellUpdate.toLowerCase =>
-                Update.Subtype.CellUpdate
+            case st if st == Update.Subtype.ActualLoad.toLowerCase =>
+                Update.Subtype.ActualLoad
             case _ => null
         }
     }

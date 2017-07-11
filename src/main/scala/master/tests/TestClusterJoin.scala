@@ -31,23 +31,18 @@ object TestClusterJoin extends App {
     val subscriber = system.actorOf(Props[MasterSubscriber], "CellSubscriber")
     
     val publisher = system.actorOf(Props[MasterPublisher], "CellPublisher")
-    
-    var jsonStr: String = MessageType.Update.Subtype.Sensors
-        .marshal(
-            SensorList(
-                InfoCell(0, "uri", "name",
-                    Coordinates(Point(1, 1), Point(-1, -1), Point(-1, 1), Point(1, -1)),
-                    Point(0, 0)
-                ),
-                List(Sensor(1, 2.0), Sensor(2, 1.55))
-            )
-        )
-    
-    val remotemsg = AriadneRemoteMessage(
+
+    val remotemsg = AriadneMessage(
         Update,
         Update.Subtype.Sensors,
         Location.Cell >> Location.Server,
-        jsonStr
+        SensorList(
+            InfoCell(0, "uri", "name",
+                Coordinates(Point(1, 1), Point(-1, -1), Point(-1, 1), Point(1, -1)),
+                Point(0, 0)
+            ),
+            List(Sensor(1, 2.0), Sensor(2, 1.55))
+        )
     )
     
     Thread.sleep(3000)

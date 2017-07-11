@@ -8,8 +8,7 @@ import cell.cluster.{CellPublisher, CellSubscriber}
 import com.typesafe.config.ConfigFactory
 import common.ClusterMembersListener
 import ontologies.messages.Location._
-import ontologies.messages.MessageType.Handshake
-import ontologies.messages.{AriadneRemoteMessage, Location}
+import ontologies.messages.{AriadneMessage, Location, _}
 /**
   * Created by Alessandro on 28/06/2017.
   */
@@ -37,10 +36,9 @@ object TestCells extends App {
     Thread.sleep(5000)
     //subscriber ! MyMessage(ontologies.Init, null)
     //Simulate a handshake message sending to the server
-    publisher ! AriadneRemoteMessage(
-        Handshake,
-        Handshake.Subtype.Cell2Master,
-        Location.Cell >> Location.Server,
-        "Hello baby.")
+    publisher ! AriadneMessage(
+        MessageType.Init,
+        MessageType.Init.Subtype.Greetings,
+        Location.Cell >> Location.Server, Greetings(List("Hello baby.")))
     println("[Cell] message sended!")
 }

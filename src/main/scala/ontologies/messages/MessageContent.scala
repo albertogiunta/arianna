@@ -109,11 +109,11 @@ final case class CellUpdate(infoCell: InfoCell,
                             currentPeople: Int,
                             sensors: List[Sensor]) extends MessageContent
 
-final case class UserAndAntennaPositionUpdate(userPosition: Point, antennaPosition: Point)
+final case class UserAndAntennaPositionUpdate(userPosition: Point, antennaPosition: Point) extends MessageContent
 
-final case class AntennaPositions(userPosition: Point, antennaPositions: List[InfoCell])
+final case class AntennaPositions(userPosition: Point, antennaPositions: List[InfoCell]) extends MessageContent
 
-final case class Empty()
+final case class Empty() extends MessageContent
 
 object CellUpdate {
     def apply(cell: Cell): CellUpdate = new CellUpdate(cell.infoCell, cell.currentPeople, cell.sensors)

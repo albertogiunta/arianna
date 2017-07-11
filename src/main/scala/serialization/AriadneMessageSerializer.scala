@@ -1,4 +1,4 @@
-package serialization.tests
+package serialization
 
 import akka.serialization._
 import ontologies.messages.Location._
@@ -137,16 +137,30 @@ object TestMessageSerializer extends App {
                 List(Sensor(1, 2.0), Sensor(2, 1.55))
             )
         )
-    
-    var toJsonObj: String => MessageContent = s => MessageType.Update.Subtype.Sensors.unmarshal(s)
-    
+
+    var jsonStr2: String = MessageType.Handshake.Subtype.User2Cell.marshal(
+        Empty()
+    )
+
+    println(jsonStr2)
+
+    //    var toJsonObj: String => MessageContent = s => MessageType.Update.Subtype.Sensors.unmarshal(s)
+    var toJsonObj: String => MessageContent = s => MessageType.Handshake.Subtype.User2Cell.unmarshal(s)
+
     val serializer = new AriadneMessageSerializer
-    
+
+    //    val message = AriadneMessage(
+    //        Update,
+    //        Update.Subtype.Sensors,
+    //        Location.Cell >> Location.Server,
+    //        toJsonObj(jsonStr)
+    //    )
+
     val message = AriadneMessage(
-        Update,
-        Update.Subtype.Sensors,
-        Location.Cell >> Location.Server,
-        toJsonObj(jsonStr)
+        Handshake,
+        Handshake.Subtype.User2Cell,
+        Location.User >> Location.Cell,
+        toJsonObj(jsonStr2)
     )
     
     println(message)

@@ -5,7 +5,7 @@ import common.BasicSubscriber
 import ontologies._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType._
-import ontologies.messages.{AriadneRemoteMessage, Location, MessageDirection}
+import ontologies.messages.{AriadneMessage, Location, MessageDirection}
 
 /**
   * An actor that models a Cell receiver for the Cells-MasterServer
@@ -27,7 +27,7 @@ class CellSubscriber extends BasicSubscriber {
     override protected def receptive = {
         case SubscribeAck(Subscribe(topic, None, `self`)) =>
             log.info("{} Successfully Subscribed to {}", name, topic)
-        case msg@AriadneRemoteMessage(Topology, Topology.Subtype.Topology4Cell, _, cnt) =>
+        case msg@AriadneMessage(Topology, Topology.Subtype.Topology4Cell, _, cnt) =>
             log.info("I received the topology: {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
 
             context.become(behavior = cultured, discardOld = true)
@@ -40,13 +40,13 @@ class CellSubscriber extends BasicSubscriber {
     }
 
     private def cultured: Receive = {
-        case msg@AriadneRemoteMessage(Alarm, _, _, cnt) =>
+        case msg@AriadneMessage(Alarm, _, _, cnt) =>
             log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
-        case msg@AriadneRemoteMessage(Update, Update.Subtype.Practicability, _, cnt) =>
+        case msg@AriadneMessage(Update, Update.Subtype.Practicability, _, cnt) =>
             log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
-        case msg@AriadneRemoteMessage(Route, _, _, cnt) =>
+        case msg@AriadneMessage(Route, _, _, cnt) =>
             log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
-        case msg@AriadneRemoteMessage(Handshake, Handshake.Subtype.Cell2Master, _, cnt) =>
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.Cell2Master, _, cnt) =>
             log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
         case _ => desist _
     }

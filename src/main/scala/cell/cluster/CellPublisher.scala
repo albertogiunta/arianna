@@ -29,28 +29,25 @@ class CellPublisher extends BasicPublisher {
     override protected def init(args: List[Any]) = {
         log.info("Hello there from {}!", name)
         mediator ! Publish(Topic.HandShakes,
-            AriadneRemoteMessage(
+            AriadneMessage(
                 Handshake,
                 Handshake.Subtype.Cell2Master,
                 Location.Cell >> Location.Server,
-
-                Handshake.Subtype.Cell2Master.marshal(
-                    InfoCell(cellID, cellUri, cellName, roomVertices, antennaPosition)
-                )
+                InfoCell(cellID, cellUri, cellName, roomVertices, antennaPosition)
             )
         )
     }
 
     override protected def receptive = {
-        case msg@AriadneLocalMessage(Handshake, Handshake.Subtype.Cell2Master, _, _) =>
-            mediator ! Publish(Topic.HandShakes, Message.local2remote(msg))
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.Cell2Master, _, _) =>
+            mediator ! Publish(Topic.HandShakes, msg)
 
-        case msg@AriadneLocalMessage(Update, Update.Subtype.Sensors, _, _) =>
-            mediator ! Publish(Topic.Updates, Message.local2remote(msg))
+        case msg@AriadneMessage(Update, Update.Subtype.Sensors, _, _) =>
+            mediator ! Publish(Topic.Updates, msg)
 
-        case msg@AriadneLocalMessage(Update, Update.Subtype.Practicability, _, _) =>
-            mediator ! Publish(Topic.Updates, Message.local2remote(msg))
-            mediator ! Publish(Topic.Practicabilities, Message.local2remote(msg))
+        case msg@AriadneMessage(Update, Update.Subtype.Practicability, _, _) =>
+            mediator ! Publish(Topic.Updates, msg)
+            mediator ! Publish(Topic.Practicabilities, msg)
 
         case _ => // Ignore
     }

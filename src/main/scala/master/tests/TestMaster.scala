@@ -6,10 +6,10 @@ import java.nio.file.Paths
 import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
 import master.Master
+import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology
 import ontologies.messages.MessageType.Topology.Subtype.Planimetrics
-import ontologies.messages.{AriadneLocalMessage, Location}
-import ontologies.messages.Location._
+import ontologies.messages.{AriadneMessage, Location}
 
 import scala.io.Source
 
@@ -33,8 +33,8 @@ object TestMaster extends App {
     val topology = Source.fromFile(new File(path2map)).getLines.mkString
     
     Thread.sleep(500)
-    
-    system.actorSelection("user/Master/TopologySupervisor") ! AriadneLocalMessage(
+
+    system.actorSelection("user/Master/TopologySupervisor") ! AriadneMessage(
         Topology,
         Planimetrics,
         Location.Admin >> Location.Server,

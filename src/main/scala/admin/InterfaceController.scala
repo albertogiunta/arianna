@@ -10,6 +10,7 @@ import javafx.scene.layout.{GridPane, Pane, VBox}
 import javafx.scene.text.Text
 
 import akka.actor.ActorRef
+import ontologies.messages.Location._
 import ontologies.messages._
 
 import scala.io.Source
@@ -59,7 +60,8 @@ class InterfaceController extends Initializable {
 
     def parseFile(file: File): Unit = {
         val source = Source.fromFile(file).getLines.mkString
-        actorRef ! AriadneLocalMessage(MessageType.Factory("Topology"), MessageSubtype.Factory("planimetrics"), Location.Admin >> Location.Self, source)
+        val area = MessageType.Topology.Subtype.Planimetrics.unmarshal(source)
+        actorRef ! AriadneMessage(MessageType.Factory("Topology"), MessageSubtype.Factory("planimetrics"), Location.Admin >> Location.Self, area)
         fileName.text = file.getName
     }
 

@@ -6,7 +6,7 @@ import akka.stream.scaladsl.{Flow, Sink, Source, SourceQueueWithComplete}
 import common.CustomActor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Update
-import ontologies.messages.MessageType.Update.Subtype.AdminUpdate
+import ontologies.messages.MessageType.Update.Subtype
 import ontologies.messages._
 
 import scala.concurrent.duration._
@@ -21,14 +21,14 @@ class DataStreamer extends CustomActor {
     implicit private val system = context.system
     implicit private val executionContext = system.dispatcher
     implicit private val materializer: ActorMaterializer = ActorMaterializer.create(system)
-    
-    private val handler: AriadneLocalMessage[_] => Unit = msg => println(Thread.currentThread().getName + " - " + msg)
-    
-    private val source = Source.queue[Iterable[Cell]](1000, OverflowStrategy.backpressure)
+
+    private val handler: AriadneMessage[_] => Unit = msg => println(Thread.currentThread().getName + " - " + msg)
+
+    private val source = Source.queue[Iterable[Cell]](1000, OverflowStrategy.dropHead)
     
     private val stream = Flow[Iterable[Cell]]
         .map(map => UpdateForAdmin(map.map(c => CellUpdate(c)).toList))
-        .map(updates => AriadneLocalMessage(Update, AdminUpdate, Location.Server >> Location.Admin, updates))
+        .map(updates => AriadneMessage(Update, Subtype.UpdateForAdmin, Location.Server >> Location.Admin, updates))
         .throttle(1, 1000 milliseconds, 1, ThrottleMode.Shaping)
         .to(Sink.foreach(msg => handler(msg)))
     

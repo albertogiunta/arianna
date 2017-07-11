@@ -28,30 +28,10 @@ trait Message[T] {
     }
 }
 
-final case class AriadneLocalMessage[T <: MessageContent](supertype: MessageType,
-                                                          subtype: MessageSubtype,
-                                                          direction: MessageDirection,
-                                                          content: T) extends Message[T]
-
 final case class AriadneMessage[T <: MessageContent](supertype: MessageType,
                                                      subtype: MessageSubtype,
                                                      direction: MessageDirection,
                                                      content: T) extends Message[T]
-
-final case class AriadneRemoteMessage(supertype: MessageType,
-                                      subtype: MessageSubtype,
-                                      direction: MessageDirection,
-                                      content: String) extends Message[String]
-
-object Message {
-    implicit def local2remote(msg: AriadneLocalMessage[MessageContent]): AriadneRemoteMessage = {
-        AriadneRemoteMessage(msg.supertype, msg.subtype, msg.direction, msg.subtype.marshal(msg.content))
-    }
-    
-    implicit def remote2local(msg: AriadneRemoteMessage): AriadneLocalMessage[MessageContent] = {
-        AriadneLocalMessage(msg.supertype, msg.subtype, msg.direction, msg.subtype.unmarshal(msg.content))
-    }
-}
 
 object TestMessage extends App {
     val s: String = Init

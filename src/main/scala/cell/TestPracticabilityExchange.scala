@@ -44,7 +44,7 @@ class TestPracticabilityExchange extends App {
     private val antennaPosition: Point = Point(0, 0)
 
 
-    publisher ! AriadneLocalMessage(
+    publisher ! AriadneMessage(
         Update,
         Update.Subtype.Practicability,
         Location.Cell >> Location.Server,

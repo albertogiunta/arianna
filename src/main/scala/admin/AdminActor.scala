@@ -22,19 +22,17 @@ class AdminActor(interfaceView: InterfaceView) extends CustomActor {
     val serverActor = context.actorSelection("akka.tcp://serverSystem@127.0.0.1:4553/user/server")
 
     override def receive: Receive = {
-        case msg@AriadneRemoteMessage(MessageType.Update, MessageType.Update.Subtype.UpdateForAdmin, _, _) => {
-            val adminUpdate: UpdateForAdmin = MessageType.Update.Subtype.UpdateForAdmin.unmarshal(msg.content)
+        case msg@AriadneMessage(MessageType.Update, MessageType.Update.Subtype.UpdateForAdmin, _, adminUpdate: UpdateForAdmin) => {
             val updateCells: ListBuffer[CellForView] = new ListBuffer[CellForView]
             adminUpdate.list.foreach(c => updateCells += new CellForView(c.infoCell.id, c.infoCell.name, c.currentPeople, c.sensors))
             interfaceController.updateView(updateCells.toList)
         }
         //TODO Update view
-        case msg@AriadneLocalMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, _, _) => {
-            area = MessageType.Topology.Subtype.Planimetrics.unmarshal(msg.content.toString)
+        case msg@AriadneMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, _, area: Area) => {
             val initialConfiguration: ListBuffer[CellForView] = new ListBuffer[CellForView]
-            area.cells.foreach(c => initialConfiguration += new CellForView(c.infoCell.id, c.infoCell.name, c.currentPeople, c.sensors))
+            area.cells.foreach(c => initialConfiguration += CellForView(c.infoCell.id, c.infoCell.name, c.currentPeople, c.sensors))
             interfaceController.createCells(initialConfiguration.toList)
-            //serverActor ! AriadneRemoteMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, Location.Admin >> Location.Server, msg.content.toString)
+            //serverActor ! AriadneMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, Location.Admin >> Location.Server, msg.content.toString)
         }
         case _ => println("none")
 
@@ -46,7 +44,7 @@ object App {
     def main(args: Array[String]): Unit = {
         new JFXPanel
         val path2Project = Paths.get("").toFile.getAbsolutePath
-        val path2Config = path2Project + "/conf/application.conf"
+        val path2Config = path2Project + "/res/conf/akka/application.conf"
         println(path2Config)
         var interfaceView: InterfaceView = new InterfaceView
         val config = ConfigFactory.parseFile(new File(path2Config))

@@ -15,15 +15,13 @@ class MasterPublisher extends BasicPublisher {
         log.info("Hello there from {}!", name)
     
         mediator ! Publish(Topic.HandShakes,
-            AriadneRemoteMessage(
+            AriadneMessage(
                 Handshake,
                 Handshake.Subtype.Cell2Master,
                 Location.Cell >> Location.Server,
-                Handshake.Subtype.Cell2Master.marshal(
-                    InfoCell(14321, "uri", "PancoPillo",
-                        Coordinates(Point(1, 1), Point(-1, -1), Point(-1, 1), Point(1, -1)),
-                        Point(0, 0)
-                    )
+                InfoCell(14321, "uri", "PancoPillo",
+                    Coordinates(Point(1, 1), Point(-1, -1), Point(-1, 1), Point(1, -1)),
+                    Point(0, 0)
                 )
             )
         )
@@ -31,11 +29,11 @@ class MasterPublisher extends BasicPublisher {
 
     override protected val receptive = {
 
-        case msg@AriadneLocalMessage(Alarm, _, _, _) =>
-            mediator ! Publish(Topic.Updates, Message.local2remote(msg))
+        case msg@AriadneMessage(Alarm, _, _, _) =>
+            mediator ! Publish(Topic.Updates, msg)
 
-        case msg@AriadneLocalMessage(Topology, _, _, _) =>
-            mediator ! Publish(Topic.Topologies, Message.local2remote(msg))
+        case msg@AriadneMessage(Topology, _, _, _) =>
+            mediator ! Publish(Topic.Topologies, msg)
         case _ => desist _
     }
 }

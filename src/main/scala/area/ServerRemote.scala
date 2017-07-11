@@ -5,8 +5,8 @@ import java.nio.file.Paths
 
 import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
-import ontologies.messages.SampleUpdate
 import common.CustomActor
+import ontologies.messages.Location._
 import ontologies.messages._
 
 class ServerRemote extends CustomActor {
@@ -15,18 +15,16 @@ class ServerRemote extends CustomActor {
     val adminRef = context.actorSelection("akka.tcp://adminSystem@127.0.0.1:4550/user/admin")
 
     def operational: Receive = {
-        case msg@AriadneLocalMessage(MessageType.Update, MessageType.Update.Subtype.UpdateForAdmin, _, _) => {
-            val jsonUpdate = MessageType.Update.Subtype.UpdateForAdmin.marshal(msg.content.asInstanceOf[UpdateForAdmin])
-            adminRef ! AriadneRemoteMessage(MessageType.Factory("Update"), MessageSubtype.Factory("UpdateForAdmin"), toAdmin, jsonUpdate)
+        case msg@AriadneMessage(MessageType.Update, MessageType.Update.Subtype.UpdateForAdmin, _, jsonUpdate: UpdateForAdmin) => {
+            adminRef ! AriadneMessage(MessageType.Factory("Update"), MessageSubtype.Factory("UpdateForAdmin"), toAdmin, jsonUpdate)
         }
-        case msg@AriadneLocalMessage(MessageType.Alarm, MessageType.Alarm.Subtype.Basic, _, _) => {
-            adminRef ! AriadneRemoteMessage(MessageType.Factory("Alarm"), MessageSubtype.Factory("Alarm"), toAdmin, "")
+        case msg@AriadneMessage(MessageType.Alarm, MessageType.Alarm.Subtype.Basic, _, _) => {
+            adminRef ! AriadneMessage(MessageType.Factory("Alarm"), MessageSubtype.Factory("Alarm"), toAdmin, Empty())
         }
     }
 
     override def receive: Receive = {
-        case msg@AriadneRemoteMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, _, _) => {
-            val area: Area = MessageType.Topology.Subtype.Planimetrics.unmarshal(msg.content)
+        case msg@AriadneMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, _, area: Area) => {
             print(area.toString)
             //Invio all'attore che si occuperà di gestire la mappa
             context.become(operational)
@@ -38,7 +36,7 @@ class ServerRemote extends CustomActor {
 object ServerRun {
     def main(args: Array[String]): Unit = {
         val path2Project = Paths.get("").toFile.getAbsolutePath
-        val path2Config = path2Project + "/conf/application.conf"
+        val path2Config = path2Project + "/res/conf/akka/application.conf"
         val config = ConfigFactory.parseFile(new File(path2Config))
         val system = ActorSystem.create("serverSystem", config.getConfig("server"))
         val server = system.actorOf(Props.create(classOf[ServerRemote]), "server")

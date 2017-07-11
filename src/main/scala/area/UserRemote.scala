@@ -6,12 +6,13 @@ import java.nio.file.Paths
 import akka.actor.{ActorLogging, ActorRef, ActorSelection, ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
 import common.{BasicActor, CustomActor}
+import ontologies.messages.Location._
 import ontologies.messages._
 
 class UserRemote extends BasicActor with ActorLogging {
 
     // local actors
-    val movementActor: ActorRef = context.actorOf(Props.create(classOf[MovementActor]), "movement")
+    val movementActor: ActorRef = context.actorOf(Props(new MovementActor(Point(0, 0))), "movement")
     val switcherActor: ActorRef = context.actorOf(Props.create(classOf[SwitcherActor]), "switcher")
 
     val fromCell2User: MessageDirection = Location.Cell >> Location.User
@@ -26,22 +27,18 @@ class UserRemote extends BasicActor with ActorLogging {
 
     override protected def init(args: List[Any]): Unit = {
         val cell: ActorSelection = context.actorSelection(args.head.asInstanceOf[String])
-        cell ! AriadneRemoteMessage(MessageType.Handshake, MessageType.Handshake.Subtype.Cell2User, Location.User >> Location.Cell, "")
+        cell ! AriadneMessage(MessageType.Handshake, MessageType.Handshake.Subtype.User2Cell, Location.User >> Location.Cell, Empty())
         log.info("Asked cell for connection")
     }
 
     override protected def receptive: Receive = {
-        case AriadneRemoteMessage(MessageType.Handshake, MessageType.Handshake.Subtype.Cell2User, UserRemote.this.fromCell2User, obj) =>
-            currentCell = MessageType.Handshake.Subtype.Cell2User.unmarshal(obj)
+        case AriadneMessage(MessageType.Handshake, MessageType.Handshake.Subtype.Cell2User, UserRemote.this.fromCell2User, currentCell: CellForUser) =>
             log.info("Received info from my new cell of id: {}", currentCell.infoCell.name)
-            movementActor ! AriadneLocalMessage(MessageType.Init, MessageType.Init.Subtype.Basic, Location.User >> Location.Movement, Point(15, 0))
-            switcherActor ! AriadneLocalMessage(MessageType.Init, MessageType.Init.Subtype.Basic, Location.User >> Location.Switcher, CellForSwitcher(currentCell))
-        case AriadneLocalMessage(MessageType.SwitcherMsg, MessageType.SwitcherMsg.Subtype.SwitchCell, _, newBestHost) =>
-            newBestHost match {
-                case c: InfoCell =>
-                    val cellAddress: String = s"akka.tcp://cellSystem@127.0.0.1:4552/user/${c.name}"
-                    init(List(cellAddress))
-            }
+            movementActor ! AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, Location.User >> Location.Movement, Point(15, 0))
+            switcherActor ! AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, Location.User >> Location.Switcher, CellForSwitcher(currentCell))
+        case AriadneMessage(MessageType.SwitcherMsg, MessageType.SwitcherMsg.Subtype.SwitchCell, _, newBestHost: InfoCell) =>
+            val cellAddress: String = s"akka.tcp://cellSystem@127.0.0.1:4552/user/${newBestHost.name}"
+            init(List(cellAddress))
 
         //        case Message.FromCell.ToUser.ALARM =>
         //            log.info("received alarm")
@@ -51,7 +48,7 @@ class UserRemote extends BasicActor with ActorLogging {
     }
 }
 
-class MovementActor extends BasicActor with ActorLogging {
+class MovementActor(var p: Point) extends BasicActor with ActorLogging {
 
     // local actors
     val movementGeneratorActor: ActorRef = context.actorOf(Props.create(classOf[MovementGeneratorActor]), "movementGenerator")
@@ -63,64 +60,64 @@ class MovementActor extends BasicActor with ActorLogging {
         currentUserPosition match {
             case _ =>
                 currentUserPosition = args.head.asInstanceOf[Point]
-                movementGeneratorActor ! AriadneLocalMessage(MessageType.Init, MessageType.Init.Subtype.Basic, Location.Movement >> Location.MovementGenerator, "")
+                movementGeneratorActor ! AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, Location.Movement >> Location.MovementGenerator, Greetings(List.empty))
         }
     }
 
     override protected def receptive: Receive = {
-        case AriadneLocalMessage(MessageType.Movement, MessageType.Movement.Subtype.Up, _, _) =>
+        case AriadneMessage(MessageType.Movement, MessageType.Movement.Subtype.Up, _, _) =>
             currentUserPosition.y += 1
             log.info("\tMoved:\tUP\t{}", currentUserPosition)
             sendUserPositionToPowerSupply()
-        case AriadneLocalMessage(MessageType.Movement, MessageType.Movement.Subtype.Down, _, _) =>
+        case AriadneMessage(MessageType.Movement, MessageType.Movement.Subtype.Down, _, _) =>
             currentUserPosition.y -= 1
             log.info("\tMoved:\tDOWN\t{}", currentUserPosition)
             sendUserPositionToPowerSupply()
-        case AriadneLocalMessage(MessageType.Movement, MessageType.Movement.Subtype.Left, _, _) =>
+        case AriadneMessage(MessageType.Movement, MessageType.Movement.Subtype.Left, _, _) =>
             currentUserPosition.x -= 1
             log.info("\tMoved:\tLEFT\t{}", currentUserPosition)
             sendUserPositionToPowerSupply()
-        case AriadneLocalMessage(MessageType.Movement, MessageType.Movement.Subtype.Right, _, _) =>
+        case AriadneMessage(MessageType.Movement, MessageType.Movement.Subtype.Right, _, _) =>
             currentUserPosition.x += 1
             log.info("\tMoved:\tRIGHT\t{}", currentUserPosition)
             sendUserPositionToPowerSupply()
     }
 
     def sendUserPositionToPowerSupply(): Unit = {
-        switcherActor.get ! AriadneLocalMessage(MessageType.Update, MessageType.Update.Subtype.UserPosition, Location.Movement >> Location.Switcher, currentUserPosition)
+        switcherActor.get ! AriadneMessage(MessageType.Update, MessageType.Update.Subtype.Position.UserPosition, Location.Movement >> Location.Switcher, currentUserPosition)
     }
 }
 
 class MovementGeneratorActor extends CustomActor with ActorLogging {
 
     override def receive: Receive = {
-        case AriadneLocalMessage(MessageType.Init, MessageType.Init.Subtype.Basic, _, _) =>
+        case AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, _, _) =>
             //            val random: Random = new Random()
             //            while (true) {
 
             log.info("FROM BORDER TO CENTER OF CELL2")
             for (i <- 1 to 5) {
                 Thread.sleep(1000)
-                context.parent ! AriadneLocalMessage(MessageType.Movement, MessageType.Movement.Subtype.Up, Location.MovementGenerator >> Location.Movement, "")
+                context.parent ! AriadneMessage(MessageType.Movement, MessageType.Movement.Subtype.Up, Location.MovementGenerator >> Location.Movement, Empty())
             }
 
             log.info("FROM CENTER TO BORDER OF CELL2")
             for (i <- 1 to 5) {
                 Thread.sleep(1000)
-                context.parent ! AriadneLocalMessage(MessageType.Movement, MessageType.Movement.Subtype.Left, Location.MovementGenerator >> Location.Movement, "")
+                context.parent ! AriadneMessage(MessageType.Movement, MessageType.Movement.Subtype.Left, Location.MovementGenerator >> Location.Movement, Empty())
             }
 
             log.info("FROM BORDER TO CENTER OF CELL1")
             for (i <- 1 to 5) {
                 Thread.sleep(1000)
-                context.parent ! AriadneLocalMessage(MessageType.Movement, MessageType.Movement.Subtype.Left, Location.MovementGenerator >> Location.Movement, "")
+                context.parent ! AriadneMessage(MessageType.Movement, MessageType.Movement.Subtype.Left, Location.MovementGenerator >> Location.Movement, Empty())
             }
         //                val randomInt = random.nextInt(3)
         //                randomInt match {
-        //                    case 0 => context.parent ! AriadneLocalMessage(MessageType.Movement, MessageType.Movement.Subtype.Up, Location.MovementGenerator >> Location.Movement, "")
-        //                    case 1 => context.parent ! AriadneLocalMessage(MessageType.Movement, MessageType.Movement.Subtype.Down, Location.MovementGenerator >> Location.Movement, "")
-        //                    case 2 => context.parent ! AriadneLocalMessage(MessageType.Movement, MessageType.Movement.Subtype.Left, Location.MovementGenerator >> Location.Movement, "")
-        //                    case 3 => context.parent ! AriadneLocalMessage(MessageType.Movement, MessageType.Movement.Subtype.Right, Location.MovementGenerator >> Location.Movement, "")
+        //                    case 0 => context.parent ! AriadneMessage(MessageType.Movement, MessageType.Movement.Subtype.Up, Location.MovementGenerator >> Location.Movement, "")
+        //                    case 1 => context.parent ! AriadneMessage(MessageType.Movement, MessageType.Movement.Subtype.Down, Location.MovementGenerator >> Location.Movement, "")
+        //                    case 2 => context.parent ! AriadneMessage(MessageType.Movement, MessageType.Movement.Subtype.Left, Location.MovementGenerator >> Location.Movement, "")
+        //                    case 3 => context.parent ! AriadneMessage(MessageType.Movement, MessageType.Movement.Subtype.Right, Location.MovementGenerator >> Location.Movement, "")
         //                }
         //            }
     }
@@ -129,7 +126,7 @@ class MovementGeneratorActor extends CustomActor with ActorLogging {
 class SwitcherActor extends BasicActor with ActorLogging {
 
     val powerSupplyActor: ActorRef = context.actorOf(Props.create(classOf[PowerSupplyActor]), "powerSupplyGenerator")
-    powerSupplyActor ! AriadneLocalMessage(MessageType.Init, MessageType.Init.Subtype.Basic, Location.Switcher >> Location.PowerSupply, "")
+    powerSupplyActor ! AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, Location.Switcher >> Location.PowerSupply, Greetings(List.empty))
 
     var currentInfoCell: CellForSwitcher = _
     var currentUserPosition: Point = _
@@ -145,33 +142,25 @@ class SwitcherActor extends BasicActor with ActorLogging {
     }
 
     override protected def receptive: Receive = {
-        case AriadneLocalMessage(MessageType.Init, MessageType.Init.Subtype.Basic, _, newInfoCell) =>
-            newInfoCell match {
-                case c: CellForSwitcher => currentInfoCell = c
-            }
-        case AriadneLocalMessage(MessageType.Update, MessageType.Update.Subtype.UserPosition, _, newUserPosition) =>
-            newUserPosition match {
-                case p: Point =>
-                    currentUserPosition = p
-                    powerSupplyActor ! AriadneLocalMessage(MessageType.SwitcherMsg, MessageType.SwitcherMsg.Subtype.CalculateStrength, Location.Switcher >> Location.PowerSupply, UserAndAntennaPositionUpdate(p, currentInfoCell.infoCell.antennaPosition))
-            }
-        case AriadneLocalMessage(MessageType.SwitcherMsg, MessageType.SwitcherMsg.Subtype.BestNexHost, _, bestNewCandidate) =>
-            bestNewCandidate match {
-                case p: InfoCell =>
-                    bestNextHost = p
-            }
-        case AriadneLocalMessage(MessageType.SignalStrength, MessageType.SignalStrength.Subtype.Strong, _, _) =>
+        case AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, _, newInfoCell: CellForSwitcher) =>
+            currentInfoCell = newInfoCell
+        case AriadneMessage(MessageType.Update, MessageType.Update.Subtype.Position.UserPosition, _, newUserPosition: Point) =>
+            currentUserPosition = newUserPosition
+            powerSupplyActor ! AriadneMessage(MessageType.SwitcherMsg, MessageType.SwitcherMsg.Subtype.CalculateStrength, Location.Switcher >> Location.PowerSupply, UserAndAntennaPositionUpdate(newUserPosition, currentInfoCell.infoCell.antennaPosition))
+        case AriadneMessage(MessageType.SwitcherMsg, MessageType.SwitcherMsg.Subtype.BestNexHost, _, bestNewCandidate: InfoCell) =>
+            bestNextHost = bestNewCandidate
+        case AriadneMessage(MessageType.SignalStrength, MessageType.SignalStrength.Subtype.Strong, _, _) =>
             log.info("\t\t\t\tSignal:\tSTRONG")
             bestNextHost = null
-        case AriadneLocalMessage(MessageType.SignalStrength, MessageType.SignalStrength.Subtype.Medium, _, _) =>
+        case AriadneMessage(MessageType.SignalStrength, MessageType.SignalStrength.Subtype.Medium, _, _) =>
             log.info("\t\t\t\tSignal:\tMEDIUM")
             bestNextHost = null
-        case AriadneLocalMessage(MessageType.SignalStrength, MessageType.SignalStrength.Subtype.Low, _, _) =>
+        case AriadneMessage(MessageType.SignalStrength, MessageType.SignalStrength.Subtype.Low, _, _) =>
             log.info("\t\t\t\tSignal:\tLOW")
-            powerSupplyActor ! AriadneLocalMessage(MessageType.SwitcherMsg, MessageType.SwitcherMsg.Subtype.ScanAndFind, SwitcherActor.this.fromSwitcher2PowerSupply, AntennaPositions(currentUserPosition, currentInfoCell.neighbors))
-        case AriadneLocalMessage(MessageType.SignalStrength, MessageType.SignalStrength.Subtype.VeryLow, _, _) =>
+            powerSupplyActor ! AriadneMessage(MessageType.SwitcherMsg, MessageType.SwitcherMsg.Subtype.ScanAndFind, SwitcherActor.this.fromSwitcher2PowerSupply, AntennaPositions(currentUserPosition, currentInfoCell.neighbors))
+        case AriadneMessage(MessageType.SignalStrength, MessageType.SignalStrength.Subtype.VeryLow, _, _) =>
             log.info("\t\t\t\tSignal:\tVERY LOW")
-            parent ! AriadneLocalMessage(MessageType.SwitcherMsg, MessageType.SwitcherMsg.Subtype.SwitchCell, Location.Switcher >> Location.User, bestNextHost)
+            parent ! AriadneMessage(MessageType.SwitcherMsg, MessageType.SwitcherMsg.Subtype.SwitchCell, Location.Switcher >> Location.User, bestNextHost)
     }
 }
 
@@ -182,18 +171,12 @@ class PowerSupplyActor extends BasicActor with ActorLogging {
     override protected def init(args: List[Any]): Unit = {}
 
     override protected def receptive: Receive = {
-        case AriadneLocalMessage(MessageType.SwitcherMsg, MessageType.SwitcherMsg.Subtype.CalculateStrength, _, userAndAntennaPosition) =>
-            userAndAntennaPosition match {
-                case p: UserAndAntennaPositionUpdate =>
-                    parent ! getStrength(getDistanceFromSource(p.userPosition, p.antennaPosition))
-            }
-        case AriadneLocalMessage(MessageType.SwitcherMsg, MessageType.SwitcherMsg.Subtype.ScanAndFind, _, userAntennaPositions) =>
-            userAntennaPositions match {
-                case msg: AntennaPositions =>
-                    val newBestCandidate = getNewBestCandidate(msg)
-                    log.info("Found new best candidate: {}", newBestCandidate.name)
-                    parent ! AriadneLocalMessage(MessageType.SwitcherMsg, MessageType.SwitcherMsg.Subtype.BestNexHost, Location.PowerSupply >> Location.Switcher, newBestCandidate)
-            }
+        case AriadneMessage(MessageType.SwitcherMsg, MessageType.SwitcherMsg.Subtype.CalculateStrength, _, userAndAntennaPosition: UserAndAntennaPositionUpdate) =>
+            parent ! getStrength(getDistanceFromSource(userAndAntennaPosition.userPosition, userAndAntennaPosition.antennaPosition))
+        case AriadneMessage(MessageType.SwitcherMsg, MessageType.SwitcherMsg.Subtype.ScanAndFind, _, userAntennaPositions: AntennaPositions) =>
+            val newBestCandidate = getNewBestCandidate(userAntennaPositions)
+            log.info("Found new best candidate: {}", newBestCandidate.name)
+            parent ! AriadneMessage(MessageType.SwitcherMsg, MessageType.SwitcherMsg.Subtype.BestNexHost, Location.PowerSupply >> Location.Switcher, newBestCandidate)
     }
 
     def getNewBestCandidate(msg: AntennaPositions): InfoCell = {
@@ -206,16 +189,16 @@ class PowerSupplyActor extends BasicActor with ActorLogging {
         distance
     }
 
-    def getStrength(distance: Double): AriadneLocalMessage[String] = {
+    def getStrength(distance: Double): AriadneMessage[Empty] = {
         distance match {
             case _ if distance <= 1 =>
-                AriadneLocalMessage(MessageType.SignalStrength, MessageType.SignalStrength.Subtype.Strong, Location.PowerSupply >> Location.Switcher, "")
+                AriadneMessage(MessageType.SignalStrength, MessageType.SignalStrength.Subtype.Strong, Location.PowerSupply >> Location.Switcher, Empty())
             case _ if distance <= 3 =>
-                AriadneLocalMessage(MessageType.SignalStrength, MessageType.SignalStrength.Subtype.Medium, Location.PowerSupply >> Location.Switcher, "")
+                AriadneMessage(MessageType.SignalStrength, MessageType.SignalStrength.Subtype.Medium, Location.PowerSupply >> Location.Switcher, Empty())
             case _ if distance <= 5 =>
-                AriadneLocalMessage(MessageType.SignalStrength, MessageType.SignalStrength.Subtype.Low, Location.PowerSupply >> Location.Switcher, "")
+                AriadneMessage(MessageType.SignalStrength, MessageType.SignalStrength.Subtype.Low, Location.PowerSupply >> Location.Switcher, Empty())
             case _ =>
-                AriadneLocalMessage(MessageType.SignalStrength, MessageType.SignalStrength.Subtype.VeryLow, Location.PowerSupply >> Location.Switcher, "")
+                AriadneMessage(MessageType.SignalStrength, MessageType.SignalStrength.Subtype.VeryLow, Location.PowerSupply >> Location.Switcher, Empty())
         }
     }
 }
@@ -224,10 +207,10 @@ class PowerSupplyActor extends BasicActor with ActorLogging {
 object UserRun {
     def main(args: Array[String]): Unit = {
         val path2Project = Paths.get("").toFile.getAbsolutePath
-        val path2Config = path2Project + "/conf/application.conf"
+        val path2Config = path2Project + "/res/conf/akka/application.conf"
         val config = ConfigFactory.parseFile(new File(path2Config))
         val system = ActorSystem.create("userSystem", config.getConfig("user"))
         val userActor = system.actorOf(Props.create(classOf[UserRemote]), "user")
-        userActor ! AriadneLocalMessage(MessageType.Init, MessageType.Init.Subtype.Basic, Location.User >> Location.Self, "akka.tcp://cellSystem@127.0.0.1:4552/user/cell2")
+        userActor ! AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, Location.User >> Location.Self, Greetings(List("akka.tcp://cellSystem@127.0.0.1:4552/user/cell2")))
     }
 }

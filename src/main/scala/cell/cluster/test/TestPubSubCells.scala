@@ -8,7 +8,7 @@ import akka.cluster.Cluster
 import cell.cluster.CellSubscriber
 import com.typesafe.config.ConfigFactory
 import ontologies.messages.Location._
-import ontologies.messages.{AriadneRemoteMessage, Location, MessageType}
+import ontologies.messages.{AriadneMessage, Greetings, Location, MessageType}
 
 /**
   * Created by Matteo Gabellini on 29/06/2017.
@@ -36,10 +36,10 @@ object TestPubSubCells extends App {
     //implicit val system2 = ActorSystem("Arianna-Cluster-Master", config)
     //Cluster(system2).join(joinAddress)
     val publisher = system1.actorOf(Props[TestPublisher], "Publisher")
-    publisher ! AriadneRemoteMessage(
+    publisher ! AriadneMessage(
         MessageType.Init,
         MessageType.Init.Subtype.Greetings,
         Location.Cell >> Location.Server,
-        "Hello baby.")
+        Greetings(List("Hello baby.")))
 
 }
