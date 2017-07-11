@@ -1,45 +1,110 @@
 package admin
 
 import java.io.File
+import java.net.URL
+import java.util.ResourceBundle
+import javafx.fxml.{FXML, FXMLLoader, Initializable}
+import javafx.scene.Node
+import javafx.scene.control.Button
+import javafx.scene.layout.{GridPane, Pane, VBox}
+import javafx.scene.text.Text
 
 import akka.actor.ActorRef
-import area.{Area, Cell, Coordinates, InfoCell, Message, Passage, Point, SampleUpdate, Sensor}
-import spray.json.{DefaultJsonProtocol, _}
+import ontologies.messages._
 
 import scala.io.Source
+import scalafx.Includes._
 import scalafx.application.Platform
+import scalafx.stage.FileChooser
+import scalafx.stage.FileChooser.ExtensionFilter
 
-object MyJsonProtocol extends DefaultJsonProtocol {
-    implicit val pointFormat = jsonFormat2(Point)
-    implicit val coordinatesFormat = jsonFormat4(Coordinates)
-    implicit val infoCellFormat = jsonFormat5(InfoCell)
-    implicit val passageFormat = jsonFormat3(Passage)
-    implicit val sensorFormat = jsonFormat2(Sensor)
-    implicit val cellFormat = jsonFormat10(Cell)
-    implicit val areaFormat = jsonFormat1(Area)
-}
+final case class CellForView(id: Int, name: String, currentOccupation: Int, sensors: List[Sensor])
 
-import admin.MyJsonProtocol._
-
-class InterfaceController(interfaceView: InterfaceView) {
+class InterfaceController extends Initializable {
     var actorRef: ActorRef = _
+    var interfaceView: InterfaceView = _
 
-    def newText(sampleUpdate: SampleUpdate): Unit = {
+    @FXML
+    var nRooms: Text = _
+    @FXML
+    var fileName: Text = _
+    @FXML
+    var loadButton: Button = _
+
+    var cellsBoxes: List[VBox] = _
+
+    @FXML
+    var gridPane: GridPane = _
+
+
+    override def initialize(location: URL, resources: ResourceBundle): Unit = {
+        println("controller initialized")
+    }
+
+    def updateView(update: List[CellForView]): Unit = {
         Platform.runLater {
-            interfaceView.setText1(sampleUpdate.temperature.toString)
-            interfaceView.setText2(sampleUpdate.people.toString)
+            //interfaceView.setText1("Niente")
+            //interfaceView.setText2(update.currentPeople.toString)
         }
+    }
+
+    @FXML
+    def handleFileLoad(): Unit = {
+        val fc = new FileChooser()
+        fc.setTitle("Get JSON")
+        fc.getExtensionFilters.add(new ExtensionFilter("JSON Files", "*.json"))
+        val json: File = fc.showOpenDialog(null)
+        parseFile(json)
     }
 
     def parseFile(file: File): Unit = {
         val source = Source.fromFile(file).getLines.mkString
-        val jsvalue: JsValue = source.parseJson
-        val area: Area = jsvalue.convertTo[Area]
-        actorRef ! Message.FromInterface.ToAdmin.MAP_CONFIG(area)
+        actorRef ! AriadneLocalMessage(MessageType.Factory("Topology"), MessageSubtype.Factory("planimetrics"), Location.Admin >> Location.Self, source)
+        fileName.text = file.getName
     }
 
-    def triggerAlarm() = {
-        actorRef ! Message.FromInterface.ToAdmin.ALARM
+    def createCells(initialConfiguration: List[CellForView]) = {
+        nRooms.text = initialConfiguration.size.toString
+        var x = 0
+        var y = 0
+        initialConfiguration.foreach(c => {
+            var node = createCellTemplate(c)
+
+            //println("prova " + prova.toString())
+            Platform.runLater {
+                gridPane.add(node, x, y)
+                if (y == 1) {
+                    y = 0
+                    x = x + 1
+                } else {
+                    y = y + 1
+                }
+            }
+
+
+        })
     }
+
+    def createCellTemplate(c: CellForView): Node = {
+        var node = new FXMLLoader(getClass.getResource("/cellTemplate.fxml")).load[VBox]
+        node.setId(c.id.toString)
+
+        var nameText = getTextNode(node, "namePane", "roomName")
+        nameText.text = c.name
+
+        var occupationText = getTextNode(node, "occupationPane", "roomOccupation")
+        occupationText.text = c.currentOccupation.toString
+
+        var temperatureText = getTextNode(node, "temperaturePane", "roomTemperature")
+        temperatureText.text = c.sensors.filter(s => s.category.equals(1)).head.value.toString
+        node
+    }
+
+    def getTextNode(node: VBox, paneId: String, textId: String): Text = {
+        var pane = node.getChildren.filter(c => c.id.value.equals(paneId)).get(0).asInstanceOf[Pane]
+        var text = pane.getChildren.filter(c => c.id.value.equals(textId)).get(0).asInstanceOf[Text]
+        text
+    }
+
 
 }

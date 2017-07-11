@@ -5,38 +5,49 @@ import java.nio.file.Paths
 import javafx.embed.swing.JFXPanel
 import javafx.stage.Stage
 
-import akka.actor.{Actor, ActorSystem, Address, Props, RootActorPath}
-import area.Message
+import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
+import common.CustomActor
+import ontologies.messages._
 
+import scala.collection.mutable.ListBuffer
 import scalafx.application.Platform
 
-class AdminActor(interfaceView: InterfaceView) extends Actor {
+class AdminActor(interfaceView: InterfaceView) extends CustomActor {
 
-    val interfaceController: InterfaceController = new InterfaceController(interfaceView);
-    interfaceView.controller = interfaceController
+    var area: Area = _
+    Thread.sleep(4000)
+    val interfaceController: InterfaceController = interfaceView.controller
     interfaceController.actorRef = self
     val serverActor = context.actorSelection("akka.tcp://serverSystem@127.0.0.1:4553/user/server")
 
     override def receive: Receive = {
-        case msg: Message.FromServer.ToAdmin.SAMPLE_UPDATE =>
-            interfaceController.newText(msg.sampleUpdate)
+        case msg@AriadneRemoteMessage(MessageType.Update, MessageType.Update.Subtype.UpdateForAdmin, _, _) => {
+            val adminUpdate: UpdateForAdmin = MessageType.Update.Subtype.UpdateForAdmin.unmarshal(msg.content)
+            val updateCells: ListBuffer[CellForView] = new ListBuffer[CellForView]
+            adminUpdate.list.foreach(c => updateCells += new CellForView(c.infoCell.id, c.infoCell.name, c.currentPeople, c.sensors))
+            interfaceController.updateView(updateCells.toList)
+        }
         //TODO Update view
-        case Message.FromServer.ToAdmin.SEND_ALARM_TO_ADMIN =>
-        //TODO Update view
-        case msg: Message.FromInterface.ToAdmin.MAP_CONFIG =>
-            serverActor ! Message.FromAdmin.ToServer.MAP_CONFIG(msg.area)
-        case Message.FromInterface.ToAdmin.ALARM =>
-            serverActor ! Message.FromAdmin.ToServer.ALARM
-    }
-}
+        case msg@AriadneLocalMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, _, _) => {
+            area = MessageType.Topology.Subtype.Planimetrics.unmarshal(msg.content.toString)
+            val initialConfiguration: ListBuffer[CellForView] = new ListBuffer[CellForView]
+            area.cells.foreach(c => initialConfiguration += new CellForView(c.infoCell.id, c.infoCell.name, c.currentPeople, c.sensors))
+            interfaceController.createCells(initialConfiguration.toList)
+            //serverActor ! AriadneRemoteMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, Location.Admin >> Location.Server, msg.content.toString)
+        }
+        case _ => println("none")
 
+    }
+
+}
 
 object App {
     def main(args: Array[String]): Unit = {
         new JFXPanel
         val path2Project = Paths.get("").toFile.getAbsolutePath
         val path2Config = path2Project + "/conf/application.conf"
+        println(path2Config)
         var interfaceView: InterfaceView = new InterfaceView
         val config = ConfigFactory.parseFile(new File(path2Config))
         val system = ActorSystem.create("adminSystem", config.getConfig("admin"))

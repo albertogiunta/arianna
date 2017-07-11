@@ -230,13 +230,13 @@ object MessageType {
                 def marshal(obj: Int): String = obj.toJson.toString()
             }
 
-            object CellUpdate extends MessageSubtype {
+            object UpdateForAdmin extends MessageSubtype {
 
-                override val subtypeName = "CellUpdate"
+                override val subtypeName = "UpdateForAdmin"
 
-                def unmarshal(json: String): CellUpdate = json.parseJson.convertTo[CellUpdate]
+                def unmarshal(json: String): UpdateForAdmin = json.parseJson.convertTo[UpdateForAdmin]
 
-                def marshal(obj: CellUpdate): String = obj.toJson.toString()
+                def marshal(obj: UpdateForAdmin): String = obj.toJson.toString()
             }
 
         }
