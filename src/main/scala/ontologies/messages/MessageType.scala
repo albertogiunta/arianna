@@ -35,8 +35,6 @@ trait MessageType {
     }
 }
 
-//final case class AriadneMessageType(override val typeName : String) extends MessageType
-
 object MessageType {
 
     object Init extends MessageType {
@@ -47,7 +45,7 @@ object MessageType {
 
             object Basic extends MessageSubtype {
 
-                override val subtypeName = "Basic"
+                override val subtypeName = "Init"
 
                 //def unmarshal(json: String): Any = null
 
@@ -66,7 +64,7 @@ object MessageType {
 
             object Basic extends MessageSubtype {
 
-                override val subtypeName = "Basic"
+                override val subtypeName = "Alarm"
 
                 def unmarshal(json: String): Int = json.parseJson.convertTo[Int]
 
@@ -85,7 +83,7 @@ object MessageType {
 
             object Basic extends MessageSubtype {
 
-                override val subtypeName = "Basic"
+                override val subtypeName = "Handshake"
 
                 def unmarshal(json: String): Int = json.parseJson.convertTo[Int]
 
@@ -122,7 +120,7 @@ object MessageType {
 
             object Basic extends MessageSubtype {
 
-                override val subtypeName = "Basic"
+                override val subtypeName = "SimpleRoute"
 
                 def unmarshal(json: String): Any = null
 
@@ -131,7 +129,7 @@ object MessageType {
 
             object Escape extends MessageSubtype {
 
-                override val subtypeName = "Escape"
+                override val subtypeName = "EscapeRoute"
 
                 def unmarshal(json: String): Any = null
 
@@ -381,13 +379,13 @@ object MessageType {
                 def marshal(obj: Int): String = obj.toJson.toString()
             }
 
-            object CellUpdate extends MessageSubtype {
+            object UpdateForAdmin extends MessageSubtype {
 
-                override val subtypeName = "CellUpdate"
+                override val subtypeName = "UpdateForAdmin"
 
-                def unmarshal(json: String): CellUpdate = json.parseJson.convertTo[CellUpdate]
+                def unmarshal(json: String): UpdateForAdmin = json.parseJson.convertTo[UpdateForAdmin]
 
-                def marshal(obj: CellUpdate): String = obj.toJson.toString()
+                def marshal(obj: UpdateForAdmin): String = obj.toJson.toString()
             }
 
             object AntennaPosition extends MessageSubtype {
@@ -410,25 +408,19 @@ object MessageType {
     object Factory {
 
         def apply(typeName: String): MessageType = typeName.toLowerCase match {
-            case t if t == Init.toString.toLowerCase => Init
-            case t if t == Route.toString.toLowerCase => Route
-            case t if t == Alarm.toString.toLowerCase => Alarm
-            case t if t == Topology.toString.toLowerCase => Topology
-            case t if t == Handshake.toString.toLowerCase => Handshake
-            case t if t == Update.toString.toLowerCase => Update
+            case t if t == Init.toLowerCase => Init
+            case t if t == Route.toLowerCase => Route
+            case t if t == Alarm.toLowerCase => Alarm
+            case t if t == Topology.toLowerCase => Topology
+            case t if t == Handshake.toLowerCase => Handshake
+            case t if t == Update.toLowerCase => Update
 
             case _ => null
         }
     }
-
 }
 
-
 object TestMessageType extends App {
-
-    //MessageType.Alarm.typeName
-
-    //MessageType.Update.Subtype.Sensors
 
     var sensor: List[Sensor] = MessageType.Update.Subtype.Sensors.unmarshal("[{\"category\" : 1,\"value\" : 2.0}, {\"category\" : 1,\"value\" : 2.0}]")
 

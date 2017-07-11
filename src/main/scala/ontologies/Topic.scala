@@ -39,6 +39,8 @@ object Topic {
     implicit def Topic2String(topic: Topic): String = topic.toString
 
     implicit def String2Topic(string: String): Topic = AriadneTopic(string)
+    
+    implicit def Topic2MessageType(topic: Topic): MessageType = topic.associatedMessageType
 }
 
 object TestTopic extends App {

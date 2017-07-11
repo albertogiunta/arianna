@@ -91,4 +91,3 @@ object CellUpdate {
     def apply(cell: Cell): CellUpdate = new CellUpdate(cell.infoCell, cell.currentPeople, cell.sensors)
 }
 
-final case class SampleUpdate(people: Int, temperature: Double)
