@@ -58,6 +58,14 @@ object MessageSubtype {
                 Update.Subtype.ActualLoad
             case st if st == Update.Subtype.AdminUpdate.toLowerCase =>
                 Update.Subtype.AdminUpdate
+            case st if st == Update.Subtype.Practicability.toLowerCase =>
+                Update.Subtype.Practicability
+            case st if st == Update.Subtype.UserPosition.toLowerCase =>
+                Update.Subtype.UserPosition
+            case st if st == Update.Subtype.CellOccupation.toLowerCase =>
+                Update.Subtype.CellOccupation
+            case st if st == Update.Subtype.CellUpdate.toLowerCase =>
+                Update.Subtype.CellUpdate
             case _ => null
         }
     }

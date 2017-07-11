@@ -35,7 +35,16 @@ final case class Passage(neighborId: Int,
                          startCoordinates: Point,
                          endCoordinates: Point) extends MessageContent
 
+
 /* Semi complete topology for the Cells */
+final case class CellForSwitcher(infoCell: InfoCell,
+                                 neighbors: List[InfoCell]) extends MessageContent
+
+object CellForSwitcher {
+    def apply(cell: CellForUser): CellForSwitcher =
+        new CellForSwitcher(cell.infoCell, cell.neighbors)
+}
+
 final case class CellForCell(infoCell: InfoCell,
                              neighbors: List[InfoCell],
                              passages: List[Passage],
@@ -99,6 +108,12 @@ object LightArea {
 final case class CellUpdate(infoCell: InfoCell,
                             currentPeople: Int,
                             sensors: List[Sensor]) extends MessageContent
+
+final case class UserAndAntennaPositionUpdate(userPosition: Point, antennaPosition: Point)
+
+final case class AntennaPositions(userPosition: Point, antennaPositions: List[InfoCell])
+
+final case class Empty()
 
 object CellUpdate {
     def apply(cell: Cell): CellUpdate = new CellUpdate(cell.infoCell, cell.currentPeople, cell.sensors)

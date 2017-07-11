@@ -1,98 +1,83 @@
 {
     "infoCell": {
         "id": 1,
-        "uri": "akka.tcp://cellSystem@127.0.0.1:4552/user/cell1",
-        "name": "name",
+        "uri": "uri1",
+        "name": "cell1",
         "roomVertices": {
             "northWest": {
                 "x": 0,
-                "y": 5
+                "y": 10
             },
             "northEast": {
-                "x": 2,
-                "y": 5
+                "x": 10,
+                "y": 10
             },
             "southWest": {
                 "x": 0,
-                "y": 3
+                "y": 0
             },
             "southEast": {
-                "x": 2,
-                "y": 3
+                "x": 10,
+                "y": 0
             }
         },
         "antennaPosition": {
-            "x": 0,
-            "y": 1
+            "x": 5,
+            "y": 5
         }
     },
     "sensors": [
         {
             "category": 1,
-            "value": 21.4
-        },
-        {
-            "category": 2,
-            "value": 0.3
+            "value": 10.0
         }
     ],
     "neighbors": [
-      {
-        "id": 1,
-        "uri": "uri1",
-        "name": "cell1",
-        "roomVertices": {
-          "northWest": {
-            "x": 0,
-            "y": 10
-          },
-          "northEast": {
-            "x": 10,
-            "y": 10
-          },
-          "southWest": {
-            "x": 0,
-            "y": 0
-          },
-          "southEast": {
-            "x": 10,
-            "y": 0
-          }
-        },
-        "antennaPosition": {
-          "x": 5,
-          "y": 5
+        {
+            "id": 2,
+            "uri": "uri2",
+            "name": "cell2",
+            "roomVertices": {
+                "northWest": {
+                    "x": 10,
+                    "y": 10
+                },
+                "northEast": {
+                    "x": 20,
+                    "y": 10
+                },
+                "southWest": {
+                    "x": 10,
+                    "y": 0
+                },
+                "southEast": {
+                    "x": 20,
+                    "y": 0
+                }
+            },
+            "antennaPosition": {
+                "x": 15,
+                "y": 5
+            }
         }
-      }
     ],
     "passages": [
         {
-            "neighborId": 0,
+            "neighborId": 2,
             "startCoordinates": {
-                "x": 0,
-                "y": 4
+                "x": 10,
+                "y": 7
             },
             "endCoordinates": {
-                "x": 0,
-                "y": 4
-            }
-        },
-        {
-            "neighborId": 1,
-            "startCoordinates": {
-                "x": 3,
-                "y": 4
-            },
-            "endCoordinates": {
-                "x": 3,
-                "y": 4
+                "x": 10,
+                "y": 8
             }
         }
     ],
     "isEntryPoint": true,
     "isExitPoint": false,
-    "capacity": 32,
-    "squareMeters": 23.5,
-    "currentPeople": 23,
-    "practicabilityLevel": 23.23
+    "capacity": 100,
+    "squareMeters": 50.0,
+    "currentPeople": 20,
+    "practicabilityLevel": 5.0
 }

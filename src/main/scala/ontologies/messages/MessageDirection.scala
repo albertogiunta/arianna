@@ -79,6 +79,12 @@ object Location {
 
     val MovGenerator: Location = LocationImpl("MovGenerator")
     
+    val PowerSupply: Location = LocationImpl("PowerSupplyGenerator")
+
+    val Movement: Location = LocationImpl("Movement")
+
+    val MovementGenerator: Location = LocationImpl("MovementGenerator")
+
     implicit def location2String(d: Location): String = d.toString
     
     implicit def location2Direction(d: Location => Direction, l: Location): Direction = d(l)
@@ -96,7 +102,7 @@ object Location {
             case loc if loc == Notifier.toLowerCase => Notifier
             case loc if loc == Self.toLowerCase => Self
             case loc if loc == Switcher.toLowerCase => Switcher
-            case loc if loc == MovGenerator.toLowerCase => MovGenerator
+            case loc if loc == MovementGenerator.toLowerCase => MovementGenerator
             case _ => null
         }
     }
