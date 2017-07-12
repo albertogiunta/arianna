@@ -35,16 +35,14 @@ final case class Passage(neighborId: Int,
                          startCoordinates: Point,
                          endCoordinates: Point) extends MessageContent
 
+/* Route content data structures */
+final case class RouteRequest(userID: String, fromCell: InfoCell, toCell: InfoCell) extends MessageContent
+
+final case class RouteInfo(req: RouteRequest, topology: AreaForCell) extends MessageContent
+
+final case class RouteResponse(request: RouteRequest, route: List[InfoCell]) extends MessageContent
 
 /* Semi complete topology for the Cells */
-final case class CellForSwitcher(infoCell: InfoCell,
-                                 neighbors: List[InfoCell]) extends MessageContent
-
-object CellForSwitcher {
-    def apply(cell: CellForUser): CellForSwitcher =
-        new CellForSwitcher(cell.infoCell, cell.neighbors)
-}
-
 final case class CellForCell(infoCell: InfoCell,
                              neighbors: List[InfoCell],
                              passages: List[Passage],
@@ -87,7 +85,6 @@ final case class Sensor(category: Int, value: Double) extends MessageContent
 final case class SensorList(info: InfoCell, sensors: List[Sensor]) extends MessageContent
 
 object SensorList {
-    
     def apply(cell: Cell): SensorList = new SensorList(cell.infoCell, cell.sensors)
 }
 
@@ -109,21 +106,11 @@ final case class CellUpdate(infoCell: InfoCell,
                             currentPeople: Int,
                             sensors: List[Sensor]) extends MessageContent
 
-final case class UserAndAntennaPositionUpdate(userPosition: Point, antennaPosition: Point) extends MessageContent
-
-final case class AntennaPositions(userPosition: Point, antennaPositions: List[InfoCell]) extends MessageContent
-
-final case class Empty() extends MessageContent
-
 object CellUpdate {
     def apply(cell: Cell): CellUpdate = new CellUpdate(cell.infoCell, cell.currentPeople, cell.sensors)
 }
 
 final case class UpdateForAdmin(list: List[CellUpdate]) extends MessageContent
-
-//object UpdateForAdmin {
-//    def apply(area: Area): UpdateForAdmin = new UpdateForAdmin(area.cells.map(c => CellUpdate(c)))
-//}
 
 /* General Content */
 final case class Greetings(args: List[String]) extends MessageContent
@@ -135,5 +122,18 @@ object AlarmContent {
 }
 
 /* BOH */
-
 final case class SampleUpdate(people: Int, temperature: Double) extends MessageContent
+
+final case class UserAndAntennaPositionUpdate(userPosition: Point, antennaPosition: Point) extends MessageContent
+
+final case class AntennaPositions(userPosition: Point, antennaPositions: List[InfoCell]) extends MessageContent
+
+final case class Empty() extends MessageContent
+
+final case class CellForSwitcher(infoCell: InfoCell,
+                                 neighbors: List[InfoCell]) extends MessageContent
+
+object CellForSwitcher {
+    def apply(cell: CellForUser): CellForSwitcher =
+        new CellForSwitcher(cell.infoCell, cell.neighbors)
+}

@@ -9,6 +9,7 @@ import ontologies.messages.MessageType._
 trait MessageSubtype {
     
     val superType: MessageType
+    
     val subtypeName: String
     
     def unmarshal(json: String): MessageContent
@@ -40,8 +41,12 @@ object MessageSubtype {
                 Handshake.Subtype.Cell2User
             case st if st == Handshake.Subtype.User2Cell.toLowerCase =>
                 Handshake.Subtype.User2Cell
-            case st if st == Route.Subtype.Basic.toLowerCase =>
-                Route.Subtype.Basic
+            case st if st == Route.Subtype.Request.toLowerCase =>
+                Route.Subtype.Request
+            case st if st == Route.Subtype.Response.toLowerCase =>
+                Route.Subtype.Response
+            case st if st == Route.Subtype.Info.toLowerCase =>
+                Route.Subtype.Info
             case st if st == Route.Subtype.Escape.toLowerCase =>
                 Route.Subtype.Escape
             case st if st == Topology.Subtype.Planimetrics.toLowerCase =>
