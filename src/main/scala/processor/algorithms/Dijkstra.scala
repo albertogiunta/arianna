@@ -1,4 +1,4 @@
-package processor.Algorithms
+package processor.algorithms
 
 import processor.prioritymap.PriorityMap
 

@@ -6,8 +6,8 @@ import ontologies.messages.Location._
 import ontologies.messages.MessageType.Route
 import ontologies.messages.MessageType.Route.Subtype.{Info, Response}
 import ontologies.messages._
-import processor.Algorithms.AStarSearch
-import processor.Algorithms.Dijkstra._
+import processor.algorithms.AStarSearch
+import processor.algorithms.Dijkstra._
 
 import scala.collection.immutable.HashMap
 import scala.collection.mutable
@@ -86,15 +86,16 @@ private class RouteProcessor(val router: ActorRef) extends BasicActor {
                                     c.name -> (100.0 + asMap(c.name).practicabilityLevel - cell.practicabilityLevel)
                                 ): _*)
                         ): _*)
-                
-                val route: Map[String, String] =
-                    AStarSearch.A_*(graph)(req.fromCell.name, req.toCell.name)
+    
+                val route: List[InfoCell] =
+                    AStarSearch.A_*(graph)(req.fromCell.name, req.toCell.name)(AStarSearch.Extractor.toList)
+                        .map(s => asMap(s).infoCell)
                 
                 AriadneMessage(
                     Route,
                     Response,
                     Location.Cell >> Location.User,
-                    RouteResponse(req, null)
+                    RouteResponse(req, route)
                 )
                 
             }.onComplete(promise => if (promise.isSuccess) router ! promise.get)

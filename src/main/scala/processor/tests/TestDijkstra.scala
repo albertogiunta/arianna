@@ -1,6 +1,7 @@
 package processor.tests
 
-import processor.Algorithms.Dijkstra
+import processor.algorithms.Dijkstra
+import processor.algorithms.Dijkstra.Graph
 
 /**
   * Created by Alessandro on 12/07/2017.
@@ -20,7 +21,7 @@ object TestDijkstra extends App {
     println(tree2)
     val time = System.currentTimeMillis
     Dijkstra.dijkstra(tree2)("A")
-    println("Execution Time : " + (System.currentTimeMillis() - time1) / 1000.0)
+    println("Execution Time : " + (System.currentTimeMillis() - time) / 1000.0)
     
     println(tree)
     val time1 = System.currentTimeMillis

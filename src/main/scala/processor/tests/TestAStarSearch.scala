@@ -1,14 +1,14 @@
 package processor.tests
 
-import processor.Algorithms.AStarSearch
-import processor.Algorithms.Dijkstra.Graph
+import processor.algorithms.AStarSearch
+import processor.algorithms.Dijkstra.Graph
 
 /**
   * Created by Alessandro on 12/07/2017.
   */
 object TestAStarSearch extends App {
     
-    //    val tree : Graph[List[Boolean]] = Dijkstra.tree(15)
+    //    val tree: Graph[List[Boolean]] = Dijkstra.tree(14)
     
     val tree: Graph[String] = Map(
         "A" -> Map("B" -> 1.0, "C" -> 1.0, "D" -> 1.0),
@@ -19,12 +19,11 @@ object TestAStarSearch extends App {
         "Z" -> Map()
     )
     
-    println(tree)
-    val time1 = System.currentTimeMillis
-    //    println(AStarSearch.A_*(tree)(List(true), Nil))//._1 foreach println
-    println(AStarSearch.A_*(tree)("A", "Z")) //._1 foreach println
+    //println(tree)
+    val time = System.currentTimeMillis
+    //    println(AStarSearch.A_*(tree)(List(true), Nil)(AStarSearch.Extractor.toList))
     
-    println("Execution Time : " + (System.currentTimeMillis() - time1) / 1000.0)
+    println(AStarSearch.A_*(tree)("A", "Z")(AStarSearch.Extractor.toList))
     
-    
+    println("Execution Time : " + (System.currentTimeMillis() - time) / 1000.0)
 }
