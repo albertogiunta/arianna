@@ -1,12 +1,13 @@
 package processor.tests
 
-import processor.algorithms.Dijkstra
-import processor.algorithms.Dijkstra.Graph
+import processor.route.algorithms.Dijkstra
+import processor.route.algorithms.Dijkstra.Graph
 
 /**
   * Created by Alessandro on 12/07/2017.
   */
 object TestDijkstra extends App {
+    
     val tree = Dijkstra.tree(12)
     
     val tree2: Graph[String] = Map(
@@ -28,9 +29,4 @@ object TestDijkstra extends App {
     Dijkstra.dijkstra(tree)(List(true)) //._1 foreach println
     
     println("Execution Time : " + (System.currentTimeMillis() - time1) / 1000.0)
-    
-    val time2 = System.currentTimeMillis
-    Dijkstra.dijkstraWithPriority(tree)(List(true)) //._1 foreach println
-    
-    println("Execution Time : " + (System.currentTimeMillis() - time2) / 1000.0)
 }

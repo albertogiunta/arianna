@@ -42,7 +42,32 @@ final case class RouteInfo(req: RouteRequest, topology: AreaForCell) extends Mes
 
 final case class RouteResponse(request: RouteRequest, route: List[InfoCell]) extends MessageContent
 
-/* Semi complete topology for the Cells */
+final case class EscapeRequest(info: InfoCell, topology: AreaForCell) extends MessageContent
+
+final case class EscapeResponse(info: InfoCell, route: List[InfoCell]) extends MessageContent
+
+/**
+  * View of the Topology from the Cell perspective
+  *
+  * @param id    Random ID value identifying the Topology
+  * @param cells List of the Cells of the Topology
+  */
+final case class AreaForCell(id: Int, cells: List[CellForCell]) extends MessageContent
+
+object AreaForCell {
+    def apply(area: Area): AreaForCell = new AreaForCell(area.id, area.cells.map(c => CellForCell(c)))
+}
+
+/**
+  * View of another Cell from the perspective of a Cell
+  *
+  * @param infoCell
+  * @param neighbors
+  * @param passages
+  * @param isEntryPoint
+  * @param isExitPoint
+  * @param practicabilityLevel
+  */
 final case class CellForCell(infoCell: InfoCell,
                              neighbors: List[InfoCell],
                              passages: List[Passage],
@@ -56,13 +81,14 @@ object CellForCell {
             cell.isExitPoint, cell.practicabilityLevel)
 }
 
-final case class AreaForCell(id: Int, cells: List[CellForCell]) extends MessageContent
-
-object AreaForCell {
-    def apply(area: Area): AreaForCell = new AreaForCell(area.id, area.cells.map(c => CellForCell(c)))
-}
-
-/* User point of view of a Cell*/
+/**
+  * View of a Cell from the Perspective of a User
+  *
+  * @param actorPath
+  * @param infoCell
+  * @param neighbors
+  * @param passages
+  */
 final case class CellForUser(actorPath: String,
                              infoCell: InfoCell,
                              neighbors: List[InfoCell],

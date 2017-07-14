@@ -1,1 +1,0 @@
-All the intellectual rights for the classes into this folder are of DeUmmels https://github.com/ummels/scala-prioritymap

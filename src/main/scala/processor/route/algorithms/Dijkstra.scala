@@ -1,6 +1,4 @@
-package processor.algorithms
-
-import processor.prioritymap.PriorityMap
+package processor.route.algorithms
 
 import scala.annotation.tailrec
 import scala.collection.immutable.HashMap
@@ -17,28 +15,9 @@ object Dijkstra {
     case class Node[N](name: N, neighbors: Map[N, Double])
     
     def shortestPath[N](graph: Graph[N])(source: N, target: N): Option[List[N]] = {
-        val pred = dijkstraWithPriority(graph)(source)._2
+        val pred = dijkstra(graph)(source)._2
         if (pred.contains(target) || source == target) Some(iterateRight(target)(pred.get))
         else None
-    }
-    
-    def dijkstraWithPriority[N](g: Graph[N])(source: N): (Map[N, Double], Map[N, N]) = {
-        
-        @tailrec def go(active: PriorityMap[N, Double], sol: Map[N, Double], preds: Map[N, N]): (Map[N, Double], Map[N, N]) =
-            if (active.isEmpty) (sol, preds)
-            else {
-                val (node, cost) = active.head
-                val neighbours = for {
-                    (n, c) <- g(node) if !sol.contains(n) &&
-                    cost + c < active.getOrElse(n, Double.MaxValue)
-                } yield n -> (cost + c)
-                
-                go(active.tail ++ neighbours,
-                    sol + (node -> cost),
-                    preds ++ neighbours mapValues (_ => node))
-            }
-        
-        go(PriorityMap(source -> 0.0), HashMap.empty, HashMap.empty)
     }
     
     def dijkstra[N](g: Graph[N])(source: N): (Map[N, Double], Map[N, N]) = {

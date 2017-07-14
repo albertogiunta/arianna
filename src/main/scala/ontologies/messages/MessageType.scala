@@ -166,15 +166,27 @@ object MessageType {
             /**
               * Takes a *** object as MessageContent
               */
-            object Escape extends MessageSubtype {
-
-                override val subtypeName = "Escape"
-
-                override val superType = Route
+            object Escape {
+    
+                object Request extends MessageSubtype {
+                    override val subtypeName = "EscapeRequest"
         
-                override def unmarshal(json: String): MessageContent = json.parseJson.convertTo[InfoCell]
+                    override val superType = Route
         
-                override def marshal(obj: MessageContent): String = obj.asInstanceOf[InfoCell].toJson.toString()
+                    override def unmarshal(json: String): EscapeRequest = json.parseJson.convertTo[EscapeRequest]
+        
+                    override def marshal(obj: MessageContent): String = obj.asInstanceOf[EscapeRequest].toJson.toString()
+                }
+    
+                object Response extends MessageSubtype {
+                    override val subtypeName = "EscapeResponse"
+        
+                    override val superType = Route
+        
+                    override def unmarshal(json: String): EscapeResponse = json.parseJson.convertTo[EscapeResponse]
+        
+                    override def marshal(obj: MessageContent): String = obj.asInstanceOf[EscapeResponse].toJson.toString()
+                }
             }
 
         }

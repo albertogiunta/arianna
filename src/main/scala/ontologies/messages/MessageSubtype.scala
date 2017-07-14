@@ -47,8 +47,10 @@ object MessageSubtype {
                 Route.Subtype.Response
             case st if st == Route.Subtype.Info.toLowerCase =>
                 Route.Subtype.Info
-            case st if st == Route.Subtype.Escape.toLowerCase =>
-                Route.Subtype.Escape
+            case st if st == Route.Subtype.Escape.Request.toLowerCase =>
+                Route.Subtype.Escape.Request
+            case st if st == Route.Subtype.Escape.Response.toLowerCase =>
+                Route.Subtype.Escape.Response
             case st if st == Topology.Subtype.Planimetrics.toLowerCase =>
                 Topology.Subtype.Planimetrics
             case st if st == Topology.Subtype.Topology4CellLight.toLowerCase =>
