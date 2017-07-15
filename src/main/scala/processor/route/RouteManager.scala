@@ -2,6 +2,7 @@ package processor.route
 
 import akka.actor.{ActorRef, Props}
 import common.BasicActor
+import ontologies.messages.Location._
 import ontologies.messages.MessageType.Route
 import ontologies.messages.MessageType.Route.Subtype.{Escape, Info, Response}
 import ontologies.messages._
@@ -19,48 +20,66 @@ class RouteManager extends BasicActor {
     
     private var processor: ActorRef = _
     
-    override protected def init(args: List[Any]): Unit = {
-        log.info("Hello there from {}", name)
+    
+    override def preStart() = {
+        super.preStart()
         cacher = context.actorOf(Props(new CacheManager(5000L)), "CacheManager")
         processor = context.actorOf(Props(new RouteProcessor(parent)), "RouteProcessor")
     }
     
+    override protected def init(args: List[Any]): Unit = {
+        log.info("Hello there from {}", name)
+    }
+    
     override protected def receptive: Receive = {
-        
-        case AriadneMessage(Route, Info, _, cnt: RouteInfo) =>
+    
+        case AriadneMessage(Route, Escape.Request, _, cnt: EscapeRequest) => manageEscape(cnt)
+    
+        case msg@AriadneMessage(Route, Info, _, _) =>
             
             // Se non è già presente in cache o il valore in cache è troppo vecchio
             // => Si calcola con Dijkstra il Percorso :: Si ritorna la strada in cache
-            cacher ! cnt.req
+            log.info("Requesting route from Cache...")
+            context.become(waitingForCache, discardOld = true)
+            cacher ! msg.content
             
-            context.become(waitingForCache)
-        case msg@AriadneMessage(Route, Escape.Request, _, _: EscapeRequest) => manageEscape(msg)
         case _ => desist _
     }
     
     private def waitingForCache: Receive = {
-        case msg@AriadneMessage(Route, Info, _, _) if sender == cacher =>
-            processor ! msg
-            context.unbecome
-            unstashAll
+        case AriadneMessage(Route, Escape.Request, _, cnt: EscapeRequest) => manageEscape(cnt)
+    
         case AriadneMessage(Route, Info, _, _) => stash
-        case msg@AriadneMessage(Route, Response, _, _) =>
-            parent ! msg
-            context.unbecome
+    
+        case cnt@RouteInfo(_, _) if sender == cacher =>
+            log.info("No cached route is present, sending data to Processor...")
+            processor ! cnt
+            context.become(receptive, discardOld = true)
             unstashAll
-        case msg@AriadneMessage(Route, Escape.Request, _, _: EscapeRequest) => manageEscape(msg)
+    
+        case cnt@RouteResponse(_, _) if sender == cacher =>
+            log.info("A valid cached route is present, sending data to Core...")
+            parent ! AriadneMessage(
+                Route,
+                Response,
+                Location.Cell >> Location.User,
+                cnt
+            )
+            context.become(receptive, discardOld = true)
+            unstashAll
+    
         case _ => desist _
     }
     
-    private def evaquating: Receive = {
+    private def evacuating: Receive = {
         case AriadneMessage(Route, Escape.Response, _, _: EscapeResponse) =>
-            ???
-        case _ => desist _
+        case _ => stash
     }
     
-    def manageEscape(msg: AriadneMessage[MessageContent]): Unit = {
-        context.become(evaquating)
+    def manageEscape(cnt: EscapeRequest): Unit = {
+        log.info("Escape route request received, becoming evacuating...")
+        context.become(evacuating)
         
-        processor forward msg
+        processor forward cnt
     }
 }

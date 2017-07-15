@@ -128,7 +128,7 @@ class TopologySupervisor extends BasicActor {
     
     private def triggerAlarm(msg: Message[AlarmContent]): Unit = {
         // Update all the Cells
-        val old = topology(msg.content.info.name).copy(practicabilityLevel = Double.MaxValue)
+        val old = topology(msg.content.info.name).copy(practicabilityLevel = Double.PositiveInfinity)
         
         topology.put(msg.content.info.name, old)
         

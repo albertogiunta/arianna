@@ -6,6 +6,8 @@ import scala.collection.mutable
 /**
   * A simple implementation of the A* Search Heuristic Algorithm
   *
+  * https://en.wikipedia.org/wiki/A*_search_algorithm
+  *
   * Created by Alessandro on 12/07/2017.
   */
 object AStarSearch {
@@ -104,8 +106,8 @@ object AStarSearch {
                 if (current == source) (sp.updated(source, successor), cost)
                 else go(sp.updated(current, successor), parents(current), current, cost + graph(current)(successor))
             }
-            
-            go(Map.empty, parents(target), target, 0.0)
+    
+            go(Map.empty, parents(target), target, graph(parents(target))(target))
         }
         
         /**
@@ -121,10 +123,10 @@ object AStarSearch {
             
             @tailrec def go(sp: List[N], current: N, successor: N, cost: Double): (List[N], Double) = {
                 if (current == source) (source :: sp, cost)
-                else go(current :: sp, parents(current), current, cost + cost + graph(current)(successor))
+                else go(current :: sp, parents(current), current, cost + graph(current)(successor))
             }
-            
-            go(List(target), parents(target), target, 0.0)
+    
+            go(List(target), parents(target), target, graph(parents(target))(target))
         }
     }
     
