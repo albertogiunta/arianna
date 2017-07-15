@@ -34,6 +34,8 @@ object MessageSubtype {
                 Init.Subtype.Greetings
             case st if st == Alarm.Subtype.Basic.toLowerCase =>
                 Alarm.Subtype.Basic
+            case st if st == Alarm.Subtype.FromInterface.toLowerCase =>
+                Alarm.Subtype.FromInterface
             case st if st == Handshake.Subtype.Cell2Master.toLowerCase =>
                 Handshake.Subtype.Cell2Master
             case st if st == Handshake.Subtype.Cell2User.toLowerCase =>

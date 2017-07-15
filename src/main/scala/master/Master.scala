@@ -1,6 +1,7 @@
 package master
 
 import akka.actor.Props
+import area.AdminManager
 import common.{ClusterMembersListener, CustomActor}
 import master.cluster._
 
@@ -22,6 +23,9 @@ class Master extends CustomActor {
         val dataStreamer = context.actorOf(Props[DataStreamer], "DataStreamer")
     
         val alarmSupervisor = context.actorOf(Props[AlarmSupervisor], "AlarmSupervisor")
+
+        val adminManager = context.actorOf(Props[AdminManager], "AdminManager")
+
     }
     
     override def receive: Receive = {
