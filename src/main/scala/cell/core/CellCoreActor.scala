@@ -38,18 +38,11 @@ class CellCoreActor extends BasicActor {
     }
 
     override protected def init(args: List[Any]): Unit = {
-
+        log.info("Hello there! the cell core has been initialized")
     }
 
     override protected def receptive: Receive = {
-        /** **Il core deve mandare allo user actor:***
-          * Cell4User quando riceve l'Area4Cell dal Subscriber
-          * (Cevo consiglia di trasformare i riferimenti in una mappa)
-          * Route: Semplice and Alarm
-          * **Deve ricevere dal subscriber:***
-          * Alarm
-          * Practicability con cui deve aggiornare l'area4cell
-          */
+
         case msg@AriadneMessage(Topology, Topology4Cell, server2Cell, cnt: AreaForCell) =>
             cnt.cells.foreach(X => topology.put(X.infoCell.name, X))
             userActor ! msg.copy(direction = cell2User)
