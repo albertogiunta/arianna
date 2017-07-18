@@ -14,8 +14,8 @@ class InterfaceView extends Application {
 
     override def start(primaryStage: Stage): Unit = {
         primaryStage.setTitle("Admin Interface")
-        primaryStage.setHeight(700)
-        primaryStage.setWidth(900)
+        primaryStage.setHeight(850)
+        primaryStage.setWidth(1200)
 
         var loader: FXMLLoader = new FXMLLoader(getClass.getResource("/interface.fxml"))
         val root: SplitPane = loader.load()
