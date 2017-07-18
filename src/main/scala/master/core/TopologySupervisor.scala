@@ -70,6 +70,7 @@ class TopologySupervisor extends BasicActor {
             if (topology.get(cell.uri).nonEmpty) {
                 log.info("Found a match into the loaded Topology for {}", cell.uri)
                 topology.put(cell.uri, topology(cell.uri).copy(infoCell = cell))
+    
                 if ((synced ++) == topology.size) {
                     
                     context.become(behavior = proactive, discardOld = true)
@@ -80,8 +81,10 @@ class TopologySupervisor extends BasicActor {
                     // Update all the Cells but first notify the subscriber
                     subscriber ! AriadneMessage(
                         Topology, Topology4Cell, server2Cell,
-                        AreaForCell(Random.nextInt(),
-                            topology.map(e => CellForCell(e._2)).toList)
+                        AreaForCell(
+                            Random.nextInt,
+                            topology.map(e => CellForCell(e._2)).toList
+                        )
                     )
                 }
             }
@@ -116,7 +119,20 @@ class TopologySupervisor extends BasicActor {
                 // Send the updated Map to the Admin
                 requestHandler ! topology.values
             }
+
+        case AriadneMessage(Handshake, Cell2Master, `cell2Server`, _) =>
+            log.info("Late handshake from {}...", sender.path)
     
+            publisher ! (
+                sender.path.toString,
+                AriadneMessage(
+                    Topology, Topology4Cell, server2Cell,
+                    AreaForCell(
+                        Random.nextInt,
+                        topology.map(e => CellForCell(e._2)).toList)
+                )
+            )
+            
         case _ => desist _
     }
     

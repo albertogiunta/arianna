@@ -55,8 +55,8 @@ class MasterSubscriber extends BasicSubscriber {
     
         case msg@AriadneMessage(Handshake, Cell2Master, `cell2Server`, _) =>
             log.info("Resolving Handshake from {}", sender.path)
-
-            topologySupervisor ! msg
+    
+            topologySupervisor forward msg
 
         case msg@AriadneMessage(Topology, Topology4Cell, _, _) =>
             log.info("All the Cells have been mapped into their logical position into the Planimetry")
@@ -75,8 +75,12 @@ class MasterSubscriber extends BasicSubscriber {
     
         case msg@AriadneMessage(Update, _, _, _) =>
             log.info("Forwarding message {} from {} to TopologySupervisor", msg.subtype, sender.path)
+    
+            topologySupervisor forward msg
 
-            topologySupervisor ! msg
+        case msg@AriadneMessage(Handshake, Cell2Master, `cell2Server`, _) =>
+            log.info("Late handshake from {}... Forwarding to Supervisor...", sender.path)
+            topologySupervisor forward msg
         
         case _ => desist _
     }
