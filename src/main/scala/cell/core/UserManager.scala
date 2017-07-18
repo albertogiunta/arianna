@@ -7,10 +7,12 @@ import _root_.io.vertx.core.Vertx
 import akka.actor.{ActorLogging, ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
 import common.BasicActor
+import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology
 import ontologies.messages.MessageType.Topology.Subtype.Topology4Cell
 import ontologies.messages._
+import spray.json._
 import similUser.WSClient
 
 
@@ -50,7 +52,8 @@ class UserActor extends BasicActor with ActorLogging {
             usrNumber -= 1
         case "firstconnection" =>
             println("[ACTOR] GOT NEW FIRST USER")
-            s.sendAreaToNewUser(area)
+            println(s"Area received from the Cell Core $area")
+            s.sendAreaToNewUser(area.toJson.toString())
             usrNumber += 1
         case _ => ""
     }
