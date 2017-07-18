@@ -204,7 +204,7 @@ class PowerSupplyActor extends BasicActor with ActorLogging {
 }
 
 
-object UserRun {
+object UserActorRun {
     def main(args: Array[String]): Unit = {
         val path2Project = Paths.get("").toFile.getAbsolutePath
         val path2Config = path2Project + "/res/conf/akka/application.conf"
