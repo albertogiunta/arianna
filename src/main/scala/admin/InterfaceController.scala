@@ -4,15 +4,15 @@ import java.io.File
 import java.net.URL
 import java.util.ResourceBundle
 import javafx.fxml.{FXML, FXMLLoader, Initializable}
-import javafx.scene.Node
-import javafx.scene.control.Button
-import javafx.scene.layout.{GridPane, Pane, VBox}
+import javafx.scene.control.{Button, SplitPane}
+import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 
 import akka.actor.ActorRef
 import ontologies.messages.Location._
 import ontologies.messages._
 
+import scala.collection.mutable.ListBuffer
 import scala.io.Source
 import scalafx.Includes._
 import scalafx.application.Platform
@@ -31,21 +31,23 @@ class InterfaceController extends Initializable {
     var fileName: Text = _
     @FXML
     var loadButton: Button = _
-
-    var cellsBoxes: List[VBox] = _
-
     @FXML
-    var gridPane: GridPane = _
+    var alarmButton: Button = _
 
+    var cellControllers: ListBuffer[CellTemplateController] = new ListBuffer[CellTemplateController]
+    @FXML
+    var vBoxPane: VBox = _
 
     override def initialize(location: URL, resources: ResourceBundle): Unit = {
-        println("controller initialized")
+        println("Controller initialized")
     }
 
     def updateView(update: List[CellForView]): Unit = {
         Platform.runLater {
-            //interfaceView.setText1("Niente")
-            //interfaceView.setText2(update.currentPeople.toString)
+            update.foreach(c => {
+                var cellController = cellControllers.filter(controller => controller.cellId.equals(c.id)).head
+                cellController.setDynamicInformation(c)
+            })
         }
     }
 
@@ -61,52 +63,35 @@ class InterfaceController extends Initializable {
     def parseFile(file: File): Unit = {
         val source = Source.fromFile(file).getLines.mkString
         val area = MessageType.Topology.Subtype.Planimetrics.unmarshal(source)
-        actorRef ! AriadneMessage(MessageType.Factory("Topology"), MessageSubtype.Factory("planimetrics"), Location.Admin >> Location.Self, area)
+        actorRef ! AriadneMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, Location.Admin >> Location.Self, area)
+        createCells(area.cells)
         fileName.text = file.getName
+        loadButton.disable = true
     }
 
-    def createCells(initialConfiguration: List[CellForView]) = {
+    def createCells(initialConfiguration: List[Cell]) = {
         nRooms.text = initialConfiguration.size.toString
-        var x = 0
-        var y = 0
         initialConfiguration.foreach(c => {
-            var node = createCellTemplate(c)
-
-            //println("prova " + prova.toString())
             Platform.runLater {
-                gridPane.add(node, x, y)
-                if (y == 1) {
-                    y = 0
-                    x = x + 1
-                } else {
-                    y = y + 1
-                }
+                var node = createCellTemplate(c)
+                vBoxPane.getChildren.add(node)
             }
-
-
         })
     }
 
-    def createCellTemplate(c: CellForView): Node = {
-        var node = new FXMLLoader(getClass.getResource("/cellTemplate.fxml")).load[VBox]
-        node.setId(c.id.toString)
-
-        var nameText = getTextNode(node, "namePane", "roomName")
-        nameText.text = c.name
-
-        var occupationText = getTextNode(node, "occupationPane", "roomOccupation")
-        occupationText.text = c.currentOccupation.toString
-
-        var temperatureText = getTextNode(node, "temperaturePane", "roomTemperature")
-        temperatureText.text = c.sensors.filter(s => s.category.equals(1)).head.value.toString
+    def createCellTemplate(c: Cell): SplitPane = {
+        var loader = new FXMLLoader(getClass.getResource("/cellTemplate2.fxml"))
+        var node = loader.load[SplitPane]
+        var controller = loader.getController[CellTemplateController]
+        cellControllers += controller
+        controller.setStaticInformation(c)
         node
     }
 
-    def getTextNode(node: VBox, paneId: String, textId: String): Text = {
-        var pane = node.getChildren.filter(c => c.id.value.equals(paneId)).get(0).asInstanceOf[Pane]
-        var text = pane.getChildren.filter(c => c.id.value.equals(textId)).get(0).asInstanceOf[Text]
-        text
+    def triggerAlarm(): Unit = {
+        actorRef ! new AriadneMessage(MessageType.Alarm, MessageType.Alarm.Subtype.FromInterface, Location.Admin >> Location.Self, Empty())
+        println("Allarme ricevuto dal controller")
+        //Fai qualcosa all'interfaccia
     }
-
 
 }

@@ -65,6 +65,18 @@ object MessageType {
                     obj.asInstanceOf[AlarmContent].toJson.toString()
             }
 
+            object FromInterface extends MessageSubtype {
+                override val subtypeName: String = "From Interface"
+
+                override val superType: MessageType = Alarm
+
+                override def unmarshal(json: String): Empty =
+                    json.parseJson.convertTo[Empty]
+
+                override def marshal(obj: MessageContent): String =
+                    obj.asInstanceOf[Empty].toJson.toString()
+            }
+
         }
 
     }
@@ -209,7 +221,7 @@ object MessageType {
                 override val superType = Topology
 
                 override def unmarshal(json: String): Area = json.parseJson.convertTo[Area]
-            
+
                 override def marshal(obj: MessageContent): String = obj.asInstanceOf[Area].toJson.toString()
             }
         
