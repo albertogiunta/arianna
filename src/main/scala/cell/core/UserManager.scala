@@ -1,25 +1,20 @@
 package cell.core
 
-import java.io.File
-import java.nio.file.Paths
-
 import _root_.io.vertx.core.Vertx
-import akka.actor.{ActorLogging, ActorSystem, Props}
-import com.typesafe.config.ConfigFactory
+import akka.actor.ActorLogging
 import common.BasicActor
 import ontologies.messages.AriannaJsonProtocol._
-import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology
 import ontologies.messages.MessageType.Topology.Subtype.Topology4Cell
 import ontologies.messages._
-import spray.json._
 import similUser.WSClient
+import spray.json._
 
 
-class UserActor extends BasicActor with ActorLogging {
+class UserManager extends BasicActor with ActorLogging {
 
     var vertx: Vertx = Vertx.vertx
-    var s = new WSServer(vertx, UserActor.this.self)
+    var s = new WSServer(vertx, self)
     var usrNumber = 0
     var area: AreaForCell = _
     var c = new WSClient(vertx)
@@ -38,8 +33,10 @@ class UserActor extends BasicActor with ActorLogging {
 
     override protected def receptive: Receive = {
         case msg@AriadneMessage(Topology, Topology4Cell, _, area: AreaForCell) =>
+            println("sono receptive")
             this.area = area
             context.become(receptiveForMobile)
+            println("in teoria sono receptiveforuser")
     }
 
     protected def receptiveForMobile: Receive = {
@@ -60,7 +57,7 @@ class UserActor extends BasicActor with ActorLogging {
 }
 
 
-object UserRun {
+/*object UserRun {
     def main(args: Array[String]): Unit = {
         val path2Project = Paths.get("").toFile.getAbsolutePath
         val path2Config = path2Project + "/res/conf/akka/application.conf"
@@ -69,4 +66,4 @@ object UserRun {
         val userActor = system.actorOf(Props.create(classOf[UserActor]), "similUser")
         userActor ! AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, Location.User >> Location.Self, Greetings(List.empty))
     }
-}
+}*/

@@ -18,8 +18,8 @@ class CellPublisher extends BasicPublisher {
     * In the future this info will be modelled in a different way
     * */
     private val cellID: Int = 12345
-    private val cellUri: String = "uri"
-    private val cellName: String = "Gondor"
+    private val cellUri: String = "uri1"
+    private val cellName: String = "cell1"
     private val roomVertices: Coordinates = Coordinates(Point(1, 1),
         Point(-1, -1),
         Point(-1, 1),

@@ -7,8 +7,7 @@ import akka.actor.{ActorSystem, Props}
 import cell.core.CellCoreActor
 import com.typesafe.config.ConfigFactory
 import ontologies.messages.Location._
-import ontologies.messages.MessageType.Topology.Subtype.Topology4Cell
-import ontologies.messages.MessageType.{Init, Topology}
+import ontologies.messages.MessageType.Init
 import ontologies.messages.{AriadneMessage, Location, _}
 import spray.json.{JsValue, _}
 
@@ -77,10 +76,10 @@ object TestCells extends App {
 
     var area: Area = loadArea()
 
-    Thread.sleep(5000)
+    Thread.sleep(500)
     private val greetings: String = "Hello there, it's time to dress-up"
     core ! AriadneMessage(Init, Init.Subtype.Greetings,
         Location.Server >> Location.Self, Greetings(List(greetings)))
-    println("Area sended to cell core")
-    core ! AriadneMessage(Topology, Topology4Cell, server2Cell, areaForCell)
+    //println("Area sended to cell core")
+    //core ! AriadneMessage(Topology, Topology4Cell, server2Cell, areaForCell)
 }

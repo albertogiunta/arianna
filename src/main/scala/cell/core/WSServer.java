@@ -1,12 +1,12 @@
 package cell.core;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import akka.actor.ActorRef;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.ServerWebSocket;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class WSServer extends AbstractVerticle {
 
@@ -50,7 +50,7 @@ public class WSServer extends AbstractVerticle {
             } else {
                 ws.reject();
             }
-        }).listen(8080);
+        }).listen(8080, "192.168.0.4");
     }
 
     public void sendOkToNewUser() {

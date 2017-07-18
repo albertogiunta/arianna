@@ -15,6 +15,9 @@ import scala.collection.mutable
   */
 class CellCoreActor extends BasicActor {
 
+    private val greetings: String = "Hello there, it's time to dress-up"
+
+    private var uri: String = "uri1"
     private var topology: mutable.Map[String, CellForCell] = mutable.Map[String, CellForCell]()
 
     private var actualCellLoad: ActualLoadUpdate = _
@@ -33,19 +36,21 @@ class CellCoreActor extends BasicActor {
         super.preStart()
         clusterListener = context.actorOf(Props[ClusterMembersListener], "CellClusterListener")
         cellPublisher = context.actorOf(Props[CellPublisher], "CellPublisher")
-        cellSubscriber = context.actorOf(Props[CellSubscriber], "CellSubsciber")
-        userActor = context.actorOf(Props[UserActor], "UserActor")
+        cellSubscriber = context.actorOf(Props[CellSubscriber], "CellSubscriber")
+        userActor = context.actorOf(Props[UserManager], "UserManager")
     }
 
     override protected def init(args: List[Any]): Unit = {
         log.info("Hello there! the cell core has been initialized")
+        userActor ! AriadneMessage(Init, Init.Subtype.Greetings,
+            Location.Server >> Location.Self, Greetings(List(greetings)))
     }
 
     override protected def receptive: Receive = {
 
         case msg@AriadneMessage(Topology, Topology4Cell, server2Cell, cnt: AreaForCell) =>
-            //            println(s"Area arrived from Server $cnt")
-            cnt.cells.foreach(X => topology.put(X.infoCell.name, X))
+            println(s"Area arrived from Server $cnt")
+            cnt.cells.foreach(X => topology.put(X.infoCell.uri, X))
             userActor ! msg.copy(direction = cell2User)
         case msg@AriadneMessage(Update, Update.Subtype.Practicability, server2Cell, cnt: LightCell) =>
             topology.put(cnt.info.name, topology(cnt.info.name).copy(practicabilityLevel = cnt.practicabilityLevel))
@@ -66,5 +71,10 @@ class CellCoreActor extends BasicActor {
             //route response from route manager for the user with the Escape route
             userActor ! msg
 
+    }
+
+    private def weight(capacity: Int, load: Int, flows: Int): Double = {
+        val log_b: (Double, Double) => Double = (b, n) => Math.log(n) / Math.log(b)
+        1 / (load * 1.05 / capacity * (if (flows == 1) 0.25 else if (flows > 4.0) log_b(3.0, 4.25) else log_b(3.0, flows)))
     }
 }
