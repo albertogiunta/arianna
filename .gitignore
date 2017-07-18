@@ -6,7 +6,6 @@
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 .idea
-*.iml
 
 # User-specific stuff:
 .idea/**/workspace.xml
@@ -87,7 +86,7 @@ fabric.properties
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see master.http://www.java.com/en/download/help/error_hotspot.xml
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
 ### Linux ###
