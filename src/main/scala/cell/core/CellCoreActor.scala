@@ -44,7 +44,7 @@ class CellCoreActor extends BasicActor {
     override protected def receptive: Receive = {
 
         case msg@AriadneMessage(Topology, Topology4Cell, server2Cell, cnt: AreaForCell) =>
-            println(s"Area arrived from Server $cnt")
+            //            println(s"Area arrived from Server $cnt")
             cnt.cells.foreach(X => topology.put(X.infoCell.name, X))
             userActor ! msg.copy(direction = cell2User)
         case msg@AriadneMessage(Update, Update.Subtype.Practicability, server2Cell, cnt: LightCell) =>

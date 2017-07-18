@@ -33,11 +33,11 @@ public class WSServer extends AbstractVerticle {
                 ws.handler(data -> {
                     System.out.println("[SERVER] GOT NEW USER | " + data.toString());
                     if (data.toString().equalsIgnoreCase("connect")) {
+                        this.usersWaitingForConnectionOk.put(ws.textHandlerID(), ws);
+                    } else if (data.toString().equalsIgnoreCase("firstconnection")) {
                         this.usersWaitingForArea.put(ws.textHandlerID(), ws);
-                    } else if (data.toString().equalsIgnoreCase("firstconnect")) {
-                        this.usersWaitingForConnectionOk.put(ws.textHandlerID(), ws);
                     } else if (data.toString().equalsIgnoreCase("disconnect")) {
-                        this.usersWaitingForConnectionOk.put(ws.textHandlerID(), ws);
+//                        this.usersWaitingForConnectionOk.put(ws.textHandlerID(), ws);
                     }
                     userActor.tell(data.toString(), ActorRef.noSender());
                 });
@@ -61,7 +61,7 @@ public class WSServer extends AbstractVerticle {
     }
 
     public void sendAreaToNewUser(String area) {
-        System.out.println("[N USERS AREA] " + usersWaitingForArea.size());
+        System.out.println("[N USERS AREA] " + usersWaitingForArea.size() + area);
         usersWaitingForArea.values().forEach(ws -> ws.writeTextMessage(area));
         usersWaitingForArea.clear();
         System.out.println("[N USERS AREA] " + usersWaitingForArea.size());
