@@ -1,7 +1,11 @@
 package master.tests
 
+import java.io.File
+import java.nio.file.Paths
+
 import akka.actor.{ActorSystem, Props}
-import master.core.DataStreamer
+import com.typesafe.config.ConfigFactory
+import master.core.{AdminManager, DataStreamer}
 import ontologies.messages._
 
 import scala.util.Random
@@ -11,14 +15,21 @@ import scala.util.Random
   */
 object TestDataStreamer extends App {
     
-    implicit val system = ActorSystem("Test")
+    val path2Project = Paths.get("").toFile.getAbsolutePath
+    val path2Config = path2Project + "/res/conf/akka/application.conf"
+    val config = ConfigFactory.parseFile(new File(path2Config))
+    val system = ActorSystem.create("serverSystem", config.getConfig("adminManager"))
+    
+    val adminManager = system.actorOf(Props[AdminManager], "AdminManager")
+    
+    Thread.sleep(5000)
     
     val streamer = system.actorOf(Props[DataStreamer], "DataStreamer")
     
     (0 to Int.MaxValue).foreach(_ => {
         val u =
             (1 to 10).map(_ => ontologies.messages.Cell(
-                InfoCell(Random.nextInt(1000), "uri" + Random.nextInt(100), "name" + Random.nextInt(100),
+                InfoCell(1, "uri" + Random.nextInt(100), "name" + Random.nextInt(100),
                     Coordinates(Point(1, 1), Point(-1, -1), Point(-1, 1), Point(1, -1)),
                     Point(0, 0)
                 ),
