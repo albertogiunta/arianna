@@ -34,6 +34,7 @@ class UserActor extends BasicActor with ActorLogging {
     override protected def receptive: Receive = {
         case msg@AriadneMessage(Topology, Topology4Cell, _, area: AreaForCell) =>
             this.area = area
+            println(s"Area received from the Cell Core $area")
             context.become(receptiveForMobile)
     }
 

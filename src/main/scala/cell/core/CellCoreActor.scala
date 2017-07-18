@@ -17,12 +17,12 @@ class CellCoreActor extends BasicActor {
 
     private var topology: mutable.Map[String, CellForCell] = mutable.Map[String, CellForCell]()
 
-    private var actualCellLoad: ActualLoadUpdate = null
+    private var actualCellLoad: ActualLoadUpdate = _
 
-    var clusterListener: ActorRef = null
-    var cellPublisher: ActorRef = null
-    var cellSubscriber: ActorRef = null
-    var userActor: ActorRef = null
+    var clusterListener: ActorRef = _
+    var cellPublisher: ActorRef = _
+    var cellSubscriber: ActorRef = _
+    var userActor: ActorRef = _
 
     private val server2Cell: MessageDirection = Location.Server >> Location.Cell
     private val cell2Server: MessageDirection = Location.Server << Location.Cell
@@ -34,7 +34,7 @@ class CellCoreActor extends BasicActor {
         clusterListener = context.actorOf(Props[ClusterMembersListener], "CellClusterListener")
         cellPublisher = context.actorOf(Props[CellPublisher], "CellPublisher")
         cellSubscriber = context.actorOf(Props[CellSubscriber], "CellSubsciber")
-        //userActor = context.actorOf(Props[UserActor], "UserActor")
+        userActor = context.actorOf(Props[UserActor], "UserActor")
     }
 
     override protected def init(args: List[Any]): Unit = {
@@ -44,6 +44,7 @@ class CellCoreActor extends BasicActor {
     override protected def receptive: Receive = {
 
         case msg@AriadneMessage(Topology, Topology4Cell, server2Cell, cnt: AreaForCell) =>
+            println(s"Area arrived from Server $cnt")
             cnt.cells.foreach(X => topology.put(X.infoCell.name, X))
             userActor ! msg.copy(direction = cell2User)
         case msg@AriadneMessage(Update, Update.Subtype.Practicability, server2Cell, cnt: LightCell) =>
