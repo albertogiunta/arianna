@@ -8,6 +8,8 @@ import akka.actor.{ActorLogging, ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
 import common.BasicActor
 import ontologies.messages.Location._
+import ontologies.messages.MessageType.Topology
+import ontologies.messages.MessageType.Topology.Subtype.Topology4Cell
 import ontologies.messages._
 
 
@@ -16,6 +18,7 @@ class UserActor extends BasicActor with ActorLogging {
     var vertx: Vertx = Vertx.vertx
     var s = new WSServer(vertx, UserActor.this.self)
     var usrNumber = 0
+    var area: AreaForCell = _
     //    var c = new WSClient(vertx)
 
     override protected def init(args: List[Any]): Unit = {
@@ -29,19 +32,9 @@ class UserActor extends BasicActor with ActorLogging {
     // TODO become handshaking col server
 
     override protected def receptive: Receive = {
-        case "areafrom" => context.become(receptiveForMobile)
-        case "connect" =>
-            println("[ACTOR] GOT NEW USER")
-            s.sendOkToNewUser()
-            usrNumber += 1
-        case "disconnect" =>
-            println("[ACTOR] USER DISCONNECTING")
-            usrNumber -= 1
-        case "firstconnection" =>
-            println("[ACTOR] GOT NEW FIRST USER")
-            s.sendAreaToNewUser("Area to new user")
-            usrNumber += 1
-        case _ => ""
+        case msg@AriadneMessage(Topology, Topology4Cell, _, area: AreaForCell) =>
+            this.area = area
+            context.become(receptiveForMobile)
     }
 
     protected def receptiveForMobile: Receive = {
