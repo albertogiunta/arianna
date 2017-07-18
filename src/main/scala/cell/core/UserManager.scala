@@ -1,4 +1,4 @@
-package area
+package cell.core
 
 import java.io.File
 import java.nio.file.Paths
@@ -66,8 +66,8 @@ object UserRun {
         val path2Project = Paths.get("").toFile.getAbsolutePath
         val path2Config = path2Project + "/res/conf/akka/application.conf"
         val config = ConfigFactory.parseFile(new File(path2Config))
-        val system = ActorSystem.create("userSystem", config.getConfig("user"))
-        val userActor = system.actorOf(Props.create(classOf[UserActor]), "user")
+        val system = ActorSystem.create("userSystem", config.getConfig("similUser"))
+        val userActor = system.actorOf(Props.create(classOf[UserActor]), "similUser")
         userActor ! AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, Location.User >> Location.Self, Greetings(List.empty))
     }
 }

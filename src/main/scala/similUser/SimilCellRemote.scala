@@ -1,4 +1,4 @@
-package area
+package similUser
 
 import java.io.File
 import java.nio.file.Paths
@@ -60,7 +60,7 @@ object MyJsonProtocol extends DefaultJsonProtocol {
     implicit val cellFormat = jsonFormat10(ontologies.messages.Cell)
 }
 
-import area.MyJsonProtocol._
+import similUser.MyJsonProtocol._
 
 object CellLoader {
 

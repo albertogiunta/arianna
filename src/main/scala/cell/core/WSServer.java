@@ -1,4 +1,4 @@
-package area;
+package cell.core;
 
 import java.util.HashMap;
 import java.util.Map;

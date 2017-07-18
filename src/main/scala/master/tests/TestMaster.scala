@@ -37,7 +37,7 @@ object TestMaster extends App {
     
     Thread.sleep(500)
 
-    system.actorSelection("user/Master/TopologySupervisor") ! AriadneMessage(
+    system.actorSelection("similUser/Master/TopologySupervisor") ! AriadneMessage(
         Topology,
         Planimetrics,
         Location.Admin >> Location.Server,

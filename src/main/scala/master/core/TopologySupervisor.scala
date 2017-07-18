@@ -1,4 +1,4 @@
-package master.cluster
+package master.core
 
 import akka.actor.ActorSelection
 import common.{BasicActor, Counter}

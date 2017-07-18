@@ -1,4 +1,4 @@
-package area
+package similUser
 
 import java.io.File
 import java.nio.file.Paths
@@ -209,8 +209,8 @@ object UserActorRun {
         val path2Project = Paths.get("").toFile.getAbsolutePath
         val path2Config = path2Project + "/res/conf/akka/application.conf"
         val config = ConfigFactory.parseFile(new File(path2Config))
-        val system = ActorSystem.create("userSystem", config.getConfig("user"))
-        val userActor = system.actorOf(Props.create(classOf[UserRemote]), "user")
+        val system = ActorSystem.create("userSystem", config.getConfig("similUser"))
+        val userActor = system.actorOf(Props.create(classOf[UserRemote]), "similUser")
         userActor ! AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, Location.User >> Location.Self, Greetings(List("akka.tcp://cellSystem@127.0.0.1:4552/user/cell2")))
     }
 }

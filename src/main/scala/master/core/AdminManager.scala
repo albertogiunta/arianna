@@ -1,4 +1,4 @@
-package area
+package master.core
 
 import java.io.File
 import java.nio.file.Paths

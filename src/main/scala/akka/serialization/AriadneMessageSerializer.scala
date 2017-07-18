@@ -1,6 +1,5 @@
-package serialization
+package akka.serialization
 
-import akka.serialization._
 import ontologies.messages.Location._
 import ontologies.messages._
 

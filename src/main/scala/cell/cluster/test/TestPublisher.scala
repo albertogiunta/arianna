@@ -36,7 +36,7 @@ class TestPublisher extends Actor with ActorLogging {
 
             // The Mediator Hierarchy is always /user/<Username>
             val subName = "Subscriber1"
-            mediator ! Send(path = "/user/" + subName,
+            mediator ! Send(path = "/similUser/" + subName,
                 msg = AriadneMessage(Topology, Topology.Subtype.Topology4User, dir, cnt),
                 localAffinity = true)
 

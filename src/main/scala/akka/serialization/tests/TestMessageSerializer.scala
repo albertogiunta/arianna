@@ -1,9 +1,9 @@
-package serialization.tests
+package akka.serialization.tests
 
+import akka.serialization.{AriadneMessageSerializer, MessageSerializer}
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Handshake
 import ontologies.messages._
-import serialization.{AriadneMessageSerializer, MessageSerializer}
 
 /**
   * Created by Alessandro on 13/07/2017.

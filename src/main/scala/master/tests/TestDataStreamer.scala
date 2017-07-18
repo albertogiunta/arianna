@@ -1,7 +1,7 @@
 package master.tests
 
 import akka.actor.{ActorSystem, Props}
-import master.cluster.DataStreamer
+import master.core.DataStreamer
 import ontologies.messages._
 
 import scala.util.Random
