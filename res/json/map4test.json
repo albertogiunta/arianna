@@ -1,0 +1,88 @@
+{
+  "id": 1837463819,
+  "cells": [
+    {
+      "infoCell": {
+        "id": 666,
+        "uri": "PancoPillo:8080",
+        "name": "PancoPillo",
+        "roomVertices": {
+          "northWest": {
+            "x": 0,
+            "y": 10
+          },
+          "northEast": {
+            "x": 10,
+            "y": 10
+          },
+          "southWest": {
+            "x": 0,
+            "y": 0
+          },
+          "southEast": {
+            "x": 10,
+            "y": 0
+          }
+        },
+        "antennaPosition": {
+          "x": 5,
+          "y": 5
+        }
+      },
+      "sensors": [
+        {
+          "category": 1,
+          "value": 10.0
+        }
+      ],
+      "neighbors": [
+        {
+          "id": 2,
+          "uri": "uri2",
+          "name": "cell2",
+          "roomVertices": {
+            "northWest": {
+              "x": 10,
+              "y": 10
+            },
+            "northEast": {
+              "x": 20,
+              "y": 10
+            },
+            "southWest": {
+              "x": 10,
+              "y": 0
+            },
+            "southEast": {
+              "x": 20,
+              "y": 0
+            }
+          },
+          "antennaPosition": {
+            "x": 15,
+            "y": 5
+          }
+        }
+      ],
+      "passages": [
+        {
+          "neighborId": 2,
+          "startCoordinates": {
+            "x": 10,
+            "y": 7
+          },
+          "endCoordinates": {
+            "x": 10,
+            "y": 8
+          }
+        }
+      ],
+      "isEntryPoint": true,
+      "isExitPoint": false,
+      "capacity": 100,
+      "squareMeters": 50.0,
+      "currentPeople": 20,
+      "practicabilityLevel": 5.0
+    }
+  ]
+}

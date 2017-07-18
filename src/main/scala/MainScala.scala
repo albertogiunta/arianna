@@ -1,4 +1,0 @@
-object MainScala extends App {
-}
-
-
