@@ -30,6 +30,8 @@ class CellSubscriber extends BasicSubscriber {
         case msg@AriadneMessage(Topology, Topology.Subtype.Topology4Cell, _, cnt) =>
             log.info("I received the topology: {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
 
+            this.parent ! msg
+
             context.become(behavior = cultured, discardOld = true)
             log.info("I've Become Cultured...")
 
@@ -42,8 +44,10 @@ class CellSubscriber extends BasicSubscriber {
     private def cultured: Receive = {
         case msg@AriadneMessage(Alarm, _, _, cnt) =>
             log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
+            this.parent ! msg
         case msg@AriadneMessage(Update, Update.Subtype.Practicability, _, cnt) =>
             log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
+            this.parent ! msg
         case msg@AriadneMessage(Route, _, _, cnt) =>
             log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
         case msg@AriadneMessage(Handshake, Handshake.Subtype.Cell2Master, _, cnt) =>

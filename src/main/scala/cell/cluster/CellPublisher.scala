@@ -49,6 +49,9 @@ class CellPublisher extends BasicPublisher {
             mediator ! Publish(Topic.Updates, msg)
             mediator ! Publish(Topic.Practicabilities, msg)
 
+        case msg@AriadneMessage(Update, Update.Subtype.ActualLoad, _, cnt: ActualLoadUpdate) =>
+            mediator ! Publish(Topic.Updates, msg)
+
         case _ => // Ignore
     }
 }
