@@ -47,7 +47,8 @@ class TopologySupervisor extends BasicActor {
             log.info("A topology has been loaded in the server...")
     
             if (topology.isEmpty) {
-                topology = mutable.HashMap(map.cells.map(c => (c.infoCell.name, c)): _*)
+                println(topology)
+                topology = mutable.HashMap(map.cells.map(c => (c.infoCell.uri, c)): _*)
                 
                 context.become(behavior = sociable, discardOld = true)
                 log.info("I've become Sociable...")
@@ -65,11 +66,10 @@ class TopologySupervisor extends BasicActor {
         case msg@AriadneMessage(Handshake, Cell2Master, `cell2Server`, cell: InfoCell) =>
     
             log.info(msg.toString)
-            
-            if (topology.get(cell.name).nonEmpty) {
-                log.info("Found a match into the loaded Topology for {}", cell.name)
-                topology.put(cell.name, topology(cell.name).copy(infoCell = cell))
-            
+
+            if (topology.get(cell.uri).nonEmpty) {
+                log.info("Found a match into the loaded Topology for {}", cell.uri)
+                topology.put(cell.uri, topology(cell.uri).copy(infoCell = cell))
                 if ((synced ++) == topology.size) {
                     
                     context.become(behavior = proactive, discardOld = true)
@@ -91,11 +91,11 @@ class TopologySupervisor extends BasicActor {
     private def proactive: Receive = {
     
         case AriadneMessage(Update, ActualLoad, `cell2Server`, pkg: ActualLoadUpdate) =>
-        
-            if (topology.get(pkg.info.name).nonEmpty) {
-                val old = topology(pkg.info.name)
-            
-                topology.put(pkg.info.name,
+
+            if (topology.get(pkg.info.uri).nonEmpty) {
+                val old = topology(pkg.info.uri)
+
+                topology.put(pkg.info.uri,
                     old.copy(
                         currentPeople = pkg.actualLoad,
                         practicabilityLevel = weight(old.capacity, pkg.actualLoad, old.passages.length)
@@ -107,11 +107,11 @@ class TopologySupervisor extends BasicActor {
             }
 
         case AriadneMessage(Update, Sensors, `cell2Server`, pkg: SensorList) =>
-        
-            if (topology.get(pkg.info.name).nonEmpty) {
-                val news = topology(pkg.info.name).copy(sensors = pkg.sensors)
-    
-                topology.put(pkg.info.name, news)
+
+            if (topology.get(pkg.info.uri).nonEmpty) {
+                val news = topology(pkg.info.uri).copy(sensors = pkg.sensors)
+
+                topology.put(pkg.info.uri, news)
                 
                 // Send the updated Map to the Admin
                 requestHandler ! topology.values

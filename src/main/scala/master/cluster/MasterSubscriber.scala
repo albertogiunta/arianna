@@ -42,7 +42,7 @@ class MasterSubscriber extends BasicSubscriber {
 
         case AriadneMessage(Topology, Planimetrics, `admin2Server`, _) =>
             log.info("A topology has been loaded in the server...")
-    
+
             context.become(behavior = sociable, discardOld = true)
             log.info("I've Become Sociable...")
             log.info("Unstashing cool'n preserved Handshakes...")

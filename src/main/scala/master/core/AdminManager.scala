@@ -16,7 +16,7 @@ class AdminManager extends CustomActor {
     val toAdmin: MessageDirection = Location.Server >> Location.Admin
     val fromAdmin: MessageDirection = Location.Admin >> Location.Server
     val admin = context.actorSelection("akka.tcp://adminSystem@192.168.0.12:4550/user/admin")
-    val subscriber: ActorSelection = sibling("Subscriber").get
+    val subscriber: ActorSelection = sibling("TopologySupervisor").get
     val publisher: ActorSelection = sibling("Publisher").get
 
     def operational: Receive = {
