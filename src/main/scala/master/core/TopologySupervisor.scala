@@ -4,9 +4,9 @@ import akka.actor.ActorSelection
 import common.{BasicActor, Counter}
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Handshake.Subtype.Cell2Master
-import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, Topology4Cell, Topology4CellLight}
+import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, Topology4Cell}
 import ontologies.messages.MessageType.Update.Subtype.{ActualLoad, Sensors}
-import ontologies.messages.MessageType.{Alarm, Handshake, Topology, Update}
+import ontologies.messages.MessageType.{Handshake, Topology, Update}
 import ontologies.messages._
 
 import scala.collection.mutable
@@ -43,8 +43,6 @@ class TopologySupervisor extends BasicActor {
     
     override protected def receptive = {
     
-        case msg@AriadneMessage(Alarm, _, _, _) => triggerAlarm(msg.asInstanceOf[Message[AlarmContent]])
-
         case msg@AriadneMessage(Topology, Planimetrics, `admin2Server`, map: Area) =>
             log.info("A topology has been loaded in the server...")
     
@@ -64,8 +62,6 @@ class TopologySupervisor extends BasicActor {
     
     private def sociable: Receive = {
     
-        case msg@AriadneMessage(Alarm, _, _, _) => triggerAlarm(msg.asInstanceOf[Message[AlarmContent]])
-
         case msg@AriadneMessage(Handshake, Cell2Master, `cell2Server`, cell: InfoCell) =>
     
             log.info(msg.toString)
@@ -94,8 +90,6 @@ class TopologySupervisor extends BasicActor {
     
     private def proactive: Receive = {
     
-        case msg@AriadneMessage(Alarm, _, _, _) => triggerAlarm(msg.asInstanceOf[Message[AlarmContent]])
-
         case AriadneMessage(Update, ActualLoad, `cell2Server`, pkg: ActualLoadUpdate) =>
         
             if (topology.get(pkg.info.name).nonEmpty) {
@@ -124,19 +118,6 @@ class TopologySupervisor extends BasicActor {
             }
     
         case _ => desist _
-    }
-    
-    private def triggerAlarm(msg: Message[AlarmContent]): Unit = {
-        // Update all the Cells
-        val old = topology(msg.content.info.name).copy(practicabilityLevel = Double.PositiveInfinity)
-        
-        topology.put(msg.content.info.name, old)
-        
-        publisher ! AriadneMessage(
-            Topology, Topology4CellLight, server2Cell,
-            LightArea(Random.nextInt(),
-                topology.values.map(b => LightCell(b)).toList)
-        )
     }
     
     private def weight(capacity: Int, load: Int, flows: Int): Double = {

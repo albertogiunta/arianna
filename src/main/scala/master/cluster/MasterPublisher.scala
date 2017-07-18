@@ -18,7 +18,7 @@ class MasterPublisher extends BasicPublisher {
 
         case msg@AriadneMessage(Alarm, _, _, _) =>
             log.info("Forwarding... {}", msg)
-            mediator ! Publish(Topic.Updates, msg)
+            mediator ! Publish(Topic.Alarms, msg)
 
         case msg@AriadneMessage(Topology, _, _, _) =>
             log.info("Forwarding... {}", msg)

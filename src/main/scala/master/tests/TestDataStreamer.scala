@@ -28,8 +28,8 @@ object TestDataStreamer extends App {
     
     (0 to Int.MaxValue).foreach(_ => {
         val u =
-            (1 to 10).map(_ => ontologies.messages.Cell(
-                InfoCell(1, "uri" + Random.nextInt(100), "name" + Random.nextInt(100),
+            (1 to 5).map(_ => ontologies.messages.Cell(
+                InfoCell(Random.nextInt(5), "uri" + Random.nextInt(100), "name" + Random.nextInt(100),
                     Coordinates(Point(1, 1), Point(-1, -1), Point(-1, 1), Point(1, -1)),
                     Point(0, 0)
                 ),
@@ -47,7 +47,7 @@ object TestDataStreamer extends App {
                 practicabilityLevel = 0.0,
                 squareMeters = 1000,
                 passages = List(Passage(Random.nextInt(1000), Point(1, 1), Point(2, 1))),
-                sensors = List(Sensor(1, 2.0), Sensor(2, 1.55))
+                sensors = List(Sensor(0, Random.nextDouble() * Random.nextInt(30)), Sensor(1, 2.0), Sensor(2, 1.55))
             ))
         
         Thread.sleep(100)
