@@ -11,6 +11,8 @@ import master.core.{AdminManager, AlarmSupervisor, DataStreamer, TopologySupervi
 class Master extends CustomActor {
     
     override def preStart = {
+    
+        val adminManager = context.actorOf(Props[AdminManager], "AdminManager")
         
         val listener = context.actorOf(Props[ClusterMembersListener], "ClusterListener")
         
@@ -23,8 +25,6 @@ class Master extends CustomActor {
         val dataStreamer = context.actorOf(Props[DataStreamer], "DataStreamer")
     
         val alarmSupervisor = context.actorOf(Props[AlarmSupervisor], "AlarmSupervisor")
-
-        val adminManager = context.actorOf(Props[AdminManager], "AdminManager")
 
     }
     

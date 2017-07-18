@@ -45,7 +45,6 @@ class MasterSubscriber extends BasicSubscriber {
     
             context.become(behavior = sociable, discardOld = true)
             log.info("I've Become Sociable...")
-    
             log.info("Unstashing cool'n preserved Handshakes...")
             unstashAll
 

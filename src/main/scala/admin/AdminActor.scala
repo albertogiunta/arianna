@@ -19,7 +19,7 @@ class AdminActor(interfaceView: InterfaceView) extends CustomActor {
     var area: Area = _
     val interfaceController: InterfaceController = interfaceView.controller
     interfaceController.actorRef = self
-    val adminManager = context.actorSelection("akka.tcp://serverSystem@127.0.0.1:4553/user/AdminManager")
+    val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@192.168.0.9:25520/user/AdminManager")
     val toServer: MessageDirection = Location.Admin >> Location.Server
 
     override def receive: Receive = {
@@ -51,10 +51,10 @@ object App {
     def main(args: Array[String]): Unit = {
         new JFXPanel
         val path2Project = Paths.get("").toFile.getAbsolutePath
-        val path2Config = path2Project + "/res/conf/akka/application.conf"
+        val path2Config = path2Project + "/res/conf/akka/admin.conf"
         var interfaceView: InterfaceView = new InterfaceView
-        val config = ConfigFactory.parseFile(new File(path2Config))
-        val system = ActorSystem.create("adminSystem", config.getConfig("admin"))
+        val config = ConfigFactory.parseFile(new File(path2Config)).resolve
+        val system = ActorSystem.create("adminSystem", config)
         Platform.runLater {
             interfaceView.start(new Stage())
             var admin = system.actorOf(Props(new AdminActor(interfaceView)), "admin")

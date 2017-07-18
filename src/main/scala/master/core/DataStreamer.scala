@@ -22,6 +22,9 @@ class DataStreamer extends CustomActor {
     implicit private val executionContext = system.dispatcher
     implicit private val materializer: ActorMaterializer = ActorMaterializer.create(system)
     
+    private var streamer: SourceQueueWithComplete[Iterable[Cell]] = _
+    private var admin: ActorSelection = _
+    
     private val handler: AriadneMessage[_] => Unit = msg => admin ! msg //println(Thread.currentThread().getName + " - " + msg)
     
     private val source = Source.queue[Iterable[Cell]](100, OverflowStrategy.dropHead)
@@ -32,11 +35,9 @@ class DataStreamer extends CustomActor {
         .throttle(1, 1000 milliseconds, 1, ThrottleMode.Shaping)
         .to(Sink.foreach(msg => handler(msg)))
     
-    private var streamer: SourceQueueWithComplete[Iterable[Cell]] = _
-    private var admin: ActorSelection = _
-    
     override def preStart = {
         admin = sibling("AdminManager").get
+        println(admin)
         streamer = stream.async.runWith(source)
         super.preStart
     }
