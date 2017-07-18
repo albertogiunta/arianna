@@ -15,7 +15,7 @@ class AdminManager extends CustomActor {
 
     val toAdmin: MessageDirection = Location.Server >> Location.Admin
     val fromAdmin: MessageDirection = Location.Admin >> Location.Server
-    val admin = context.actorSelection("akka.tcp://adminSystem@127.0.0.1:4550/user/admin")
+    val admin = context.actorSelection("akka.tcp://adminSystem@192.168.0.12:4550/user/admin")
     val subscriber: ActorSelection = sibling("Subscriber").get
     val publisher: ActorSelection = sibling("Publisher").get
 
@@ -48,10 +48,13 @@ class AdminManager extends CustomActor {
 object ServerRun {
     def main(args: Array[String]): Unit = {
         val path2Project = Paths.get("").toFile.getAbsolutePath
-        val path2Config = path2Project + "/res/conf/akka/master.conf"
+        val path2Config = path2Project + "/res/conf/akka/testMaster.conf"
         //val path2Config2 = path2Project + "/res/conf/akka/application.conf"
-        val config = ConfigFactory.parseFile(new File(path2Config)).resolve()
+        val config = ConfigFactory.parseFile(new File(path2Config))
+            .withFallback(ConfigFactory.load()).resolve()
+        
         val system = ActorSystem.create("Arianna-Cluster", config)
+    
         val server = system.actorOf(Props[AdminManager], "AdminManager")
         val publisher = system.actorOf(Props[MasterPublisher], "Publisher")
 

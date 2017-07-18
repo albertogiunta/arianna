@@ -27,13 +27,13 @@ class AlarmSupervisor extends BasicSubscriber {
     }
     
     override protected def receptive = {
+    
         case msg@AriadneMessage(Alarm, Basic, _, _) =>
             log.info("Got {} from {}", msg.toString, sender.path.name)
             admin forward msg
     
         case msg@AriadneMessage(Alarm, FromInterface, _, _) =>
             log.info("Got {} from {}", msg.toString, sender.path.name)
-        //            topologySupervisor forward msg
     
         case _ => desist _
     }
