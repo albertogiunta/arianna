@@ -1,7 +1,5 @@
 package cell.core;
 
-import com.google.gson.Gson;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,7 +7,6 @@ import akka.actor.ActorRef;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.ServerWebSocket;
-import ontologies.messages.AreaForCell;
 
 public class WSServer extends AbstractVerticle {
 
@@ -62,10 +59,6 @@ public class WSServer extends AbstractVerticle {
         usersWaitingForConnectionOk.clear();
         System.out.println("[N USERS OK] " + usersWaitingForConnectionOk.size());
     }
-
-    public void sendAreaToNewUser(String area) {
-        System.out.println("[N USERS AREA] " + usersWaitingForArea.size() + area);
-        usersWaitingForArea.values().forEach(ws -> ws.writeTextMessage(area));
 
     public void sendAreaToNewUser(String area) {
         System.out.println("[N USERS AREA] " + usersWaitingForArea.size());
