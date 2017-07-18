@@ -28,22 +28,22 @@ object TestDataStreamer extends App {
     
     (0 to Int.MaxValue).foreach(_ => {
         val u =
-            (1 to 5).map(_ => ontologies.messages.Cell(
-                InfoCell(Random.nextInt(5), "uri" + Random.nextInt(100), "name" + Random.nextInt(100),
+            (0 to 5).map(id => ontologies.messages.Cell(
+                InfoCell(id, "uri" + id, "name" + id,
                     Coordinates(Point(1, 1), Point(-1, -1), Point(-1, 1), Point(1, -1)),
                     Point(0, 0)
                 ),
-                neighbors = List(InfoCell(Random.nextInt(1000), "uri" + Random.nextInt(100), "name" + Random.nextInt(100),
+                neighbors = List(InfoCell(Random.nextInt(5), "uri" + Random.nextInt(5), "name" + Random.nextInt(5),
                     Coordinates(Point(1, 1), Point(-1, -1), Point(-1, 1), Point(1, -1)),
                     Point(0, 0)
-                ), InfoCell(Random.nextInt(1000), "uri" + Random.nextInt(100), "name" + Random.nextInt(100),
+                ), InfoCell(Random.nextInt(5), "uri" + Random.nextInt(5), "name" + Random.nextInt(5),
                     Coordinates(Point(1, 1), Point(-1, -1), Point(-1, 1), Point(1, -1)),
                     Point(0, 0)
                 )),
                 isExitPoint = true,
                 isEntryPoint = true,
-                capacity = Random.nextInt(100),
-                currentPeople = Random.nextInt(90),
+                capacity = 100,
+                currentPeople = Random.nextInt(95),
                 practicabilityLevel = 0.0,
                 squareMeters = 1000,
                 passages = List(Passage(Random.nextInt(1000), Point(1, 1), Point(2, 1))),
