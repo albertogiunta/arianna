@@ -29,17 +29,33 @@ class UserActor extends BasicActor with ActorLogging {
     // TODO become handshaking col server
 
     override protected def receptive: Receive = {
+        case "areafrom" => context.become(receptiveForMobile)
         case "connect" =>
             println("[ACTOR] GOT NEW USER")
             s.sendOkToNewUser()
             usrNumber += 1
+        case "disconnect" =>
+            println("[ACTOR] USER DISCONNECTING")
+            usrNumber -= 1
         case "firstconnection" =>
             println("[ACTOR] GOT NEW FIRST USER")
             s.sendAreaToNewUser("Area to new user")
             usrNumber += 1
+        case _ => ""
+    }
+
+    protected def receptiveForMobile: Receive = {
+        case "connect" =>
+            println("[ACTOR] GOT NEW USER")
+            s.sendOkToNewUser()
+            usrNumber += 1
         case "disconnect" =>
             println("[ACTOR] USER DISCONNECTING")
             usrNumber -= 1
+        case "firstconnection" =>
+            println("[ACTOR] GOT NEW FIRST USER")
+            s.sendAreaToNewUser("Area to new user")
+            usrNumber += 1
         case _ => ""
     }
 }

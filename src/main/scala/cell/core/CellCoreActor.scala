@@ -52,16 +52,16 @@ class CellCoreActor extends BasicActor {
             actualCellLoad = cnt
             cellPublisher ! msg.copy(direction = cell2Server)
 
-        case msg@AriadneMessage(Route, Route.Subtype.Basic, user2Cell, cnt) =>
+        case msg@AriadneMessage(Route, Route.Subtype.Request, user2Cell, cnt) =>
         //route request from user management
         //routeManager ! msg with topology
-        case msg@AriadneMessage(Route, Route.Subtype.Basic, cell2User, cnt) =>
+        case msg@AriadneMessage(Route, Route.Subtype.Response, cell2User, cnt) =>
             //route response from route manager for the user
             userActor ! msg
         case msg@AriadneMessage(Alarm, Alarm.Subtype.Basic, server2Cell, cnt) =>
         //request to the route manager the escape route
         //routeManager ! msg with topology
-        case msg@AriadneMessage(Route, Route.Subtype.Escape, cell2User, cnt) =>
+        case msg@AriadneMessage(Route, Route.Subtype.Escape.Response, cell2User, cnt) =>
             //route response from route manager for the user with the Escape route
             userActor ! msg
 
