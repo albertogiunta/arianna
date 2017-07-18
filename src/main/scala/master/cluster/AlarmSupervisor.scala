@@ -4,7 +4,7 @@ import akka.actor.ActorSelection
 import common.BasicSubscriber
 import ontologies.Topic
 import ontologies.messages.MessageType.Alarm
-import ontologies.messages.{AriadneMessage, Message, MessageContent}
+import ontologies.messages.{AlarmContent, AriadneMessage, Message}
 
 /**
   * Alarm Supervisor has to react only to Alarms of triggered in the system,
@@ -26,10 +26,10 @@ class AlarmSupervisor extends BasicSubscriber {
     }
     
     override protected def receptive = {
-        case msg@AriadneMessage(Alarm, _, _, _) => triggerAlarm(msg)
+        case msg@AriadneMessage(Alarm, _, _, _) => triggerAlarm(msg.asInstanceOf[Message[AlarmContent]])
     }
     
-    private def triggerAlarm(msg: Message[MessageContent]) = {
+    private def triggerAlarm(msg: Message[AlarmContent]) = {
         log.info("Got {} from {}", msg.toString, sender.path.name)
         
         topologySupervisor forward msg

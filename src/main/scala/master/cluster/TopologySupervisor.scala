@@ -42,8 +42,8 @@ class TopologySupervisor extends BasicActor {
     }
     
     override protected def receptive = {
-
-        case msg@AriadneMessage(Alarm, _, _, _) => triggerAlarm(msg)
+    
+        case msg@AriadneMessage(Alarm, _, _, _) => triggerAlarm(msg.asInstanceOf[Message[AlarmContent]])
 
         case msg@AriadneMessage(Topology, Planimetrics, `admin2Server`, map: Area) =>
             log.info("A topology has been loaded in the server...")
@@ -63,8 +63,8 @@ class TopologySupervisor extends BasicActor {
     }
     
     private def sociable: Receive = {
-
-        case msg@AriadneMessage(Alarm, _, _, _) => triggerAlarm(msg)
+    
+        case msg@AriadneMessage(Alarm, _, _, _) => triggerAlarm(msg.asInstanceOf[Message[AlarmContent]])
 
         case msg@AriadneMessage(Handshake, Cell2Master, `cell2Server`, cell: InfoCell) =>
     
@@ -93,8 +93,8 @@ class TopologySupervisor extends BasicActor {
     }
     
     private def proactive: Receive = {
-
-        case msg@AriadneMessage(Alarm, _, _, _) => triggerAlarm(msg)
+    
+        case msg@AriadneMessage(Alarm, _, _, _) => triggerAlarm(msg.asInstanceOf[Message[AlarmContent]])
 
         case AriadneMessage(Update, ActualLoad, `cell2Server`, pkg: ActualLoadUpdate) =>
         
@@ -102,7 +102,7 @@ class TopologySupervisor extends BasicActor {
                 val old = topology(pkg.info.name)
             
                 topology.put(pkg.info.name,
-                    topology(pkg.info.name).copy(
+                    old.copy(
                         currentPeople = pkg.actualLoad,
                         practicabilityLevel = weight(old.capacity, pkg.actualLoad, old.passages.length)
                     )
@@ -110,7 +110,6 @@ class TopologySupervisor extends BasicActor {
                 
                 // Send the updated Map to the Admin
                 requestHandler ! topology.values
-    
             }
 
         case AriadneMessage(Update, Sensors, `cell2Server`, pkg: SensorList) =>
@@ -127,8 +126,12 @@ class TopologySupervisor extends BasicActor {
         case _ => desist _
     }
     
-    private def triggerAlarm(msg: Message[_]): Unit = {
+    private def triggerAlarm(msg: Message[AlarmContent]): Unit = {
         // Update all the Cells
+        val old = topology(msg.content.info.name).copy(practicabilityLevel = Double.PositiveInfinity)
+        
+        topology.put(msg.content.info.name, old)
+        
         publisher ! AriadneMessage(
             Topology, Topology4CellLight, server2Cell,
             LightArea(Random.nextInt(),
@@ -138,7 +141,7 @@ class TopologySupervisor extends BasicActor {
     
     private def weight(capacity: Int, load: Int, flows: Int): Double = {
         val log_b: (Double, Double) => Double = (b, n) => Math.log(n) / Math.log(b)
-        (load * 1.05) / capacity * (100.0 / log_b(4.0, flows))
+        1 / (load * 1.05 / capacity * (if (flows == 1) 0.25 else if (flows > 4.0) log_b(3.0, 4.25) else log_b(3.0, flows)))
     }
     
 }

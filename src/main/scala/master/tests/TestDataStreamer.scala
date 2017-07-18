@@ -2,10 +2,7 @@ package master.tests
 
 import akka.actor.{ActorSystem, Props}
 import master.cluster.DataStreamer
-import ontologies.messages.MessageType.Update
-import ontologies.messages.MessageType.Update.Subtype.Sensors
 import ontologies.messages._
-import ontologies.messages.Location._
 
 import scala.util.Random
 
@@ -20,7 +17,7 @@ object TestDataStreamer extends App {
     
     (0 to Int.MaxValue).foreach(_ => {
         val u =
-            (1 to 5).map(_ => ontologies.messages.Cell(
+            (1 to 10).map(_ => ontologies.messages.Cell(
                 InfoCell(Random.nextInt(1000), "uri" + Random.nextInt(100), "name" + Random.nextInt(100),
                     Coordinates(Point(1, 1), Point(-1, -1), Point(-1, 1), Point(1, -1)),
                     Point(0, 0)

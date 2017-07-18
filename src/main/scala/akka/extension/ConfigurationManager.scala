@@ -100,7 +100,7 @@ object ConfigPathBuilder {
 
 object TestConfigManager extends App {
     val path2Project = Paths.get("").toFile.getAbsolutePath
-    val path2Config = path2Project + "/conf/master.conf"
+    val path2Config = path2Project + "/res/conf/akka/master.conf"
 
     implicit val config = ConfigFactory.parseFile(new File(path2Config))
         .withFallback(ConfigFactory.load()).resolve()
