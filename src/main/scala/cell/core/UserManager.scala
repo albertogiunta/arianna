@@ -13,6 +13,8 @@ import ontologies.messages.MessageType.Topology
 import ontologies.messages.MessageType.Topology.Subtype.Topology4Cell
 import ontologies.messages._
 import spray.json._
+import similUser.WSClient
+
 
 class UserActor extends BasicActor with ActorLogging {
 
@@ -20,17 +22,19 @@ class UserActor extends BasicActor with ActorLogging {
     var s = new WSServer(vertx, UserActor.this.self)
     var usrNumber = 0
     var area: AreaForCell = _
-    //    var c = new WSClient(vertx)
+    var c = new WSClient(vertx)
 
     override protected def init(args: List[Any]): Unit = {
         log.info("Started actor")
         vertx.deployVerticle(s)
-        //        vertx.deployVerticle(c)
-        //        Thread.sleep(3000)
-        //        c.sendMessageConnect()
+        //        initWSClient()
     }
 
-    // TODO become handshaking col server
+    def initWSClient(): Unit = {
+        vertx.deployVerticle(c)
+        Thread.sleep(3000)
+        c.sendMessageConnect()
+    }
 
     override protected def receptive: Receive = {
         case msg@AriadneMessage(Topology, Topology4Cell, _, area: AreaForCell) =>
