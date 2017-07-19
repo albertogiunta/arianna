@@ -61,13 +61,13 @@ class CellCoreActor extends BasicActor {
         case AriadneMessage(Update, Update.Subtype.Practicability, `cell2Cell`, cnt: PracticabilityUpdate) =>
             topology.put(cnt.info.uri, topology(cnt.info.uri)
                 .copy(practicability = cnt.practicability))
+
+        case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, `user2Cell`, cnt: CurrentPeopleUpdate) =>
     
-        case msg@AriadneMessage(Update, Update.Subtype.ActualLoad, `user2Cell`, cnt: ActualLoadUpdate) =>
-        
-            actualSelfLoad = cnt.actualLoad
+            actualSelfLoad = cnt.currentPeople
     
             topology.put(uri, topology(uri).copy(practicability =
-                weight(topology(uri).capacity, cnt.actualLoad, topology(uri).passages.length)))
+                weight(topology(uri).capacity, cnt.currentPeople, topology(uri).passages.length)))
             
             cellPublisher ! msg.copy(direction = cell2Server)
             cellPublisher ! AriadneMessage(

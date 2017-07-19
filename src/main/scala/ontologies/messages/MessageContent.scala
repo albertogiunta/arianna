@@ -139,13 +139,13 @@ object CellForUser {
   *
   * Could've also been used the LightCell View but to the master practicability isn't necessary.
   *
-  * @param info       The identification info of the cell sending the data.
-  * @param actualLoad The actual number of people inside the Room where the cell is located into.
+  * @param info          The identification info of the cell sending the data.
+  * @param currentPeople The actual number of people inside the Room where the cell is located into.
   */
-final case class ActualLoadUpdate(info: InfoCell, actualLoad: Int) extends MessageContent
+final case class CurrentPeopleUpdate(info: InfoCell, currentPeople: Int) extends MessageContent
 
-object ActualLoadUpdate {
-    def apply(cell: Cell): ActualLoadUpdate = new ActualLoadUpdate(cell.info, cell.currentPeople)
+object CurrentPeopleUpdate {
+    def apply(cell: Cell): CurrentPeopleUpdate = new CurrentPeopleUpdate(cell.info, cell.currentPeople)
 }
 
 /**
@@ -212,7 +212,7 @@ object AreaPracticability {
   */
 final case class CellUpdate(info: InfoCell,
                             currentPeople: Int,
-                            sensors: List[Sensor]) extends MessageContent
+                            sensors: List[Sensor]) extends MessageContent // To be renamed CellData
 
 object CellUpdate {
     def apply(cell: Cell): CellUpdate = new CellUpdate(cell.info, cell.currentPeople, cell.sensors)
@@ -224,7 +224,7 @@ object CellUpdate {
   *
   * @param list A List of CellUpdates, containing a simplified view of a Cell
   */
-final case class UpdateForAdmin(list: List[CellUpdate]) extends MessageContent
+final case class UpdateForAdmin(list: List[CellUpdate]) extends MessageContent // to be renamed AdminUpdate
 
 /**
   * This case class is meant to be used as a Content for Initialization Messages,

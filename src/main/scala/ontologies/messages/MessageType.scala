@@ -506,15 +506,15 @@ object MessageType {
             /**
               * Takes a ActualLoadUpdate object as MessageContent
               */
-            object ActualLoad extends MessageSubtype {
+            object CurrentPeople extends MessageSubtype {
 
                 override val subtypeName = "CellOccupation"
 
                 override val superType = Update
-
-                override def unmarshal(json: String): ActualLoadUpdate = json.parseJson.convertTo[ActualLoadUpdate]
-
-                override def marshal(obj: MessageContent): String = obj.asInstanceOf[ActualLoadUpdate].toJson.toString()
+    
+                override def unmarshal(json: String): CurrentPeopleUpdate = json.parseJson.convertTo[CurrentPeopleUpdate]
+    
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[CurrentPeopleUpdate].toJson.toString()
             }
     
             /**

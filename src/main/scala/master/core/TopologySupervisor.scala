@@ -5,7 +5,7 @@ import common.{BasicActor, Counter}
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Handshake.Subtype.Cell2Master
 import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, Topology4Cell}
-import ontologies.messages.MessageType.Update.Subtype.{ActualLoad, Sensors}
+import ontologies.messages.MessageType.Update.Subtype.{CurrentPeople, Sensors}
 import ontologies.messages.MessageType.{Handshake, Topology, Update}
 import ontologies.messages._
 
@@ -95,15 +95,15 @@ class TopologySupervisor extends BasicActor {
     
     private def proactive: Receive = {
     
-        case AriadneMessage(Update, ActualLoad, `cell2Server`, pkg: ActualLoadUpdate) =>
+        case AriadneMessage(Update, CurrentPeople, `cell2Server`, pkg: CurrentPeopleUpdate) =>
 
             if (topology.get(pkg.info.uri).nonEmpty) {
                 val old = topology(pkg.info.uri)
 
                 topology.put(pkg.info.uri,
                     old.copy(
-                        currentPeople = pkg.actualLoad,
-                        practicability = weight(old.capacity, pkg.actualLoad, old.passages.length)
+                        currentPeople = pkg.currentPeople,
+                        practicability = weight(old.capacity, pkg.currentPeople, old.passages.length)
                     )
                 )
                 
