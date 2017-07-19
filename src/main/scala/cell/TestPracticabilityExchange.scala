@@ -54,7 +54,6 @@ class TestPracticabilityExchange extends App {
                 cellName,
                 roomVertices,
                 antennaPosition),
-            10,
             50.0)
     )
 }

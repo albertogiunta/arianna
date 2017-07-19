@@ -1,7 +1,7 @@
-package processor.tests
+package cell.processor.tests
 
-import processor.route.algorithms.Dijkstra.Graph
-import processor.route.algorithms.{AStarSearch, Dijkstra}
+import cell.processor.route.algorithms.Dijkstra.Graph
+import cell.processor.route.algorithms.{AStarSearch, Dijkstra}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration

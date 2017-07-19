@@ -6,39 +6,37 @@ import java.nio.file.Paths
 import akka.actor.{ActorSystem, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider}
 import com.typesafe.config.{Config, ConfigFactory, ConfigObject, ConfigValue}
 
+import scala.collection.JavaConverters.asScalaBuffer
+
 /**
   * Created by Alessandro on 02/07/2017.
   */
 class ConfigurationManagerImpl(system: ActorSystem) extends Extension {
-
-    import scala.collection.JavaConverters._
 
     def config: Config = system.settings.config
 
     def config(path: String): Config = config.getConfig(path)
     
     def property(path: String): PropertyChooser = PropertyChooser(config, path)
-    
-    final case class PropertyChooser(config: Config, path: String) {
-        
-        def string: String = config.getString(path)
-
-        def stringList: List[String] =
-            asScalaBuffer(config.getStringList(path)).toList
-
-        def number: Number = config.getNumber(path)
-
-        def numberList: List[Number] = asScalaBuffer(config.getNumberList(path)).toList
-
-        def value: ConfigValue = config.getValue(path)
-
-        def configObj: ConfigObject = config.getObject(path)
-
-        def configObjList: List[ConfigObject] = asScalaBuffer(config.getObjectList(path)).toList
-    }
-
 }
 
+final case class PropertyChooser(config: Config, path: String) {
+    
+    def string: String = config.getString(path)
+    
+    def stringList: List[String] =
+        asScalaBuffer(config.getStringList(path)).toList
+    
+    def number: Number = config.getNumber(path)
+    
+    def numberList: List[Number] = asScalaBuffer(config.getNumberList(path)).toList
+    
+    def value: ConfigValue = config.getValue(path)
+    
+    def configObj: ConfigObject = config.getObject(path)
+    
+    def configObjList: List[ConfigObject] = asScalaBuffer(config.getObjectList(path)).toList
+}
 
 case class ConfigPathBuilder() {
     

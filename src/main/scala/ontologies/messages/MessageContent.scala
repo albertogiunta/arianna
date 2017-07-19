@@ -20,7 +20,7 @@ final case class Coordinates(northWest: Point,
 final case class Area(id: Int,
                       cells: List[Cell]) extends MessageContent
 
-final case class Cell(infoCell: InfoCell,
+final case class Cell(info: InfoCell,
                       sensors: List[Sensor],
                       neighbors: List[InfoCell],
                       passages: List[Passage],
@@ -94,47 +94,48 @@ object AreaForCell {
 /**
   * View of another Cell from the perspective of a Cell
   *
-  * @param infoCell
+  * @param info
   * @param neighbors
   * @param passages
   * @param isEntryPoint
   * @param isExitPoint
   * @param practicabilityLevel
   */
-final case class CellForCell(infoCell: InfoCell,
+final case class CellForCell(info: InfoCell,
                              neighbors: List[InfoCell],
                              passages: List[Passage],
                              isEntryPoint: Boolean,
                              isExitPoint: Boolean,
+                             capacity: Int,
                              practicabilityLevel: Double) extends MessageContent
 
 object CellForCell {
     def apply(cell: Cell): CellForCell =
-        new CellForCell(cell.infoCell, cell.neighbors, cell.passages, cell.isEntryPoint,
-            cell.isExitPoint, cell.practicabilityLevel)
+        new CellForCell(cell.info, cell.neighbors, cell.passages, cell.isEntryPoint,
+            cell.isExitPoint, cell.capacity, cell.practicabilityLevel)
 }
 
 /**
   * View of a Cell from the Perspective of a User
   *
   * @param actorPath
-  * @param infoCell
+  * @param info
   * @param neighbors
   * @param passages
   */
 final case class CellForUser(actorPath: String,
-                             infoCell: InfoCell,
+                             info: InfoCell,
                              neighbors: List[InfoCell],
                              passages: List[Passage]) extends MessageContent
 
 object CellForUser {
     def apply(cell: Cell, actorPath: String): CellForUser =
-        new CellForUser(actorPath, cell.infoCell, cell.neighbors, cell.passages)
+        new CellForUser(actorPath, cell.info, cell.neighbors, cell.passages)
 }
 
 /**
   * This case class is meant to be used as Update of the number of people present in the various rooms
-  * for the Master node.
+  * for the Master node or for the Cell itself.
   *
   * Could've also been used the LightCell View but to the master practicability isn't necessary.
   *
@@ -144,7 +145,7 @@ object CellForUser {
 final case class ActualLoadUpdate(info: InfoCell, actualLoad: Int) extends MessageContent
 
 object ActualLoadUpdate {
-    def apply(cell: Cell): ActualLoadUpdate = new ActualLoadUpdate(cell.infoCell, cell.currentPeople)
+    def apply(cell: Cell): ActualLoadUpdate = new ActualLoadUpdate(cell.info, cell.currentPeople)
 }
 
 /**
@@ -167,7 +168,7 @@ final case class Sensor(category: Int, value: Double, min: Double, max: Double) 
 final case class SensorList(info: InfoCell, sensors: List[Sensor]) extends MessageContent
 
 object SensorList {
-    def apply(cell: Cell): SensorList = new SensorList(cell.infoCell, cell.sensors)
+    def apply(cell: Cell): SensorList = new SensorList(cell.info, cell.sensors)
 }
 
 /**
@@ -177,13 +178,12 @@ object SensorList {
   * and the calculated practicability level for the cell to be updated
   *
   * @param info                The Identification Info of the Cell to be updated
-  * @param actualLoad          The actual number of people inside the Room the Cell is located into
   * @param practicabilityLevel The actual practicability level of the Room the Cell is located into
   */
-case class LightCell(info: InfoCell, actualLoad: Int, practicabilityLevel: Double) extends MessageContent
+case class LightCell(info: InfoCell, practicabilityLevel: Double) extends MessageContent
 
 object LightCell {
-    def apply(cell: Cell): LightCell = new LightCell(cell.infoCell, cell.currentPeople, cell.practicabilityLevel)
+    def apply(cell: Cell): LightCell = new LightCell(cell.info, cell.practicabilityLevel)
 }
 
 /**
@@ -206,16 +206,16 @@ object LightArea {
   *
   * This Class grant a simplified view of a Cell, only containing dynamic and identification Info of it
   *
-  * @param infoCell      Identification Info of the cell
+  * @param info          Identification Info of the cell
   * @param currentPeople Actual number of people inside the Room
   * @param sensors       A List of Sensors containing the new values sensed by them
   */
-final case class CellUpdate(infoCell: InfoCell,
+final case class CellUpdate(info: InfoCell,
                             currentPeople: Int,
                             sensors: List[Sensor]) extends MessageContent
 
 object CellUpdate {
-    def apply(cell: Cell): CellUpdate = new CellUpdate(cell.infoCell, cell.currentPeople, cell.sensors)
+    def apply(cell: Cell): CellUpdate = new CellUpdate(cell.info, cell.currentPeople, cell.sensors)
 }
 
 /**
@@ -247,7 +247,7 @@ final case class Greetings(args: List[String]) extends MessageContent
 final case class AlarmContent(info: InfoCell, isExitPoint: Boolean, isEntryPoint: Boolean) extends MessageContent
 
 object AlarmContent {
-    def apply(cell: Cell): AlarmContent = new AlarmContent(cell.infoCell, cell.isExitPoint, cell.isEntryPoint)
+    def apply(cell: Cell): AlarmContent = new AlarmContent(cell.info, cell.isExitPoint, cell.isEntryPoint)
 }
 
 /* BOH */
@@ -259,10 +259,10 @@ final case class AntennaPositions(userPosition: Point, antennaPositions: List[In
 
 final case class Empty() extends MessageContent
 
-final case class CellForSwitcher(infoCell: InfoCell,
+final case class CellForSwitcher(info: InfoCell,
                                  neighbors: List[InfoCell]) extends MessageContent
 
 object CellForSwitcher {
     def apply(cell: CellForUser): CellForSwitcher =
-        new CellForSwitcher(cell.infoCell, cell.neighbors)
+        new CellForSwitcher(cell.info, cell.neighbors)
 }

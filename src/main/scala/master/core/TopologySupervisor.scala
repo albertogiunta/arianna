@@ -48,7 +48,7 @@ class TopologySupervisor extends BasicActor {
     
             if (topology.isEmpty) {
                 println(topology)
-                topology = mutable.HashMap(map.cells.map(c => (c.infoCell.uri, c)): _*)
+                topology = mutable.HashMap(map.cells.map(c => (c.info.uri, c)): _*)
                 
                 context.become(behavior = sociable, discardOld = true)
                 log.info("I've become Sociable...")
@@ -69,7 +69,7 @@ class TopologySupervisor extends BasicActor {
 
             if (topology.get(cell.uri).nonEmpty) {
                 log.info("Found a match into the loaded Topology for {}", cell.uri)
-                topology.put(cell.uri, topology(cell.uri).copy(infoCell = cell))
+                topology.put(cell.uri, topology(cell.uri).copy(info = cell))
     
                 dataStreamer ! msg
                 
