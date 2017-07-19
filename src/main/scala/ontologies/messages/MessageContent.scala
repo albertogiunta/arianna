@@ -35,13 +35,46 @@ final case class Passage(neighborId: Int,
                          startCoordinates: Point,
                          endCoordinates: Point) extends MessageContent
 
-/* Route content data structures */
+/**
+  * This case class represent a user request of a Route from Cell X to Cell Y
+  *
+  * @param userID   The ID of the User requesting the Route
+  * @param fromCell The Cell where the user is located
+  * @param toCell   The Cell where the user have to arrive
+  */
 final case class RouteRequest(userID: String, fromCell: InfoCell, toCell: InfoCell) extends MessageContent
 
+/**
+  * This case class represent info sent to the RouteManager Actor from the CellCore Actor.
+  *
+  * This wrap a RouteRequest and add the topology on which calculating the route
+  *
+  * @param req      The RouteRequest sent by a User
+  * @param topology The View of the Topology help by the CoreCell Actor
+  */
 final case class RouteInfo(req: RouteRequest, topology: AreaForCell) extends MessageContent
 
+/**
+  * This case class represent a response to a route request.
+  *
+  * This is sent to the CoreCell Actor by the RouteProcessor.
+  *
+  * @param request The wrapped RouteRequest
+  * @param route   The calculated optimal route from Cell X to Cell Y
+  */
 final case class RouteResponse(request: RouteRequest, route: List[InfoCell]) extends MessageContent
 
+/**
+  * This case class is a RouteRequest but cause from the trigger of an alarm.
+  *
+  * As such there are no chosen starting point.
+  *
+  * Being triggered from inside the cluster or from the Admin, the Topology is already attached to
+  * this Request
+  *
+  * @param info     The identification data of the cell from which calculatin the route (that is the starting/source point)
+  * @param topology The actual view of the topology held by the CoreCell Actor
+  */
 final case class EscapeRequest(info: InfoCell, topology: AreaForCell) extends MessageContent
 
 final case class EscapeResponse(info: InfoCell, route: List[InfoCell]) extends MessageContent
@@ -99,35 +132,84 @@ object CellForUser {
         new CellForUser(actorPath, cell.infoCell, cell.neighbors, cell.passages)
 }
 
-/* Updates for the server from the Cells */
+/**
+  * This case class is meant to be used as Update of the number of people present in the various rooms
+  * for the Master node.
+  *
+  * Could've also been used the LightCell View but to the master practicability isn't necessary.
+  *
+  * @param info       The identification info of the cell sending the data.
+  * @param actualLoad The actual number of people inside the Room where the cell is located into.
+  */
 final case class ActualLoadUpdate(info: InfoCell, actualLoad: Int) extends MessageContent
 
 object ActualLoadUpdate {
     def apply(cell: Cell): ActualLoadUpdate = new ActualLoadUpdate(cell.infoCell, cell.currentPeople)
 }
 
-final case class Sensor(category: Int, value: Double) extends MessageContent
+/**
+  * This case class represent a sensor.
+  *
+  * @param category The Category of the Sensor
+  * @param value    The actual Value percieved from the sensor
+  * @param min      The Minimum value for which the held value is not dangerous
+  * @param max      The Maximum value for which the held value is not dangerous
+  */
+final case class Sensor(category: Int, value: Double, min: Double, max: Double) extends MessageContent
 
+/**
+  * This case Class is meant to be used as an Update of all the Sensors data
+  * from a single Cell to the Master.
+  *
+  * @param info    The identification info of the Cells that is sending the Updates
+  * @param sensors A list of sensors data
+  */
 final case class SensorList(info: InfoCell, sensors: List[Sensor]) extends MessageContent
 
 object SensorList {
     def apply(cell: Cell): SensorList = new SensorList(cell.infoCell, cell.sensors)
 }
 
-/* Light weight Topology updates for Cells */
+/**
+  * This case Class is only meant to be used under the hood of a List into LightArea representations.
+  *
+  * This class give a simplified view of a Cell for other cells, contaning the new number of people
+  * and the calculated practicability level for the cell to be updated
+  *
+  * @param info                The Identification Info of the Cell to be updated
+  * @param actualLoad          The actual number of people inside the Room the Cell is located into
+  * @param practicabilityLevel The actual practicability level of the Room the Cell is located into
+  */
 case class LightCell(info: InfoCell, actualLoad: Int, practicabilityLevel: Double) extends MessageContent
 
 object LightCell {
     def apply(cell: Cell): LightCell = new LightCell(cell.infoCell, cell.currentPeople, cell.practicabilityLevel)
 }
 
-case class LightArea(id: Int, cells: List[LightCell]) extends MessageContent
+/**
+  * This case class is meant to be used as Content to update Cells
+  * about the updated Topology of the place from their PoV.
+  *
+  * It's a simplified view of the area.
+  *
+  * @param id    Identification number for this Topology
+  * @param cells List of LightCells composing the Area
+  */
+case class LightArea(id: Int, cells: List[LightCell]) extends MessageContent // Actually not Used
 
 object LightArea {
     def apply(area: Area): LightArea = new LightArea(area.id, area.cells.map(c => LightCell(c)))
 }
 
-/* Updates for the Admin Dashboard */
+/**
+  * This case Class is meant to be used only under the hood of a List into UpdateForAdmin.
+  *
+  * This Class grant a simplified view of a Cell, only containing dynamic and identification Info of it
+  *
+  * @param infoCell      Identification Info of the cell
+  * @param currentPeople Actual number of people inside the Room
+  * @param sensors       A List of Sensors containing the new values sensed by them
+  */
 final case class CellUpdate(infoCell: InfoCell,
                             currentPeople: Int,
                             sensors: List[Sensor]) extends MessageContent
@@ -136,11 +218,32 @@ object CellUpdate {
     def apply(cell: Cell): CellUpdate = new CellUpdate(cell.infoCell, cell.currentPeople, cell.sensors)
 }
 
+/**
+  * This Case Class is meant to be used as a Content for Messages sent to the Admin Application,
+  * in order to updates its information
+  *
+  * @param list A List of CellUpdates, containing a simplified view of a Cell
+  */
 final case class UpdateForAdmin(list: List[CellUpdate]) extends MessageContent
 
-/* General Content */
+/**
+  * This case class is meant to be used as a Content for Initialization Messages,
+  * where the various arguments for an Actor are submitted as Strings
+  *
+  * This obviously doesn't permit to send complex objects inside of it,
+  * but can always use .json.
+  *
+  * @param args Initialization Arguments as List of Strings
+  */
 final case class Greetings(args: List[String]) extends MessageContent
 
+/**
+  * This case class in meant to be sent as Content for Alarm sent by Cells to other Cells and the Master
+  *
+  * @param info         The Info of the Cell tha gave origin to the Alarm
+  * @param isExitPoint  Is the Cell located in a Room with Exits?
+  * @param isEntryPoint Is the Cell Located in a Room with Entries?
+  */
 final case class AlarmContent(info: InfoCell, isExitPoint: Boolean, isEntryPoint: Boolean) extends MessageContent
 
 object AlarmContent {

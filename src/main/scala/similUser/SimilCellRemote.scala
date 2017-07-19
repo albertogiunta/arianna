@@ -56,7 +56,7 @@ object MyJsonProtocol extends DefaultJsonProtocol {
     implicit val coordinatesFormat = jsonFormat4(Coordinates)
     implicit val infoCellFormat = jsonFormat5(InfoCell)
     implicit val passageFormat = jsonFormat3(Passage)
-    implicit val sensorFormat = jsonFormat2(Sensor)
+    implicit val sensorFormat = jsonFormat4(Sensor)
     implicit val cellFormat = jsonFormat10(ontologies.messages.Cell)
 }
 

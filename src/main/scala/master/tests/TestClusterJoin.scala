@@ -41,7 +41,7 @@ object TestClusterJoin extends App {
                 Coordinates(Point(1, 1), Point(-1, -1), Point(-1, 1), Point(1, -1)),
                 Point(0, 0)
             ),
-            List(Sensor(1, 2.0), Sensor(2, 1.55))
+            List(Sensor(1, 2.0, 0.0, 0.0), Sensor(2, 1.55, 0.0, 0.0))
         )
     )
     

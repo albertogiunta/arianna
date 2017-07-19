@@ -50,7 +50,6 @@ class DataStreamer extends CustomActor {
     override def receive: Receive = {
     
         case msg: Iterable[Cell] =>
-            //            log.info(Thread.currentThread().getName + " - Streaming to handler...")
             streamer offer msg
         case _ =>
     }
