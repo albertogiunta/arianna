@@ -123,10 +123,10 @@ object MessageType {
                 override val subtypeName = "Cell2Master"
 
                 override val superType = Handshake
-
-                override def unmarshal(json: String): InfoCell = json.parseJson.convertTo[InfoCell]
-
-                override def marshal(obj: MessageContent): String = obj.asInstanceOf[InfoCell].toJson.toString()
+    
+                override def unmarshal(json: String): SensorList = json.parseJson.convertTo[SensorList]
+    
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[SensorList].toJson.toString()
             }
 
         }

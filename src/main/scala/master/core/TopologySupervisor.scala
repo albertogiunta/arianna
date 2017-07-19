@@ -28,7 +28,7 @@ class TopologySupervisor extends BasicActor {
     private val admin2Server: MessageDirection = Location.Admin >> Location.Server
     private val server2Admin: MessageDirection = admin2Server.reverse
     
-    private var requestHandler: ActorSelection = _
+    private var dataStreamer: ActorSelection = _
     private var publisher: ActorSelection = _
     private var subscriber: ActorSelection = _
     
@@ -36,7 +36,7 @@ class TopologySupervisor extends BasicActor {
     
     override protected def init(args: List[Any]) = {
         log.info("Hello there from {}!", name)
-        requestHandler = sibling("DataStreamer").get
+        dataStreamer = sibling("DataStreamer").get
         publisher = sibling("Publisher").get
         subscriber = sibling("Subscriber").get
     }
@@ -63,7 +63,7 @@ class TopologySupervisor extends BasicActor {
     
     private def sociable: Receive = {
     
-        case msg@AriadneMessage(Handshake, Cell2Master, `cell2Server`, cell: InfoCell) =>
+        case msg@AriadneMessage(Handshake, Cell2Master, `cell2Server`, SensorList(cell, _)) =>
     
             log.info(msg.toString)
 
@@ -71,6 +71,8 @@ class TopologySupervisor extends BasicActor {
                 log.info("Found a match into the loaded Topology for {}", cell.uri)
                 topology.put(cell.uri, topology(cell.uri).copy(infoCell = cell))
     
+                dataStreamer ! msg
+                
                 if ((synced ++) == topology.size) {
                     
                     context.become(behavior = proactive, discardOld = true)
@@ -106,7 +108,7 @@ class TopologySupervisor extends BasicActor {
                 )
                 
                 // Send the updated Map to the Admin
-                requestHandler ! topology.values
+                dataStreamer ! topology.values
             }
 
         case AriadneMessage(Update, Sensors, `cell2Server`, pkg: SensorList) =>
@@ -117,7 +119,7 @@ class TopologySupervisor extends BasicActor {
                 topology.put(pkg.info.uri, news)
                 
                 // Send the updated Map to the Admin
-                requestHandler ! topology.values
+                dataStreamer ! topology.values
             }
 
         case AriadneMessage(Handshake, Cell2Master, `cell2Server`, _) =>

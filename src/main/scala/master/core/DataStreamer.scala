@@ -5,8 +5,8 @@ import akka.stream._
 import akka.stream.scaladsl.{Flow, Sink, Source, SourceQueueWithComplete}
 import common.CustomActor
 import ontologies.messages.Location._
-import ontologies.messages.MessageType.Update
 import ontologies.messages.MessageType.Update.Subtype
+import ontologies.messages.MessageType.{Handshake, Update}
 import ontologies.messages._
 
 import scala.concurrent.duration._
@@ -51,6 +51,7 @@ class DataStreamer extends CustomActor {
     
         case msg: Iterable[Cell] =>
             streamer offer msg
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.Cell2Master, _, _) => admin ! msg
         case _ =>
     }
 }
