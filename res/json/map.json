@@ -233,12 +233,7 @@
                     "y": 5
                 }
             },
-            "sensors": [
-                {
-                    "category": 1,
-                    "value": 30.0
-                }
-            ],
+          "sensors": [],
             "neighbors": [
                 {
                     "id": 2,

@@ -2,7 +2,7 @@
   "id": 1,
   "cells": [
     {
-      "infoCell": {
+      "info": {
         "id": 1,
         "uri": "uri1",
         "name": "Padiglione A",
@@ -29,12 +29,7 @@
           "y": 5
         }
       },
-      "sensors": [
-        {
-          "category": 1,
-          "value": 10.0
-        }
-      ],
+      "sensors": [],
       "neighbors": [
         {
           "id": 2,
@@ -85,7 +80,7 @@
       "practicabilityLevel": 5.0
     },
     {
-      "infoCell": {
+      "info": {
         "id": 2,
         "uri": "uri2",
         "name": "Padiglione B",
@@ -112,12 +107,7 @@
           "y": 5
         }
       },
-      "sensors": [
-        {
-          "category": 1,
-          "value": 30.0
-        }
-      ],
+      "sensors": [],
       "neighbors": [
         {
           "id": 1,
@@ -168,7 +158,7 @@
       "practicabilityLevel": 2.0
     },
     {
-      "infoCell": {
+      "info": {
         "id": 3,
         "uri": "uri2",
         "name": "Padiglione C",
@@ -195,12 +185,7 @@
           "y": 5
         }
       },
-      "sensors": [
-        {
-          "category": 1,
-          "value": 30.0
-        }
-      ],
+      "sensors": [],
       "neighbors": [
         {
           "id": 1,
@@ -251,7 +236,7 @@
       "practicabilityLevel": 2.0
     },
     {
-      "infoCell": {
+      "info": {
         "id": 4,
         "uri": "uri2",
         "name": "Padiglione D",
@@ -278,12 +263,7 @@
           "y": 5
         }
       },
-      "sensors": [
-        {
-          "category": 1,
-          "value": 30.0
-        }
-      ],
+      "sensors": [],
       "neighbors": [
         {
           "id": 1,
@@ -334,7 +314,7 @@
       "practicabilityLevel": 2.0
     },
     {
-      "infoCell": {
+      "info": {
         "id": 5,
         "uri": "uri3",
         "name": "Padiglione E",
@@ -361,12 +341,7 @@
           "y": 5
         }
       },
-      "sensors": [
-        {
-          "category": 1,
-          "value": 30.0
-        }
-      ],
+      "sensors": [],
       "neighbors": [
         {
           "id": 1,

@@ -38,7 +38,7 @@ class AdminActor(interfaceView: InterfaceView) extends CustomActor {
         case msg@AriadneMessage(_, Alarm.Subtype.Basic, _, _) => interfaceController.triggerAlarm()
 
         case msg@AriadneMessage(Handshake, Handshake.Subtype.Cell2Master, _, sensorsInfo: SensorList) => {
-
+            interfaceController.initializeSensors(sensorsInfo)
         }
 
         case _ => println("none")
