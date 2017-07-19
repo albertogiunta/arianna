@@ -95,8 +95,18 @@ class CellCoreActor extends BasicActor {
         case msg@AriadneMessage(Route, Route.Subtype.Response, `cell2User`, _) =>
             //route response from route manager for the user
             userActor ! msg
-    
-        case AriadneMessage(Alarm, _, _, cnt: AlarmContent) =>
+
+        case AriadneMessage(Alarm, _, _, alarm) =>
+            val area = alarm match {
+                case AlarmContent(compromisedCell, _, _) =>
+                    topology.values.map(cell => {
+                        if (cell.info.uri == compromisedCell.uri)
+                            cell.copy(practicability = Double.PositiveInfinity)
+                        else cell
+                    }).toList
+                case Empty() =>
+                    topology.values.toList
+            }
             //request to the route manager the escape route
             routeManager ! AriadneMessage(
                 Route,
@@ -104,13 +114,7 @@ class CellCoreActor extends BasicActor {
                 Location.Self >> Location.Self,
                 EscapeRequest(
                     topology(uri).info,
-                    AreaForCell(
-                        Random.nextInt(),
-                        topology.values.map(cfc => {
-                            if (cfc.info.uri == cnt.info.uri)
-                                cfc.copy(practicability = Double.PositiveInfinity)
-                            else cfc
-                        }).toList)
+                    AreaForCell(Random.nextInt(), area)
                 )
             )
     
