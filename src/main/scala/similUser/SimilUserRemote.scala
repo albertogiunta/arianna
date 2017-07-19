@@ -33,7 +33,7 @@ class UserRemote extends BasicActor with ActorLogging {
 
     override protected def receptive: Receive = {
         case AriadneMessage(MessageType.Handshake, MessageType.Handshake.Subtype.Cell2User, UserRemote.this.fromCell2User, currentCell: CellForUser) =>
-            log.info("Received info from my new cell of id: {}", currentCell.infoCell.name)
+            log.info("Received info from my new cell of id: {}", currentCell.info.name)
             movementActor ! AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, Location.User >> Location.Movement, Point(15, 0))
             switcherActor ! AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, Location.User >> Location.Switcher, CellForSwitcher(currentCell))
         case AriadneMessage(MessageType.SwitcherMsg, MessageType.SwitcherMsg.Subtype.SwitchCell, _, newBestHost: InfoCell) =>
@@ -146,7 +146,7 @@ class SwitcherActor extends BasicActor with ActorLogging {
             currentInfoCell = newInfoCell
         case AriadneMessage(MessageType.Update, MessageType.Update.Subtype.Position.UserPosition, _, newUserPosition: Point) =>
             currentUserPosition = newUserPosition
-            powerSupplyActor ! AriadneMessage(MessageType.SwitcherMsg, MessageType.SwitcherMsg.Subtype.CalculateStrength, Location.Switcher >> Location.PowerSupply, UserAndAntennaPositionUpdate(newUserPosition, currentInfoCell.infoCell.antennaPosition))
+            powerSupplyActor ! AriadneMessage(MessageType.SwitcherMsg, MessageType.SwitcherMsg.Subtype.CalculateStrength, Location.Switcher >> Location.PowerSupply, UserAndAntennaPositionUpdate(newUserPosition, currentInfoCell.info.antennaPosition))
         case AriadneMessage(MessageType.SwitcherMsg, MessageType.SwitcherMsg.Subtype.BestNexHost, _, bestNewCandidate: InfoCell) =>
             bestNextHost = bestNewCandidate
         case AriadneMessage(MessageType.SignalStrength, MessageType.SignalStrength.Subtype.Strong, _, _) =>

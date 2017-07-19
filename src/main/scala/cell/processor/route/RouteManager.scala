@@ -1,4 +1,4 @@
-package processor.route
+package cell.processor.route
 
 import akka.actor.{ActorRef, Props}
 import common.BasicActor
@@ -34,14 +34,14 @@ class RouteManager extends BasicActor {
     override protected def receptive: Receive = {
     
         case AriadneMessage(Route, Escape.Request, _, cnt: EscapeRequest) => manageEscape(cnt)
-    
-        case msg@AriadneMessage(Route, Info, _, _) =>
+
+        case AriadneMessage(Route, Info, _, info: RouteInfo) =>
             
             // Se non è già presente in cache o il valore in cache è troppo vecchio
-            // => Si calcola con Dijkstra il Percorso :: Si ritorna la strada in cache
+            // => Si calcola con A* il Percorso :: Si ritorna la strada in cache
             log.info("Requesting route from Cache...")
             context.become(waitingForCache, discardOld = true)
-            cacher ! msg.content
+            cacher ! info
             
         case _ => desist _
     }

@@ -27,7 +27,7 @@ class AdminActor(interfaceView: InterfaceView) extends CustomActor {
         //Ricezione dell'aggiornamento delle celle
         case msg@AriadneMessage(_, MessageType.Update.Subtype.UpdateForAdmin, _, adminUpdate: UpdateForAdmin) => {
             val updateCells: ListBuffer[CellForView] = new ListBuffer[CellForView]
-            adminUpdate.list.foreach(c => updateCells += new CellForView(c.infoCell.id, c.infoCell.name, c.currentPeople, c.sensors))
+            adminUpdate.list.foreach(c => updateCells += new CellForView(c.info.id, c.info.name, c.currentPeople, c.sensors))
             interfaceController.updateView(updateCells.toList)
         }
         //Ricezione del messaggio iniziale dall'interfaccia con aggiornamento iniziale

@@ -1,10 +1,10 @@
-package processor.tests
+package cell.processor.tests
 
 import akka.actor.{ActorSystem, Props}
+import cell.processor.route.RouteManager
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.{Init, Route}
 import ontologies.messages._
-import processor.route.RouteManager
 
 import scala.collection.immutable.HashMap
 import scala.util.Random
@@ -36,6 +36,7 @@ object TestRouteProcessor extends App {
                 ),
                 isEntryPoint = false,
                 isExitPoint = false,
+                Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
             CellForCell(
@@ -48,6 +49,7 @@ object TestRouteProcessor extends App {
                 ),
                 isEntryPoint = true,
                 isExitPoint = true,
+                Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
             CellForCell(
@@ -59,6 +61,7 @@ object TestRouteProcessor extends App {
                 ),
                 isEntryPoint = false,
                 isExitPoint = false,
+                Random.nextInt(20),
                 10 * Random.nextDouble() //Double.PositiveInfinity
             ),
             CellForCell(
@@ -72,6 +75,7 @@ object TestRouteProcessor extends App {
                 ),
                 isEntryPoint = false,
                 isExitPoint = false,
+                Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
             CellForCell(
@@ -84,6 +88,7 @@ object TestRouteProcessor extends App {
                 ),
                 isEntryPoint = false,
                 isExitPoint = true,
+                Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
             CellForCell(
@@ -96,6 +101,7 @@ object TestRouteProcessor extends App {
                 ),
                 isEntryPoint = false,
                 isExitPoint = true,
+                Random.nextInt(20),
                 10 * Random.nextDouble() //Double.PositiveInfinity//
             ),
             CellForCell(
@@ -107,6 +113,7 @@ object TestRouteProcessor extends App {
                 ),
                 isEntryPoint = false,
                 isExitPoint = false,
+                Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
             CellForCell(
@@ -119,6 +126,7 @@ object TestRouteProcessor extends App {
                 ),
                 isEntryPoint = true,
                 isExitPoint = true,
+                Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
             CellForCell(
@@ -130,18 +138,19 @@ object TestRouteProcessor extends App {
                 ),
                 isEntryPoint = false,
                 isExitPoint = false,
+                Random.nextInt(20),
                 10 * Random.nextDouble()
             )
         ))
     val cells = areaForRoute.cells
     
-    val asMap: Map[String, CellForCell] = HashMap(cells.map(c => c.infoCell.name -> c): _*)
+    val asMap: Map[String, CellForCell] = HashMap(cells.map(c => c.info.name -> c): _*)
     
     val fromCell = "Cell1"
     val toCell = "Cell9"
     
-    //    import processor.route.algorithms.AStarSearch
-    //    import processor.route.algorithms.AStarSearch.Graph
+    //    import cell.processor.route.algorithms.AStarSearch
+    //    import cell.processor.route.algorithms.AStarSearch.Graph
     //
     //    areaForRoute.cells.foreach(c => println(c.infoCell.name -> c.practicabilityLevel))
     //
@@ -198,6 +207,7 @@ object TestRouteProcessor extends App {
                 ),
                 isEntryPoint = false,
                 isExitPoint = false,
+                Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
             CellForCell(
@@ -210,6 +220,7 @@ object TestRouteProcessor extends App {
                 ),
                 isEntryPoint = true,
                 isExitPoint = true,
+                Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
             CellForCell(
@@ -221,6 +232,7 @@ object TestRouteProcessor extends App {
                 ),
                 isEntryPoint = false,
                 isExitPoint = false,
+                Random.nextInt(20),
                 10 * Random.nextDouble() //Double.PositiveInfinity
             ),
             CellForCell(
@@ -234,6 +246,7 @@ object TestRouteProcessor extends App {
                 ),
                 isEntryPoint = false,
                 isExitPoint = false,
+                Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
             CellForCell(
@@ -246,6 +259,7 @@ object TestRouteProcessor extends App {
                 ),
                 isEntryPoint = false,
                 isExitPoint = true,
+                Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
             CellForCell(
@@ -258,6 +272,7 @@ object TestRouteProcessor extends App {
                 ),
                 isEntryPoint = false,
                 isExitPoint = true,
+                Random.nextInt(20),
                 Double.PositiveInfinity //10*Random.nextDouble()//
             ),
             CellForCell(
@@ -269,6 +284,7 @@ object TestRouteProcessor extends App {
                 ),
                 isEntryPoint = false,
                 isExitPoint = false,
+                Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
             CellForCell(
@@ -281,6 +297,7 @@ object TestRouteProcessor extends App {
                 ),
                 isEntryPoint = true,
                 isExitPoint = true,
+                Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
             CellForCell(
@@ -292,6 +309,7 @@ object TestRouteProcessor extends App {
                 ),
                 isEntryPoint = false,
                 isExitPoint = false,
+                Random.nextInt(20),
                 10 * Random.nextDouble()
             )
         ))

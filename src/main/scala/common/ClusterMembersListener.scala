@@ -27,7 +27,6 @@ class ClusterMembersListener extends CustomActor {
         cluster.subscribe(self, classOf[MemberUp], classOf[MemberEvent])
 
         // If this is the master node, Actors should be already Initialized
-
         try {
             if (config.property(builder.akka.cluster.get("seed-nodes"))
                 .stringList.contains(cluster.selfAddress.toString)) {
@@ -41,7 +40,6 @@ class ClusterMembersListener extends CustomActor {
         } catch {
             case ex: Throwable => ex.printStackTrace()
         }
-
     }
 
     override def postStop: Unit =
