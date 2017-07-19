@@ -57,16 +57,16 @@ class CellCoreActor extends BasicActor {
             println(s"Area arrived from Server $cnt")
             cnt.cells.foreach(X => topology.put(X.info.uri, X))
             userActor ! msg.copy(direction = cell2User)
-    
-        case AriadneMessage(Update, Update.Subtype.Practicability, `cell2Cell`, cnt: LightCell) =>
+
+        case AriadneMessage(Update, Update.Subtype.Practicability, `cell2Cell`, cnt: PracticabilityUpdate) =>
             topology.put(cnt.info.uri, topology(cnt.info.uri)
-                .copy(practicabilityLevel = cnt.practicabilityLevel))
+                .copy(practicability = cnt.practicability))
     
         case msg@AriadneMessage(Update, Update.Subtype.ActualLoad, `user2Cell`, cnt: ActualLoadUpdate) =>
         
             actualSelfLoad = cnt.actualLoad
-        
-            topology.put(uri, topology(uri).copy(practicabilityLevel =
+    
+            topology.put(uri, topology(uri).copy(practicability =
                 weight(topology(uri).capacity, cnt.actualLoad, topology(uri).passages.length)))
             
             cellPublisher ! msg.copy(direction = cell2Server)
@@ -74,9 +74,9 @@ class CellCoreActor extends BasicActor {
                 Update,
                 Update.Subtype.Practicability,
                 cell2Cell,
-                LightCell(
+                PracticabilityUpdate(
                     topology(uri).info,
-                    topology(uri).practicabilityLevel
+                    topology(uri).practicability
                 )
             )
     
@@ -108,7 +108,7 @@ class CellCoreActor extends BasicActor {
                         Random.nextInt(),
                         topology.values.map(cfc => {
                             if (cfc.info.uri == cnt.info.uri)
-                                cfc.copy(practicabilityLevel = Double.PositiveInfinity)
+                                cfc.copy(practicability = Double.PositiveInfinity)
                             else cfc
                         }).toList)
                 )

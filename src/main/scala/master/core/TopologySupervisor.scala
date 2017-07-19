@@ -103,7 +103,7 @@ class TopologySupervisor extends BasicActor {
                 topology.put(pkg.info.uri,
                     old.copy(
                         currentPeople = pkg.actualLoad,
-                        practicabilityLevel = weight(old.capacity, pkg.actualLoad, old.passages.length)
+                        practicability = weight(old.capacity, pkg.actualLoad, old.passages.length)
                     )
                 )
                 

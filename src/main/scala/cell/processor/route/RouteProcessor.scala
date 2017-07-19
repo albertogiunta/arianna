@@ -78,7 +78,7 @@ private class RouteProcessor(val core: ActorRef) extends CustomActor {
                         cell.info.name ->
                             HashMap(cell.neighbors.map(neighbor =>
                                 neighbor.name -> Math.max(
-                                    0.0, 100.0 + asMap(neighbor.name).practicabilityLevel - cell.practicabilityLevel
+                                    0.0, 100.0 + asMap(neighbor.name).practicability - cell.practicability
                                 )
                             ): _*)
                     ): _*)

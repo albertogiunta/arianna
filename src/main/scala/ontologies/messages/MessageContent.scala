@@ -29,7 +29,7 @@ final case class Cell(info: InfoCell,
                       capacity: Int,
                       squareMeters: Double,
                       currentPeople: Int,
-                      practicabilityLevel: Double) extends MessageContent
+                      practicability: Double) extends MessageContent
 
 final case class Passage(neighborId: Int,
                          startCoordinates: Point,
@@ -99,7 +99,7 @@ object AreaForCell {
   * @param passages
   * @param isEntryPoint
   * @param isExitPoint
-  * @param practicabilityLevel
+  * @param practicability
   */
 final case class CellForCell(info: InfoCell,
                              neighbors: List[InfoCell],
@@ -107,12 +107,12 @@ final case class CellForCell(info: InfoCell,
                              isEntryPoint: Boolean,
                              isExitPoint: Boolean,
                              capacity: Int,
-                             practicabilityLevel: Double) extends MessageContent
+                             practicability: Double) extends MessageContent
 
 object CellForCell {
     def apply(cell: Cell): CellForCell =
         new CellForCell(cell.info, cell.neighbors, cell.passages, cell.isEntryPoint,
-            cell.isExitPoint, cell.capacity, cell.practicabilityLevel)
+            cell.isExitPoint, cell.capacity, cell.practicability)
 }
 
 /**
@@ -177,13 +177,13 @@ object SensorList {
   * This class give a simplified view of a Cell for other cells, contaning the new number of people
   * and the calculated practicability level for the cell to be updated
   *
-  * @param info                The Identification Info of the Cell to be updated
-  * @param practicabilityLevel The actual practicability level of the Room the Cell is located into
+  * @param info           The Identification Info of the Cell to be updated
+  * @param practicability The actual practicability level of the Room the Cell is located into
   */
-case class LightCell(info: InfoCell, practicabilityLevel: Double) extends MessageContent
+case class PracticabilityUpdate(info: InfoCell, practicability: Double) extends MessageContent
 
-object LightCell {
-    def apply(cell: Cell): LightCell = new LightCell(cell.info, cell.practicabilityLevel)
+object PracticabilityUpdate {
+    def apply(cell: Cell): PracticabilityUpdate = new PracticabilityUpdate(cell.info, cell.practicability)
 }
 
 /**
@@ -195,10 +195,10 @@ object LightCell {
   * @param id    Identification number for this Topology
   * @param cells List of LightCells composing the Area
   */
-case class LightArea(id: Int, cells: List[LightCell]) extends MessageContent // Actually not Used
+case class AreaPracticability(id: Int, cells: List[PracticabilityUpdate]) extends MessageContent // Actually not Used
 
-object LightArea {
-    def apply(area: Area): LightArea = new LightArea(area.id, area.cells.map(c => LightCell(c)))
+object AreaPracticability {
+    def apply(area: Area): AreaPracticability = new AreaPracticability(area.id, area.cells.map(c => PracticabilityUpdate(c)))
 }
 
 /**
