@@ -7,6 +7,8 @@ import ontologies.messages.Location._
 import ontologies.messages.MessageType._
 import ontologies.messages._
 
+import scala.concurrent.Future
+
 /**
   * Actor that manages the sending of messages to the main server
   * Created by Matteo Gabellini on 29/06/2017.
@@ -32,22 +34,23 @@ class CellPublisher extends BasicPublisher {
     override protected def init(args: List[Any]) = {
         log.info("Hello there from {}!", name)
     
-        Thread.sleep(1000)
+        log.info("Sending Handshake to Master...")
     
-    
-        mediator ! Publish(Topic.HandShakes,
-            AriadneMessage(
-                Handshake,
-                Handshake.Subtype.Cell2Master,
-                Location.Cell >> Location.Server,
-                SensorList(
-                    InfoCell(cellID, cellUri, cellName, roomVertices, antennaPosition),
-                    List()
+        Future {
+            Thread.sleep(1000)
+        }.onComplete(_ =>
+            mediator ! Publish(Topic.HandShakes,
+                AriadneMessage(
+                    Handshake,
+                    Handshake.Subtype.Cell2Master,
+                    Location.Cell >> Location.Server,
+                    SensorList(
+                        InfoCell(cellID, cellUri, cellName, roomVertices, antennaPosition),
+                        List()
+                    )
                 )
             )
         )
-    
-        log.info("Handshake sent to Master...")
     }
     
     override protected def receptive = {
