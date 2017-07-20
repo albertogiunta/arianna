@@ -9,7 +9,7 @@ import scala.collection.mutable
   * This actor manages a cache of Route. Routes are valid for a time of X seconds
   *
   */
-private class CacheManager(val timelife: Long) extends CustomActor {
+private class CacheManager(val cacheKeepAlive: Long) extends CustomActor {
     
     private val routeCache: mutable.Map[(String, String), List[InfoCell]] = mutable.HashMap.empty
     
@@ -22,12 +22,12 @@ private class CacheManager(val timelife: Long) extends CustomActor {
                 // Maybe we can check also the if there is a path saved going from "to" to "from"
                 // that is a reverse path
                 if (routesTimelife.get((from.name, to.name)).nonEmpty
-                    && System.currentTimeMillis - routesTimelife((from.name, to.name)) < timelife) {
+                    && System.currentTimeMillis - routesTimelife((from.name, to.name)) < cacheKeepAlive) {
                     log.info("Match found in Cache...")
                     RouteResponse(req, routeCache(from.name, to.name))
                     
                 } else if (routesTimelife.get((to.name, from.name)).nonEmpty
-                    && System.currentTimeMillis - routesTimelife((to.name, from.name)) < timelife) {
+                    && System.currentTimeMillis - routesTimelife((to.name, from.name)) < cacheKeepAlive) {
                     log.info("Match found in Cache...")
                     RouteResponse(req, routeCache(from.name, to.name).reverse)
                     

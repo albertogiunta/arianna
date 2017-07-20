@@ -1,4 +1,4 @@
-package common
+package common.utils
 
 /**
   * Created by Alessandro on 05/07/2017.

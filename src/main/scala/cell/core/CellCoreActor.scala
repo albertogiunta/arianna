@@ -106,7 +106,7 @@ class CellCoreActor extends BasicActor {
                             cell.copy(practicability = Double.PositiveInfinity)
                         else cell
                     }).toList
-                case Empty() =>
+                case _ =>
                     topology.values.toList
             }
             //request to the route manager the escape route

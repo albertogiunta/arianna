@@ -1,7 +1,8 @@
 package master.core
 
 import akka.actor.ActorSelection
-import common.{BasicActor, Counter}
+import common.BasicActor
+import common.utils.{Counter, Practicability}
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Handshake.Subtype.Cell2Master
 import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, Topology4Cell}
@@ -28,18 +29,11 @@ class TopologySupervisor extends BasicActor {
     private val admin2Server: MessageDirection = Location.Admin >> Location.Server
     private val server2Admin: MessageDirection = admin2Server.reverse
     
-    private var dataStreamer: ActorSelection = _
-    private var publisher: ActorSelection = _
-    private var subscriber: ActorSelection = _
+    private val dataStreamer: () => ActorSelection = () => sibling("DataStreamer").get
+    private val publisher: () => ActorSelection = () => sibling("Publisher").get
+    private val subscriber: () => ActorSelection = () => sibling("Subscriber").get
     
     private val synced: Counter = Counter()
-    
-    override protected def init(args: List[Any]) = {
-        log.info("Hello there from {}!", name)
-        dataStreamer = sibling("DataStreamer").get
-        publisher = sibling("Publisher").get
-        subscriber = sibling("Subscriber").get
-    }
     
     override protected def receptive = {
     
@@ -56,7 +50,7 @@ class TopologySupervisor extends BasicActor {
                 unstashAll
         
                 log.info("Notifying the Subscriber...")
-                subscriber ! msg
+                subscriber() ! msg
             }
         case _ => stash
     }
@@ -71,7 +65,7 @@ class TopologySupervisor extends BasicActor {
                 log.info("Found a match into the loaded Topology for {}", cell.uri)
                 topology.put(cell.uri, topology(cell.uri).copy(info = cell))
     
-                dataStreamer ! msg
+                dataStreamer() ! msg
                 
                 if ((synced ++) == topology.size) {
                     
@@ -81,7 +75,7 @@ class TopologySupervisor extends BasicActor {
                     unstashAll
     
                     // Update all the Cells but first notify the subscriber
-                    subscriber ! AriadneMessage(
+                    subscriber() ! AriadneMessage(
                         Topology, Topology4Cell, server2Cell,
                         AreaForCell(
                             Random.nextInt,
@@ -103,12 +97,12 @@ class TopologySupervisor extends BasicActor {
                 topology.put(pkg.info.uri,
                     old.copy(
                         currentPeople = pkg.currentPeople,
-                        practicability = weight(old.capacity, pkg.currentPeople, old.passages.length)
+                        practicability = Practicability(old.capacity, pkg.currentPeople, old.passages.length)
                     )
                 )
                 
                 // Send the updated Map to the Admin
-                dataStreamer ! topology.values
+                dataStreamer() ! topology.values
             }
 
         case AriadneMessage(Update, Sensors, `cell2Server`, pkg: SensorList) =>
@@ -119,13 +113,13 @@ class TopologySupervisor extends BasicActor {
                 topology.put(pkg.info.uri, news)
                 
                 // Send the updated Map to the Admin
-                dataStreamer ! topology.values
+                dataStreamer() ! topology.values
             }
 
         case AriadneMessage(Handshake, Cell2Master, `cell2Server`, _) =>
             log.info("Late handshake from {}...", sender.path)
     
-            publisher ! (
+            publisher() ! (
                 sender.path.toString,
                 AriadneMessage(
                     Topology, Topology4Cell, server2Cell,
@@ -137,10 +131,4 @@ class TopologySupervisor extends BasicActor {
             
         case _ => desist _
     }
-    
-    private def weight(capacity: Int, load: Int, flows: Int): Double = {
-        val log_b: (Double, Double) => Double = (b, n) => Math.log(n) / Math.log(b)
-        1 / (load * 1.05 / capacity * (if (flows == 1) 0.25 else if (flows > 4.0) log_b(3.0, 4.25) else log_b(3.0, flows)))
-    }
-    
 }

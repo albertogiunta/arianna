@@ -22,14 +22,8 @@ class MasterSubscriber extends BasicSubscriber {
     private val cell2Server: MessageDirection = Location.Server << Location.Cell
     private val admin2Server: MessageDirection = Location.Admin >> Location.Server
     
-    private var topologySupervisor: ActorSelection = _
-    private var publisher: ActorSelection = _
-    
-    override protected def init(args: List[Any]) = {
-        log.info("Hello there from {}!", name)
-        publisher = sibling("Publisher").get
-        topologySupervisor = sibling("TopologySupervisor").get
-    }
+    private val topologySupervisor: () => ActorSelection = () => sibling("Publisher").get
+    private val publisher: () => ActorSelection = () => sibling("TopologySupervisor").get
     
     override protected def receptive = {
     
@@ -56,7 +50,7 @@ class MasterSubscriber extends BasicSubscriber {
         case msg@AriadneMessage(Handshake, Cell2Master, `cell2Server`, _) =>
             log.info("Resolving Handshake from {}", sender.path)
     
-            topologySupervisor forward msg
+            topologySupervisor() forward msg
 
         case msg@AriadneMessage(Topology, Topology4Cell, _, _) =>
             log.info("All the Cells have been mapped into their logical position into the Planimetry")
@@ -65,8 +59,8 @@ class MasterSubscriber extends BasicSubscriber {
             log.info("I've become ProActive...")
     
             unstashAll
-            
-            publisher forward msg
+    
+            publisher() forward msg
 
         case _ => stash
     }
@@ -75,12 +69,11 @@ class MasterSubscriber extends BasicSubscriber {
     
         case msg@AriadneMessage(Update, _, _, _) =>
             log.info("Forwarding message {} from {} to TopologySupervisor", msg.subtype, sender.path)
-    
-            topologySupervisor forward msg
+            topologySupervisor() forward msg
 
         case msg@AriadneMessage(Handshake, Cell2Master, `cell2Server`, _) =>
             log.info("Late handshake from {}... Forwarding to Supervisor...", sender.path)
-            topologySupervisor forward msg
+            topologySupervisor() forward msg
         
         case _ => desist _
     }

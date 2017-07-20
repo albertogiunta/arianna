@@ -11,10 +11,6 @@ import ontologies.messages._
   */
 class MasterPublisher extends BasicPublisher {
     
-    override protected def init(args: List[Any]) = {
-        log.info("Hello there from {}!", name)
-    }
-    
     override protected def receptive = {
         
         case msg@AriadneMessage(Alarm, _, _, _) =>

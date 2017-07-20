@@ -23,12 +23,8 @@ class RouteManager extends BasicActor {
     
     override def preStart() = {
         super.preStart()
-        cacher = context.actorOf(Props(new CacheManager(5000L)), "CacheManager")
+        cacher = context.actorOf(Props(new CacheManager(cacheKeepAlive = 2500L)), "CacheManager")
         processor = context.actorOf(Props(new RouteProcessor(parent)), "RouteProcessor")
-    }
-    
-    override protected def init(args: List[Any]): Unit = {
-        log.info("Hello there from {}", name)
     }
     
     override protected def receptive: Receive = {
