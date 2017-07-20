@@ -16,7 +16,7 @@ class SensorTemplateController extends Initializable {
     @FXML
     private var sensorValue: Text = _
 
-    var sensorId: Int = _
+    var sensorCategory: Int = _
 
     def createSensor(sensor: Sensor): Unit = {
         sensorName.setText(assignSensorName(sensor.category));

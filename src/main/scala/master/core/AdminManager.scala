@@ -17,7 +17,7 @@ class AdminManager extends CustomActor {
     val toAdmin: MessageDirection = Location.Server >> Location.Admin
     val fromAdmin: MessageDirection = Location.Admin >> Location.Server
     val admin = context.actorSelection("akka.tcp://adminSystem@127.0.0.1:4550/user/admin")
-    val subscriber: ActorSelection = sibling("TopologySupervisor").get
+    val topologySupervisor: ActorSelection = sibling("TopologySupervisor").get
     val publisher: ActorSelection = sibling("Publisher").get
 
     def operational: Receive = {
@@ -28,14 +28,15 @@ class AdminManager extends CustomActor {
         //Ricezione di un allarme da parte del sistema
         case msg@AriadneMessage(Alarm, Alarm.Subtype.Basic, _, _) => admin ! msg.copy(direction = toAdmin)
         //Ricezione di aggiornamento sensori
-        case msg@AriadneMessage(Handshake, Handshake.Subtype.Cell2Master, _, _) => admin ! msg
-
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.Cell2Master, _, _) => {
+            admin ! msg
+        }
     }
 
     override def receive: Receive = {
         case msg@AriadneMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, _, area: Area) => {
-            subscriber ! msg
-            println("ricevuta mappa")
+            //topologySupervisor ! msg
+            println("Ricevuta mappa")
             context.become(operational)
         }
     }

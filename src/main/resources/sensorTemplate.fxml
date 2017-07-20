@@ -4,9 +4,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Text?>
 <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8"
-      xmlns:fx="http://javafx.com/fxml/1" fx:controller="SensorTemplateController">
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="admin.SensorTemplateController">
     <children>
-        <Label fx:id="sensorType"/>
+        <Label fx:id="sensorName"/>
         <Text fx:id="sensorValue" strokeType="OUTSIDE" strokeWidth="0.0"/>
     </children>
 </HBox>

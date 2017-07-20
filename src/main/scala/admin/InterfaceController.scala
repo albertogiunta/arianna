@@ -80,11 +80,17 @@ class InterfaceController extends Initializable {
     }
 
     def initializeSensors(sensorsInfo: SensorList): Unit = {
-        var loader = new FXMLLoader(getClass.getResource("/sensorTemplate.fxml"))
-        var sensor = loader.load[HBox]
         var cellController = cellControllers.filter(c => c.cellId.equals(sensorsInfo.info.id)).head
-        cellController.sensorsController = loader.getController[SensorTemplateController]
-        cellController.addSensorTemplate(sensor)
+        Platform.runLater {
+            sensorsInfo.sensors.foreach(s => {
+                var loader = new FXMLLoader(getClass.getResource("/sensorTemplate.fxml"))
+                var sensor = loader.load[HBox]
+                val sensorController = loader.getController[SensorTemplateController]
+                sensorController.sensorCategory = s.category
+                cellController.sensorsController += sensorController
+                cellController.addSensorTemplate(sensor, s)
+            })
+        }
     }
 
     private def createCellTemplate(c: Cell): SplitPane = {
@@ -92,7 +98,9 @@ class InterfaceController extends Initializable {
         var node = loader.load[SplitPane]
         var controller = loader.getController[CellTemplateController]
         cellControllers += controller
-        controller.setStaticInformation(c)
+        Platform.runLater {
+            controller.setStaticInformation(c)
+        }
         node
     }
 
