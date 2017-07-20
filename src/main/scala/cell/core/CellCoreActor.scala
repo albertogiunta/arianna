@@ -39,8 +39,10 @@ class CellCoreActor extends BasicActor {
     override def preStart(): Unit = {
         super.preStart()
         clusterListener = context.actorOf(Props[ClusterMembersListener], "CellClusterListener")
+    
         cellPublisher = context.actorOf(Props[CellPublisher], "CellPublisher")
         cellSubscriber = context.actorOf(Props[CellSubscriber], "CellSubscriber")
+    
         userActor = context.actorOf(Props[UserManager], "UserManager")
         routeManager = context.actorOf(Props[RouteManager], "RouteManager")
     }
