@@ -19,7 +19,7 @@ class AdminActor(interfaceView: InterfaceView) extends CustomActor {
     var area: Area = _
     val interfaceController: InterfaceController = interfaceView.controller
     interfaceController.actorRef = self
-    val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@192.168.0.9:25520/user/AdminManager")
+    val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/Master/AdminManager")
     val toServer: MessageDirection = Location.Admin >> Location.Server
 
     override def receive: Receive = {

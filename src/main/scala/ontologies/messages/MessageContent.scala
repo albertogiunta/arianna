@@ -36,6 +36,8 @@ final case class Passage(neighborId: Int,
                          endCoordinates: Point) extends MessageContent
 
 /* Route content data structures */
+final case class RouteRequestLight(userID: String, fromCellId: Int, toCellId: Int) extends MessageContent
+
 final case class RouteRequest(userID: String, fromCell: InfoCell, toCell: InfoCell) extends MessageContent
 
 final case class RouteInfo(req: RouteRequest, topology: AreaForCell) extends MessageContent
