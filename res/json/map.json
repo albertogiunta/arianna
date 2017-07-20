@@ -4,7 +4,7 @@
         {
             "infoCell": {
                 "id": 1,
-                "uri": "uri1",
+                "uri": ":8080/uri1",
                 "name": "cell1",
                 "roomVertices": {
                     "northWest": {
@@ -38,7 +38,7 @@
             "neighbors": [
                 {
                     "id": 2,
-                    "uri": "uri2",
+                    "uri": ":8081/uri2",
                     "name": "cell2",
                     "roomVertices": {
                         "northWest": {
@@ -66,6 +66,17 @@
             ],
             "passages": [
                 {
+                    "neighborId": -1,
+                    "startCoordinates": {
+                        "x": 0,
+                        "y": 4
+                    },
+                    "endCoordinates": {
+                        "x": 0,
+                        "y": 6
+                    }
+                },
+                {
                     "neighborId": 2,
                     "startCoordinates": {
                         "x": 10,
@@ -87,7 +98,7 @@
         {
             "infoCell": {
                 "id": 2,
-                "uri": "uri2",
+                "uri": ":8081/uri2",
                 "name": "cell2",
                 "roomVertices": {
                     "northWest": {
@@ -121,7 +132,7 @@
             "neighbors": [
                 {
                     "id": 1,
-                    "uri": "uri1",
+                    "uri": ":8080/uri1",
                     "name": "cell1",
                     "roomVertices": {
                         "northWest": {
@@ -148,7 +159,7 @@
                 },
                 {
                     "id": 3,
-                    "uri": "uri3",
+                    "uri": ":8082/uri3",
                     "name": "cell3",
                     "roomVertices": {
                         "northWest": {
@@ -176,17 +187,6 @@
             ],
             "passages": [
                 {
-                    "neighborId": 0,
-                    "startCoordinates": {
-                        "x": 0,
-                        "y": 4
-                    },
-                    "endCoordinates": {
-                        "x": 0,
-                        "y": 6
-                    }
-                },
-                {
                     "neighborId": 1,
                     "startCoordinates": {
                         "x": 10,
@@ -194,6 +194,17 @@
                     },
                     "endCoordinates": {
                         "x": 10,
+                        "y": 8
+                    }
+                },
+                {
+                    "neighborId": 3,
+                    "startCoordinates": {
+                        "x": 20,
+                        "y": 2
+                    },
+                    "endCoordinates": {
+                        "x": 20,
                         "y": 8
                     }
                 }
@@ -208,7 +219,7 @@
         {
             "infoCell": {
                 "id": 3,
-                "uri": "uri3",
+                "uri": ":8082/uri3",
                 "name": "cell3",
                 "roomVertices": {
                     "northWest": {
@@ -242,7 +253,7 @@
             "neighbors": [
                 {
                     "id": 2,
-                    "uri": "uri2",
+                    "uri": ":8081/uri2",
                     "name": "cell2",
                     "roomVertices": {
                         "northWest": {
@@ -270,18 +281,7 @@
             ],
             "passages": [
                 {
-                    "neighborId": 0,
-                    "startCoordinates": {
-                        "x": 24,
-                        "y": 0
-                    },
-                    "endCoordinates": {
-                        "x": 26,
-                        "y": 0
-                    }
-                },
-                {
-                    "neighborId": 1,
+                    "neighborId": 2,
                     "startCoordinates": {
                         "x": 20,
                         "y": 2
@@ -290,10 +290,21 @@
                         "x": 20,
                         "y": 8
                     }
+                },
+                {
+                    "neighborId": -1,
+                    "startCoordinates": {
+                        "x": 30,
+                        "y": 4
+                    },
+                    "endCoordinates": {
+                        "x": 30,
+                        "y": 6
+                    }
                 }
             ],
             "isEntryPoint": false,
-            "isExitPoint": true,
+            "isExitPoint": false,
             "capacity": 30,
             "squareMeters": 20.0,
             "currentPeople": 10,

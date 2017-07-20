@@ -9,14 +9,9 @@ import com.typesafe.config.ConfigFactory
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Init
 import ontologies.messages.{AriadneMessage, Location, _}
-import spray.json.{JsValue, _}
-
-import scala.io.Source
 /**
   * Created by Alessandro on 28/06/2017.
   */
-
-import ontologies.messages.AriannaJsonProtocol._
 
 object TestCells extends App {
     /*val path2Project = Paths.get("").toFile.getAbsolutePath
@@ -60,21 +55,21 @@ object TestCells extends App {
     var server2Cell = Location.Server >> Location.Cell
 
 
-    private def readJson(filename: String): JsValue = {
-        val source: String = Source.fromFile(filename).getLines.mkString
-        source.parseJson
-    }
-
-    def loadArea(): Area = {
-        val area = readJson(s"res/json/map.json").convertTo[Area]
-        area
-    }
-
-    def areaForCell: AreaForCell = {
-        AreaForCell(area)
-    }
-
-    var area: Area = loadArea()
+    //    private def readJson(filename: String): JsValue = {
+    //        val source: String = Source.fromFile(filename).getLines.mkString
+    //        source.parseJson
+    //    }
+    //
+    //    def loadArea(): Area = {
+    //        val area = readJson(s"res/json/map1.json").convertTo[Area]
+    //        area
+    //    }
+    //
+    //    def areaForCell: AreaForCell = {
+    //        AreaForCell(area)
+    //    }
+    //
+    //    var area: Area = loadArea()
 
     Thread.sleep(500)
     private val greetings: String = "Hello there, it's time to dress-up"
