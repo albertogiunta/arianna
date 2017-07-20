@@ -17,8 +17,8 @@ class CellRemote extends BasicActor with ActorLogging {
 
     val serverAddress: String = "akka.tcp://serverSystem@127.0.0.1:4553/user/server"
     val server: ActorSelection = context.actorSelection(serverAddress)
-
-    var area: AreaForCell = _
+    
+    var area: AreaViewedFromACell = _
     var cellSelfInfo: Cell = _
     val users: mutable.Set[ActorRef] = scala.collection.mutable.Set[ActorRef]()
 
@@ -26,7 +26,7 @@ class CellRemote extends BasicActor with ActorLogging {
     val fromServer2Cell: MessageDirection = Location.Server >> Location.Cell
 
     def syncWithServer: Receive = {
-        case msg: AreaForCell =>
+        case msg: AreaViewedFromACell =>
             area = msg
             log.info("Received Area for Cell")
             context.become(receptive)
@@ -54,7 +54,7 @@ class CellRemote extends BasicActor with ActorLogging {
 object MyJsonProtocol extends DefaultJsonProtocol {
     implicit val pointFormat = jsonFormat2(Point)
     implicit val coordinatesFormat = jsonFormat4(Coordinates)
-    implicit val infoCellFormat = jsonFormat5(InfoCell)
+    implicit val infoCellFormat = jsonFormat5(InfoCell.apply)
     implicit val passageFormat = jsonFormat3(Passage)
     implicit val sensorFormat = jsonFormat4(Sensor)
     implicit val cellFormat = jsonFormat10(ontologies.messages.Cell)
@@ -75,9 +75,9 @@ object CellLoader {
         val cell = readJson(s"res/json/cell/$cellName.json").convertTo[Cell]
         cell
     }
-
-    def areaForCell: AreaForCell = {
-        AreaForCell(area)
+    
+    def areaForCell: AreaViewedFromACell = {
+        AreaViewedFromACell(area)
     }
 }
 object CellRun {

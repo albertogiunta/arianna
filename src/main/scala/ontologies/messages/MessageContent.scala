@@ -9,6 +9,15 @@ final case class InfoCell(id: Int,
                           roomVertices: Coordinates,
                           antennaPosition: Point) extends MessageContent
 
+object InfoCell {
+    def empty: InfoCell =
+        InfoCell(
+            Int.MinValue,
+            "", "",
+            Coordinates(Point(0, 0), Point(0, 0), Point(0, 0), Point(0, 0)),
+            Point(0, 0)
+        )
+}
 
 final case class Point(var x: Int, var y: Int) extends MessageContent
 
@@ -38,11 +47,11 @@ final case class Passage(neighborId: Int,
 /**
   * This case class represent a user request of a Route from Cell X to Cell Y
   *
-  * @param userID   The ID of the User requesting the Route
+  * @param userID   The ID of the User requesting the Route {-1 for Cells, 0 for Admin, n > 0 others}
   * @param fromCell The Cell where the user is located
-  * @param toCell   The Cell where the user have to arrive
+  * @param toCell   The Cell where the user have to arrive, will an empty String for Escape Routes
   */
-final case class RouteRequest(userID: String, fromCell: InfoCell, toCell: InfoCell) extends MessageContent
+final case class RouteRequest(userID: String, fromCell: InfoCell, toCell: InfoCell, isEscape: Boolean) extends MessageContent
 
 /**
   * This case class represent info sent to the RouteManager Actor from the CellCore Actor.
@@ -52,7 +61,7 @@ final case class RouteRequest(userID: String, fromCell: InfoCell, toCell: InfoCe
   * @param req      The RouteRequest sent by a User
   * @param topology The View of the Topology help by the CoreCell Actor
   */
-final case class RouteInfo(req: RouteRequest, topology: AreaForCell) extends MessageContent
+final case class RouteInfo(req: RouteRequest, topology: AreaViewedFromACell) extends MessageContent
 
 /**
   * This case class represent a response to a route request.
@@ -65,30 +74,15 @@ final case class RouteInfo(req: RouteRequest, topology: AreaForCell) extends Mes
 final case class RouteResponse(request: RouteRequest, route: List[InfoCell]) extends MessageContent
 
 /**
-  * This case class is a RouteRequest but cause from the trigger of an alarm.
-  *
-  * As such there are no chosen starting point.
-  *
-  * Being triggered from inside the cluster or from the Admin, the Topology is already attached to
-  * this Request
-  *
-  * @param info     The identification data of the cell from which calculatin the route (that is the starting/source point)
-  * @param topology The actual view of the topology held by the CoreCell Actor
-  */
-final case class EscapeRequest(info: InfoCell, topology: AreaForCell) extends MessageContent
-
-final case class EscapeResponse(info: InfoCell, route: List[InfoCell]) extends MessageContent
-
-/**
   * View of the Topology from the Cell perspective
   *
   * @param id    Random ID value identifying the Topology
   * @param cells List of the Cells of the Topology
   */
-final case class AreaForCell(id: Int, cells: List[CellForCell]) extends MessageContent
+final case class AreaViewedFromACell(id: Int, cells: List[CellViewedFromACell]) extends MessageContent
 
-object AreaForCell {
-    def apply(area: Area): AreaForCell = new AreaForCell(area.id, area.cells.map(c => CellForCell(c)))
+object AreaViewedFromACell {
+    def apply(area: Area): AreaViewedFromACell = new AreaViewedFromACell(area.id, area.cells.map(c => CellViewedFromACell(c)))
 }
 
 /**
@@ -101,17 +95,17 @@ object AreaForCell {
   * @param isExitPoint
   * @param practicability
   */
-final case class CellForCell(info: InfoCell,
-                             neighbors: List[InfoCell],
-                             passages: List[Passage],
-                             isEntryPoint: Boolean,
-                             isExitPoint: Boolean,
-                             capacity: Int,
-                             practicability: Double) extends MessageContent
+final case class CellViewedFromACell(info: InfoCell,
+                                     neighbors: List[InfoCell],
+                                     passages: List[Passage],
+                                     isEntryPoint: Boolean,
+                                     isExitPoint: Boolean,
+                                     capacity: Int,
+                                     practicability: Double) extends MessageContent
 
-object CellForCell {
-    def apply(cell: Cell): CellForCell =
-        new CellForCell(cell.info, cell.neighbors, cell.passages, cell.isEntryPoint,
+object CellViewedFromACell {
+    def apply(cell: Cell): CellViewedFromACell =
+        new CellViewedFromACell(cell.info, cell.neighbors, cell.passages, cell.isEntryPoint,
             cell.isExitPoint, cell.capacity, cell.practicability)
 }
 
@@ -165,10 +159,10 @@ final case class Sensor(category: Int, value: Double, min: Double, max: Double) 
   * @param info    The identification info of the Cells that is sending the Updates
   * @param sensors A list of sensors data
   */
-final case class SensorList(info: InfoCell, sensors: List[Sensor]) extends MessageContent
+final case class SensorsUpdate(info: InfoCell, sensors: List[Sensor]) extends MessageContent
 
-object SensorList {
-    def apply(cell: Cell): SensorList = new SensorList(cell.info, cell.sensors)
+object SensorsUpdate {
+    def apply(cell: Cell): SensorsUpdate = new SensorsUpdate(cell.info, cell.sensors)
 }
 
 /**
@@ -210,12 +204,12 @@ object AreaPracticability {
   * @param currentPeople Actual number of people inside the Room
   * @param sensors       A List of Sensors containing the new values sensed by them
   */
-final case class CellUpdate(info: InfoCell,
-                            currentPeople: Int,
-                            sensors: List[Sensor]) extends MessageContent // To be renamed CellData
+final case class CellDataUpdate(info: InfoCell,
+                                currentPeople: Int,
+                                sensors: List[Sensor]) extends MessageContent // To be renamed CellData
 
-object CellUpdate {
-    def apply(cell: Cell): CellUpdate = new CellUpdate(cell.info, cell.currentPeople, cell.sensors)
+object CellDataUpdate {
+    def apply(cell: Cell): CellDataUpdate = new CellDataUpdate(cell.info, cell.currentPeople, cell.sensors)
 }
 
 /**
@@ -224,7 +218,7 @@ object CellUpdate {
   *
   * @param list A List of CellUpdates, containing a simplified view of a Cell
   */
-final case class UpdateForAdmin(list: List[CellUpdate]) extends MessageContent // to be renamed AdminUpdate
+final case class UpdateForAdmin(list: List[CellDataUpdate]) extends MessageContent // to be renamed AdminUpdate
 
 /**
   * This case class is meant to be used as a Content for Initialization Messages,

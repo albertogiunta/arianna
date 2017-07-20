@@ -6,7 +6,6 @@ import cell.processor.route.algorithms.AStarSearch.Graph
 import common.CustomActor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Route
-import ontologies.messages.MessageType.Route.Subtype.Escape
 import ontologies.messages._
 
 import scala.collection.immutable.HashMap
@@ -20,57 +19,48 @@ import scala.concurrent.{Await, Future}
   */
 private class RouteProcessor(val core: ActorRef) extends CustomActor {
     
-    var cacher: ActorSelection = _
-    
-    
-    override def preStart() = {
-        super.preStart()
-        
-        cacher = sibling("CacheManager").get
-    }
+    val cacheManager: () => ActorSelection = () => sibling("CacheManager").get
     
     override def receive: Receive = {
-        case RouteInfo(req, AreaForCell(_, cells)) =>
+        case RouteInfo(req, AreaViewedFromACell(_, cells)) =>
+            req match {
+                case RouteRequest(_, actualCell, _, true) =>
+                    val futures = cells.filter(c => c.isExitPoint)
+                        .map(exit => computeRoute(actualCell.name, exit.info.name, cells))
+                
+                    Future {
+                        futures.map(f => Await.result(f, Duration.Inf)).minBy(res => res._2)._1
+                    }.onComplete(p => if (p.isSuccess) {
+                        core ! ResponseMessage(req.copy(toCell = p.get.last), p.get)
+                    })
             
-            computeRoute(req.fromCell.name, req.toCell.name, cells)
-                .onComplete(p => if (p.isSuccess) {
+                case RouteRequest(_, fromCell, toCell, false) =>
+                    computeRoute(fromCell.name, toCell.name, cells)
+                        .onComplete(p => if (p.isSuccess) {
+                        
+                            log.info("Sending route data for Caching")
+                        
+                            cacheManager() ! RouteResponse(req, p.get._1)
+                        
+                            core ! ResponseMessage(req, p.get._1)
+                        })
+            }
     
-                    val cnt = RouteResponse(req, p.get._1)
-    
-                    log.info("Sending route data for Caching")
-    
-                    cacher ! cnt
-    
-                    core ! AriadneMessage(
-                        Route,
-                        Route.Subtype.Response,
-                        Location.Cell >> Location.User,
-                        cnt
-                    )
-                })
-        
-        case EscapeRequest(actualCell, AreaForCell(_, cells)) =>
-            
-            val futures = cells.filter(c => c.isExitPoint)
-                .map(c => computeRoute(actualCell.name, c.info.name, cells))
-    
-            Future {
-                futures.map(f => Await.result(f, Duration.Inf)).minBy(res => res._2)._1
-            }.onComplete(p => if (p.isSuccess) {
-                val msg = AriadneMessage(
-                    Route,
-                    Escape.Response,
-                    Location.Cell >> Location.User,
-                    EscapeResponse(actualCell, p.get)
-                )
-                core ! msg
-            })
-        case _ =>
+        case _ => // Ignore
     }
     
-    def computeRoute(fromCell: String, toCell: String, cells: List[CellForCell]): Future[(List[InfoCell], Double)] =
+    private val ResponseMessage = (req: RouteRequest, route: List[InfoCell]) =>
+        AriadneMessage(
+            Route,
+            Route.Subtype.Response,
+            Location.Cell >> Location.User,
+            RouteResponse(req, route)
+        )
+    
+    
+    def computeRoute(fromCell: String, toCell: String, cells: List[CellViewedFromACell]): Future[(List[InfoCell], Double)] =
         Future[(List[InfoCell], Double)] {
-            val asMap: Map[String, CellForCell] = HashMap(cells.map(c => c.info.name -> c): _*)
+            val asMap: Map[String, CellViewedFromACell] = HashMap(cells.map(c => c.info.name -> c): _*)
             
             val graph: Graph[String] =
                 HashMap(

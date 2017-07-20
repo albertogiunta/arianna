@@ -4,8 +4,8 @@ import akka.actor.ActorSelection
 import common.BasicActor
 import common.utils.{Counter, Practicability}
 import ontologies.messages.Location._
-import ontologies.messages.MessageType.Handshake.Subtype.Cell2Master
-import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, Topology4Cell}
+import ontologies.messages.MessageType.Handshake.Subtype.CellToMaster
+import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, ViewedFromACell}
 import ontologies.messages.MessageType.Update.Subtype.{CurrentPeople, Sensors}
 import ontologies.messages.MessageType.{Handshake, Topology, Update}
 import ontologies.messages._
@@ -57,7 +57,7 @@ class TopologySupervisor extends BasicActor {
     
     private def sociable: Receive = {
     
-        case msg@AriadneMessage(Handshake, Cell2Master, `cell2Server`, SensorList(cell, _)) =>
+        case msg@AriadneMessage(Handshake, CellToMaster, `cell2Server`, SensorsUpdate(cell, _)) =>
     
             log.info(msg.toString)
 
@@ -76,10 +76,10 @@ class TopologySupervisor extends BasicActor {
     
                     // Update all the Cells but first notify the subscriber
                     subscriber() ! AriadneMessage(
-                        Topology, Topology4Cell, server2Cell,
-                        AreaForCell(
+                        Topology, ViewedFromACell, server2Cell,
+                        AreaViewedFromACell(
                             Random.nextInt,
-                            topology.map(e => CellForCell(e._2)).toList
+                            topology.map(e => CellViewedFromACell(e._2)).toList
                         )
                     )
                 }
@@ -105,7 +105,7 @@ class TopologySupervisor extends BasicActor {
                 dataStreamer() ! topology.values
             }
 
-        case AriadneMessage(Update, Sensors, `cell2Server`, pkg: SensorList) =>
+        case AriadneMessage(Update, Sensors, `cell2Server`, pkg: SensorsUpdate) =>
 
             if (topology.get(pkg.info.uri).nonEmpty) {
                 val news = topology(pkg.info.uri).copy(sensors = pkg.sensors)
@@ -116,16 +116,16 @@ class TopologySupervisor extends BasicActor {
                 dataStreamer() ! topology.values
             }
 
-        case AriadneMessage(Handshake, Cell2Master, `cell2Server`, _) =>
+        case AriadneMessage(Handshake, CellToMaster, `cell2Server`, _) =>
             log.info("Late handshake from {}...", sender.path)
     
             publisher() ! (
                 sender.path.toString,
                 AriadneMessage(
-                    Topology, Topology4Cell, server2Cell,
-                    AreaForCell(
+                    Topology, ViewedFromACell, server2Cell,
+                    AreaViewedFromACell(
                         Random.nextInt,
-                        topology.map(e => CellForCell(e._2)).toList)
+                        topology.map(e => CellViewedFromACell(e._2)).toList)
                 )
             )
             

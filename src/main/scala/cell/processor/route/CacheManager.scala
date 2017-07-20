@@ -16,7 +16,7 @@ private class CacheManager(val cacheKeepAlive: Long) extends CustomActor {
     private val routesTimelife: mutable.Map[(String, String), Long] = mutable.HashMap.empty
     
     override def receive: Receive = {
-        case msg@RouteInfo(req@RouteRequest(_, from, to), _) =>
+        case msg@RouteInfo(req@RouteRequest(_, from, to, _), _) =>
             log.info("Evaluating cache...")
             sender ! (
                 // Maybe we can check also the if there is a path saved going from "to" to "from"
@@ -35,8 +35,8 @@ private class CacheManager(val cacheKeepAlive: Long) extends CustomActor {
                     log.info("No match found in Cache...")
                     msg
                 })
-        
-        case RouteResponse(RouteRequest(_, from, to), route) =>
+    
+        case RouteResponse(RouteRequest(_, from, to, _), route) =>
             log.info("Caching new route... ")
             routeCache.put((from.name, to.name), route)
             routesTimelife.put((from.name, to.name), System.currentTimeMillis)

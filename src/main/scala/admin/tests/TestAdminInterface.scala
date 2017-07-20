@@ -32,8 +32,8 @@ object TestAdminInterface extends App {
             sensors += Sensor(i, (Math.random() * 10).round.toDouble, 0, 10)
         }
         println(sensors.toString)
-        var sensorList: SensorList = SensorList(InfoCell(i, "uri0", "a", new Coordinates(Point(1, 1), Point(1, 1), Point(1, 1), Point(1, 1)), Point(1, 1)), sensors.toList)
-        adminManager ! AriadneMessage(Handshake, Handshake.Subtype.Cell2Master, Location.Server >> Location.Admin, sensorList)
+        var sensorList: SensorsUpdate = SensorsUpdate(InfoCell(i, "uri0", "a", new Coordinates(Point(1, 1), Point(1, 1), Point(1, 1), Point(1, 1)), Point(1, 1)), sensors.toList)
+        adminManager ! AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, Location.Server >> Location.Admin, sensorList)
         println(i.toString)
         i = i + 1
     }

@@ -5,7 +5,7 @@ import cell.cluster.{CellPublisher, CellSubscriber}
 import cell.processor.route.RouteManager
 import common.{BasicActor, ClusterMembersListener}
 import ontologies.messages.Location._
-import ontologies.messages.MessageType.Topology.Subtype.Topology4Cell
+import ontologies.messages.MessageType.Topology.Subtype.ViewedFromACell
 import ontologies.messages.MessageType._
 import ontologies.messages._
 
@@ -20,7 +20,7 @@ class CellCoreActor extends BasicActor {
     private val greetings: String = "Hello there, it's time to dress-up"
     
     private val uri: String = "uri1"
-    private val topology: mutable.Map[String, CellForCell] = mutable.HashMap[String, CellForCell]()
+    private val topology: mutable.Map[String, CellViewedFromACell] = mutable.HashMap[String, CellViewedFromACell]()
     
     private var actualSelfLoad: Int = 0
 
@@ -55,7 +55,7 @@ class CellCoreActor extends BasicActor {
 
     override protected def receptive: Receive = {
     
-        case msg@AriadneMessage(Topology, Topology4Cell, `server2Cell`, cnt: AreaForCell) =>
+        case msg@AriadneMessage(Topology, ViewedFromACell, `server2Cell`, cnt: AreaViewedFromACell) =>
             println(s"Area arrived from Server $cnt")
             cnt.cells.foreach(X => topology.put(X.info.uri, X))
             userActor ! msg.copy(direction = cell2User)
@@ -90,7 +90,7 @@ class CellCoreActor extends BasicActor {
                 Location.Self >> Location.Self,
                 RouteInfo(
                     cnt,
-                    AreaForCell(Random.nextInt(), topology.values.toList)
+                    AreaViewedFromACell(Random.nextInt(), topology.values.toList)
                 )
             )
     
@@ -99,31 +99,26 @@ class CellCoreActor extends BasicActor {
             userActor ! msg
 
         case AriadneMessage(Alarm, _, _, alarm) =>
-            val area = alarm match {
+            val (id, area) = alarm match {
                 case AlarmContent(compromisedCell, _, _) =>
-                    topology.values.map(cell => {
+                    ("-1", topology.values.map(cell => {
                         if (cell.info.uri == compromisedCell.uri)
                             cell.copy(practicability = Double.PositiveInfinity)
                         else cell
-                    }).toList
+                    }).toList)
                 case _ =>
-                    topology.values.toList
+                    ("0", topology.values.toList)
             }
             //request to the route manager the escape route
             routeManager ! AriadneMessage(
                 Route,
-                Route.Subtype.Escape.Request,
+                Route.Subtype.Info,
                 Location.Self >> Location.Self,
-                EscapeRequest(
-                    topology(uri).info,
-                    AreaForCell(Random.nextInt(), area)
+                RouteInfo(
+                    RouteRequest(id, topology(uri).info, InfoCell.empty, isEscape = true),
+                    AreaViewedFromACell(Random.nextInt(), area)
                 )
             )
-    
-        case msg@AriadneMessage(Route, Route.Subtype.Escape.Response, `cell2User`, _) =>
-            //route response from route manager for the user with the Escape route
-            userActor ! msg
-
     }
 
     private def weight(capacity: Int, load: Int, flows: Int): Double = {

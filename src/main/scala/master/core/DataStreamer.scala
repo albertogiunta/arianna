@@ -30,7 +30,7 @@ class DataStreamer extends BasicActor {
     private val source = Source.queue[Iterable[Cell]](100, OverflowStrategy.dropHead)
     
     private val stream = Flow[Iterable[Cell]]
-        .map(map => UpdateForAdmin(map.map(c => CellUpdate(c)).toList))
+        .map(map => UpdateForAdmin(map.map(c => CellDataUpdate(c)).toList))
         .map(updates => AriadneMessage(Update, Subtype.UpdateForAdmin, Location.Server >> Location.Admin, updates))
         .throttle(1, 1000 milliseconds, 1, ThrottleMode.Shaping)
         .to(Sink.foreach(msg => handler(msg)))
@@ -49,7 +49,7 @@ class DataStreamer extends BasicActor {
     
         case msg: Iterable[Cell] =>
             streamer offer msg
-        case msg@AriadneMessage(Handshake, Handshake.Subtype.Cell2Master, _, _) => admin() ! msg
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, _) => admin() ! msg
         case _ =>
     }
 }

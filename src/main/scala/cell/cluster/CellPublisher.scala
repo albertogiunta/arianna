@@ -43,9 +43,9 @@ class CellPublisher extends BasicPublisher {
             mediator ! Publish(Topic.HandShakes,
                 AriadneMessage(
                     Handshake,
-                    Handshake.Subtype.Cell2Master,
+                    Handshake.Subtype.CellToMaster,
                     Location.Cell >> Location.Server,
-                    SensorList(
+                    SensorsUpdate(
                         InfoCell(cellID, cellUri, cellName, roomVertices, antennaPosition),
                         List()
                     )
@@ -55,7 +55,7 @@ class CellPublisher extends BasicPublisher {
     }
     
     override protected def receptive = {
-        case msg@AriadneMessage(Handshake, Handshake.Subtype.Cell2Master, _, _) =>
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, _) =>
             mediator ! Publish(Topic.HandShakes, msg)
 
         case msg@AriadneMessage(Update, Update.Subtype.Sensors, _, _) =>

@@ -78,8 +78,8 @@ class InterfaceController extends Initializable {
             }
         })
     }
-
-    def initializeSensors(sensorsInfo: SensorList): Unit = {
+    
+    def initializeSensors(sensorsInfo: SensorsUpdate): Unit = {
         var cellController = cellControllers.filter(c => c.cellId.equals(sensorsInfo.info.id)).head
         Platform.runLater {
             sensorsInfo.sensors.foreach(s => {

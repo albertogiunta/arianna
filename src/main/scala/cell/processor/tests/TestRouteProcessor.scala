@@ -24,10 +24,10 @@ object TestRouteProcessor extends App {
         )
     ).toMap
     
-    val areaForRoute = AreaForCell(
+    val areaForRoute = AreaViewedFromACell(
         Random.nextInt(Int.MaxValue),
         List(
-            CellForCell(
+            CellViewedFromACell(
                 infos(1),
                 neighbors = List(infos(2), infos(5)),
                 passages = List(
@@ -39,7 +39,7 @@ object TestRouteProcessor extends App {
                 Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
-            CellForCell(
+            CellViewedFromACell(
                 infos(2),
                 neighbors = List(infos(1), infos(3), infos(4)),
                 passages = List(
@@ -52,7 +52,7 @@ object TestRouteProcessor extends App {
                 Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
-            CellForCell(
+            CellViewedFromACell(
                 infos(3),
                 neighbors = List(infos(2), infos(6)),
                 passages = List(
@@ -64,7 +64,7 @@ object TestRouteProcessor extends App {
                 Random.nextInt(20),
                 10 * Random.nextDouble() //Double.PositiveInfinity
             ),
-            CellForCell(
+            CellViewedFromACell(
                 infos(4),
                 neighbors = List(infos(2), infos(5), infos(6), infos(8)),
                 passages = List(
@@ -78,7 +78,7 @@ object TestRouteProcessor extends App {
                 Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
-            CellForCell(
+            CellViewedFromACell(
                 infos(5),
                 neighbors = List(infos(1), infos(4), infos(7)),
                 passages = List(
@@ -91,7 +91,7 @@ object TestRouteProcessor extends App {
                 Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
-            CellForCell(
+            CellViewedFromACell(
                 infos(6),
                 neighbors = List(infos(3), infos(4), infos(9)),
                 passages = List(
@@ -104,7 +104,7 @@ object TestRouteProcessor extends App {
                 Random.nextInt(20),
                 10 * Random.nextDouble() //Double.PositiveInfinity//
             ),
-            CellForCell(
+            CellViewedFromACell(
                 infos(7),
                 neighbors = List(infos(8), infos(5)),
                 passages = List(
@@ -116,7 +116,7 @@ object TestRouteProcessor extends App {
                 Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
-            CellForCell(
+            CellViewedFromACell(
                 infos(8),
                 neighbors = List(infos(4), infos(7), infos(9)),
                 passages = List(
@@ -129,7 +129,7 @@ object TestRouteProcessor extends App {
                 Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
-            CellForCell(
+            CellViewedFromACell(
                 infos(9),
                 neighbors = List(infos(6), infos(8)),
                 passages = List(
@@ -144,7 +144,7 @@ object TestRouteProcessor extends App {
         ))
     val cells = areaForRoute.cells
     
-    val asMap: Map[String, CellForCell] = HashMap(cells.map(c => c.info.name -> c): _*)
+    val asMap: Map[String, CellViewedFromACell] = HashMap(cells.map(c => c.info.name -> c): _*)
     
     val fromCell = "Cell1"
     val toCell = "Cell9"
@@ -190,15 +190,18 @@ object TestRouteProcessor extends App {
         Route,
         Route.Subtype.Info,
         Location.User >> Location.Cell,
-        RouteInfo(RouteRequest(Random.nextInt().toString, infos(1), infos(9)), areaForRoute)
+        RouteInfo(
+            RouteRequest(Random.nextInt().toString, infos(1), infos(9), isEscape = false),
+            areaForRoute
+        )
     )
     
     Thread.sleep(1000L)
     
-    val areaForAlarm = AreaForCell(
+    val areaForAlarm = AreaViewedFromACell(
         Random.nextInt(Int.MaxValue),
         List(
-            CellForCell(
+            CellViewedFromACell(
                 infos(1),
                 neighbors = List(infos(2), infos(5)),
                 passages = List(
@@ -210,7 +213,7 @@ object TestRouteProcessor extends App {
                 Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
-            CellForCell(
+            CellViewedFromACell(
                 infos(2),
                 neighbors = List(infos(1), infos(3), infos(4)),
                 passages = List(
@@ -223,7 +226,7 @@ object TestRouteProcessor extends App {
                 Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
-            CellForCell(
+            CellViewedFromACell(
                 infos(3),
                 neighbors = List(infos(2), infos(6)),
                 passages = List(
@@ -235,7 +238,7 @@ object TestRouteProcessor extends App {
                 Random.nextInt(20),
                 10 * Random.nextDouble() //Double.PositiveInfinity
             ),
-            CellForCell(
+            CellViewedFromACell(
                 infos(4),
                 neighbors = List(infos(2), infos(5), infos(6), infos(8)),
                 passages = List(
@@ -249,7 +252,7 @@ object TestRouteProcessor extends App {
                 Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
-            CellForCell(
+            CellViewedFromACell(
                 infos(5),
                 neighbors = List(infos(1), infos(4), infos(7)),
                 passages = List(
@@ -262,7 +265,7 @@ object TestRouteProcessor extends App {
                 Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
-            CellForCell(
+            CellViewedFromACell(
                 infos(6),
                 neighbors = List(infos(3), infos(4), infos(9)),
                 passages = List(
@@ -275,7 +278,7 @@ object TestRouteProcessor extends App {
                 Random.nextInt(20),
                 Double.PositiveInfinity //10*Random.nextDouble()//
             ),
-            CellForCell(
+            CellViewedFromACell(
                 infos(7),
                 neighbors = List(infos(8), infos(5)),
                 passages = List(
@@ -287,7 +290,7 @@ object TestRouteProcessor extends App {
                 Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
-            CellForCell(
+            CellViewedFromACell(
                 infos(8),
                 neighbors = List(infos(4), infos(7), infos(9)),
                 passages = List(
@@ -300,7 +303,7 @@ object TestRouteProcessor extends App {
                 Random.nextInt(20),
                 10 * Random.nextDouble()
             ),
-            CellForCell(
+            CellViewedFromACell(
                 infos(9),
                 neighbors = List(infos(6), infos(8)),
                 passages = List(
@@ -318,8 +321,11 @@ object TestRouteProcessor extends App {
     
     routeManager ! AriadneMessage(
         Route,
-        Route.Subtype.Escape.Request,
-        Location.Cell >> Location.Cell,
-        EscapeRequest(infos(9), areaForAlarm)
+        Route.Subtype.Info,
+        Location.User >> Location.Cell,
+        RouteInfo(
+            RouteRequest(Random.nextInt().toString, infos(9), InfoCell.empty, isEscape = true),
+            areaForAlarm
+        )
     )
 }

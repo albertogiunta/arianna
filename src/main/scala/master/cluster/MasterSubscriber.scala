@@ -5,8 +5,8 @@ import akka.cluster.pubsub.DistributedPubSubMediator.{Subscribe, SubscribeAck}
 import common.BasicSubscriber
 import ontologies._
 import ontologies.messages.Location._
-import ontologies.messages.MessageType.Handshake.Subtype.Cell2Master
-import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, Topology4Cell}
+import ontologies.messages.MessageType.Handshake.Subtype.CellToMaster
+import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, ViewedFromACell}
 import ontologies.messages.MessageType._
 import ontologies.messages._
 
@@ -30,7 +30,7 @@ class MasterSubscriber extends BasicSubscriber {
         case SubscribeAck(Subscribe(topic, None, `self`)) =>
             log.info("{} Successfully Subscribed to {}", name, topic)
 
-        case AriadneMessage(Handshake, Cell2Master, `cell2Server`, _) =>
+        case AriadneMessage(Handshake, CellToMaster, `cell2Server`, _) =>
             log.info("Stashing handshake from {} for later administration...", sender.path)
             stash
 
@@ -47,12 +47,12 @@ class MasterSubscriber extends BasicSubscriber {
     
     private def sociable: Receive = {
     
-        case msg@AriadneMessage(Handshake, Cell2Master, `cell2Server`, _) =>
+        case msg@AriadneMessage(Handshake, CellToMaster, `cell2Server`, _) =>
             log.info("Resolving Handshake from {}", sender.path)
     
             topologySupervisor() forward msg
-
-        case msg@AriadneMessage(Topology, Topology4Cell, _, _) =>
+    
+        case msg@AriadneMessage(Topology, ViewedFromACell, _, _) =>
             log.info("All the Cells have been mapped into their logical position into the Planimetry")
     
             context.become(behavior = proactive, discardOld = true)
@@ -71,7 +71,7 @@ class MasterSubscriber extends BasicSubscriber {
             log.info("Forwarding message {} from {} to TopologySupervisor", msg.subtype, sender.path)
             topologySupervisor() forward msg
 
-        case msg@AriadneMessage(Handshake, Cell2Master, `cell2Server`, _) =>
+        case msg@AriadneMessage(Handshake, CellToMaster, `cell2Server`, _) =>
             log.info("Late handshake from {}... Forwarding to Supervisor...", sender.path)
             topologySupervisor() forward msg
         

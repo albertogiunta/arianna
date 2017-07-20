@@ -62,7 +62,7 @@ object TestCells extends App {
     
     def loadArea: Area = readJson(s"res/json/map.json").convertTo[Area]
     
-    def areaForCell: AreaForCell = AreaForCell(loadArea)
+    def areaForCell: AreaViewedFromACell = AreaViewedFromACell(loadArea)
     
 
     Thread.sleep(500)
