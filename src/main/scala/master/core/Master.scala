@@ -1,9 +1,8 @@
-package master
+package master.core
 
 import akka.actor.Props
 import common.{ClusterMembersListener, CustomActor}
 import master.cluster._
-import master.core.{AdminManager, AlarmSupervisor, DataStreamer, TopologySupervisor}
 
 /**
   * Created by Alessandro on 29/06/2017.

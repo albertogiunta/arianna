@@ -37,7 +37,6 @@ class DataStreamer extends CustomActor {
     
     override def preStart = {
         admin = sibling("AdminManager").get
-        println(admin)
         streamer = stream.async.runWith(source)
         super.preStart
     }

@@ -39,8 +39,10 @@ class CellCoreActor extends BasicActor {
     override def preStart(): Unit = {
         super.preStart()
         clusterListener = context.actorOf(Props[ClusterMembersListener], "CellClusterListener")
+    
         cellPublisher = context.actorOf(Props[CellPublisher], "CellPublisher")
         cellSubscriber = context.actorOf(Props[CellSubscriber], "CellSubscriber")
+    
         userActor = context.actorOf(Props[UserManager], "UserManager")
         routeManager = context.actorOf(Props[RouteManager], "RouteManager")
     }
@@ -57,26 +59,26 @@ class CellCoreActor extends BasicActor {
             println(s"Area arrived from Server $cnt")
             cnt.cells.foreach(X => topology.put(X.info.uri, X))
             userActor ! msg.copy(direction = cell2User)
-    
-        case AriadneMessage(Update, Update.Subtype.Practicability, `cell2Cell`, cnt: LightCell) =>
+
+        case AriadneMessage(Update, Update.Subtype.Practicability, `cell2Cell`, cnt: PracticabilityUpdate) =>
             topology.put(cnt.info.uri, topology(cnt.info.uri)
-                .copy(practicabilityLevel = cnt.practicabilityLevel))
+                .copy(practicability = cnt.practicability))
+
+        case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, `user2Cell`, cnt: CurrentPeopleUpdate) =>
     
-        case msg@AriadneMessage(Update, Update.Subtype.ActualLoad, `user2Cell`, cnt: ActualLoadUpdate) =>
-        
-            actualSelfLoad = cnt.actualLoad
-        
-            topology.put(uri, topology(uri).copy(practicabilityLevel =
-                weight(topology(uri).capacity, cnt.actualLoad, topology(uri).passages.length)))
+            actualSelfLoad = cnt.currentPeople
+    
+            topology.put(uri, topology(uri).copy(practicability =
+                weight(topology(uri).capacity, cnt.currentPeople, topology(uri).passages.length)))
             
             cellPublisher ! msg.copy(direction = cell2Server)
             cellPublisher ! AriadneMessage(
                 Update,
                 Update.Subtype.Practicability,
                 cell2Cell,
-                LightCell(
+                PracticabilityUpdate(
                     topology(uri).info,
-                    topology(uri).practicabilityLevel
+                    topology(uri).practicability
                 )
             )
     
@@ -95,8 +97,18 @@ class CellCoreActor extends BasicActor {
         case msg@AriadneMessage(Route, Route.Subtype.Response, `cell2User`, _) =>
             //route response from route manager for the user
             userActor ! msg
-    
-        case AriadneMessage(Alarm, _, _, cnt: AlarmContent) =>
+
+        case AriadneMessage(Alarm, _, _, alarm) =>
+            val area = alarm match {
+                case AlarmContent(compromisedCell, _, _) =>
+                    topology.values.map(cell => {
+                        if (cell.info.uri == compromisedCell.uri)
+                            cell.copy(practicability = Double.PositiveInfinity)
+                        else cell
+                    }).toList
+                case Empty() =>
+                    topology.values.toList
+            }
             //request to the route manager the escape route
             routeManager ! AriadneMessage(
                 Route,
@@ -104,13 +116,7 @@ class CellCoreActor extends BasicActor {
                 Location.Self >> Location.Self,
                 EscapeRequest(
                     topology(uri).info,
-                    AreaForCell(
-                        Random.nextInt(),
-                        topology.values.map(cfc => {
-                            if (cfc.info.uri == cnt.info.uri)
-                                cfc.copy(practicabilityLevel = Double.PositiveInfinity)
-                            else cfc
-                        }).toList)
+                    AreaForCell(Random.nextInt(), area)
                 )
             )
     

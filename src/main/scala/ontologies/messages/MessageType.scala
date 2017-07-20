@@ -233,10 +233,10 @@ object MessageType {
                 override val subtypeName = "LightweightTopology4Cell"
 
                 override val superType = Topology
-
-                override def unmarshal(json: String): LightArea = json.parseJson.convertTo[LightArea]
-
-                override def marshal(obj: MessageContent): String = obj.asInstanceOf[LightArea].toJson.toString()
+    
+                override def unmarshal(json: String): AreaPracticability = json.parseJson.convertTo[AreaPracticability]
+    
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[AreaPracticability].toJson.toString()
             }
         
             /**
@@ -497,24 +497,24 @@ object MessageType {
                 override val subtypeName = "Practicability"
 
                 override val superType = Update
-
-                override def unmarshal(json: String): LightCell = json.parseJson.convertTo[LightCell]
-
-                override def marshal(obj: MessageContent): String = obj.asInstanceOf[LightCell].toJson.toString()
+    
+                override def unmarshal(json: String): PracticabilityUpdate = json.parseJson.convertTo[PracticabilityUpdate]
+    
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[PracticabilityUpdate].toJson.toString()
             }
     
             /**
               * Takes a ActualLoadUpdate object as MessageContent
               */
-            object ActualLoad extends MessageSubtype {
+            object CurrentPeople extends MessageSubtype {
 
                 override val subtypeName = "CellOccupation"
 
                 override val superType = Update
-
-                override def unmarshal(json: String): ActualLoadUpdate = json.parseJson.convertTo[ActualLoadUpdate]
-
-                override def marshal(obj: MessageContent): String = obj.asInstanceOf[ActualLoadUpdate].toJson.toString()
+    
+                override def unmarshal(json: String): CurrentPeopleUpdate = json.parseJson.convertTo[CurrentPeopleUpdate]
+    
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[CurrentPeopleUpdate].toJson.toString()
             }
     
             /**

@@ -67,14 +67,14 @@ object MessageSubtype {
                 Update.Subtype.Position.UserPosition
             case st if st == Update.Subtype.Position.AntennaPosition.toLowerCase =>
                 Update.Subtype.Position.AntennaPosition
-            case st if st == Update.Subtype.ActualLoad.toLowerCase =>
-                Update.Subtype.ActualLoad
+            case st if st == Update.Subtype.CurrentPeople.toLowerCase =>
+                Update.Subtype.CurrentPeople
             case st if st == Update.Subtype.UpdateForAdmin.toLowerCase =>
                 Update.Subtype.UpdateForAdmin
             case st if st == Update.Subtype.Practicability.toLowerCase =>
                 Update.Subtype.Practicability
-            case st if st == Update.Subtype.ActualLoad.toLowerCase =>
-                Update.Subtype.ActualLoad
+            case st if st == Update.Subtype.CurrentPeople.toLowerCase =>
+                Update.Subtype.CurrentPeople
             case _ => null
         }
     }
