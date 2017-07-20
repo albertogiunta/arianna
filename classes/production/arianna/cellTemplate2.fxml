@@ -22,12 +22,45 @@
                                 <HBox alignment="CENTER_LEFT" prefHeight="22.0" prefWidth="371.0"
                                       style="-fx-padding: 10;">
                                     <children>
-                                        <Label fx:id="currentPeopleLabel" text="Current people"/>
+                                        <Label fx:id="currentPeopleLabel" text="  Persone attuali"/>
                                         <Text fx:id="currentPeopleValue" strokeType="OUTSIDE" strokeWidth="0.0"
                                               wrappingWidth="32.0"/>
                                     </children>
                                 </HBox>
-                                <VBox fx:id="sensorsContainer" prefHeight="139.0" prefWidth="380.0"/>
+                                <VBox prefHeight="139.0" prefWidth="380.0">
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Label fx:id="temperatureLabel" text="Temperatura"/>
+                                                <Text fx:id="temperatureValue" strokeType="OUTSIDE" strokeWidth="0.0"/>
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Label fx:id="humidityLabel" text="Umidità"/>
+                                                <Text fx:id="humidityValue" strokeType="OUTSIDE" strokeWidth="0.0"/>
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Label fx:id="smokeLabel11" text="Sensore Y"/>
+                                                <Text fx:id="sensorYValue" strokeType="OUTSIDE" strokeWidth="0.0"/>
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Label fx:id="smokeLabel" text="Fumo"/>
+                                                <Text fx:id="smokeValue" strokeType="OUTSIDE" strokeWidth="0.0"/>
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Label fx:id="smokeLabel1" text="Sensore X"/>
+                                                <Text fx:id="sensorXValue" strokeType="OUTSIDE" strokeWidth="0.0"/>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
                             </children>
                         </HBox>
                     </content>
@@ -38,7 +71,8 @@
                             <children>
                                 <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
                                     <children>
-                                        <Label fx:id="maxCapacityLabel" contentDisplay="CENTER" text="Max capacity"/>
+                                        <Label fx:id="maxCapacityLabel" contentDisplay="CENTER"
+                                               text="Capacità massima"/>
                                         <Text fx:id="maxCapacityValue" strokeType="OUTSIDE" strokeWidth="0.0"/>
                                     </children>
                                 </HBox>
@@ -50,13 +84,13 @@
                                 </HBox>
                                 <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
                                     <children>
-                                        <Label fx:id="entranceLabel" text="Entry"/>
+                                        <Label fx:id="entranceLabel" text="Entrate"/>
                                         <Text fx:id="entranceValue" strokeType="OUTSIDE" strokeWidth="0.0"/>
                                     </children>
                                 </HBox>
                                 <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
                                     <children>
-                                        <Label fx:id="exitLabel1" text="Exit"/>
+                                        <Label fx:id="exitLabel1" text="Uscite"/>
                                         <Text fx:id="exitValue" strokeType="OUTSIDE" strokeWidth="0.0"/>
                                     </children>
                                 </HBox>

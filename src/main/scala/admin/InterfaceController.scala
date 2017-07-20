@@ -5,7 +5,7 @@ import java.net.URL
 import java.util.ResourceBundle
 import javafx.fxml.{FXML, FXMLLoader, Initializable}
 import javafx.scene.control.{Button, SplitPane}
-import javafx.scene.layout.VBox
+import javafx.scene.layout.{HBox, VBox}
 import javafx.scene.text.Text
 
 import akka.actor.ActorRef
@@ -79,12 +79,28 @@ class InterfaceController extends Initializable {
         })
     }
 
-    def createCellTemplate(c: Cell): SplitPane = {
+    def initializeSensors(sensorsInfo: SensorList): Unit = {
+        var cellController = cellControllers.filter(c => c.cellId.equals(sensorsInfo.info.id)).head
+        Platform.runLater {
+            sensorsInfo.sensors.foreach(s => {
+                var loader = new FXMLLoader(getClass.getResource("/sensorTemplate.fxml"))
+                var sensor = loader.load[HBox]
+                val sensorController = loader.getController[SensorTemplateController]
+                sensorController.sensorCategory = s.category
+                cellController.sensorsController += sensorController
+                cellController.addSensorTemplate(sensor, s)
+            })
+        }
+    }
+
+    private def createCellTemplate(c: Cell): SplitPane = {
         var loader = new FXMLLoader(getClass.getResource("/cellTemplate2.fxml"))
         var node = loader.load[SplitPane]
         var controller = loader.getController[CellTemplateController]
         cellControllers += controller
-        controller.setStaticInformation(c)
+        Platform.runLater {
+            controller.setStaticInformation(c)
+        }
         node
     }
 

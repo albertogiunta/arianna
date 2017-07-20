@@ -2,7 +2,7 @@
   "id": 1,
   "cells": [
     {
-      "infoCell": {
+      "info": {
         "id": 1,
         "uri": "uri1",
         "name": "cell1",
@@ -29,12 +29,7 @@
           "y": 5
         }
       },
-      "sensors": [
-        {
-          "category": 1,
-          "value": 10.0
-        }
-      ],
+      "sensors": [],
       "neighbors": [
         {
           "id": 2,
