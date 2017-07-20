@@ -28,12 +28,18 @@ class CellPublisher extends BasicPublisher {
     
     override protected def init(args: List[Any]) = {
         log.info("Hello there from {}!", name)
+    
+        Thread.sleep(1000)
+        
         mediator ! Publish(Topic.HandShakes,
             AriadneMessage(
                 Handshake,
                 Handshake.Subtype.Cell2Master,
                 Location.Cell >> Location.Server,
-                InfoCell(cellID, cellUri, cellName, roomVertices, antennaPosition)
+                SensorList(
+                    InfoCell(cellID, cellUri, cellName, roomVertices, antennaPosition),
+                    List()
+                )
             )
         )
     }

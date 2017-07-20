@@ -36,7 +36,6 @@ class ClusterMembersListener extends CustomActor {
                 siblings ! AriadneMessage(Init, Init.Subtype.Greetings,
                     Location.Server >> Location.Self, Greetings(List(greetings)))
             }
-
         } catch {
             case ex: Throwable => ex.printStackTrace()
         }
