@@ -48,13 +48,12 @@ class TestPracticabilityExchange extends App {
         Update,
         Update.Subtype.Practicability,
         Location.Cell >> Location.Server,
-        LightCell(
+        PracticabilityUpdate(
             InfoCell(cellID,
                 cellUri,
                 cellName,
                 roomVertices,
                 antennaPosition),
-            10,
             50.0)
     )
 }

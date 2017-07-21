@@ -5,7 +5,7 @@ import akka.actor.ActorLogging
 import common.BasicActor
 import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.MessageType.Topology
-import ontologies.messages.MessageType.Topology.Subtype.Topology4Cell
+import ontologies.messages.MessageType.Topology.Subtype.ViewedFromACell
 import ontologies.messages._
 import similUser.WSClient
 import spray.json._
@@ -16,7 +16,7 @@ class UserManager extends BasicActor with ActorLogging {
     var vertx: Vertx = Vertx.vertx
     var s = new WSServer(vertx, self)
     var usrNumber = 0
-    var area: AreaForCell = _
+    var area: AreaViewedFromACell = _
     var c = new WSClient(vertx)
 
     override protected def init(args: List[Any]): Unit = {
@@ -32,7 +32,7 @@ class UserManager extends BasicActor with ActorLogging {
     }
 
     override protected def receptive: Receive = {
-        case msg@AriadneMessage(Topology, Topology4Cell, _, area: AreaForCell) =>
+        case msg@AriadneMessage(Topology, ViewedFromACell, _, area: AreaViewedFromACell) =>
             println("sono receptive")
             this.area = area
             context.become(receptiveForMobile)

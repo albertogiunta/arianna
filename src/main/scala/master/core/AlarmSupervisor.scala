@@ -5,7 +5,7 @@ import common.BasicSubscriber
 import ontologies.Topic
 import ontologies.messages.AriadneMessage
 import ontologies.messages.MessageType.Alarm
-import ontologies.messages.MessageType.Alarm.Subtype.{Basic, FromInterface}
+import ontologies.messages.MessageType.Alarm.Subtype.Basic
 
 /**
   * Alarm Supervisor has to react only to Alarms of triggered in the system,
@@ -17,23 +17,20 @@ import ontologies.messages.MessageType.Alarm.Subtype.{Basic, FromInterface}
 class AlarmSupervisor extends BasicSubscriber {
     override val topics = Set(Topic.Alarms)
     
-    private var topologySupervisor: ActorSelection = _
-    private var admin: ActorSelection = _
-    
-    override protected def init(args: List[Any]) = {
-        log.info("Hello there from {}!", name)
-        topologySupervisor = sibling("TopologySupervisor").get
-        admin = sibling("AdminManager").get
-    }
+    private val topologySupervisor: () => ActorSelection = () => sibling("TopologySupervisor").get
+    private val admin: () => ActorSelection = () => sibling("AdminManager").get
     
     override protected def receptive = {
     
-        case msg@AriadneMessage(Alarm, Basic, _, _) =>
+        case msg@AriadneMessage(Alarm, subtype, _, _) =>
             log.info("Got {} from {}", msg.toString, sender.path.name)
-            admin forward msg
+        
+            subtype match {
+                case Basic => admin() forward msg
+                case _ => // Ignore
+            }
     
-        case msg@AriadneMessage(Alarm, FromInterface, _, _) =>
-            log.info("Got {} from {}", msg.toString, sender.path.name)
+            topologySupervisor() forward msg
     
         case _ => desist _
     }

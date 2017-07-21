@@ -37,8 +37,8 @@ object MessageSubtype {
                 Alarm.Subtype.Basic
             case st if st == Alarm.Subtype.FromInterface.toLowerCase =>
                 Alarm.Subtype.FromInterface
-            case st if st == Handshake.Subtype.Cell2Master.toLowerCase =>
-                Handshake.Subtype.Cell2Master
+            case st if st == Handshake.Subtype.CellToMaster.toLowerCase =>
+                Handshake.Subtype.CellToMaster
             case st if st == Handshake.Subtype.Cell2User.toLowerCase =>
                 Handshake.Subtype.Cell2User
             case st if st == Handshake.Subtype.User2Cell.toLowerCase =>
@@ -49,16 +49,12 @@ object MessageSubtype {
                 Route.Subtype.Response
             case st if st == Route.Subtype.Info.toLowerCase =>
                 Route.Subtype.Info
-            case st if st == Route.Subtype.Escape.Request.toLowerCase =>
-                Route.Subtype.Escape.Request
-            case st if st == Route.Subtype.Escape.Response.toLowerCase =>
-                Route.Subtype.Escape.Response
             case st if st == Topology.Subtype.Planimetrics.toLowerCase =>
                 Topology.Subtype.Planimetrics
-            case st if st == Topology.Subtype.Topology4CellLight.toLowerCase =>
-                Topology.Subtype.Topology4CellLight
-            case st if st == Topology.Subtype.Topology4Cell.toLowerCase =>
-                Topology.Subtype.Topology4Cell
+            case st if st == Topology.Subtype.Practicability.toLowerCase =>
+                Topology.Subtype.Practicability
+            case st if st == Topology.Subtype.ViewedFromACell.toLowerCase =>
+                Topology.Subtype.ViewedFromACell
             case st if st == Topology.Subtype.Topology4User.toLowerCase =>
                 Topology.Subtype.Topology4User
             case st if st == Update.Subtype.Sensors.toLowerCase =>
@@ -67,14 +63,14 @@ object MessageSubtype {
                 Update.Subtype.Position.UserPosition
             case st if st == Update.Subtype.Position.AntennaPosition.toLowerCase =>
                 Update.Subtype.Position.AntennaPosition
-            case st if st == Update.Subtype.ActualLoad.toLowerCase =>
-                Update.Subtype.ActualLoad
+            case st if st == Update.Subtype.CurrentPeople.toLowerCase =>
+                Update.Subtype.CurrentPeople
             case st if st == Update.Subtype.UpdateForAdmin.toLowerCase =>
                 Update.Subtype.UpdateForAdmin
             case st if st == Update.Subtype.Practicability.toLowerCase =>
                 Update.Subtype.Practicability
-            case st if st == Update.Subtype.ActualLoad.toLowerCase =>
-                Update.Subtype.ActualLoad
+            case st if st == Update.Subtype.CurrentPeople.toLowerCase =>
+                Update.Subtype.CurrentPeople
             case _ => null
         }
     }

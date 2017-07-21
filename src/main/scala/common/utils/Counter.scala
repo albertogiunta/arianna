@@ -1,4 +1,4 @@
-package common
+package common.utils
 
 /**
   * Created by Alessandro on 05/07/2017.
@@ -8,12 +8,12 @@ case class Counter(private val start: Int) {
     private var value = start
     
     def ++ : Int = {
-        value += 1;
+        value += 1
         this.get
     }
     
     def ++(step: Int): Int = {
-        value += step;
+        value += step
         this.get
     }
     
@@ -23,7 +23,7 @@ case class Counter(private val start: Int) {
     }
     
     def --(step: Int): Int = {
-        value -= step;
+        value -= step
         this.get
     }
     
@@ -37,11 +37,10 @@ case class Counter(private val start: Int) {
 }
 
 object Counter {
-    def apply(start: Int): Counter = new Counter(start)
     
     def apply(): Counter = new Counter(0)
     
-    def counterToInt(counter: Counter): Int = counter.get
+    implicit def counterToInt(counter: Counter): Int = counter.get
     
-    def intToCounter(n: Int): Counter = Counter(n)
+    implicit def intToCounter(n: Int): Counter = new Counter(n)
 }

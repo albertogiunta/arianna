@@ -11,11 +11,7 @@ import ontologies.messages._
   */
 class MasterPublisher extends BasicPublisher {
     
-    override protected def init(args: List[Any]) = {
-        log.info("Hello there from {}!", name)
-    }
-    
-    override protected val receptive = {
+    override protected def receptive = {
         
         case msg@AriadneMessage(Alarm, _, _, _) =>
             log.info("Forwarding... {}", msg)
@@ -26,8 +22,9 @@ class MasterPublisher extends BasicPublisher {
             mediator ! Publish(Topic.Topologies, msg)
         
         case (dest: String, cnt: AriadneMessage[_]) =>
-            log.info("Forwarding Point to Point message to {}", dest)
-            mediator ! Send(dest, cnt, localAffinity = false)
+            log.info("Forwarding Point to Point message {} to {}", cnt.toString, dest)
+            mediator ! Send(dest.replace("Publisher", "Subscriber"), cnt, localAffinity = false)
+            
         case _ => desist _
     }
 }
