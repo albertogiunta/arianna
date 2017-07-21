@@ -12,10 +12,11 @@ trait Topic {
     def associatedMessageSubtype: Option[MessageSubtype]
     
     val topic: String
+    
     val subTopic: Option[String]
     
     override def toString: String = {
-        topic + "/" + subTopic.getOrElse("")
+        topic + "/" + subTopic.getOrElse("All")
     }
 
     override def equals(obj: scala.Any) = obj match {
@@ -32,23 +33,26 @@ case class AriadneTopic(override val topic: String, override val subTopic: Optio
 
 object Topic {
     
-    val Alarms = AriadneTopic(MessageType.Alarm, Option("All"))
+    val Alarms = AriadneTopic(MessageType.Alarm, Option.empty)
     
-    val Topologies = AriadneTopic(MessageType.Topology, Option("All"))
+    val Topologies = AriadneTopic(MessageType.Topology, Option.empty)
     
-    val HandShakes = AriadneTopic(MessageType.Handshake, Option("All"))
+    val HandShakes = AriadneTopic(MessageType.Handshake, Option.empty)
     
-    val Routes = AriadneTopic(MessageType.Route, Option("All"))
+    val Routes = AriadneTopic(MessageType.Route, Option.empty)
     
-    val Updates = AriadneTopic(MessageType.Update, Option("All"))
+    val Updates = AriadneTopic(MessageType.Update, Option.empty)
     
     val Practicabilities = AriadneTopic(MessageType.Update, Option(MessageType.Update.Subtype.Practicability))
 
     implicit def Topic2String(topic: Topic): String = topic.toString
     
     implicit def Topic2MessageType(topic: Topic): MessageType = topic.associatedMessageType
+    
+    implicit def Topic2MessageSubtype(topic: Topic): MessageSubtype = topic.associatedMessageSubtype.orNull
 }
 
 object TestTopic extends App {
     println(Topic.Practicabilities)
+    println(Topic.Updates)
 }

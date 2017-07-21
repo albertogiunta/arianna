@@ -9,6 +9,7 @@ import common.CustomActor
 import master.cluster.MasterPublisher
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Init.Subtype
+import ontologies.messages.MessageType.{Alarm, Handshake, Update}
 import ontologies.messages._
 
 class AdminManager extends CustomActor {
@@ -16,30 +17,26 @@ class AdminManager extends CustomActor {
     val toAdmin: MessageDirection = Location.Server >> Location.Admin
     val fromAdmin: MessageDirection = Location.Admin >> Location.Server
     val admin = context.actorSelection("akka.tcp://adminSystem@127.0.0.1:4550/user/admin")
-    val subscriber: ActorSelection = sibling("TopologySupervisor").get
+    val topologySupervisor: ActorSelection = sibling("TopologySupervisor").get
     val publisher: ActorSelection = sibling("Publisher").get
 
     def operational: Receive = {
-        //Ricezione di un update da qualcuno
-        case msg@AriadneMessage(MessageType.Update, MessageType.Update.Subtype.UpdateForAdmin, _, jsonUpdate: UpdateForAdmin) => {
-            println("ricevuto update adminmanager")
-            admin ! AriadneMessage(MessageType.Update, MessageType.Update.Subtype.UpdateForAdmin, toAdmin, jsonUpdate)
-        }
+        //Ricezione di un update dal server
+        case msg@AriadneMessage(Update, Update.Subtype.UpdateForAdmin, _, _) => admin ! msg.copy(direction = toAdmin)
         //Ricezione di un allarme dall'admin
-        case msg@AriadneMessage(MessageType.Alarm, MessageType.Alarm.Subtype.FromInterface, fromAdmin, _) => {
-            println("Allarme ricevuto dal server")
-            publisher ! AriadneMessage(MessageType.Alarm, MessageType.Alarm.Subtype.FromInterface, toAdmin, Empty())
-        }
+        case msg@AriadneMessage(Alarm, Alarm.Subtype.FromInterface, fromAdmin, _) => publisher ! msg.copy(direction = fromAdmin)
         //Ricezione di un allarme da parte del sistema
-        case msg@AriadneMessage(MessageType.Alarm, MessageType.Alarm.Subtype.Basic, _, _) => {
-            admin ! AriadneMessage(MessageType.Alarm, MessageType.Alarm.Subtype.Basic, toAdmin, Empty())
+        case msg@AriadneMessage(Alarm, Alarm.Subtype.Basic, _, _) => admin ! msg.copy(direction = toAdmin)
+        //Ricezione di aggiornamento sensori
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, _) => {
+            admin ! msg
         }
     }
 
     override def receive: Receive = {
         case msg@AriadneMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, _, area: Area) => {
-            subscriber ! msg
-            println("ricevuta mappa")
+            //topologySupervisor ! msg
+            println("Ricevuta mappa")
             context.become(operational)
         }
     }

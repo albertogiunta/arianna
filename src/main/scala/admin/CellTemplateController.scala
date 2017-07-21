@@ -3,9 +3,12 @@ package admin
 import java.net.URL
 import java.util.ResourceBundle
 import javafx.fxml.{FXML, Initializable}
+import javafx.scene.layout.{HBox, VBox}
 import javafx.scene.text.Text
 
-import ontologies.messages.Cell
+import ontologies.messages.{Cell, Sensor}
+
+import scala.collection.mutable.ListBuffer
 
 /**
   * Created by lisamazzini on 14/07/17.
@@ -13,28 +16,23 @@ import ontologies.messages.Cell
 class CellTemplateController extends Initializable {
 
     var cellId: Int = _
+
+    var sensorsController: ListBuffer[SensorTemplateController] = new ListBuffer[SensorTemplateController]
     @FXML
-    var roomName: Text = _
+    private var roomName: Text = _
     @FXML
-    var currentPeopleValue: Text = _
+    private var currentPeopleValue: Text = _
     @FXML
-    var temperatureValue: Text = _
+    private var sensorsContainer: VBox = _
     @FXML
-    var humidityValue: Text = _
+    private var maxCapacityValue: Text = _
     @FXML
-    var smokeValue: Text = _
+    private var sqrMetersValue: Text = _
     @FXML
-    var sensorYValue: Text = _
+    private var entranceValue: Text = _
     @FXML
-    var sensorXValue: Text = _
-    @FXML
-    var maxCapacityValue: Text = _
-    @FXML
-    var sqrMetersValue: Text = _
-    @FXML
-    var entranceValue: Text = _
-    @FXML
-    var exitValue: Text = _
+    private var exitValue: Text = _
+
 
     override def initialize(location: URL, resources: ResourceBundle): Unit = {}
 
@@ -49,8 +47,17 @@ class CellTemplateController extends Initializable {
 
     def setDynamicInformation(cell: CellForView): Unit = {
         currentPeopleValue.setText(cell.currentOccupation.toString)
-        temperatureValue.setText(cell.sensors.filter(s => s.category == 0).head.value.toString)
-        humidityValue.setText(cell.sensors.filter(s => s.category == 1).head.value.toString)
-        smokeValue.setText(cell.sensors.filter(s => s.category == 2).head.value.toString)
+        cell.sensors.foreach(s => {
+            val controller = sensorsController.filter(c => c.sensorCategory.equals(s.category)).head
+            controller.updateSensor(s)
+        })
+    }
+
+    def addSensorTemplate(sensorTemplate: HBox, sensor: Sensor): Unit = {
+        val controller = sensorsController.filter(c => c.sensorCategory.equals(sensor.category)).head
+        controller.createSensor(sensor)
+        sensorsContainer.getChildren.add(sensorTemplate)
+        //TODO : ordina gli elementi sull'id
+        //sensorsContainer.getChildren.sort()
     }
 }
