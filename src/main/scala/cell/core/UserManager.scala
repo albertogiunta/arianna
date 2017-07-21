@@ -11,7 +11,7 @@ import common.BasicActor
 import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology
-import ontologies.messages.MessageType.Topology.Subtype.Topology4Cell
+import ontologies.messages.MessageType.Topology.Subtype._
 import ontologies.messages._
 import spray.json._
 
@@ -29,7 +29,7 @@ class UserManager extends BasicActor with ActorLogging {
     var s: WSServer = _
     var c: WSClient = _
     var usrNumber = 0
-    var area: AreaForCell = _
+    var area: AreaViewedFromACell = _
 
     override protected def init(args: List[Any]): Unit = {
         vertx = Vertx.vertx()
@@ -47,7 +47,7 @@ class UserManager extends BasicActor with ActorLogging {
     }
 
     override protected def receptive: Receive = {
-        case msg@AriadneMessage(Topology, Topology4Cell, _, area: AreaForCell) =>
+        case msg@AriadneMessage(Topology, ViewedFromACell, _, area: AreaViewedFromACell) =>
             this.area = area
             context.become(receptiveForMobile)
     }
@@ -69,17 +69,19 @@ class UserManager extends BasicActor with ActorLogging {
             s.disconnectUsers()
             usrNumber -= 1
         // todo tell parent
-        case msg: RouteRequestLight =>
+        case msg: RouteRequestShort =>
             // use for test
-            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Escape.Response, Location.User >> Location.Cell, EscapeResponse(area.cells.head.info, area.cells.map(c => c.info)))
+            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest("", getCellWithId(msg.fromCellId), getCellWithId(msg.toCellId), isEscape = false), area.cells.map(c => c.info)))
             Thread.sleep(500)
-            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest(msg.userID, getCellWithId(msg.fromCellId), getCellWithId(msg.toCellId)), area.cells.map(c => c.info)))
+            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest("", area.cells.head.info, area.cells.tail.head.info, isEscape = true), area.cells.map(c => c.info)))
         // use in production
-        //            parent ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell, RouteRequest(msg.userID, getCellWithId(msg.fromCellId), getCellWithId(msg.toCellId)))
-        case msg@AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, _, response: RouteResponse) =>
-            s.sendRouteToUsers(response, RouteResponseShort(response.route).toJson.toString())
-        case msg@AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Escape.Response, _, response: EscapeResponse) =>
-            s.sendAlarmToUsers(RouteResponseShort(response.route).toJson.toString())
+        //            parent ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell, RouteRequest(msg.userID, getCellWithId(msg.fromCellId), getCellWithId(msg.toCellId), isEscape = false))
+        //            parent ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell, RouteRequest(msg.userID, getCellWithId(msg.fromCellId), getCellWithId(msg.toCellId), isEscape = true))
+        case msg@AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, _, response@RouteResponse(request, route)) =>
+            request match {
+                case RouteRequest(_, _, _, false) => s.sendRouteToUsers(response, RouteResponseShort(route).toJson.toString())
+                case RouteRequest(_, _, _, true) => s.sendAlarmToUsers(RouteResponseShort(route).toJson.toString())
+            }
         case _ => ""
     }
 
@@ -100,8 +102,8 @@ object UserRun {
         area
     }
 
-    def areaForCell: AreaForCell = {
-        AreaForCell(area)
+    def areaForCell: AreaViewedFromACell = {
+        AreaViewedFromACell(area)
     }
 
     var area: Area = loadArea()
@@ -120,10 +122,10 @@ object UserRun {
         val userActor3 = system.actorOf(Props.create(classOf[UserManager]), "user3")
         userActor3 ! AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, Location.User >> Location.Self, Greetings(List("/uri3", "8082")))
         Thread.sleep(500)
-        userActor ! AriadneMessage(Topology, Topology4Cell, Location.User >> Location.Self, areaForCell)
+        userActor ! AriadneMessage(Topology, ViewedFromACell, Location.User >> Location.Self, areaForCell)
         Thread.sleep(500)
-        userActor2 ! AriadneMessage(Topology, Topology4Cell, Location.User >> Location.Self, areaForCell)
+        userActor2 ! AriadneMessage(Topology, ViewedFromACell, Location.User >> Location.Self, areaForCell)
         Thread.sleep(500)
-        userActor3 ! AriadneMessage(Topology, Topology4Cell, Location.User >> Location.Self, areaForCell)
+        userActor3 ! AriadneMessage(Topology, ViewedFromACell, Location.User >> Location.Self, areaForCell)
     }
 }

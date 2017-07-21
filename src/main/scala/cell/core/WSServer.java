@@ -11,7 +11,7 @@ import akka.actor.ActorRef;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.ServerWebSocket;
-import ontologies.messages.RouteRequestLight;
+import ontologies.messages.RouteRequestShort;
 import ontologies.messages.RouteResponse;
 
 public class WSServer extends AbstractVerticle {
@@ -34,11 +34,11 @@ public class WSServer extends AbstractVerticle {
         this.baseUrl = baseUrl;
         this.basePort = port;
 
-        this.usersWaitingForDisconnection = new HashMap();
-        this.usersWaitingForConnectionOk = new HashMap();
-        this.usersWaitingForArea = new HashMap();
-        this.usersReadyForAlarm = new HashMap();
-        this.usersWaitingForRoute = new HashMap();
+        this.usersWaitingForDisconnection = new HashMap<>();
+        this.usersWaitingForConnectionOk = new HashMap<>();
+        this.usersWaitingForArea = new HashMap<>();
+        this.usersReadyForAlarm = new HashMap<>();
+        this.usersWaitingForRoute = new HashMap<>();
     }
 
     @Override
@@ -64,7 +64,7 @@ public class WSServer extends AbstractVerticle {
                     Integer idEnd   = Integer.parseInt(data.toString().split("-")[1]);
                     Pair    p       = new Pair<>(idStart, idEnd);
                     usersWaitingForRoute.computeIfAbsent(p, k -> new LinkedList<>()).add(new Pair<>(ws.textHandlerID(), ws));
-                    userActor.tell(new RouteRequestLight(ws.textHandlerID(), idStart, idEnd), ActorRef.noSender());
+                    userActor.tell(new RouteRequestShort(ws.textHandlerID(), idStart, idEnd, false), ActorRef.noSender());
                 });
             } else if (ws.path().equals(baseUrl + "/alarm")) {
                 this.usersReadyForAlarm.put(ws.textHandlerID(), ws);

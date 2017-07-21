@@ -123,6 +123,19 @@ final case class RouteInfo(request: RouteRequest, topology: AreaViewedFromACell)
 final case class RouteResponse(request: RouteRequest, route: List[InfoCell]) extends MessageContent
 
 /**
+  * This case class represent a response to a route request that only contains the route (no additional metadata).
+  *
+  * This is sent to the UserManager Actor by the Vertx instance.
+  *
+  * @param route The calculated optimal route from Cell X to Cell Y
+  */
+
+final case class RouteResponseShort(route: List[InfoCell]) extends MessageContent
+
+
+final case class RouteRequestShort(userID: String, fromCellId: Int, toCellId: Int, isEscape: Boolean) extends MessageContent
+
+/**
   * View of the Topology from the Cell perspective
   *
   * @param id    Random ID value identifying the Topology
