@@ -1,6 +1,14 @@
 package ontologies.messages
 
-sealed trait MessageContent
+import scala.util.Random
+
+/**
+  * A trait that represent a Content for Ariadne Messages
+  *
+  */
+sealed trait MessageContent {
+    val MID: Int = Random.nextInt()
+}
 
 /**
   * This Class is a Static representation of a Cell
@@ -50,12 +58,17 @@ final case class Room(id: Int,
                       isExitPoint: Boolean,
                       antennaPosition: Point) extends MessageContent
 
-final case class Point(var x: Int, var y: Int) extends MessageContent
-
 final case class Coordinates(northWest: Point,
                              northEast: Point,
                              southWest: Point,
                              southEast: Point)
+
+final case class Passage(neighborId: Int,
+                         startCoordinates: Point,
+                         endCoordinates: Point) extends MessageContent
+
+final case class Point(var x: Int, var y: Int) extends MessageContent
+
 
 final case class Area(id: Int,
                       cells: List[Cell]) extends MessageContent
@@ -84,10 +97,6 @@ final case class Cell(info: InfoCell,
                       squareMeters: Double,
                       currentPeople: Int,
                       practicability: Double) extends MessageContent
-
-final case class Passage(neighborId: Int,
-                         startCoordinates: Point,
-                         endCoordinates: Point) extends MessageContent
 
 /**
   * This case class represent a user request of a Route from Cell X to Cell Y
@@ -289,14 +298,15 @@ object AlarmContent {
     def apply(cell: Cell): AlarmContent = new AlarmContent(cell.info, cell.isExitPoint, cell.isEntryPoint)
 }
 
-/* BOH */
-final case class SampleUpdate(people: Int, temperature: Double) extends MessageContent
+/**
+  * An Empty message content
+  *
+  */
+final case class Empty() extends MessageContent
 
 final case class UserAndAntennaPositionUpdate(userPosition: Point, antennaPosition: Point) extends MessageContent
 
 final case class AntennaPositions(userPosition: Point, antennaPositions: List[InfoCell]) extends MessageContent
-
-final case class Empty() extends MessageContent
 
 final case class CellForSwitcher(info: InfoCell,
                                  neighbors: List[InfoCell]) extends MessageContent
