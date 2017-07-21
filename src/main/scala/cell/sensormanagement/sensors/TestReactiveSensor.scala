@@ -5,9 +5,13 @@ package cell.sensormanagement.sensors
   */
 object TestReactiveSensor extends App {
     var tSensor = new BasicTemperatureSensor(0, -40.0, 100.0, 100.0 - -40.0)
-    var simulatedTempSensor: SimulatedMonotonicTemperatureSensor = new SimulatedMonotonicTemperatureSensor(tSensor, 1000, 0.15)
+    var simulatedTempSensor = new SimulatedMonotonicTemperatureSensor(tSensor, 1000, 0.15)
     var oTSensor: ObservableTemperatureSensor = new ObservableTemperatureSensor(simulatedTempSensor)
-    var sensor: Sensor[Double] = tSensor
+
+    var gasSensor = new BasicGasSensor(0, 0, 50.0, 50.0, "CO2")
+    var simulatedGasSensor = new SimulatedMonotonicGasSensor(gasSensor, 1000, 0.2)
+    var oGSensor = new ObservableGasSensor(simulatedGasSensor)
+
 
     println("Test ReactiveTemperatureSensor")
     println("Current Temp:" + simulatedTempSensor.currentValue)
@@ -21,5 +25,18 @@ object TestReactiveSensor extends App {
 
     Thread.sleep(10000)
     simulatedTempSensor.stopGeneration()
+
+    println("Test ReactiveGasSensor")
+    println("Current Gas Level:" + simulatedGasSensor.currentValue)
+    Thread.sleep(2000)
+    println("Current Gas Level:" + simulatedGasSensor.currentValue)
+    Thread.sleep(2000)
+    println("Current Gas Level:" + simulatedGasSensor.currentValue)
+
+
+    oGSensor.createObservable(1000).subscribe(X => println("Gas Level: " + X))
+
+    Thread.sleep(10000)
+    simulatedGasSensor.stopGeneration()
     println("Bye Bye!")
 }
