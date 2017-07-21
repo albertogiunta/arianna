@@ -5,12 +5,29 @@ import java.util.concurrent.{Executors, TimeUnit}
 import io.reactivex.{BackpressureStrategy, Flowable}
 
 /**
+  * a trait for a sensor
+  **/
+trait Sensor {
+    def name: String
+
+    def category: String
+}
+
+object SensorCategories {
+    val temperatureSensor = "temperature sensor" //1
+    val smokeSensor = "smoke sensor" //2
+    val humiditySensor = "humidity sensor" //3
+    val oxygenSensor = "oxygen sensor" //4
+    val CO2Sensor = "CO2 Sensor" //5
+}
+/**
   * A trait for a generic sensor
   *
   * @tparam T type of data managed by the sensor
   * Created by Matteo Gabellini on 05/07/2017.
   */
-trait Sensor[T] {
+trait GenericSensor[T] extends Sensor {
+    def name: String
     def currentValue: T
 }
 
@@ -18,7 +35,7 @@ trait Sensor[T] {
   * A trait for a sensor that works with an ordered scale of value
   * with a min and a max value
   **/
-trait OrderedScaleSensor[T] extends Sensor[T] {
+trait OrderedScaleSensor[T] extends GenericSensor[T] {
 
     def minValue: T
 
@@ -41,7 +58,7 @@ trait NumericSensor[T] extends OrderedScaleSensor[T] {
   *           corresponds to the T type of the sensor see the trait Sensor
   * @tparam S an implementation of a Sensor
   */
-trait SimulationStrategy[T, S <: Sensor[T]] {
+trait SimulationStrategy[T, S <: GenericSensor[T]] {
     def execute(sensor: S): T
 }
 
@@ -81,9 +98,9 @@ object SimulationStrategies {
   * @param millisRefreshRate rate at the sensor change its value
   * @param changeStrategy    the strategy that specifies the sensor behaviour
   */
-abstract class SimulatedSensor[T](val sensor: Sensor[T],
+abstract class SimulatedSensor[T](val sensor: GenericSensor[T],
                                   val millisRefreshRate: Long,
-                                  var changeStrategy: SimulationStrategy[T, Sensor[T]]) extends Sensor[T] {
+                                  var changeStrategy: SimulationStrategy[T, GenericSensor[T]]) extends GenericSensor[T] {
     var value: T = sensor.currentValue
 
     //thread safe read-access to the current value
@@ -111,13 +128,17 @@ abstract class SimulatedSensor[T](val sensor: Sensor[T],
 class SimulatedNumericSensor[T](override val sensor: NumericSensor[T],
                                 override val millisRefreshRate: Long,
                                 var numericChangeStrategy: SimulationStrategy[T, NumericSensor[T]])
-    extends SimulatedSensor[T](sensor, millisRefreshRate, numericChangeStrategy.asInstanceOf[SimulationStrategy[T, Sensor[T]]]) with NumericSensor[T] {
+    extends SimulatedSensor[T](sensor, millisRefreshRate, numericChangeStrategy.asInstanceOf[SimulationStrategy[T, GenericSensor[T]]]) with NumericSensor[T] {
 
     override def minValue: T = sensor.minValue
 
     override def maxValue: T = sensor.maxValue
 
     override def range: T = sensor.range
+
+    override def name: String = sensor.name
+
+    override def category: String = sensor.category
 }
 
 
@@ -125,7 +146,7 @@ class SimulatedNumericSensor[T](override val sensor: NumericSensor[T],
   * A trait for an object that can be observed with the
   * Scala ReactiveX API
   **/
-trait ObservableSensor[T] extends Sensor[T] {
+trait ObservableSensor[T] extends GenericSensor[T] {
     /**
       * Create a Flowable for the sensor values
       *
@@ -172,4 +193,8 @@ class ObservableNumericSensor[T](private val sensor: NumericSensor[T])
     override def maxValue: T = sensor.maxValue
 
     override def range: T = sensor.range
+
+    override def name: String = sensor.name
+
+    override def category: String = sensor.category
 }

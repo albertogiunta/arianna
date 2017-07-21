@@ -6,9 +6,12 @@ package cell.sensormanagement.sensors
   */
 trait TemperatureSensor extends NumericSensor[Double] {
     def measureUnit: String
+
+    override def category: String = SensorCategories.temperatureSensor
 }
 
-case class BasicTemperatureSensor(override val currentValue: Double,
+case class BasicTemperatureSensor(override val name: String,
+                                  override val currentValue: Double,
                                   override val minValue: Double,
                                   override val maxValue: Double,
                                   override val range: Double,

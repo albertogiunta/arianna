@@ -8,11 +8,47 @@ trait GasSensor extends NumericSensor[Double] {
     def gasMeasured: String
 }
 
-case class BasicGasSensor(override val currentValue: Double,
+object Gas {
+    val carbonMonoxide = "CO"
+    val carbonDioxide = "CO2"
+    val oxygen = "O"
+}
+
+abstract class BasicGasSensor(override val name: String,
+                              override val currentValue: Double,
                           override val minValue: Double,
                           override val maxValue: Double,
                           override val range: Double,
                           override val gasMeasured: String) extends GasSensor
+
+case class SmokeSensor(override val name: String,
+                       override val currentValue: Double,
+                       override val minValue: Double,
+                       override val maxValue: Double,
+                       override val range: Double)
+    extends BasicGasSensor(name, currentValue, minValue, maxValue, range, Gas.carbonMonoxide) {
+    override def category: String = SensorCategories.smokeSensor
+}
+
+case class CO2Sensor(override val name: String,
+                     override val currentValue: Double,
+                     override val minValue: Double,
+                     override val maxValue: Double,
+                     override val range: Double,
+                     override val gasMeasured: String)
+    extends BasicGasSensor(name, currentValue, minValue, maxValue, range, Gas.carbonMonoxide) {
+    override def category: String = SensorCategories.smokeSensor
+}
+
+case class OxygenSensor(override val name: String,
+                        override val currentValue: Double,
+                        override val minValue: Double,
+                        override val maxValue: Double,
+                        override val range: Double)
+    extends BasicGasSensor(name, currentValue, minValue, maxValue, range, Gas.oxygen) {
+    override def category: String = SensorCategories.oxygenSensor
+}
+
 
 case class SimulatedMonotonicGasSensor(override val sensor: GasSensor,
                                        override val millisRefreshRate: Long,

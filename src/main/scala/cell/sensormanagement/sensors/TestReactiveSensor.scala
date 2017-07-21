@@ -4,11 +4,11 @@ package cell.sensormanagement.sensors
   * Created by Matteo Gabellini on 05/07/2017.
   */
 object TestReactiveSensor extends App {
-    var tSensor = new BasicTemperatureSensor(0, -40.0, 100.0, 100.0 - -40.0)
+    var tSensor = new BasicTemperatureSensor("tSensor", 0, -40.0, 100.0, 100.0 - -40.0)
     var simulatedTempSensor = new SimulatedMonotonicTemperatureSensor(tSensor, 1000, 0.15)
     var oTSensor: ObservableTemperatureSensor = new ObservableTemperatureSensor(simulatedTempSensor)
 
-    var gasSensor = new BasicGasSensor(0, 0, 50.0, 50.0, "CO2")
+    var gasSensor = new BasicGasSensor("CO2Sensor", 0, 0, 50.0, 50.0, "CO2")
     var simulatedGasSensor = new SimulatedMonotonicGasSensor(gasSensor, 1000, 0.2)
     var oGSensor = new ObservableGasSensor(simulatedGasSensor)
 

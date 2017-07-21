@@ -106,7 +106,7 @@ object ActualLoadUpdate {
     def apply(cell: Cell): ActualLoadUpdate = new ActualLoadUpdate(cell.infoCell, cell.currentPeople)
 }
 
-final case class Sensor(category: Int, value: Double) extends MessageContent
+final case class Sensor(category: String, value: Double) extends MessageContent
 
 final case class SensorList(info: InfoCell, sensors: List[Sensor]) extends MessageContent
 
