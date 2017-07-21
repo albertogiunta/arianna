@@ -33,7 +33,7 @@ class RouteManager extends BasicActor {
             
             // Se non è già presente in cache o il valore in cache è troppo vecchio
             // => Si calcola con A* il Percorso :: Si ritorna la strada in cache
-            if (info.req.isEscape) manageEscape(info)
+            if (info.request.isEscape) manageEscape(info)
             else {
                 log.info("Requesting route from Cache...")
                 context.become(waitingForCache, discardOld = true)
@@ -44,7 +44,7 @@ class RouteManager extends BasicActor {
     
     private def waitingForCache: Receive = {
         case AriadneMessage(Route, Info, _, info: RouteInfo) =>
-            if (info.req.isEscape) manageEscape(info) else stash
+            if (info.request.isEscape) manageEscape(info) else stash
     
         case cnt@RouteInfo(_, _) if sender == cacher =>
             log.info("No cached route is present, sending data to Processor...")

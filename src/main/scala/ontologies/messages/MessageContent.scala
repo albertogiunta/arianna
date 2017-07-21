@@ -2,7 +2,15 @@ package ontologies.messages
 
 sealed trait MessageContent
 
-/* Complete Topology for the server */
+/**
+  * This Class is a Static representation of a Cell
+  *
+  * @param id              The Identifier of the Room where the Cell is Located
+  * @param uri             The URI that point to this Cell
+  * @param name            The name of this Cell
+  * @param roomVertices    The spatial Vertices of the Room where the Cell is Located
+  * @param antennaPosition The Position of the WiFi antenna inside the Room where the Cell is Located
+  */
 final case class InfoCell(id: Int,
                           uri: String,
                           name: String,
@@ -19,6 +27,29 @@ object InfoCell {
         )
 }
 
+/**
+  * This class is a Static representation of a Room
+  *
+  * @param id              The Identifier of the Room where the Cell is Located
+  * @param capacity        Tha Max number of person the Room can hold at one time
+  * @param squareMeters    The area covered by the Room
+  * @param roomVertices    The spatial Vertices of the Room
+  * @param neighbors       Rooms near this Room
+  * @param passages        Openings that lead to neighbor Rooms
+  * @param isEntryPoint    If this Cell is an Exit
+  * @param isExitPoint     If this Cell is an Entrance
+  * @param antennaPosition The Position of the WiFi antenna inside the Room
+  */
+final case class Room(id: Int,
+                      capacity: Int,
+                      squareMeters: Double,
+                      roomVertices: Coordinates,
+                      neighbors: List[InfoCell],
+                      passages: List[Passage],
+                      isEntryPoint: Boolean,
+                      isExitPoint: Boolean,
+                      antennaPosition: Point) extends MessageContent
+
 final case class Point(var x: Int, var y: Int) extends MessageContent
 
 final case class Coordinates(northWest: Point,
@@ -29,6 +60,20 @@ final case class Coordinates(northWest: Point,
 final case class Area(id: Int,
                       cells: List[Cell]) extends MessageContent
 
+/**
+  * This is a Complete representation of a Cell, whit both Dynamic and Static properties
+  *
+  * @param info           Static Info of a Cell
+  * @param sensors        The sensors that are placed in the Room and attached to the Cell
+  * @param neighbors      Cells near this cell
+  * @param passages       Openings that lead to neighbor Cells
+  * @param isEntryPoint   If this Cell is an Exit
+  * @param isExitPoint    If this Cell is an Entrance
+  * @param capacity       Tha Max number of person the Room where the Cell is located can hold at one time
+  * @param squareMeters   The area covered by the Room
+  * @param currentPeople  The current number of people occupying this Room
+  * @param practicability How much likely you should walk through this Room
+  */
 final case class Cell(info: InfoCell,
                       sensors: List[Sensor],
                       neighbors: List[InfoCell],
@@ -58,10 +103,10 @@ final case class RouteRequest(userID: String, fromCell: InfoCell, toCell: InfoCe
   *
   * This wrap a RouteRequest and add the topology on which calculating the route
   *
-  * @param req      The RouteRequest sent by a User
+  * @param request  The RouteRequest sent by a User
   * @param topology The View of the Topology help by the CoreCell Actor
   */
-final case class RouteInfo(req: RouteRequest, topology: AreaViewedFromACell) extends MessageContent
+final case class RouteInfo(request: RouteRequest, topology: AreaViewedFromACell) extends MessageContent
 
 /**
   * This case class represent a response to a route request.
@@ -88,12 +133,12 @@ object AreaViewedFromACell {
 /**
   * View of another Cell from the perspective of a Cell
   *
-  * @param info
-  * @param neighbors
-  * @param passages
-  * @param isEntryPoint
-  * @param isExitPoint
-  * @param practicability
+  * @param info           Static Info of a Cell
+  * @param neighbors      Cells near this cell
+  * @param passages       Openings that lead to neighbor Cells
+  * @param isEntryPoint   If this Cell is an Exit
+  * @param isExitPoint    If this Cell is an Entrance
+  * @param practicability How much likely you should walk through this Room
   */
 final case class CellViewedFromACell(info: InfoCell,
                                      neighbors: List[InfoCell],
@@ -112,10 +157,10 @@ object CellViewedFromACell {
 /**
   * View of a Cell from the Perspective of a User
   *
-  * @param actorPath
-  * @param info
-  * @param neighbors
-  * @param passages
+  * @param actorPath The URL pointing the Cell that the User have to connect to
+  * @param info      Static Info of a Cell
+  * @param neighbors Cells near this cell
+  * @param passages  Openings that lead to neighbor Cells
   */
 final case class CellForUser(actorPath: String,
                              info: InfoCell,
