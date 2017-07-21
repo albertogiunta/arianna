@@ -37,8 +37,6 @@ case class Counter(private val start: Int) {
 }
 
 object Counter {
-    def apply(start: Int): Counter = new Counter(start)
-    
     def apply(): Counter = new Counter(0)
     
     def counterToInt(counter: Counter): Int = counter.get
