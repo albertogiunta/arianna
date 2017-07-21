@@ -6,8 +6,7 @@ import java.util.ResourceBundle
 import javafx.fxml.{FXML, FXMLLoader, Initializable}
 import javafx.scene.canvas.Canvas
 import javafx.scene.control.{Button, SplitPane}
-import javafx.scene.layout.{HBox, VBox}
-import javafx.scene.paint.Color
+import javafx.scene.layout.{HBox, Pane, VBox}
 import javafx.scene.text.Text
 
 import akka.actor.ActorRef
@@ -26,7 +25,8 @@ final case class CellForView(id: Int, name: String, currentOccupation: Int, sens
 class InterfaceController extends Initializable {
     var actorRef: ActorRef = _
     var interfaceView: InterfaceView = _
-    val cellControllers: ListBuffer[CellTemplateController] = new ListBuffer[CellTemplateController]
+    private val cellControllers: ListBuffer[CellTemplateController] = new ListBuffer[CellTemplateController]
+    private var canvasController: CanvasController = _
 
     @FXML
     var nRooms: Text = _
@@ -37,9 +37,9 @@ class InterfaceController extends Initializable {
     @FXML
     var alarmButton: Button = _
     @FXML
-    var map: Canvas = _
-    @FXML
     var vBoxPane: VBox = _
+    @FXML
+    var mapContainer: Pane = _
 
     override def initialize(location: URL, resources: ResourceBundle): Unit = {
         println("Controller initialized")
@@ -67,9 +67,17 @@ class InterfaceController extends Initializable {
         val source = Source.fromFile(file).getLines.mkString
         val area = MessageType.Topology.Subtype.Planimetrics.unmarshal(source)
         actorRef ! AriadneMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, Location.Admin >> Location.Self, area)
+        loadCanvas()
         createCells(area.cells)
         fileName.text = file.getName
         loadButton.disable = true
+    }
+
+    private def loadCanvas(): Unit = {
+        var loader = new FXMLLoader(getClass.getResource("/canvasTemplate.fxml"))
+        var canvas = loader.load[Canvas]
+        canvasController = loader.getController[CanvasController]
+        mapContainer.getChildren.add(canvas)
     }
 
     private def createCells(initialConfiguration: List[Cell]) = {
@@ -78,24 +86,8 @@ class InterfaceController extends Initializable {
             Platform.runLater {
                 var node = createCellTemplate(c)
                 vBoxPane.getChildren.add(node)
-                drawOnMap(c)
+                canvasController.drawOnMap(c)
             }
-        })
-    }
-
-    private def drawOnMap(cell: Cell): Unit = {
-        val x: Double = cell.info.roomVertices.southWest.x
-        val y: Double = cell.info.roomVertices.southWest.y
-        val width: Double = cell.info.roomVertices.northEast.x - cell.info.roomVertices.northWest.x
-        val height: Double = cell.info.roomVertices.northWest.y - cell.info.roomVertices.southWest.y
-        println("X: " + x.toString + " Y: " + y.toString + " width: " + width.toString + " height: " + height.toString)
-        val gc = map.getGraphicsContext2D
-        gc.setStroke(Color.BLACK)
-        gc.setLineWidth(2.0)
-        gc.strokeRect(x, y, width, height)
-        gc.setStroke(Color.RED)
-        cell.passages.foreach(p => {
-            gc.strokeLine(p.startCoordinates.x, p.startCoordinates.y, p.endCoordinates.x, p.endCoordinates.y)
         })
     }
 
