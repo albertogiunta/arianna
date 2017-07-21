@@ -7,7 +7,7 @@ import scala.util.Random
   *
   */
 sealed trait MessageContent {
-    val MID: Int = Random.nextInt()
+    val MCID: Int = Random.nextInt()
 }
 
 /**
