@@ -134,8 +134,8 @@ object TestRouteProcessor extends App {
             )
         ))
     val cells = areaForRoute.cells
-    
-    val asMap: Map[String, CellForCell] = HashMap(cells.map(c => c.infoCell.name -> c): _*)
+
+    val asMap: Map[String, CellForCell] = HashMap(cells.map(c => c.info.name -> c): _*)
     
     val fromCell = "Cell1"
     val toCell = "Cell9"

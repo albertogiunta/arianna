@@ -29,6 +29,7 @@ object AriannaJsonProtocol extends DefaultJsonProtocol {
     implicit val routeRequestFormat: RootJsonFormat[RouteRequest] = jsonFormat3(RouteRequest)
     implicit val routeInfoFormat: RootJsonFormat[RouteInfo] = jsonFormat2(RouteInfo)
     implicit val routeResponseFormat: RootJsonFormat[RouteResponse] = jsonFormat2(RouteResponse)
+    implicit val routeResponseShortFormat: RootJsonFormat[RouteResponseShort] = jsonFormat1(RouteResponseShort)
     implicit val escapeRequestFormat: RootJsonFormat[EscapeRequest] = jsonFormat2(EscapeRequest)
     implicit val escapeResponseFormat: RootJsonFormat[EscapeResponse] = jsonFormat2(EscapeResponse)
     implicit val userAndAntennaPositionUpdateFormat: RootJsonFormat[UserAndAntennaPositionUpdate] = jsonFormat2(UserAndAntennaPositionUpdate)

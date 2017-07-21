@@ -50,10 +50,10 @@ class CellCoreActor extends BasicActor {
 
         case msg@AriadneMessage(Topology, Topology4Cell, server2Cell, cnt: AreaForCell) =>
             println(s"Area arrived from Server $cnt")
-            cnt.cells.foreach(X => topology.put(X.infoCell.uri, X))
+            cnt.cells.foreach(X => topology.put(X.info.uri, X))
             userActor ! msg.copy(direction = cell2User)
         case msg@AriadneMessage(Update, Update.Subtype.Practicability, server2Cell, cnt: LightCell) =>
-            topology.put(cnt.info.name, topology(cnt.info.name).copy(practicabilityLevel = cnt.practicabilityLevel))
+            topology.put(cnt.info.name, topology(cnt.info.name).copy(practicability = cnt.practicabilityLevel))
         case msg@AriadneMessage(Update, Update.Subtype.ActualLoad, user2Cell, cnt: ActualLoadUpdate) =>
             actualCellLoad = cnt
             cellPublisher ! msg.copy(direction = cell2Server)

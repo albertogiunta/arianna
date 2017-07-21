@@ -1,4 +1,4 @@
-package similUser;
+package cell;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;

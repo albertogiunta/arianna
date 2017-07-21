@@ -39,8 +39,8 @@ class CellTemplateController extends Initializable {
     override def initialize(location: URL, resources: ResourceBundle): Unit = {}
 
     def setStaticInformation(cell: Cell): Unit = {
-        cellId = cell.infoCell.id
-        roomName.setText(cell.infoCell.name)
+        cellId = cell.info.id
+        roomName.setText(cell.info.name)
         maxCapacityValue.setText(cell.capacity.toString)
         sqrMetersValue.setText(cell.squareMeters.toString)
         if (cell.isEntryPoint) entranceValue.setText("1") else entranceValue.setText("0")

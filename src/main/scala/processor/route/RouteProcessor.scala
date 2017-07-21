@@ -52,7 +52,7 @@ private class RouteProcessor(val router: ActorRef) extends CustomActor {
         case EscapeRequest(actualCell, AreaForCell(_, cells)) =>
             
             val futures = cells.filter(c => c.isExitPoint)
-                .map(c => computeRoute(actualCell.name, c.infoCell.name, cells))
+                .map(c => computeRoute(actualCell.name, c.info.name, cells))
     
             Future {
                 futures.map(f => Await.result(f, Duration.Inf)).minBy(res => res._2)._1
@@ -70,15 +70,15 @@ private class RouteProcessor(val router: ActorRef) extends CustomActor {
     
     def computeRoute(fromCell: String, toCell: String, cells: List[CellForCell]): Future[(List[InfoCell], Double)] =
         Future[(List[InfoCell], Double)] {
-            val asMap: Map[String, CellForCell] = HashMap(cells.map(c => c.infoCell.name -> c): _*)
+            val asMap: Map[String, CellForCell] = HashMap(cells.map(c => c.info.name -> c): _*)
             
             val graph: Graph[String] =
                 HashMap(
                     cells.map(cell =>
-                        cell.infoCell.name ->
+                        cell.info.name ->
                             HashMap(cell.neighbors.map(neighbor =>
                                 neighbor.name -> Math.max(
-                                    0.0, 100.0 + asMap(neighbor.name).practicabilityLevel - cell.practicabilityLevel
+                                    0.0, 100.0 + asMap(neighbor.name).practicability - cell.practicability
                                 )
                             ): _*)
                     ): _*)
@@ -86,7 +86,7 @@ private class RouteProcessor(val router: ActorRef) extends CustomActor {
             val (shp, cost) = AStarSearch.A_*(graph)(fromCell, toCell)(AStarSearch.Extractors.toList)
     
             log.info("Found route {} with a cost of {}", shp.mkString(" -> "), cost)
-            
-            (shp.map(s => asMap(s).infoCell), cost)
+
+            (shp.map(s => asMap(s).info), cost)
         }
 }

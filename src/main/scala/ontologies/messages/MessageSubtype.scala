@@ -63,10 +63,6 @@ object MessageSubtype {
                 Topology.Subtype.Topology4User
             case st if st == Update.Subtype.Sensors.toLowerCase =>
                 Update.Subtype.Sensors
-            case st if st == Update.Subtype.Position.UserPosition.toLowerCase =>
-                Update.Subtype.Position.UserPosition
-            case st if st == Update.Subtype.Position.AntennaPosition.toLowerCase =>
-                Update.Subtype.Position.AntennaPosition
             case st if st == Update.Subtype.ActualLoad.toLowerCase =>
                 Update.Subtype.ActualLoad
             case st if st == Update.Subtype.UpdateForAdmin.toLowerCase =>

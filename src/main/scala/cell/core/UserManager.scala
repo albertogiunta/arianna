@@ -5,6 +5,7 @@ import java.nio.file.Paths
 
 import _root_.io.vertx.core.Vertx
 import akka.actor.{ActorLogging, ActorSystem, Props}
+import cell.WSClient
 import com.typesafe.config.ConfigFactory
 import common.BasicActor
 import ontologies.messages.AriannaJsonProtocol._
@@ -12,13 +13,12 @@ import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology
 import ontologies.messages.MessageType.Topology.Subtype.Topology4Cell
 import ontologies.messages._
-import similUser.WSClient
 import spray.json._
 
 import scala.io.Source
 
 object MSGToAkka {
-    val CONNECT: String = "connect"
+    val NORMAL_CONNECTION: String = "connect"
     val FIRST_CONNECTION: String = "firstconnection"
     val DISCONNECT: String = "disconnect"
 }
@@ -53,7 +53,7 @@ class UserManager extends BasicActor with ActorLogging {
     }
 
     protected def receptiveForMobile: Receive = {
-        case MSGToAkka.CONNECT =>
+        case MSGToAkka.NORMAL_CONNECTION =>
             println("[ACTOR] GOT NEW USER")
             s.sendOkToNewUser()
             usrNumber += 1
@@ -71,18 +71,20 @@ class UserManager extends BasicActor with ActorLogging {
         // todo tell parent
         case msg: RouteRequestLight =>
             // use for test
-            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest(msg.userID, getCellWithId(msg.fromCellId), getCellWithId(msg.toCellId)), area.cells.map(c => c.infoCell)))
+            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Escape.Response, Location.User >> Location.Cell, EscapeResponse(area.cells.head.info, area.cells.map(c => c.info)))
+            Thread.sleep(500)
+            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest(msg.userID, getCellWithId(msg.fromCellId), getCellWithId(msg.toCellId)), area.cells.map(c => c.info)))
         // use in production
         //            parent ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell, RouteRequest(msg.userID, getCellWithId(msg.fromCellId), getCellWithId(msg.toCellId)))
         case msg@AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, _, response: RouteResponse) =>
-            s.sendRouteToUsers(response, response.toJson.toString())
+            s.sendRouteToUsers(response, RouteResponseShort(response.route).toJson.toString())
         case msg@AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Escape.Response, _, response: EscapeResponse) =>
-            s.sendRouteToUsers(response, response.toJson.toString())
+            s.sendAlarmToUsers(RouteResponseShort(response.route).toJson.toString())
         case _ => ""
     }
 
     def getCellWithId(id: Int): InfoCell = {
-        area.cells.filter(c => c.infoCell.id == id).map(c => c.infoCell).head
+        area.cells.filter(c => c.info.id == id).map(c => c.info).head
     }
 }
 

@@ -48,11 +48,11 @@ public class WSServer extends AbstractVerticle {
             if (ws.path().equals(baseUrl + "/connect")) {
                 ws.handler(data -> {
                     System.out.println("[SERVER " + baseUrl + "] GOT NEW USER | " + data.toString());
-                    if (data.toString().equalsIgnoreCase("connect")) {
+                    if (data.toString().equalsIgnoreCase(MSGToAkka.NORMAL_CONNECTION())) {
                         this.usersWaitingForConnectionOk.put(ws.textHandlerID(), ws);
-                    } else if (data.toString().equalsIgnoreCase("firstconnection")) {
+                    } else if (data.toString().equalsIgnoreCase(MSGToAkka.FIRST_CONNECTION())) {
                         this.usersWaitingForArea.put(ws.textHandlerID(), ws);
-                    } else if (data.toString().equalsIgnoreCase("disconnect")) {
+                    } else if (data.toString().equalsIgnoreCase(MSGToAkka.DISCONNECT())) {
                         this.usersWaitingForDisconnection.put(ws.textHandlerID(), ws);
                     }
                     userActor.tell(data.toString(), ActorRef.noSender());
@@ -67,8 +67,9 @@ public class WSServer extends AbstractVerticle {
                     userActor.tell(new RouteRequestLight(ws.textHandlerID(), idStart, idEnd), ActorRef.noSender());
                 });
             } else if (ws.path().equals(baseUrl + "/alarm")) {
+                this.usersReadyForAlarm.put(ws.textHandlerID(), ws);
                 ws.handler(data -> {
-                    this.usersReadyForAlarm.put(ws.textHandlerID(), ws);
+//                    this.usersReadyForAlarm.put(ws.textHandlerID(), ws);
                 });
             } else if (ws.path().equals(baseUrl + "/position-update")) {
                 ws.handler(data -> {
