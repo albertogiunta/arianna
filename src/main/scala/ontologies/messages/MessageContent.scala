@@ -1,14 +1,21 @@
 package ontologies.messages
 
-import scala.util.Random
-
 /**
   * A trait that represent a Content for Ariadne Messages
   *
   */
-sealed trait MessageContent {
-    val MCID: Int = Random.nextInt()
-}
+sealed trait MessageContent
+
+final case class Point(var x: Int, var y: Int) extends MessageContent
+
+final case class Coordinates(northWest: Point,
+                             northEast: Point,
+                             southWest: Point,
+                             southEast: Point)
+
+final case class Passage(neighborId: Int,
+                         startCoordinates: Point,
+                         endCoordinates: Point) extends MessageContent
 
 /**
   * This Class is a Static representation of a Cell
@@ -57,18 +64,6 @@ final case class Room(id: Int,
                       isEntryPoint: Boolean,
                       isExitPoint: Boolean,
                       antennaPosition: Point) extends MessageContent
-
-final case class Coordinates(northWest: Point,
-                             northEast: Point,
-                             southWest: Point,
-                             southEast: Point)
-
-final case class Passage(neighborId: Int,
-                         startCoordinates: Point,
-                         endCoordinates: Point) extends MessageContent
-
-final case class Point(var x: Int, var y: Int) extends MessageContent
-
 
 final case class Area(id: Int,
                       cells: List[Cell]) extends MessageContent
@@ -174,7 +169,7 @@ object CellViewedFromACell {
 final case class CellForUser(actorPath: String,
                              info: InfoCell,
                              neighbors: List[InfoCell],
-                             passages: List[Passage]) extends MessageContent
+                             passages: List[Passage]) extends MessageContent // To be renamed CellViewedFromAUser
 
 object CellForUser {
     def apply(cell: Cell, actorPath: String): CellForUser =

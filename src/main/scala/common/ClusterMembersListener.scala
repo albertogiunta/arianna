@@ -10,6 +10,7 @@ import ontologies.messages.{AriadneMessage, Greetings, Location}
 /**
   * This actor implements a listener for members event when nodes interact each other into the cluster
   * For example this actors is notified when the a node complete the connection to the cluster ecc...
+  *
   * Created by Matteo Gabellini on 29/06/2017.
   * Code based on akka code from official documentation
   * [link: http://doc.akka.io/docs/akka/current/scala/cluster-usage.html]
