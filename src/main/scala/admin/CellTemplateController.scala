@@ -49,8 +49,8 @@ class CellTemplateController extends Initializable {
 
     def setDynamicInformation(cell: CellForView): Unit = {
         currentPeopleValue.setText(cell.currentOccupation.toString)
-        temperatureValue.setText(cell.sensors.filter(s => s.category == 0).head.value.toString)
-        humidityValue.setText(cell.sensors.filter(s => s.category == 1).head.value.toString)
-        smokeValue.setText(cell.sensors.filter(s => s.category == 2).head.value.toString)
+        temperatureValue.setText(cell.sensors.filter(s => s.categoryId == 0).head.value.toString)
+        humidityValue.setText(cell.sensors.filter(s => s.categoryId == 1).head.value.toString)
+        smokeValue.setText(cell.sensors.filter(s => s.categoryId == 2).head.value.toString)
     }
 }

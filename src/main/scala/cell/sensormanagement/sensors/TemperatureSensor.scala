@@ -1,5 +1,7 @@
 package cell.sensormanagement.sensors
 
+import ontologies.{SensorCategories, SensorCategory}
+
 /**
   * A basic trait for a temperature sensor
   * Created by Matteo Gabellini on 05/07/2017.
@@ -7,7 +9,7 @@ package cell.sensormanagement.sensors
 trait TemperatureSensor extends NumericSensor[Double] {
     def measureUnit: String
 
-    override def category: String = SensorCategories.temperatureSensor
+    override def category: SensorCategory = SensorCategories.Temperature
 }
 
 case class BasicTemperatureSensor(override val name: String,
@@ -32,7 +34,7 @@ case class SimulatedMonotonicTemperatureSensor(override val sensor: TemperatureS
                                                val changeStep: Double)
     extends SimulatedNumericSensor[Double](sensor,
         millisRefreshRate,
-        SimulationStrategies.MonotonicNumericSimulation(changeStep)) with TemperatureSensor {
+        SimulationStrategies.MonotonicDoubleSimulation(changeStep)) with TemperatureSensor {
     override def measureUnit: String = sensor.measureUnit
 }
 

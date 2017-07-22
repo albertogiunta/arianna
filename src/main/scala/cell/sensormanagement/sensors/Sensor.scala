@@ -3,6 +3,7 @@ package cell.sensormanagement.sensors
 import java.util.concurrent.{Executors, TimeUnit}
 
 import io.reactivex.{BackpressureStrategy, Flowable}
+import ontologies.SensorCategory
 
 /**
   * a trait for a sensor
@@ -10,16 +11,9 @@ import io.reactivex.{BackpressureStrategy, Flowable}
 trait Sensor {
     def name: String
 
-    def category: String
+    def category: SensorCategory
 }
 
-object SensorCategories {
-    val temperatureSensor = "temperature sensor" //1
-    val smokeSensor = "smoke sensor" //2
-    val humiditySensor = "humidity sensor" //3
-    val oxygenSensor = "oxygen sensor" //4
-    val CO2Sensor = "CO2 Sensor" //5
-}
 /**
   * A trait for a generic sensor
   *
@@ -68,7 +62,7 @@ trait SimulationStrategy[T, S <: GenericSensor[T]] {
   **/
 object SimulationStrategies {
 
-    case class MonotonicNumericSimulation(val changeStep: Double)
+    case class MonotonicDoubleSimulation(val changeStep: Double)
         extends SimulationStrategy[Double, NumericSensor[Double]] {
         private var increasePhase: Boolean = true
 
@@ -89,6 +83,26 @@ object SimulationStrategies {
             this increase sensor else this decrease sensor
     }
 
+    case class MonotonicIntSimulation(val changeStep: Int)
+        extends SimulationStrategy[Int, NumericSensor[Int]] {
+        private var increasePhase: Boolean = true
+
+        private def shouldIncrease(sensor: NumericSensor[Int]): Boolean =
+            if (increasePhase) {
+                increasePhase = sensor.currentValue < sensor.maxValue
+                increasePhase
+            } else {
+                increasePhase = !(sensor.currentValue > sensor.minValue)
+                increasePhase
+            }
+
+        private def increase(sensor: NumericSensor[Int]): Int = sensor.currentValue + changeStep
+
+        private def decrease(sensor: NumericSensor[Int]): Int = sensor.currentValue - changeStep
+
+        override def execute(sensor: NumericSensor[Int]): Int = if (this shouldIncrease sensor)
+            this increase sensor else this decrease sensor
+    }
 }
 
 /**
@@ -138,7 +152,7 @@ class SimulatedNumericSensor[T](override val sensor: NumericSensor[T],
 
     override def name: String = sensor.name
 
-    override def category: String = sensor.category
+    override def category: SensorCategory = sensor.category
 }
 
 
@@ -196,5 +210,5 @@ class ObservableNumericSensor[T](private val sensor: NumericSensor[T])
 
     override def name: String = sensor.name
 
-    override def category: String = sensor.category
+    override def category: SensorCategory = sensor.category
 }
