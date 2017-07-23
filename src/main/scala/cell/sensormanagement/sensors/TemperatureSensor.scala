@@ -1,12 +1,13 @@
 package cell.sensormanagement.sensors
 
+import cell.sensormanagement.{DoubleThreshold, Threshold}
 import ontologies.{SensorCategories, SensorCategory}
 
 /**
   * A basic trait for a temperature sensor
   * Created by Matteo Gabellini on 05/07/2017.
   */
-trait TemperatureSensor extends NumericSensor[Double] {
+trait TemperatureSensor extends NumericSensor[Double] with SensorWithThreshold[Double] {
     def measureUnit: String
 
     override def category: SensorCategory = SensorCategories.Temperature
@@ -17,6 +18,7 @@ case class BasicTemperatureSensor(override val name: String,
                                   override val minValue: Double,
                                   override val maxValue: Double,
                                   override val range: Double,
+                                  override val threshold: TemperatureThreshold,
                                   override val measureUnit: String = TemperatureUnitMeasure.Celsius
                                  ) extends TemperatureSensor
 /**
@@ -36,6 +38,8 @@ case class SimulatedMonotonicTemperatureSensor(override val sensor: TemperatureS
         millisRefreshRate,
         SimulationStrategies.MonotonicDoubleSimulation(changeStep)) with TemperatureSensor {
     override def measureUnit: String = sensor.measureUnit
+
+    override def threshold: Threshold[Double] = sensor.threshold
 }
 
 /**
@@ -46,4 +50,15 @@ case class SimulatedMonotonicTemperatureSensor(override val sensor: TemperatureS
   *               in order to become reactive to the sensor value changes
   **/
 class ObservableTemperatureSensor(private val sensor: TemperatureSensor)
-    extends ObservableNumericSensor[Double](sensor)
+    extends ObservableNumericSensor[Double](sensor) with TemperatureSensor {
+    override def measureUnit: String = ???
+
+    override def threshold: Threshold[Double] = sensor.threshold
+}
+
+
+case class TemperatureThreshold(var minValue: Double, var maxValue: Double) extends DoubleThreshold[Double] {
+
+    override def hasBeenExceeded(currentSensorValue: Double): Boolean =
+        currentSensorValue < minValue || currentSensorValue > maxValue
+}

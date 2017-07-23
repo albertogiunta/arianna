@@ -1,12 +1,13 @@
 package cell.sensormanagement.sensors
 
+import cell.sensormanagement.{SingleThreshold, Threshold}
 import ontologies.{SensorCategories, SensorCategory}
 
 /**
   * A trait for a basic smoke sensor
   * Created by Matteo Gabellini on 05/07/2017.
   */
-trait GasSensor extends NumericSensor[Double] {
+trait GasSensor extends NumericSensor[Double] with SensorWithThreshold[Double] {
     def gasMeasured: String
 }
 
@@ -27,29 +28,45 @@ case class SmokeSensor(override val name: String,
                        override val currentValue: Double,
                        override val minValue: Double,
                        override val maxValue: Double,
-                       override val range: Double)
+                       override val range: Double,
+                       override val threshold: SmokeThreshold)
     extends BasicGasSensor(name, currentValue, minValue, maxValue, range, Gas.carbonMonoxide) {
     override def category: SensorCategory = SensorCategories.Smoke
+}
+
+
+case class SmokeThreshold(var value: Double) extends SingleThreshold[Double] {
+    override def hasBeenExceeded(currentSensorValue: Double): Boolean = currentSensorValue > value
 }
 
 case class CO2Sensor(override val name: String,
                      override val currentValue: Double,
                      override val minValue: Double,
                      override val maxValue: Double,
-                     override val range: Double)
+                     override val range: Double,
+                     override val threshold: CO2Threshold)
     extends BasicGasSensor(name, currentValue, minValue, maxValue, range, Gas.carbonMonoxide) {
     override def category: SensorCategory = SensorCategories.CO2
+}
+
+
+case class CO2Threshold(var value: Double) extends SingleThreshold[Double] {
+    override def hasBeenExceeded(currentSensorValue: Double): Boolean = currentSensorValue > value
 }
 
 case class OxygenSensor(override val name: String,
                         override val currentValue: Double,
                         override val minValue: Double,
                         override val maxValue: Double,
-                        override val range: Double)
+                        override val range: Double,
+                        override val threshold: OxygenThreshold)
     extends BasicGasSensor(name, currentValue, minValue, maxValue, range, Gas.oxygen) {
     override def category: SensorCategory = SensorCategories.Oxygen
 }
 
+case class OxygenThreshold(var value: Double) extends SingleThreshold[Double] {
+    override def hasBeenExceeded(currentSensorValue: Double): Boolean = currentSensorValue < value
+}
 
 case class SimulatedMonotonicGasSensor(override val sensor: GasSensor,
                                        override val millisRefreshRate: Long,
@@ -59,8 +76,12 @@ case class SimulatedMonotonicGasSensor(override val sensor: GasSensor,
         millisRefreshRate,
         SimulationStrategies.MonotonicDoubleSimulation(changeStep)) with GasSensor {
     override def gasMeasured: String = sensor.gasMeasured
+
+    override def threshold: Threshold[Double] = sensor.threshold
 }
 
 class ObservableGasSensor(private val sensor: GasSensor) extends ObservableNumericSensor[Double](sensor) with GasSensor {
     override def gasMeasured: String = sensor.gasMeasured
+
+    override def threshold: Threshold[Double] = sensor.threshold
 }

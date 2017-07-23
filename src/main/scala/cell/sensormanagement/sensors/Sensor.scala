@@ -2,6 +2,7 @@ package cell.sensormanagement.sensors
 
 import java.util.concurrent.{Executors, TimeUnit}
 
+import cell.sensormanagement.Threshold
 import io.reactivex.{BackpressureStrategy, Flowable}
 import ontologies.SensorCategory
 
@@ -45,6 +46,13 @@ trait NumericSensor[C] extends OrderedScaleSensor[C] {
     def range: C
 }
 
+/**
+  * A trait for a sensor that have a threshold where is defined
+  * the threshold value and the logic that define when it is exceeded
+  */
+trait SensorWithThreshold[H] extends GenericSensor[H] {
+    def threshold: Threshold[H]
+}
 
 /**
   * This trait define the basic method of a simulation change strategy
@@ -124,7 +132,7 @@ abstract class SimulatedSensor[E](val sensor: GenericSensor[E],
     }
 
     //thread safe write-access to the current value
-    def currentValue_=(i: E): Unit = sensor.synchronized {
+    private def currentValue_=(i: E): Unit = sensor.synchronized {
         value = i
     }
 

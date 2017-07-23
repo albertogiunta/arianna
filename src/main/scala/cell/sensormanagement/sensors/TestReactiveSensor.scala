@@ -6,7 +6,7 @@ import io.reactivex.Flowable
   * Created by Matteo Gabellini on 05/07/2017.
   */
 object TestReactiveSensor extends App {
-    var tSensor = new BasicTemperatureSensor("tSensor", 0, -40.0, 100.0, 100.0 - -40.0)
+    var tSensor = new BasicTemperatureSensor("tSensor", 0, -40.0, 100.0, 100.0 - -40.0, new TemperatureThreshold(-10, 50))
     var simulatedTempSensor = new SimulatedMonotonicTemperatureSensor(tSensor, 1000, 0.15)
     var oTSensor: ObservableTemperatureSensor = new ObservableTemperatureSensor(simulatedTempSensor)
 
@@ -27,24 +27,24 @@ object TestReactiveSensor extends App {
     //oTSensor.stopObservation()
 
 
-    var smokeSensor = new SmokeSensor("SmokeSensor", 0, 0, 50.0, 50.0)
+    var smokeSensor = new SmokeSensor("SmokeSensor", 0, 0, 50.0, 50.0, new SmokeThreshold(30))
     var simulatedSmokeSensor = new SimulatedMonotonicGasSensor(smokeSensor, 1000, 0.2)
     var oSSensor = new ObservableGasSensor(simulatedSmokeSensor)
     monotonicGasSensorTest(smokeSensor, simulatedSmokeSensor, oSSensor)
 
 
-    var co2Sensor = new CO2Sensor("CO2Sensor", 0, 0, 100.0, 100.0)
+    var co2Sensor = new CO2Sensor("CO2Sensor", 0, 0, 100.0, 100.0, new CO2Threshold(50))
     var simulatedCO2Sensor = new SimulatedMonotonicGasSensor(co2Sensor, 1000, 0.5)
     var oCSensor = new ObservableGasSensor(simulatedCO2Sensor)
     monotonicGasSensorTest(co2Sensor, simulatedCO2Sensor, oCSensor)
 
-    var oxygenSensor = new OxygenSensor("OxygenSensor", 0, 0, 70.0, 70.0)
+    var oxygenSensor = new OxygenSensor("OxygenSensor", 0, 0, 70.0, 70.0, new OxygenThreshold(25))
     var simulatedOxygenSensor = new SimulatedMonotonicGasSensor(oxygenSensor, 1000, 0.38)
     var oOSensor = new ObservableGasSensor(simulatedOxygenSensor)
     monotonicGasSensorTest(oxygenSensor, simulatedOxygenSensor, oOSensor)
 
 
-    var hSensor = new BasicHumiditySensor("humiditySensor", 0, 0, 100, 100)
+    var hSensor = new BasicHumiditySensor("humiditySensor", 0, 0, 100, 100, new HumidityThreshold(20, 80))
     var simulatedHumiditySensor = new SimulatedMonotonicHumiditySensor(hSensor, 1000, 1)
     var oHSensor: ObservableHumiditySensor = new ObservableHumiditySensor(simulatedHumiditySensor)
 
