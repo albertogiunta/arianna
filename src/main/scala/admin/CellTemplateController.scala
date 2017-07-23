@@ -14,11 +14,11 @@ import scala.collection.mutable
 import scalafx.application.Platform
 
 /**
-  * Created by lisamazzini on 14/07/17.
+  * This class represent the controller for each Cell template inside the interface
   */
 class CellTemplateController extends Initializable {
 
-    var sensorsController: mutable.Map[Int, SensorTemplateController] = new mutable.HashMap[Int, SensorTemplateController]
+    private var sensorsController: mutable.Map[Int, SensorTemplateController] = new mutable.HashMap[Int, SensorTemplateController]
     @FXML
     private var roomName: Text = _
     @FXML
@@ -36,9 +36,14 @@ class CellTemplateController extends Initializable {
     @FXML
     private var header: Pane = _
 
-
     override def initialize(location: URL, resources: ResourceBundle): Unit = {}
 
+    /**
+      * This method fills the interface with static information about the Cell; it's called only one time when the map is loaded
+      *
+      * @param cell : Cell object containing data
+      *
+      **/
     def setStaticInformation(cell: Cell): Unit = {
         roomName setText cell.info.name
         maxCapacityValue setText cell.capacity.toString
@@ -47,6 +52,12 @@ class CellTemplateController extends Initializable {
         if (cell.isExitPoint) exitValue setText "1" else exitValue setText "0"
     }
 
+    /**
+      * This method update the interface with dynamic information about the Cell; it's called everytime the Application receive
+      * an update from the System
+      *
+      * @param cell : CellForView object containing only dynamic data
+      * */
     def setDynamicInformation(cell: CellForView): Unit = {
         currentPeopleValue setText cell.currentOccupation.toString
         cell.sensors.foreach(sensor => {
@@ -55,6 +66,12 @@ class CellTemplateController extends Initializable {
         })
     }
 
+    /**
+      * This method fills the interface with data about sensors of the Cell, once the Application has received it from the System.
+      *
+      * @param sensorsInfo : SensorUpdate object containing data
+      *
+      * */
     def addSensors(sensorsInfo: SensorsUpdate): Unit = {
         Platform.runLater {
             sensorsInfo.sensors.foreach(sensor => {
@@ -69,6 +86,10 @@ class CellTemplateController extends Initializable {
         //sensorsContainer.getChildren.sort()
     }
 
+    /**
+      * This method modifies the interface in order to show to the administrator that an Alarm arrived.
+      *
+      * */
     def handleAlarm(): Unit = {
         Platform.runLater {
             header setBackground new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY))

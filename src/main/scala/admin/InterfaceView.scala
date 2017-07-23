@@ -8,6 +8,10 @@ import javafx.stage.Stage
 import scalafx.Includes._
 import scalafx.scene.Scene
 
+/**
+  * This class represent the interface of the Application
+  *
+  **/
 class InterfaceView extends Application {
 
     var controller: InterfaceController = _

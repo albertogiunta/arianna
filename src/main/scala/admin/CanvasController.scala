@@ -18,8 +18,20 @@ sealed case class Room(roomVertices: Coordinates) {
     val height: Double = roomVertices.northWest.y - roomVertices.southWest.y
 }
 
+/**
+  *
+  * Class representing the line to draw for a Passage between rooms
+  *
+  * @param startPoint : starting point of the line
+  * @param endPoint   : ending point of the line
+  *
+  **/
 sealed case class PassageLine(startPoint: Point, endPoint: Point)
 
+/**
+  * This class is the Controller for the Canvas node inside the interface.
+  *
+  * */
 class CanvasController extends Initializable {
 
     @FXML
@@ -29,12 +41,17 @@ class CanvasController extends Initializable {
 
     override def initialize(location: URL, resources: ResourceBundle): Unit = {}
 
+    /**
+      * This method draws on the Canvas a rectangle representing the Cell passed as parameter
+      *
+      * @param cell : cell to be drawn
+      *
+      * */
     def drawOnMap(cell: Cell): Unit = {
         val room: Room = Room(cell.info.roomVertices)
         val passages: ListBuffer[PassageLine] = new ListBuffer[PassageLine]
         cell.passages.foreach(passage => {
             passages += PassageLine(passage.startCoordinates, passage.endCoordinates)
-            //gc strokeLine(passage.startCoordinates.x, passage.startCoordinates.y, passage.endCoordinates.x, passage.endCoordinates.y)
         })
 
         rooms += ((cell.info.id, (room, passages)))
@@ -42,6 +59,12 @@ class CanvasController extends Initializable {
         drawPassages(passages)
     }
 
+    /**
+      * This method handles the alarm, redrawing and marking on the interface the room from which the alarm comes
+      *
+      * @param id : id of the cell where the alarm comes from
+      *
+      * */
     def handleAlarm(id: Int): Unit = {
         val roomData = rooms.get(id).get
         drawRoom(roomData._1, Color.RED)
