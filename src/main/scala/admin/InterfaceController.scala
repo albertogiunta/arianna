@@ -108,10 +108,17 @@ class InterfaceController extends Initializable {
         node
     }
 
-    def triggerAlarm(): Unit = {
+    def triggerAlarm(alarmContent: AlarmContent): Unit = {
         actorRef ! new AriadneMessage(MessageType.Alarm, MessageType.Alarm.Subtype.FromInterface, Location.Admin >> Location.Self, Empty())
         println("Allarme ricevuto dal controller")
+        cellControllers.get(alarmContent.info.id).get.handleAlarm
+        canvasController handleAlarm alarmContent.info.id
+
         //Fai qualcosa all'interfaccia
+    }
+
+    def triggerAlarm(): Unit = {
+        //Allarme lanciato dall'interfaccia
     }
 
 }

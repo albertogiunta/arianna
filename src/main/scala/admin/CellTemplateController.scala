@@ -3,7 +3,9 @@ package admin
 import java.net.URL
 import java.util.ResourceBundle
 import javafx.fxml.{FXML, FXMLLoader, Initializable}
-import javafx.scene.layout.{HBox, VBox}
+import javafx.geometry.Insets
+import javafx.scene.layout._
+import javafx.scene.paint.Color
 import javafx.scene.text.Text
 
 import ontologies.messages.{Cell, SensorsUpdate}
@@ -31,6 +33,8 @@ class CellTemplateController extends Initializable {
     private var entranceValue: Text = _
     @FXML
     private var exitValue: Text = _
+    @FXML
+    private var header: Pane = _
 
 
     override def initialize(location: URL, resources: ResourceBundle): Unit = {}
@@ -63,5 +67,11 @@ class CellTemplateController extends Initializable {
         }
         //TODO : ordina gli elementi sull'id
         //sensorsContainer.getChildren.sort()
+    }
+
+    def handleAlarm(): Unit = {
+        Platform.runLater {
+            header setBackground new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY))
+        }
     }
 }
