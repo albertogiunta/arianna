@@ -3,16 +3,21 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<SplitPane dividerPositions="0.1746" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-           minWidth="-Infinity" orientation="VERTICAL" prefHeight="211.0" prefWidth="400.0"
+<SplitPane dividerPositions="0.11353711790393013" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+           minWidth="-Infinity" orientation="VERTICAL" prefHeight="231.0" prefWidth="398.0"
            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="admin.CellTemplateController">
     <items>
-        <Text fx:id="roomName" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="221.0">
-            <font>
-                <Font size="18.0"/>
-            </font>
-        </Text>
+        <Pane fx:id="header" prefHeight="29.0" prefWidth="396.0">
+            <children>
+                <Text fx:id="roomName" layoutX="88.0" layoutY="17.0" strokeType="OUTSIDE" strokeWidth="0.0"
+                      textAlignment="CENTER" wrappingWidth="221.0">
+                    <font>
+                        <Font size="18.0"/>
+                    </font>
+                </Text>
+            </children>
+        </Pane>
         <TabPane fx:id="tabPane" prefHeight="169.0" prefWidth="400.0" tabClosingPolicy="UNAVAILABLE">
             <tabs>
                 <Tab fx:id="tabDynamic" text="Dinamic">
