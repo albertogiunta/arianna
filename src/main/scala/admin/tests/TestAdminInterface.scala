@@ -24,8 +24,8 @@ object TestAdminInterface extends App {
 
     val adminManager = system.actorOf(Props[AdminManager], "AdminManager")
     var i = 1
-    Thread.sleep(5000)
-    while (!i.equals(6)) {
+    Thread.sleep(10000)
+    while (!i.equals(4)) {
         Thread.sleep(1000)
         var sensors: ListBuffer[Sensor] = new ListBuffer[Sensor]
         for (i <- 1 until 4) {

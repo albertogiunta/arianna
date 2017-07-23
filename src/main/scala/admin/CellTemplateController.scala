@@ -2,22 +2,21 @@ package admin
 
 import java.net.URL
 import java.util.ResourceBundle
-import javafx.fxml.{FXML, Initializable}
+import javafx.fxml.{FXML, FXMLLoader, Initializable}
 import javafx.scene.layout.{HBox, VBox}
 import javafx.scene.text.Text
 
-import ontologies.messages.{Cell, Sensor}
+import ontologies.messages.{Cell, SensorsUpdate}
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable
+import scalafx.application.Platform
 
 /**
   * Created by lisamazzini on 14/07/17.
   */
 class CellTemplateController extends Initializable {
 
-    var cellId: Int = _
-
-    var sensorsController: ListBuffer[SensorTemplateController] = new ListBuffer[SensorTemplateController]
+    var sensorsController: mutable.Map[Int, SensorTemplateController] = new mutable.HashMap[Int, SensorTemplateController]
     @FXML
     private var roomName: Text = _
     @FXML
@@ -37,7 +36,6 @@ class CellTemplateController extends Initializable {
     override def initialize(location: URL, resources: ResourceBundle): Unit = {}
 
     def setStaticInformation(cell: Cell): Unit = {
-        cellId = cell.info.id
         roomName.setText(cell.info.name)
         maxCapacityValue.setText(cell.capacity.toString)
         sqrMetersValue.setText(cell.squareMeters.toString)
@@ -48,15 +46,21 @@ class CellTemplateController extends Initializable {
     def setDynamicInformation(cell: CellForView): Unit = {
         currentPeopleValue.setText(cell.currentOccupation.toString)
         cell.sensors.foreach(s => {
-            val controller = sensorsController.filter(c => c.sensorCategory.equals(s.category)).head
+            val controller = sensorsController.get(s.category).get
             controller.updateSensor(s)
         })
     }
 
-    def addSensorTemplate(sensorTemplate: HBox, sensor: Sensor): Unit = {
-        val controller = sensorsController.filter(c => c.sensorCategory.equals(sensor.category)).head
-        controller.createSensor(sensor)
-        sensorsContainer.getChildren.add(sensorTemplate)
+    def addSensor(sensorsInfo: SensorsUpdate): Unit = {
+        Platform.runLater {
+            sensorsInfo.sensors.foreach(s => {
+                var loader = new FXMLLoader(getClass.getResource("/sensorTemplate.fxml"))
+                var sensorTemplate = loader.load[HBox]
+                val sensorController = loader.getController[SensorTemplateController]
+                sensorController.createSensor(s)
+                sensorsContainer.getChildren.add(sensorTemplate)
+            })
+        }
         //TODO : ordina gli elementi sull'id
         //sensorsContainer.getChildren.sort()
     }

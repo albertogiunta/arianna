@@ -8,7 +8,7 @@ import javafx.scene.paint.Color
 
 import ontologies.messages.{Cell, Coordinates}
 
-case class Room(roomVertices: Coordinates) {
+sealed case class Room(roomVertices: Coordinates) {
     val x: Double = roomVertices.southWest.x
     val y: Double = roomVertices.southWest.y
     val width: Double = roomVertices.northEast.x - roomVertices.northWest.x

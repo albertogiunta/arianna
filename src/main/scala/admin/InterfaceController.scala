@@ -6,26 +6,26 @@ import java.util.ResourceBundle
 import javafx.fxml.{FXML, FXMLLoader, Initializable}
 import javafx.scene.canvas.Canvas
 import javafx.scene.control.{Button, SplitPane}
-import javafx.scene.layout.{HBox, Pane, VBox}
+import javafx.scene.layout.{Pane, VBox}
 import javafx.scene.text.Text
 
 import akka.actor.ActorRef
 import ontologies.messages.Location._
 import ontologies.messages._
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable
 import scala.io.Source
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.stage.FileChooser
 import scalafx.stage.FileChooser.ExtensionFilter
 
-final case class CellForView(id: Int, name: String, currentOccupation: Int, sensors: List[Sensor])
+sealed case class CellForView(id: Int, name: String, currentOccupation: Int, sensors: List[Sensor])
 
 class InterfaceController extends Initializable {
     var actorRef: ActorRef = _
     var interfaceView: InterfaceView = _
-    private val cellControllers: ListBuffer[CellTemplateController] = new ListBuffer[CellTemplateController]
+    private val cellControllers: mutable.Map[Int, CellTemplateController] = new mutable.HashMap[Int, CellTemplateController]
     private var canvasController: CanvasController = _
 
     @FXML
@@ -48,7 +48,7 @@ class InterfaceController extends Initializable {
     def updateView(update: List[CellForView]): Unit = {
         Platform.runLater {
             update.foreach(c => {
-                var cellController = cellControllers.filter(controller => controller.cellId.equals(c.id)).head
+                var cellController = cellControllers.get(c.id).get
                 cellController.setDynamicInformation(c)
             })
         }
@@ -92,24 +92,15 @@ class InterfaceController extends Initializable {
     }
     
     def initializeSensors(sensorsInfo: SensorsUpdate): Unit = {
-        var cellController = cellControllers.filter(c => c.cellId.equals(sensorsInfo.info.id)).head
-        Platform.runLater {
-            sensorsInfo.sensors.foreach(s => {
-                var loader = new FXMLLoader(getClass.getResource("/sensorTemplate.fxml"))
-                var sensor = loader.load[HBox]
-                val sensorController = loader.getController[SensorTemplateController]
-                sensorController.sensorCategory = s.category
-                cellController.sensorsController += sensorController
-                cellController.addSensorTemplate(sensor, s)
-            })
-        }
+        var cellController = cellControllers.get(sensorsInfo.info.id).get
+        cellController.addSensor(sensorsInfo)
     }
 
     private def createCellTemplate(c: Cell): SplitPane = {
         var loader = new FXMLLoader(getClass.getResource("/cellTemplate2.fxml"))
         var node = loader.load[SplitPane]
         var controller = loader.getController[CellTemplateController]
-        cellControllers += controller
+        cellControllers += ((c.info.id, controller))
         Platform.runLater {
             controller.setStaticInformation(c)
         }
