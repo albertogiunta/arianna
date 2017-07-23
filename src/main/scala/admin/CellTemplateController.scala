@@ -36,28 +36,28 @@ class CellTemplateController extends Initializable {
     override def initialize(location: URL, resources: ResourceBundle): Unit = {}
 
     def setStaticInformation(cell: Cell): Unit = {
-        roomName.setText(cell.info.name)
-        maxCapacityValue.setText(cell.capacity.toString)
-        sqrMetersValue.setText(cell.squareMeters.toString)
-        if (cell.isEntryPoint) entranceValue.setText("1") else entranceValue.setText("0")
-        if (cell.isExitPoint) exitValue.setText("1") else exitValue.setText("0")
+        roomName setText cell.info.name
+        maxCapacityValue setText cell.capacity.toString
+        sqrMetersValue setText cell.squareMeters.toString
+        if (cell.isEntryPoint) entranceValue setText "1" else entranceValue setText "0"
+        if (cell.isExitPoint) exitValue setText "1" else exitValue setText "0"
     }
 
     def setDynamicInformation(cell: CellForView): Unit = {
-        currentPeopleValue.setText(cell.currentOccupation.toString)
-        cell.sensors.foreach(s => {
-            val controller = sensorsController.get(s.category).get
-            controller.updateSensor(s)
+        currentPeopleValue setText cell.currentOccupation.toString
+        cell.sensors.foreach(sensor => {
+            val controller = sensorsController.get(sensor.category).get
+            controller updateSensor sensor
         })
     }
 
-    def addSensor(sensorsInfo: SensorsUpdate): Unit = {
+    def addSensors(sensorsInfo: SensorsUpdate): Unit = {
         Platform.runLater {
-            sensorsInfo.sensors.foreach(s => {
+            sensorsInfo.sensors.foreach(sensor => {
                 var loader = new FXMLLoader(getClass.getResource("/sensorTemplate.fxml"))
                 var sensorTemplate = loader.load[HBox]
                 val sensorController = loader.getController[SensorTemplateController]
-                sensorController.createSensor(s)
+                sensorController createSensor sensor
                 sensorsContainer.getChildren.add(sensorTemplate)
             })
         }

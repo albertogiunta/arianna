@@ -11,6 +11,7 @@ import javafx.scene.text.Text
 
 import akka.actor.ActorRef
 import ontologies.messages.Location._
+import ontologies.messages.MessageType.Topology
 import ontologies.messages._
 
 import scala.collection.mutable
@@ -47,9 +48,9 @@ class InterfaceController extends Initializable {
 
     def updateView(update: List[CellForView]): Unit = {
         Platform.runLater {
-            update.foreach(c => {
-                var cellController = cellControllers.get(c.id).get
-                cellController.setDynamicInformation(c)
+            update.foreach(cell => {
+                var cellController = cellControllers.get(cell.id).get
+                cellController setDynamicInformation cell
             })
         }
     }
@@ -57,15 +58,15 @@ class InterfaceController extends Initializable {
     @FXML
     def handleFileLoad(): Unit = {
         val fc = new FileChooser()
-        fc.setTitle("Get JSON")
-        fc.getExtensionFilters.add(new ExtensionFilter("JSON Files", "*.json"))
+        fc.title = "Get JSON"
+        fc.extensionFilters += (new ExtensionFilter("JSON Files", "*.json"))
         val json: File = fc.showOpenDialog(null)
         parseFile(json)
     }
 
     private def parseFile(file: File): Unit = {
         val source = Source.fromFile(file).getLines.mkString
-        val area = MessageType.Topology.Subtype.Planimetrics.unmarshal(source)
+        val area = Topology.Subtype.Planimetrics.unmarshal(source)
         actorRef ! AriadneMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, Location.Admin >> Location.Self, area)
         loadCanvas()
         createCells(area.cells)
@@ -77,32 +78,32 @@ class InterfaceController extends Initializable {
         var loader = new FXMLLoader(getClass.getResource("/canvasTemplate.fxml"))
         var canvas = loader.load[Canvas]
         canvasController = loader.getController[CanvasController]
-        mapContainer.getChildren.add(canvas)
+        mapContainer.getChildren += canvas
     }
 
     private def createCells(initialConfiguration: List[Cell]) = {
         nRooms.text = initialConfiguration.size.toString
-        initialConfiguration.foreach(c => {
+        initialConfiguration.foreach(cell => {
             Platform.runLater {
-                var node = createCellTemplate(c)
-                vBoxPane.getChildren.add(node)
-                canvasController.drawOnMap(c)
+                var node = createCellTemplate(cell)
+                vBoxPane.getChildren += node
+                canvasController drawOnMap cell
             }
         })
     }
     
     def initializeSensors(sensorsInfo: SensorsUpdate): Unit = {
         var cellController = cellControllers.get(sensorsInfo.info.id).get
-        cellController.addSensor(sensorsInfo)
+        cellController addSensors sensorsInfo
     }
 
-    private def createCellTemplate(c: Cell): SplitPane = {
+    private def createCellTemplate(cell: Cell): SplitPane = {
         var loader = new FXMLLoader(getClass.getResource("/cellTemplate2.fxml"))
         var node = loader.load[SplitPane]
         var controller = loader.getController[CellTemplateController]
-        cellControllers += ((c.info.id, controller))
+        cellControllers += ((cell.info.id, controller))
         Platform.runLater {
-            controller.setStaticInformation(c)
+            controller setStaticInformation cell
         }
         node
     }

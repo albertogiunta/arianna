@@ -25,12 +25,12 @@ class CanvasController extends Initializable {
     def drawOnMap(cell: Cell): Unit = {
         val room: Room = Room(cell.info.roomVertices)
         val gc = mapCanvas.getGraphicsContext2D
-        gc.setStroke(Color.BLACK)
-        gc.setLineWidth(2.0)
-        gc.strokeRect(room.x, room.y, room.width, room.height)
-        gc.setStroke(Color.WHITE)
-        cell.passages.foreach(p => {
-            gc.strokeLine(p.startCoordinates.x, p.startCoordinates.y, p.endCoordinates.x, p.endCoordinates.y)
+        gc setStroke Color.BLACK
+        gc setLineWidth 2.0
+        gc strokeRect(room.x, room.y, room.width, room.height)
+        gc setStroke Color.WHITE
+        cell.passages.foreach(passage => {
+            gc strokeLine(passage.startCoordinates.x, passage.startCoordinates.y, passage.endCoordinates.x, passage.endCoordinates.y)
         })
     }
 
