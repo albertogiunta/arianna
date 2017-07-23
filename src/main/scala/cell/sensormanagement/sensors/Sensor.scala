@@ -17,43 +17,44 @@ trait Sensor {
 /**
   * A trait for a generic sensor
   *
-  * @tparam T type of data managed by the sensor
-  * Created by Matteo Gabellini on 05/07/2017.
+  * @tparam A the type of data managed by the sensor
+  *           Created by Matteo Gabellini on 05/07/2017.
   */
-trait GenericSensor[T] extends Sensor {
+trait GenericSensor[A] extends Sensor {
     def name: String
-    def currentValue: T
+
+    def currentValue: A
 }
 
 /**
   * A trait for a sensor that works with an ordered scale of value
   * with a min and a max value
   **/
-trait OrderedScaleSensor[T] extends GenericSensor[T] {
+trait OrderedScaleSensor[B] extends GenericSensor[B] {
 
-    def minValue: T
+    def minValue: B
 
-    def maxValue: T
+    def maxValue: B
 }
 
 /**
   * A trait for a Numeric Sensor that works in a specific range of
   * numeric value
   */
-trait NumericSensor[T] extends OrderedScaleSensor[T] {
-    def range: T
+trait NumericSensor[C] extends OrderedScaleSensor[C] {
+    def range: C
 }
 
 
 /**
   * This trait define the basic method of a simulation change strategy
   *
-  * @tparam T type of data managed by the sensor.
+  * @tparam D the type of data managed by the sensor.
   *           corresponds to the T type of the sensor see the trait Sensor
   * @tparam S an implementation of a Sensor
   */
-trait SimulationStrategy[T, S <: GenericSensor[T]] {
-    def execute(sensor: S): T
+trait SimulationStrategy[D, S <: GenericSensor[D]] {
+    def execute(sensor: S): D
 }
 
 /**
@@ -112,10 +113,10 @@ object SimulationStrategies {
   * @param millisRefreshRate rate at the sensor change its value
   * @param changeStrategy    the strategy that specifies the sensor behaviour
   */
-abstract class SimulatedSensor[T](val sensor: GenericSensor[T],
+abstract class SimulatedSensor[E](val sensor: GenericSensor[E],
                                   val millisRefreshRate: Long,
-                                  var changeStrategy: SimulationStrategy[T, GenericSensor[T]]) extends GenericSensor[T] {
-    var value: T = sensor.currentValue
+                                  var changeStrategy: SimulationStrategy[E, GenericSensor[E]]) extends GenericSensor[E] {
+    var value: E = sensor.currentValue
 
     //thread safe read-access to the current value
     override def currentValue = sensor.synchronized {
@@ -123,7 +124,7 @@ abstract class SimulatedSensor[T](val sensor: GenericSensor[T],
     }
 
     //thread safe write-access to the current value
-    def currentValue_=(i: T): Unit = sensor.synchronized {
+    def currentValue_=(i: E): Unit = sensor.synchronized {
         value = i
     }
 
@@ -139,16 +140,16 @@ abstract class SimulatedSensor[T](val sensor: GenericSensor[T],
 }
 
 
-class SimulatedNumericSensor[T](override val sensor: NumericSensor[T],
+class SimulatedNumericSensor[F](override val sensor: NumericSensor[F],
                                 override val millisRefreshRate: Long,
-                                var numericChangeStrategy: SimulationStrategy[T, NumericSensor[T]])
-    extends SimulatedSensor[T](sensor, millisRefreshRate, numericChangeStrategy.asInstanceOf[SimulationStrategy[T, GenericSensor[T]]]) with NumericSensor[T] {
+                                var numericChangeStrategy: SimulationStrategy[F, NumericSensor[F]])
+    extends SimulatedSensor[F](sensor, millisRefreshRate, numericChangeStrategy.asInstanceOf[SimulationStrategy[F, GenericSensor[F]]]) with NumericSensor[F] {
 
-    override def minValue: T = sensor.minValue
+    override def minValue: F = sensor.minValue
 
-    override def maxValue: T = sensor.maxValue
+    override def maxValue: F = sensor.maxValue
 
-    override def range: T = sensor.range
+    override def range: F = sensor.range
 
     override def name: String = sensor.name
 
@@ -160,14 +161,19 @@ class SimulatedNumericSensor[T](override val sensor: NumericSensor[T],
   * A trait for an object that can be observed with the
   * Scala ReactiveX API
   **/
-trait ObservableSensor[T] extends GenericSensor[T] {
+trait ObservableSensor[G] extends GenericSensor[G] {
     /**
       * Create a Flowable for the sensor values
       *
       * @param refreshPeriod milliseconds between each refresh
       * @return
       */
-    def createObservable(refreshPeriod: Long): Flowable[T]
+    def createObservable(refreshPeriod: Long): Flowable[G]
+
+    /**
+      * Stop the observation on the decorated Sensor
+      **/
+    def stopObservation(): Unit
 }
 
 
@@ -181,13 +187,16 @@ trait ObservableSensor[T] extends GenericSensor[T] {
 class ObservableNumericSensor[T](private val sensor: NumericSensor[T])
     extends ObservableSensor[T] with NumericSensor[T] {
 
+    private var continueObservation = true;
+
     override def currentValue: T = sensor.currentValue
 
-    override def createObservable(refreshPeriod: Long): Flowable[T] = Flowable.create(emitter => {
+    override def createObservable(refreshPeriod: Long): Flowable[T] = Flowable.create[T](emitter => {
+        continueObservation = true
         new Thread(() => {
             var currentValue: T = sensor.currentValue
             var tmpPrev = sensor.minValue
-            while (true) {
+            while (continueObservation) {
                 try {
                     currentValue = sensor.currentValue
                     if (tmpPrev != currentValue) {
@@ -211,4 +220,6 @@ class ObservableNumericSensor[T](private val sensor: NumericSensor[T])
     override def name: String = sensor.name
 
     override def category: SensorCategory = sensor.category
+
+    override def stopObservation(): Unit = continueObservation = false
 }

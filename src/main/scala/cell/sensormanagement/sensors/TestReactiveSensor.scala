@@ -1,5 +1,7 @@
 package cell.sensormanagement.sensors
 
+import io.reactivex.Flowable
+
 /**
   * Created by Matteo Gabellini on 05/07/2017.
   */
@@ -22,6 +24,7 @@ object TestReactiveSensor extends App {
 
     Thread.sleep(10000)
     simulatedTempSensor.stopGeneration()
+    //oTSensor.stopObservation()
 
 
     var smokeSensor = new SmokeSensor("SmokeSensor", 0, 0, 50.0, 50.0)
@@ -53,8 +56,12 @@ object TestReactiveSensor extends App {
     println("Current Humidity:" + simulatedHumiditySensor.currentValue + "%")
 
 
-    println("...attach a reactive observable to " + oTSensor.name)
-    oHSensor.createObservable(1000).subscribe(X => println("Humidity: " + X + "%"))
+    println("...attach a reactive observable to " + oHSensor.name)
+    val flowVal: Flowable[Int] = oHSensor.createObservable(1000)
+    //Try also a threshold checking mode
+    flowVal.filter(X => X > 8).subscribe(X => println("THRESHOLD EXCEEDED"))
+    flowVal.subscribe(X => println("Humidity: " + X + "%"))
+
 
     Thread.sleep(10000)
     simulatedHumiditySensor.stopGeneration()
@@ -75,7 +82,7 @@ object TestReactiveSensor extends App {
         println("Current " + oSensor.gasMeasured + " Level:" + simulatedGasSensor.currentValue)
 
         println("...attach a reactive observable to " + oSensor.name)
-        oSensor.createObservable(1000).subscribe(X => println(oSensor.gasMeasured + " Level: " + X))
+        oSensor.createObservable(1000).subscribe((X: Double) => println(oSensor.gasMeasured + " Level: " + X))
 
         Thread.sleep(10000)
         simulatedGasSensor.stopGeneration()
