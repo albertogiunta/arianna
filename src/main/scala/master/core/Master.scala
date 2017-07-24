@@ -1,7 +1,7 @@
 package master.core
 
 import akka.actor.Props
-import common.{ClusterMembersListener, CustomActor}
+import com.actors.{ClusterMembersListener, CustomActor}
 import master.cluster._
 
 /**

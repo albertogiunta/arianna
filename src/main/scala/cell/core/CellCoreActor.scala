@@ -2,8 +2,8 @@ package cell.core
 
 import akka.actor.{ActorRef, Props}
 import cell.cluster.{CellPublisher, CellSubscriber}
-import cell.processor.route.RouteManager
-import common.{BasicActor, ClusterMembersListener}
+import cell.processor.route.actors.RouteManager
+import com.actors.{BasicActor, ClusterMembersListener}
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology.Subtype.ViewedFromACell
 import ontologies.messages.MessageType._

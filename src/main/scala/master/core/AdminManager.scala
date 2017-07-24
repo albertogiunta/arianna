@@ -4,8 +4,8 @@ import java.io.File
 import java.nio.file.Paths
 
 import akka.actor.{ActorSelection, ActorSystem, Props}
+import com.actors.CustomActor
 import com.typesafe.config.ConfigFactory
-import common.CustomActor
 import master.cluster.MasterPublisher
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Init.Subtype

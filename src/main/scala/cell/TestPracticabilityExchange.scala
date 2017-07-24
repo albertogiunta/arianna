@@ -5,8 +5,8 @@ import java.nio.file.Paths
 
 import akka.actor.{ActorSystem, Props}
 import cell.cluster.{CellPublisher, CellSubscriber}
+import com.actors.ClusterMembersListener
 import com.typesafe.config.ConfigFactory
-import common.ClusterMembersListener
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Update
 import ontologies.messages._

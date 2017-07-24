@@ -1,7 +1,7 @@
-package cell.processor.route
+package cell.processor.route.actors
 
 import akka.actor.{ActorRef, Props}
-import common.BasicActor
+import com.actors.BasicActor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Route
 import ontologies.messages.MessageType.Route.Subtype.{Info, Response}

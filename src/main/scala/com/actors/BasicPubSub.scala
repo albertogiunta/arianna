@@ -1,4 +1,4 @@
-package common
+package com.actors
 
 import akka.actor.ActorRef
 import akka.cluster.pubsub.DistributedPubSub

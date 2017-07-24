@@ -26,8 +26,8 @@ object AStarSearch {
       */
     def A_*[N, R](graph: Graph[N])(source: N, target: N)
                  (extractor: (Graph[N], Map[N, N], N, N) => R): R = {
-        
-        if (source == target) return extractor(graph, Map(target -> source), source, target)
+    
+        if (source == target) return extractor(graph, Map.empty, source, target)
         
         val heuristicCost: (N, N) => Double = (src, dst) => 0.0
         
@@ -101,13 +101,16 @@ object AStarSearch {
           * @return A Map of Node by Transforming the given parents Map and the cost of the path
           */
         def toMap[N](graph: Graph[N], parents: Map[N, N], source: N, target: N): (Map[N, N], Double) = {
-            
-            @tailrec def go(sp: Map[N, N], current: N, successor: N, cost: Double): (Map[N, N], Double) = {
-                if (current == source) (sp.updated(source, successor), cost)
-                else go(sp.updated(current, successor), parents(current), current, cost + graph(current)(successor))
-            }
     
-            go(Map.empty, parents(target), target, graph(parents(target))(target))
+            if (source == target) (Map(source -> target), 0.0)
+            else {
+                @tailrec def go(sp: Map[N, N], current: N, successor: N, cost: Double): (Map[N, N], Double) = {
+                    if (current == source) (sp.updated(source, successor), cost)
+                    else go(sp.updated(current, successor), parents(current), current, cost + graph(current)(successor))
+                }
+        
+                go(Map.empty, parents(target), target, graph(parents(target))(target))
+            }
         }
         
         /**
@@ -120,13 +123,16 @@ object AStarSearch {
           * @return A List of Node by Transforming the given parents Map and the cost of the path
           */
         def toList[N](graph: Graph[N], parents: Map[N, N], source: N, target: N): (List[N], Double) = {
-            
-            @tailrec def go(sp: List[N], current: N, successor: N, cost: Double): (List[N], Double) = {
-                if (current == source) (source :: sp, cost)
-                else go(current :: sp, parents(current), current, cost + graph(current)(successor))
-            }
     
-            go(List(target), parents(target), target, graph(parents(target))(target))
+            if (source == target) (List(target), 0.0)
+            else {
+                @tailrec def go(sp: List[N], current: N, successor: N, cost: Double): (List[N], Double) = {
+                    if (current == source) (source :: sp, cost)
+                    else go(current :: sp, parents(current), current, cost + graph(current)(successor))
+                }
+        
+                go(List(target), parents(target), target, graph(parents(target))(target))
+            }
         }
     }
     

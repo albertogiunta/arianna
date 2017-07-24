@@ -1,6 +1,6 @@
-package cell.processor.route
+package cell.processor.route.actors
 
-import common.CustomActor
+import com.actors.CustomActor
 import ontologies.messages._
 
 import scala.collection.mutable
@@ -9,7 +9,7 @@ import scala.collection.mutable
   * This actor manages a cache of Route. Routes are valid for a time of X seconds
   *
   */
-private class CacheManager(val cacheKeepAlive: Long) extends CustomActor {
+class CacheManager(val cacheKeepAlive: Long) extends CustomActor {
     
     private val routeCache: mutable.Map[(String, String), List[InfoCell]] = mutable.HashMap.empty
     

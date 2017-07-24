@@ -6,8 +6,8 @@ import javafx.embed.swing.JFXPanel
 import javafx.stage.Stage
 
 import akka.actor.{ActorSystem, Props}
+import com.actors.CustomActor
 import com.typesafe.config.ConfigFactory
-import common.CustomActor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.{Alarm, Handshake, Topology}
 import ontologies.messages._

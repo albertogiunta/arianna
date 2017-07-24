@@ -1,4 +1,4 @@
-package common
+package com.actors
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSelection, Stash}
 import akka.extension._

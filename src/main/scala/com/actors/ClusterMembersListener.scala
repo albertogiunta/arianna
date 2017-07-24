@@ -1,4 +1,4 @@
-package common
+package com.actors
 
 import akka.actor.Address
 import akka.cluster.ClusterEvent.{CurrentClusterState, MemberEvent, MemberRemoved, MemberUp}

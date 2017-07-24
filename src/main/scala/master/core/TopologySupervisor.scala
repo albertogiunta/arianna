@@ -1,8 +1,8 @@
 package master.core
 
 import akka.actor.ActorSelection
-import common.BasicActor
-import common.utils.{Counter, Practicability}
+import com.actors.BasicActor
+import com.utils.{Counter, Practicability}
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Handshake.Subtype.CellToMaster
 import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, ViewedFromACell}

@@ -1,7 +1,7 @@
 package master.cluster
 
 import akka.cluster.pubsub.DistributedPubSubMediator._
-import common.BasicPublisher
+import com.actors.BasicPublisher
 import ontologies.Topic
 import ontologies.messages.MessageType._
 import ontologies.messages._

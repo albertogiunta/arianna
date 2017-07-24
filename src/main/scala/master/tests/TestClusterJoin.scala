@@ -6,8 +6,8 @@ import java.nio.file.Paths
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator.Publish
+import com.actors.ClusterMembersListener
 import com.typesafe.config.ConfigFactory
-import common.ClusterMembersListener
 import master.cluster.{MasterPublisher, MasterSubscriber}
 import ontologies.Topic
 import ontologies.messages.Location._

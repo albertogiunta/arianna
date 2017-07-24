@@ -1,7 +1,7 @@
 package master.core
 
 import akka.actor.ActorSelection
-import common.BasicSubscriber
+import com.actors.BasicSubscriber
 import ontologies.Topic
 import ontologies.messages.AriadneMessage
 import ontologies.messages.MessageType.Alarm

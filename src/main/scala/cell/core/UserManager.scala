@@ -6,8 +6,8 @@ import java.nio.file.Paths
 import _root_.io.vertx.core.Vertx
 import akka.actor.{ActorLogging, ActorSystem, Props}
 import cell.WSClient
+import com.actors.BasicActor
 import com.typesafe.config.ConfigFactory
-import common.BasicActor
 import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology

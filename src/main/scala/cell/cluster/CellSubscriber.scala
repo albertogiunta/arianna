@@ -1,7 +1,7 @@
 package cell.cluster
 
 import akka.cluster.pubsub.DistributedPubSubMediator.{Subscribe, SubscribeAck}
-import common.BasicSubscriber
+import com.actors.BasicSubscriber
 import ontologies._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType._

@@ -3,7 +3,7 @@ package master.core
 import akka.actor.ActorSelection
 import akka.stream._
 import akka.stream.scaladsl.{Flow, Sink, Source, SourceQueueWithComplete}
-import common.BasicActor
+import com.actors.BasicActor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Update.Subtype
 import ontologies.messages.MessageType.{Handshake, Update}

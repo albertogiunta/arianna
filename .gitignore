@@ -174,3 +174,5 @@ gradle-app.setting
 
 # End of https://www.gitignore.io/api/java,macos,linux,scala,gradle,windows,intellij
 /classes/
+/arianna.properties
+/arianna.xml
