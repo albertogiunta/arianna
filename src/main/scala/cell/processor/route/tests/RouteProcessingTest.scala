@@ -1,8 +1,6 @@
 package cell.processor.route.tests
 
 import cell.processor.route.actors.RouteProcessor
-import ontologies.messages.Location._
-import ontologies.messages.MessageType.Route
 import ontologies.messages._
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
@@ -295,29 +293,4 @@ class RouteProcessingTest extends FunSuite with BeforeAndAfter {
         
         assert(shp == routeForAlarmSolution)
     }
-    
-    test("Sending and checking request to manager...") {
-        AriadneMessage(
-            Route,
-            Route.Subtype.Info,
-            Location.User >> Location.Cell,
-            RouteInfo(
-                RouteRequest(Random.nextInt().toString, infoCells(1), infoCells(9), isEscape = false),
-                areaForRoute
-            )
-        )
-    }
-    
-    test("Sending and checking alarm to manager...") {
-        AriadneMessage(
-            Route,
-            Route.Subtype.Info,
-            Location.User >> Location.Cell,
-            RouteInfo(
-                RouteRequest(Random.nextInt().toString, infoCells(9), InfoCell.empty, isEscape = true),
-                areaForAlarm
-            )
-        )
-    }
-    
 }

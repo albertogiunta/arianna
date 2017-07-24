@@ -273,30 +273,51 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
     }
     
     "A RouteProcessor Actor" must {
-        
-        "Respond with RouteResponse, holding the SHP from the specified source to the specified target" in {
-            
-            val probe = TestProbe()
-            
-            val core = system.actorOf(Props(new AssertActor(probe)), "AssertActors")
-            
+    
+        val probe = TestProbe()
+    
+        val core = system.actorOf(Props(new AssertActor(probe)), "AssertActor")
+    
+        "Answer with a RouteResponse holding the SHP from the specified source to the specified target" in {
             core ! AriadneMessage(
                 Route, Route.Subtype.Info,
                 Location.User >> Location.Cell,
                 RouteInfo(
-                    RouteRequest("1234", fromCell = infoCells(1), toCell = infoCells(9), isEscape = false),
+                    RouteRequest("15469", fromCell = infoCells(1), toCell = infoCells(9), isEscape = false),
                     areaForRoute
                 )
             )
-            
+        
             probe.expectMsg(
                 FiniteDuration(10L, duration.SECONDS),
                 AriadneMessage(
                     Route, Route.Subtype.Response,
                     Location.Cell >> Location.User,
                     RouteResponse(
-                        RouteRequest("1234", infoCells(1), infoCells(9), isEscape = false),
+                        RouteRequest("15469", infoCells(1), infoCells(9), isEscape = false),
                         routeForAreaSolution
+                    )
+                ))
+        }
+    
+        "Answer with a RouteResponse holding the SHP to the exit when an Escape Request is received" in {
+            core ! AriadneMessage(
+                Route, Route.Subtype.Info,
+                Location.User >> Location.Cell,
+                RouteInfo(
+                    RouteRequest("964512", fromCell = infoCells(9), InfoCell.empty, isEscape = true),
+                    areaForAlarm
+                )
+            )
+        
+            probe.expectMsg(
+                FiniteDuration(10L, duration.SECONDS),
+                AriadneMessage(
+                    Route, Route.Subtype.Response,
+                    Location.Cell >> Location.User,
+                    RouteResponse(
+                        RouteRequest("964512", infoCells(9), infoCells(2), isEscape = true),
+                        routeForAlarmSolution
                     )
                 ))
         }
@@ -323,5 +344,4 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
                 probe.ref forward msg
         }
     }
-    
 }
