@@ -1,5 +1,6 @@
 package cell.sensormanagement.sensors
 
+import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.{DoubleThresholdInfo, SensorInfoFromConfig, SingleThresholdInfo}
 import ontologies.sensor.SensorCategories
 import ontologies.sensor.SensorCategories._
@@ -60,7 +61,7 @@ object SensorsFactory {
         }
     }
 
-    def createTheObservableVersion(sensor: Sensor): ObservableSensor[_ <: Any] = sensor.asInstanceOf match {
+    def createTheObservableVersion(sensor: Sensor): ObservableSensor[_ <: Any] = sensor.category match {
         case Temperature => new ObservableTemperatureSensor(sensor.asInstanceOf[TemperatureSensor])
         case Smoke | Oxygen | CO2 => new ObservableGasSensor(sensor.asInstanceOf[GasSensor])
         case Humidity => new ObservableHumiditySensor(sensor.asInstanceOf[HumiditySensor])

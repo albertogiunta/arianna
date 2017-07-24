@@ -5,6 +5,7 @@ import cell.cluster.{CellPublisher, CellSubscriber}
 import cell.processor.route.RouteManager
 import cell.sensormanagement.SensorManager
 import common.{BasicActor, ClusterMembersListener}
+import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology.Subtype.ViewedFromACell
 import ontologies.messages.MessageType._

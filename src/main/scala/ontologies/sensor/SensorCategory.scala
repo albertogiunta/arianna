@@ -33,7 +33,7 @@ object SensorCategories {
         case 5 => CO2
     }
 
-    def thresholdNumberValue(category: SensorCategory): Int = category {
+    def thresholdNumberValue(category: SensorCategory): Int = category match {
         case Temperature => 2
         case Smoke => 1
         case Humidity => 2

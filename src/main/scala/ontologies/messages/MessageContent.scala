@@ -216,7 +216,7 @@ final case class SensorInfo(categoryId: Int, value: Double) extends MessageConte
 
 final case class SensorInfoFromConfig(categoryId: Int, minValue: Double, maxValue: Double, threshold: String) extends MessageContent
 
-abstract case class ThresholdInfo() extends MessageContent
+abstract class ThresholdInfo() extends MessageContent
 
 final case class SingleThresholdInfo(value: Double) extends ThresholdInfo
 
