@@ -27,7 +27,7 @@ class CellSubscriber extends BasicSubscriber {
     override protected def receptive = {
         case SubscribeAck(Subscribe(topic, None, `self`)) =>
             log.info("{} Successfully Subscribed to {}", name, topic)
-        case msg@AriadneMessage(Topology, Topology.Subtype.Topology4Cell, _, cnt) =>
+        case msg@AriadneMessage(Topology, Topology.Subtype.ViewedFromACell, _, cnt) =>
             log.info("I received the topology: {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
 
             this.parent ! msg
@@ -50,7 +50,7 @@ class CellSubscriber extends BasicSubscriber {
             this.parent ! msg
         case msg@AriadneMessage(Route, _, _, cnt) =>
             log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
-        case msg@AriadneMessage(Handshake, Handshake.Subtype.Cell2Master, _, cnt) =>
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, cnt) =>
             log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
         case _ => desist _
     }

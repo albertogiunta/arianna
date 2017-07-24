@@ -7,6 +7,7 @@
 
 .idea
 *.iml
+/classes
 
 # User-specific stuff:
 .idea/**/workspace.xml
@@ -172,3 +173,4 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 
 # End of https://www.gitignore.io/api/java,macos,linux,scala,gradle,windows,intellij
+/classes/

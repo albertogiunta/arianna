@@ -18,25 +18,21 @@ class SensorManagerActor extends BasicActor {
     private val observationRefresh = 1000
 
     //private var sensors: Map[String, Sensor] = new mutable.HashMap[String, Sensor]
-    private val observableSensors: ListBuffer[ObservableSensor[Any]] = new ListBuffer[ObservableSensor[Any]]
+    private val observableSensors: ListBuffer[ObservableSensor[_ <: Any]] = new ListBuffer[ObservableSensor[_ <: Any]]
 
     private val internalMessage: MessageDirection = Location.Self >> Location.Self
 
 
     override protected def init(args: List[Any]): Unit = {
         //Load the sensor list to initialize from the config file
-        //        var tSensor = new BasicTemperatureSensor("tSensor1", 0, -40.0, 100.0, 100.0 - -40.0)
-        //        var simulatedTempSensor = new SimulatedMonotonicTemperatureSensor(tSensor, 1000, 0.15)
-        //        var oTSensor: ObservableTemperatureSensor = new ObservableTemperatureSensor(simulatedTempSensor)
-        //        oTSensor.createObservable(1000)
-        //            .subscribe((X:Double)=> self ! ontologies.messages.Sensor(oTSensor.category.id, X.asInstanceOf[Double]))
-        //
-        //        var gasSensor = new BasicGasSensor("CO2Sensor", 0, 0, 50.0, 50.0, "CO2")
-        //        var simulatedGasSensor = new SimulatedMonotonicGasSensor(gasSensor, 1000, 0.2)
-        //        var oGSensor = new ObservableGasSensor(simulatedGasSensor)
-        //
-        //        oGSensor.createObservable(1000)
-        //            .subscribe(X => self ! ontologies.messages.Sensor(oGSensor.category, X.asInstanceOf[Double]))
+        var tSensor = new BasicTemperatureSensor("tSensor1", 0, -40.0, 100.0, new TemperatureThreshold(-10, 50))
+        var simulatedTempSensor = new SimulatedMonotonicTemperatureSensor(tSensor, 1000, 0.15)
+        var oTSensor: ObservableTemperatureSensor = new ObservableTemperatureSensor(simulatedTempSensor)
+        observableSensors += oTSensor
+        var gasSensor = new CO2Sensor("CO2Sensor", 0, 0, 50.0, 50.0, new CO2Threshold(30))
+        var simulatedGasSensor = new SimulatedMonotonicGasSensor(gasSensor, 1000, 0.2)
+        var oCSensor = new ObservableGasSensor(simulatedGasSensor)
+        observableSensors += oCSensor
     }
 
     override protected def receptive: Receive = {

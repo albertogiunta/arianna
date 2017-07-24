@@ -6,6 +6,13 @@ import akka.cluster.pubsub.DistributedPubSubMediator.{Put, Subscribe, SubscribeA
 import ontologies.Topic
 
 /**
+  * This class gives a common template for a Akka Subscriber.
+  *
+  * The actual implementation of this Template is partly provided by the BasicActor superclass,
+  * partly by the topics abstract val, where must be placed the topics to which the Actor need to be subscribed.
+  *
+  * The subscription is automatically done during the preStart phase.
+  *
   * Created by Alessandro on 01/07/2017.
   */
 abstract class BasicSubscriber extends BasicActor {
@@ -29,6 +36,10 @@ abstract class BasicSubscriber extends BasicActor {
     }
 }
 
+/**
+  * This class gives a common template for a Akka Publisher
+  *
+  */
 abstract class BasicPublisher extends BasicActor {
 
     // activate the extension

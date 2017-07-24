@@ -12,12 +12,12 @@ object TestMessageSerializer extends App {
     
     var jsonStr: String = MessageType.Update.Subtype.Sensors
         .marshal(
-            SensorList(
+            SensorsInfosUpdate(
                 InfoCell(0, "uri", "name",
                     Coordinates(Point(1, 1), Point(-1, -1), Point(-1, 1), Point(1, -1)),
                     Point(0, 0)
                 ),
-                List(Sensor(1, 2.0), Sensor(2, 1.55))
+                List(SensorInfo(1, 2.0, 0.0, 0.0), SensorInfo(2, 1.55, 0.0, 0.0))
             )
         )
     

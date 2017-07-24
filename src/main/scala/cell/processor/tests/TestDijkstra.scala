@@ -1,7 +1,7 @@
-package processor.tests
+package cell.processor.tests
 
-import processor.route.algorithms.Dijkstra
-import processor.route.algorithms.Dijkstra.Graph
+import cell.processor.route.algorithms.Dijkstra
+import cell.processor.route.algorithms.Dijkstra.Graph
 
 /**
   * Created by Alessandro on 12/07/2017.

@@ -5,7 +5,7 @@ import java.nio.file.Paths
 
 import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
-import master.Master
+import master.core.Master
 
 /**
   * Created by Xander_C on 09/07/2017.

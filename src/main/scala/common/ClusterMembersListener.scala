@@ -10,6 +10,7 @@ import ontologies.messages.{AriadneMessage, Greetings, Location}
 /**
   * This actor implements a listener for members event when nodes interact each other into the cluster
   * For example this actors is notified when the a node complete the connection to the cluster ecc...
+  *
   * Created by Matteo Gabellini on 29/06/2017.
   * Code based on akka code from official documentation
   * [link: http://doc.akka.io/docs/akka/current/scala/cluster-usage.html]
@@ -27,7 +28,6 @@ class ClusterMembersListener extends CustomActor {
         cluster.subscribe(self, classOf[MemberUp], classOf[MemberEvent])
 
         // If this is the master node, Actors should be already Initialized
-
         try {
             if (config.property(builder.akka.cluster.get("seed-nodes"))
                 .stringList.contains(cluster.selfAddress.toString)) {
@@ -37,11 +37,9 @@ class ClusterMembersListener extends CustomActor {
                 siblings ! AriadneMessage(Init, Init.Subtype.Greetings,
                     Location.Server >> Location.Self, Greetings(List(greetings)))
             }
-
         } catch {
             case ex: Throwable => ex.printStackTrace()
         }
-
     }
 
     override def postStop: Unit =

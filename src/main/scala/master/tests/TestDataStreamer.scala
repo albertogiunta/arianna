@@ -44,10 +44,10 @@ object TestDataStreamer extends App {
                 isEntryPoint = true,
                 capacity = 100,
                 currentPeople = Random.nextInt(95),
-                practicabilityLevel = 0.0,
+                practicability = 0.0,
                 squareMeters = 1000,
                 passages = List(Passage(Random.nextInt(1000), Point(1, 1), Point(2, 1))),
-                sensors = List(Sensor(0, Random.nextDouble() * Random.nextInt(30)), Sensor(1, 2.0), Sensor(2, 1.55))
+                sensors = List(Sensor(0, Random.nextDouble() * Random.nextInt(30), 0.0, 0.0), Sensor(1, 2.0, 0.0, 0.0), Sensor(2, 1.55, 0.0, 0.0))
             ))
         
         Thread.sleep(100)
