@@ -1,4 +1,4 @@
-package cell.sensormanagement
+package ontologies.sensor
 
 /**
   * This trait define the basic method to implements a threshold

@@ -20,7 +20,7 @@ import scalafx.application.Platform
 import scalafx.stage.FileChooser
 import scalafx.stage.FileChooser.ExtensionFilter
 
-final case class CellForView(id: Int, name: String, currentOccupation: Int, sensors: List[Sensor])
+final case class CellForView(id: Int, name: String, currentOccupation: Int, sensors: List[SensorInfo])
 
 class InterfaceController extends Initializable {
     var actorRef: ActorRef = _
@@ -90,15 +90,15 @@ class InterfaceController extends Initializable {
             }
         })
     }
-    
-    def initializeSensors(sensorsInfo: SensorsUpdate): Unit = {
+
+    def initializeSensors(sensorsInfo: SensorsInfoUpdate): Unit = {
         var cellController = cellControllers.filter(c => c.cellId.equals(sensorsInfo.info.id)).head
         Platform.runLater {
             sensorsInfo.sensors.foreach(s => {
                 var loader = new FXMLLoader(getClass.getResource("/sensorTemplate.fxml"))
                 var sensor = loader.load[HBox]
                 val sensorController = loader.getController[SensorTemplateController]
-                sensorController.sensorCategory = s.category
+                sensorController.sensorCategory = s.categoryId
                 cellController.sensorsController += sensorController
                 cellController.addSensorTemplate(sensor, s)
             })

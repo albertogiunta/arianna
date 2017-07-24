@@ -17,6 +17,8 @@ final case class Passage(neighborId: Int,
                          startCoordinates: Point,
                          endCoordinates: Point) extends MessageContent
 
+final case class CellConfig(uri: String, sensors: String) extends MessageContent
+
 /**
   * This Class is a Static representation of a Cell
   *
@@ -83,7 +85,7 @@ final case class Area(id: Int,
   * @param practicability How much likely you should walk through this Room
   */
 final case class Cell(info: InfoCell,
-                      sensors: List[Sensor],
+                      sensors: List[SensorInfo],
                       neighbors: List[InfoCell],
                       passages: List[Passage],
                       isEntryPoint: Boolean,
@@ -207,12 +209,18 @@ object CurrentPeopleUpdate {
 /**
   * This case class represent a sensor.
   *
-  * @param category The Category of the Sensor
-  * @param value    The actual Value percieved from the sensor
-  * @param min      The Minimum value for which the held value is not dangerous
-  * @param max      The Maximum value for which the held value is not dangerous
+  * @param categoryId The Category of the Sensor
+  * @param value      The actual Value percieved from the sensor
   */
-final case class Sensor(category: Int, value: Double, min: Double, max: Double) extends MessageContent
+final case class SensorInfo(categoryId: Int, value: Double) extends MessageContent
+
+final case class SensorInfoFromConfig(categoryId: Int, minValue: Double, maxValue: Double, threshold: String) extends MessageContent
+
+abstract case class ThresholdInfo() extends MessageContent
+
+final case class SingleThresholdInfo(value: Double) extends ThresholdInfo
+
+final case class DoubleThresholdInfo(lowThreshold: Double, highThreshold: Double) extends ThresholdInfo
 
 /**
   * This case Class is meant to be used as an Update of all the Sensors data
@@ -221,10 +229,10 @@ final case class Sensor(category: Int, value: Double, min: Double, max: Double) 
   * @param info    The identification info of the Cells that is sending the Updates
   * @param sensors A list of sensors data
   */
-final case class SensorsUpdate(info: InfoCell, sensors: List[Sensor]) extends MessageContent
+final case class SensorsInfoUpdate(info: InfoCell, sensors: List[SensorInfo]) extends MessageContent
 
-object SensorsUpdate {
-    def apply(cell: Cell): SensorsUpdate = new SensorsUpdate(cell.info, cell.sensors)
+object SensorsInfoUpdate {
+    def apply(cell: Cell): SensorsInfoUpdate = new SensorsInfoUpdate(cell.info, cell.sensors)
 }
 
 /**
@@ -268,7 +276,7 @@ object AreaPracticability {
   */
 final case class CellDataUpdate(info: InfoCell,
                                 currentPeople: Int,
-                                sensors: List[Sensor]) extends MessageContent // To be renamed CellData
+                                sensors: List[SensorInfo]) extends MessageContent // To be renamed CellData
 
 object CellDataUpdate {
     def apply(cell: Cell): CellDataUpdate = new CellDataUpdate(cell.info, cell.currentPeople, cell.sensors)

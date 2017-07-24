@@ -24,7 +24,7 @@ class DataStreamer extends BasicActor {
     
     private var streamer: SourceQueueWithComplete[Iterable[Cell]] = _
     private val admin: () => ActorSelection = () => sibling("AdminManager").get
-    
+
     private val handler: AriadneMessage[_] => Unit = msg => admin() ! msg //println(Thread.currentThread().getName + " - " + msg)
     
     private val source = Source.queue[Iterable[Cell]](100, OverflowStrategy.dropHead)
@@ -44,7 +44,7 @@ class DataStreamer extends BasicActor {
         streamer.complete()
         super.postStop
     }
-    
+
     override protected def receptive: Receive = {
     
         case msg: Iterable[Cell] =>

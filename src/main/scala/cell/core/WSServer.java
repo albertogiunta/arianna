@@ -1,31 +1,30 @@
 package cell.core;
 
-import com.sun.tools.javac.util.Pair;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import akka.actor.ActorRef;
+import com.sun.tools.javac.util.Pair;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.ServerWebSocket;
 import ontologies.messages.RouteRequestShort;
 import ontologies.messages.RouteResponse;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 public class WSServer extends AbstractVerticle {
 
-    private final Vertx    vertx;
+    private final Vertx vertx;
     private final ActorRef userActor;
 
-    private Map<String, ServerWebSocket>                                     usersWaitingForDisconnection;
-    private Map<String, ServerWebSocket>                                     usersWaitingForConnectionOk;
-    private Map<String, ServerWebSocket>                                     usersWaitingForArea;
-    private Map<String, ServerWebSocket>                                     usersReadyForAlarm;
+    private Map<String, ServerWebSocket> usersWaitingForDisconnection;
+    private Map<String, ServerWebSocket> usersWaitingForConnectionOk;
+    private Map<String, ServerWebSocket> usersWaitingForArea;
+    private Map<String, ServerWebSocket> usersReadyForAlarm;
     private Map<Pair<Integer, Integer>, List<Pair<String, ServerWebSocket>>> usersWaitingForRoute;
 
-    private String  baseUrl  = "";
+    private String baseUrl = "";
     private Integer basePort = 0;
 
     public WSServer(Vertx vertx, ActorRef userActor, String baseUrl, Integer port) {
@@ -61,8 +60,8 @@ public class WSServer extends AbstractVerticle {
                 ws.handler(data -> {
                     System.out.println("asked route " + data.toString());
                     Integer idStart = Integer.parseInt(data.toString().split("-")[0]);
-                    Integer idEnd   = Integer.parseInt(data.toString().split("-")[1]);
-                    Pair    p       = new Pair<>(idStart, idEnd);
+                    Integer idEnd = Integer.parseInt(data.toString().split("-")[1]);
+                    Pair p = new Pair<>(idStart, idEnd);
                     usersWaitingForRoute.computeIfAbsent(p, k -> new LinkedList<>()).add(new Pair<>(ws.textHandlerID(), ws));
                     userActor.tell(new RouteRequestShort(ws.textHandlerID(), idStart, idEnd, false), ActorRef.noSender());
                 });

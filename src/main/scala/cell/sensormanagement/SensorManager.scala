@@ -4,9 +4,10 @@ import cell.sensormanagement.sensors._
 import common.BasicActor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.{Alarm, Update}
-import ontologies.messages.{AriadneMessage, Location, MessageDirection}
+import ontologies.messages._
+import spray.json._
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ListBuffer, _}
 
 /**
   * This class implements an Actor that manage the different sensors of the cell,
@@ -14,10 +15,11 @@ import scala.collection.mutable.ListBuffer
   * the threshold (set in the configuration file of the cell) in an reactive way
   * Created by Matteo Gabellini on 05/07/2017.
   */
-class SensorManagerActor extends BasicActor {
+class SensorManager extends BasicActor {
     private val observationRefresh = 1000
 
-    //private var sensors: Map[String, Sensor] = new mutable.HashMap[String, Sensor]
+    private var sensors = new HashMap[Int, SensorInfo]
+    private val simulatedSensor: ListBuffer[SimulatedSensor[Double]] = new ListBuffer[SimulatedSensor[Double]]
     private val observableSensors: ListBuffer[ObservableSensor[_ <: Any]] = new ListBuffer[ObservableSensor[_ <: Any]]
 
     private val internalMessage: MessageDirection = Location.Self >> Location.Self
@@ -25,18 +27,35 @@ class SensorManagerActor extends BasicActor {
 
     override protected def init(args: List[Any]): Unit = {
         //Load the sensor list to initialize from the config file
-        var tSensor = new BasicTemperatureSensor("tSensor1", 0, -40.0, 100.0, new TemperatureThreshold(-10, 50))
-        var simulatedTempSensor = new SimulatedMonotonicTemperatureSensor(tSensor, 1000, 0.15)
-        var oTSensor: ObservableTemperatureSensor = new ObservableTemperatureSensor(simulatedTempSensor)
-        observableSensors += oTSensor
-        var gasSensor = new CO2Sensor("CO2Sensor", 0, 0, 50.0, 50.0, new CO2Threshold(30))
-        var simulatedGasSensor = new SimulatedMonotonicGasSensor(gasSensor, 1000, 0.2)
-        var oCSensor = new ObservableGasSensor(simulatedGasSensor)
-        observableSensors += oCSensor
+        var sensorsToLoad = args(0).asInstanceOf[String].parseJson.convertTo[List[SensorInfoFromConfig]]
+        sensorsToLoad foreach (X => {
+            sensors.put(X.categoryId, SensorInfo(X.categoryId, 0))
+            val simSensor = SensorsFactory.createASensorFromConfig(X)
+            simulatedSensor += simSensor.asInstanceOf[SimulatedSensor[Double]]
+            observableSensors += SensorsFactory.createTheObservableVersion(simSensor)
+        })
+        initializeSensors()
     }
 
+    private def initializeSensors(): Unit = {
+        observableSensors foreach (X => {
+            var flow = X.createObservable(observationRefresh)
+            flow.subscribe(Y => self ! ontologies.messages.SensorInfo(X.category.id, Y))
+            if (X.isInstanceOf[SensorWithThreshold[_ <: AnyVal]]) {
+                flow.filter(K => X.asInstanceOf[SensorWithThreshold[_ <: Any]].threshold hasBeenExceeded K)
+                    .subscribe(K => self ! AriadneMessage(
+                        Alarm,
+                        Alarm.Subtype.Basic,
+                        internalMessage,
+                        ontologies.messages.SensorInfo(X.category.id, K.asInstanceOf[Double])))
+            }
+        })
+    }
+
+
     override protected def receptive: Receive = {
-        case msg: ontologies.messages.Sensor =>
+        case msg: ontologies.messages.SensorInfo =>
+            this.sensors.put(msg.categoryId, msg)
             this.parent ! AriadneMessage(Update,
                 Update.Subtype.Sensors,
                 internalMessage, msg)
@@ -44,27 +63,9 @@ class SensorManagerActor extends BasicActor {
             this.parent ! msg
     }
 
-    private def loadSensorfromConfig(): Unit = {
-
-    }
-
-    private def initializeSensors(): Unit = {
-        observableSensors foreach (X => {
-            var flow = X.createObservable(observationRefresh)
-            flow.subscribe(Y => self ! ontologies.messages.Sensor(X.category.id, Y))
-            if (X.isInstanceOf[SensorWithThreshold[_ <: AnyVal]]) {
-                flow.filter(K => X.asInstanceOf[SensorWithThreshold[_ <: Any]].threshold hasBeenExceeded K)
-                    .subscribe(K => self ! AriadneMessage(
-                        Alarm,
-                        Alarm.Subtype.Basic,
-                        internalMessage,
-                        ontologies.messages.Sensor(X.category.id, K.asInstanceOf[Double])))
-            }
-        })
-    }
-
     override def postStop(): Unit = {
         super.postStop()
+        simulatedSensor foreach (X => X.stopGeneration())
         observableSensors foreach (X => X.stopObservation())
     }
 }

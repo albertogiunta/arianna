@@ -10,7 +10,7 @@ import ontologies.messages._
   * Created by Alessandro on 28/06/2017.
   */
 class MasterPublisher extends BasicPublisher {
-    
+
     override protected def receptive = {
         
         case msg@AriadneMessage(Alarm, _, _, _) =>

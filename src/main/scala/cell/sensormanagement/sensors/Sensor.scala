@@ -2,9 +2,8 @@ package cell.sensormanagement.sensors
 
 import java.util.concurrent.{Executors, TimeUnit}
 
-import cell.sensormanagement.Threshold
 import io.reactivex.{BackpressureStrategy, Flowable}
-import ontologies.SensorCategory
+import ontologies.sensor.{SensorCategory, Threshold}
 
 /**
   * a trait for a sensor
@@ -58,7 +57,7 @@ trait SensorWithThreshold[H] extends GenericSensor[H] {
   * This trait define the basic method of a simulation change strategy
   *
   * @tparam D the type of data managed by the sensor.
-  *           corresponds to the T type of the sensor see the trait Sensor
+  *           corresponds to the T type of the sensor (see the trait Sensor)
   * @tparam S an implementation of a Sensor
   */
 trait SimulationStrategy[D, S <: GenericSensor[D]] {
@@ -123,7 +122,8 @@ object SimulationStrategies {
   */
 abstract class SimulatedSensor[E](val sensor: GenericSensor[E],
                                   val millisRefreshRate: Long,
-                                  var changeStrategy: SimulationStrategy[E, GenericSensor[E]]) extends GenericSensor[E] {
+                                  var changeStrategy: SimulationStrategy[E, GenericSensor[E]])
+    extends GenericSensor[E] {
     var value: E = sensor.currentValue
 
     //thread safe read-access to the current value
@@ -145,23 +145,26 @@ abstract class SimulatedSensor[E](val sensor: GenericSensor[E],
     def stopGeneration(): Unit = {
         this.executor.shutdown()
     }
+
+    override def name: String = sensor.name
+
+    override def category: SensorCategory = sensor.category
 }
 
 
 class SimulatedNumericSensor[F](override val sensor: NumericSensor[F],
                                 override val millisRefreshRate: Long,
                                 var numericChangeStrategy: SimulationStrategy[F, NumericSensor[F]])
-    extends SimulatedSensor[F](sensor, millisRefreshRate, numericChangeStrategy.asInstanceOf[SimulationStrategy[F, GenericSensor[F]]]) with NumericSensor[F] {
+    extends SimulatedSensor[F](sensor,
+        millisRefreshRate,
+        numericChangeStrategy.asInstanceOf[SimulationStrategy[F, GenericSensor[F]]])
+        with NumericSensor[F] {
 
     override def minValue: F = sensor.minValue
 
     override def maxValue: F = sensor.maxValue
 
     override def range: F = sensor.range
-
-    override def name: String = sensor.name
-
-    override def category: SensorCategory = sensor.category
 }
 
 

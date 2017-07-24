@@ -37,10 +37,10 @@ case class Counter(private val start: Int) {
 }
 
 object Counter {
-    
+
     def apply(): Counter = new Counter(0)
-    
+
     implicit def counterToInt(counter: Counter): Int = counter.get
-    
+
     implicit def intToCounter(n: Int): Counter = new Counter(n)
 }

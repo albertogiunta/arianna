@@ -1,4 +1,4 @@
-package ontologies
+package ontologies.sensor
 
 /**
   * A trait for a category of sensor
@@ -24,4 +24,21 @@ object SensorCategories {
 
     object CO2 extends BasicSensorCategory("CO2 Sensor", 5)
 
+
+    def categoryWithId(id: Int): SensorCategory = id match {
+        case 1 => Temperature
+        case 2 => Smoke
+        case 3 => Humidity
+        case 4 => Oxygen
+        case 5 => CO2
+    }
+
+    def thresholdNumberValue(category: SensorCategory): Int = category {
+        case Temperature => 2
+        case Smoke => 1
+        case Humidity => 2
+        case Oxygen => 1
+        case CO2 => 1
+    }
 }
+

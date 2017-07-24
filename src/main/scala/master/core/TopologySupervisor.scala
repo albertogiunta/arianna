@@ -28,7 +28,7 @@ class TopologySupervisor extends BasicActor {
     private val server2Cell: MessageDirection = cell2Server.reverse
     private val admin2Server: MessageDirection = Location.Admin >> Location.Server
     private val server2Admin: MessageDirection = admin2Server.reverse
-    
+
     private val dataStreamer: () => ActorSelection = () => sibling("DataStreamer").get
     private val publisher: () => ActorSelection = () => sibling("Publisher").get
     private val subscriber: () => ActorSelection = () => sibling("Subscriber").get
@@ -56,15 +56,15 @@ class TopologySupervisor extends BasicActor {
     }
     
     private def sociable: Receive = {
-    
-        case msg@AriadneMessage(Handshake, CellToMaster, `cell2Server`, SensorsUpdate(cell, _)) =>
+
+        case msg@AriadneMessage(Handshake, CellToMaster, `cell2Server`, SensorsInfoUpdate(cell, _)) =>
     
             log.info(msg.toString)
 
             if (topology.get(cell.uri).nonEmpty) {
                 log.info("Found a match into the loaded Topology for {}", cell.uri)
                 topology.put(cell.uri, topology(cell.uri).copy(info = cell))
-    
+
                 dataStreamer() ! msg
                 
                 if ((synced ++) == topology.size) {
@@ -88,7 +88,7 @@ class TopologySupervisor extends BasicActor {
     }
     
     private def proactive: Receive = {
-    
+
         case AriadneMessage(Update, CurrentPeople, `cell2Server`, pkg: CurrentPeopleUpdate) =>
 
             if (topology.get(pkg.info.uri).nonEmpty) {
@@ -105,7 +105,7 @@ class TopologySupervisor extends BasicActor {
                 dataStreamer() ! topology.values
             }
 
-        case AriadneMessage(Update, Sensors, `cell2Server`, pkg: SensorsUpdate) =>
+        case AriadneMessage(Update, Sensors, `cell2Server`, pkg: SensorsInfoUpdate) =>
 
             if (topology.get(pkg.info.uri).nonEmpty) {
                 val news = topology(pkg.info.uri).copy(sensors = pkg.sensors)
@@ -118,7 +118,7 @@ class TopologySupervisor extends BasicActor {
 
         case AriadneMessage(Handshake, CellToMaster, `cell2Server`, _) =>
             log.info("Late handshake from {}...", sender.path)
-    
+
             publisher() ! (
                 sender.path.toString,
                 AriadneMessage(

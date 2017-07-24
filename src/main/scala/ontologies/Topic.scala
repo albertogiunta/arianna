@@ -12,7 +12,7 @@ trait Topic {
     def associatedMessageSubtype: Option[MessageSubtype]
     
     val topic: String
-    
+
     val subTopic: Option[String]
     
     override def toString: String = {
@@ -32,15 +32,15 @@ case class AriadneTopic(override val topic: String, override val subTopic: Optio
 }
 
 object Topic {
-    
+
     val Alarms = AriadneTopic(MessageType.Alarm, Option.empty)
-    
+
     val Topologies = AriadneTopic(MessageType.Topology, Option.empty)
-    
+
     val HandShakes = AriadneTopic(MessageType.Handshake, Option.empty)
-    
+
     val Routes = AriadneTopic(MessageType.Route, Option.empty)
-    
+
     val Updates = AriadneTopic(MessageType.Update, Option.empty)
     
     val Practicabilities = AriadneTopic(MessageType.Update, Option(MessageType.Update.Subtype.Practicability))
@@ -48,7 +48,7 @@ object Topic {
     implicit def Topic2String(topic: Topic): String = topic.toString
     
     implicit def Topic2MessageType(topic: Topic): MessageType = topic.associatedMessageType
-    
+
     implicit def Topic2MessageSubtype(topic: Topic): MessageSubtype = topic.associatedMessageSubtype.orNull
 }
 

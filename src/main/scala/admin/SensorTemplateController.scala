@@ -6,7 +6,7 @@ import javafx.fxml.{FXML, Initializable}
 import javafx.scene.control.Label
 import javafx.scene.text.Text
 
-import ontologies.messages.Sensor
+import ontologies.messages.SensorInfo
 
 class SensorTemplateController extends Initializable {
 
@@ -18,11 +18,11 @@ class SensorTemplateController extends Initializable {
 
     var sensorCategory: Int = _
 
-    def createSensor(sensor: Sensor): Unit = {
-        sensorName.setText(assignSensorName(sensor.category));
+    def createSensor(sensor: SensorInfo): Unit = {
+        sensorName.setText(assignSensorName(sensor.categoryId));
     }
 
-    def updateSensor(sensor: Sensor): Unit = {
+    def updateSensor(sensor: SensorInfo): Unit = {
         sensorValue.setText(sensor.value.toString)
     }
 

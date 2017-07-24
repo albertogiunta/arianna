@@ -1,7 +1,6 @@
 package cell.sensormanagement.sensors
 
-import cell.sensormanagement.{DoubleThreshold, Threshold}
-import ontologies.{SensorCategories, SensorCategory}
+import ontologies.sensor.{DoubleThreshold, SensorCategories, SensorCategory, Threshold}
 
 /**
   * A basic trait for a temperature sensor
@@ -11,13 +10,14 @@ trait TemperatureSensor extends NumericSensor[Double] with SensorWithThreshold[D
     def measureUnit: String
 
     override def category: SensorCategory = SensorCategories.Temperature
+
+    override def range: Double = maxValue - minValue
 }
 
 case class BasicTemperatureSensor(override val name: String,
                                   override val currentValue: Double,
                                   override val minValue: Double,
                                   override val maxValue: Double,
-                                  override val range: Double,
                                   override val threshold: TemperatureThreshold,
                                   override val measureUnit: String = TemperatureUnitMeasure.Celsius
                                  ) extends TemperatureSensor

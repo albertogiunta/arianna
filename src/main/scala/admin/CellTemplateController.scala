@@ -6,7 +6,7 @@ import javafx.fxml.{FXML, Initializable}
 import javafx.scene.layout.{HBox, VBox}
 import javafx.scene.text.Text
 
-import ontologies.messages.{Cell, Sensor}
+import ontologies.messages.{Cell, SensorInfo}
 
 import scala.collection.mutable.ListBuffer
 
@@ -48,13 +48,13 @@ class CellTemplateController extends Initializable {
     def setDynamicInformation(cell: CellForView): Unit = {
         currentPeopleValue.setText(cell.currentOccupation.toString)
         cell.sensors.foreach(s => {
-            val controller = sensorsController.filter(c => c.sensorCategory.equals(s.category)).head
+            val controller = sensorsController.filter(c => c.sensorCategory.equals(s.categoryId)).head
             controller.updateSensor(s)
         })
     }
 
-    def addSensorTemplate(sensorTemplate: HBox, sensor: Sensor): Unit = {
-        val controller = sensorsController.filter(c => c.sensorCategory.equals(sensor.category)).head
+    def addSensorTemplate(sensorTemplate: HBox, sensor: SensorInfo): Unit = {
+        val controller = sensorsController.filter(c => c.sensorCategory.equals(sensor.categoryId)).head
         controller.createSensor(sensor)
         sensorsContainer.getChildren.add(sensorTemplate)
         //TODO : ordina gli elementi sull'id

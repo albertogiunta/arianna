@@ -1,12 +1,31 @@
 {
-    "infoCell": {
-        "id": 1,
-      "uri": "uri1"
-    },
+    "uri": "uri1",
     "sensors": [
         {
             "category": 1,
-            "value": 10.0
+            "min": -40.0,
+            "max": 100.0,
+            "threshold": {
+                "min": -10,
+                "max": 50
+            }
+        },
+        {
+            "category": 2,
+            "min": 0.0,
+            "max": 50.0,
+            "threshold": {
+                "value": 30
+            }
+        },
+        {
+            "category": 3,
+            "min": 0,
+            "max": 100,
+            "threshold": {
+                "min": 20,
+                "max": 80
+            }
         }
     ]
 

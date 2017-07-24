@@ -1,7 +1,6 @@
 package cell.sensormanagement.sensors
 
-import cell.sensormanagement.{SingleThreshold, Threshold}
-import ontologies.{SensorCategories, SensorCategory}
+import ontologies.sensor.{SensorCategories, SensorCategory, SingleThreshold, Threshold}
 
 /**
   * A trait for a basic smoke sensor
@@ -9,6 +8,8 @@ import ontologies.{SensorCategories, SensorCategory}
   */
 trait GasSensor extends NumericSensor[Double] with SensorWithThreshold[Double] {
     def gasMeasured: String
+
+    override def range: Double = maxValue - minValue
 }
 
 object Gas {
@@ -21,16 +22,14 @@ abstract class BasicGasSensor(override val name: String,
                               override val currentValue: Double,
                           override val minValue: Double,
                           override val maxValue: Double,
-                          override val range: Double,
                           override val gasMeasured: String) extends GasSensor
 
 case class SmokeSensor(override val name: String,
                        override val currentValue: Double,
                        override val minValue: Double,
                        override val maxValue: Double,
-                       override val range: Double,
                        override val threshold: SmokeThreshold)
-    extends BasicGasSensor(name, currentValue, minValue, maxValue, range, Gas.carbonMonoxide) {
+    extends BasicGasSensor(name, currentValue, minValue, maxValue, Gas.carbonMonoxide) {
     override def category: SensorCategory = SensorCategories.Smoke
 }
 
@@ -43,9 +42,8 @@ case class CO2Sensor(override val name: String,
                      override val currentValue: Double,
                      override val minValue: Double,
                      override val maxValue: Double,
-                     override val range: Double,
                      override val threshold: CO2Threshold)
-    extends BasicGasSensor(name, currentValue, minValue, maxValue, range, Gas.carbonMonoxide) {
+    extends BasicGasSensor(name, currentValue, minValue, maxValue, Gas.carbonMonoxide) {
     override def category: SensorCategory = SensorCategories.CO2
 }
 
@@ -58,9 +56,8 @@ case class OxygenSensor(override val name: String,
                         override val currentValue: Double,
                         override val minValue: Double,
                         override val maxValue: Double,
-                        override val range: Double,
                         override val threshold: OxygenThreshold)
-    extends BasicGasSensor(name, currentValue, minValue, maxValue, range, Gas.oxygen) {
+    extends BasicGasSensor(name, currentValue, minValue, maxValue, Gas.oxygen) {
     override def category: SensorCategory = SensorCategories.Oxygen
 }
 

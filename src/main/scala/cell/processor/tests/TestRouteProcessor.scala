@@ -23,7 +23,7 @@ object TestRouteProcessor extends App {
             antennaPosition = Point(3, 3)
         )
     ).toMap
-    
+
     val areaForRoute = AreaViewedFromACell(
         Random.nextInt(Int.MaxValue),
         List(
@@ -143,12 +143,12 @@ object TestRouteProcessor extends App {
             )
         ))
     val cells = areaForRoute.cells
-    
+
     val asMap: Map[String, CellViewedFromACell] = HashMap(cells.map(c => c.info.name -> c): _*)
     
     val fromCell = "Cell1"
     val toCell = "Cell9"
-    
+
     //    import cell.processor.route.algorithms.AStarSearch
     //    import cell.processor.route.algorithms.AStarSearch.Graph
     //
@@ -197,7 +197,7 @@ object TestRouteProcessor extends App {
     )
     
     Thread.sleep(1000L)
-    
+
     val areaForAlarm = AreaViewedFromACell(
         Random.nextInt(Int.MaxValue),
         List(

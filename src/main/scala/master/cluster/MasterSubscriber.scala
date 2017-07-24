@@ -21,7 +21,7 @@ class MasterSubscriber extends BasicSubscriber {
     
     private val cell2Server: MessageDirection = Location.Server << Location.Cell
     private val admin2Server: MessageDirection = Location.Admin >> Location.Server
-    
+
     private val topologySupervisor: () => ActorSelection = () => sibling("Publisher").get
     private val publisher: () => ActorSelection = () => sibling("TopologySupervisor").get
     
@@ -46,12 +46,12 @@ class MasterSubscriber extends BasicSubscriber {
     }
     
     private def sociable: Receive = {
-    
+
         case msg@AriadneMessage(Handshake, CellToMaster, `cell2Server`, _) =>
             log.info("Resolving Handshake from {}", sender.path)
-    
+
             topologySupervisor() forward msg
-    
+
         case msg@AriadneMessage(Topology, ViewedFromACell, _, _) =>
             log.info("All the Cells have been mapped into their logical position into the Planimetry")
     
@@ -59,7 +59,7 @@ class MasterSubscriber extends BasicSubscriber {
             log.info("I've become ProActive...")
     
             unstashAll
-    
+
             publisher() forward msg
 
         case _ => stash

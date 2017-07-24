@@ -16,20 +16,20 @@ import ontologies.messages.MessageType.Alarm.Subtype.Basic
   */
 class AlarmSupervisor extends BasicSubscriber {
     override val topics = Set(Topic.Alarms)
-    
+
     private val topologySupervisor: () => ActorSelection = () => sibling("TopologySupervisor").get
     private val admin: () => ActorSelection = () => sibling("AdminManager").get
     
     override protected def receptive = {
-    
+
         case msg@AriadneMessage(Alarm, subtype, _, _) =>
             log.info("Got {} from {}", msg.toString, sender.path.name)
-        
+
             subtype match {
                 case Basic => admin() forward msg
                 case _ => // Ignore
             }
-    
+
             topologySupervisor() forward msg
     
         case _ => desist _

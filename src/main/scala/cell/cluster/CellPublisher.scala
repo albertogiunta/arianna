@@ -15,7 +15,7 @@ import scala.concurrent.Future
   * Created by Matteo Gabellini on 29/06/2017.
   */
 class CellPublisher extends BasicPublisher {
-    
+
     /*
     * Provisional constants that represents the cell's info.
     * In the future this info will be modelled in a different way
@@ -34,9 +34,9 @@ class CellPublisher extends BasicPublisher {
     
     override protected def init(args: List[Any]) = {
         log.info("Hello there from {}!", name)
-    
+
         log.info("Sending Handshake to Master...")
-    
+
         Future {
             Thread.sleep(1000)
         }.onComplete(_ =>
@@ -45,7 +45,7 @@ class CellPublisher extends BasicPublisher {
                     Handshake,
                     Handshake.Subtype.CellToMaster,
                     Location.Cell >> Location.Server,
-                    SensorsUpdate(
+                    SensorsInfoUpdate(
                         InfoCell(cellID, cellUri, cellName, roomVertices, antennaPosition),
                         List()
                     )
@@ -53,7 +53,7 @@ class CellPublisher extends BasicPublisher {
             )
         )
     }
-    
+
     override protected def receptive = {
         case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, _) =>
             mediator ! Publish(Topic.HandShakes, msg)
@@ -62,7 +62,7 @@ class CellPublisher extends BasicPublisher {
             mediator ! Publish(Topic.Updates, msg)
 
         case msg@AriadneMessage(Update, Update.Subtype.Practicability, _, _) =>
-    
+
             mediator ! Publish(Topic.Practicabilities, msg)
 
         case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, _, _) =>
