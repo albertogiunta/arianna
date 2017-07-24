@@ -20,7 +20,7 @@ object TestReactiveSensor extends App {
 
 
     println("...attach a reactive observable to " + oTSensor.name)
-    oTSensor.createObservable(1000).subscribe(X => println("Temperature: " + X))
+    oTSensor.createObservable(1000).subscribe((X: Double) => println("Temperature: " + X))
 
     Thread.sleep(10000)
     simulatedTempSensor.stopGeneration()

@@ -176,7 +176,7 @@ trait ObservableSensor[G] extends GenericSensor[G] {
       * @param refreshPeriod milliseconds between each refresh
       * @return
       */
-    def createObservable(refreshPeriod: Long): Flowable[G]
+    def createObservable[G](refreshPeriod: Long): Flowable[G]
 
     /**
       * Stop the observation on the decorated Sensor
@@ -199,14 +199,14 @@ class ObservableNumericSensor[T](private val sensor: NumericSensor[T])
 
     override def currentValue: T = sensor.currentValue
 
-    override def createObservable(refreshPeriod: Long): Flowable[T] = Flowable.create[T](emitter => {
+    override def createObservable[T](refreshPeriod: Long): Flowable[T] = Flowable.create[T](emitter => {
         continueObservation = true
         new Thread(() => {
-            var currentValue: T = sensor.currentValue
-            var tmpPrev = sensor.minValue
+            var currentValue: T = sensor.currentValue.asInstanceOf[T]
+            var tmpPrev = sensor.minValue.asInstanceOf[T]
             while (continueObservation) {
                 try {
-                    currentValue = sensor.currentValue
+                    currentValue = sensor.currentValue.asInstanceOf[T]
                     if (tmpPrev != currentValue) {
                         emitter.onNext(currentValue);
                         tmpPrev = currentValue;
