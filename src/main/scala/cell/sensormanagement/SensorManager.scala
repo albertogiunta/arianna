@@ -41,14 +41,16 @@ class SensorManager extends BasicActor {
     private def initializeSensors(): Unit = {
         observableSensors foreach (X => {
             var flow = X.createObservable(observationRefresh)
-            flow.subscribe(Y => self ! ontologies.messages.SensorInfo(X.category.id, Y))
-            if (X.isInstanceOf[SensorWithThreshold[_ <: AnyVal]]) {
-                flow.filter(K => X.asInstanceOf[SensorWithThreshold[_ <: Any]].threshold hasBeenExceeded K)
-                    .subscribe(K => self ! AriadneMessage(
-                        Alarm,
-                        Alarm.Subtype.Basic,
-                        internalMessage,
-                        ontologies.messages.SensorInfo(X.category.id, K.asInstanceOf[Double])))
+            flow.subscribe((Y: Double) => self ! ontologies.messages.SensorInfo(X.category.id, Y))
+            X match {
+                case x: SensorWithThreshold[Double] => {
+                    flow.filter((K: Double) => x.threshold hasBeenExceeded K)
+                        .subscribe((K: Double) => self ! AriadneMessage(
+                            Alarm,
+                            Alarm.Subtype.Basic,
+                            internalMessage,
+                            ontologies.messages.SensorInfo(X.category.id, K)))
+                }
             }
         })
     }
