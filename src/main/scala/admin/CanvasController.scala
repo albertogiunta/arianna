@@ -12,10 +12,10 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 sealed case class Room(roomVertices: Coordinates) {
-    val x: Double = roomVertices.southWest.x
-    val y: Double = roomVertices.southWest.y
+    val x: Double = roomVertices.northWest.x
+    val y: Double = roomVertices.northWest.y
     val width: Double = roomVertices.northEast.x - roomVertices.northWest.x
-    val height: Double = roomVertices.northWest.y - roomVertices.southWest.y
+    val height: Double = roomVertices.southWest.y - roomVertices.northWest.y
 }
 
 /**
@@ -57,6 +57,7 @@ class CanvasController extends Initializable {
         rooms += ((cell.info.id, (room, passages)))
         drawRoom(room, Color.WHITE)
         drawPassages(passages)
+        drawAntenna(cell.info.antennaPosition)
     }
 
     /**
@@ -72,6 +73,7 @@ class CanvasController extends Initializable {
     }
 
     private def drawRoom(room: Room, color: Color): Unit = {
+        println("Disegno la stanza")
         val gc = mapCanvas.getGraphicsContext2D
         gc setStroke Color.BLACK
         gc setFill color
@@ -84,6 +86,12 @@ class CanvasController extends Initializable {
         val gc = mapCanvas.getGraphicsContext2D
         gc setStroke Color.LIGHTGRAY
         lines.foreach(line => gc strokeLine(line.startPoint.x, line.startPoint.y, line.endPoint.x, line.endPoint.y))
+    }
+
+    private def drawAntenna(point: Point): Unit = {
+        val gc = mapCanvas.getGraphicsContext2D
+        gc setStroke Color.GREEN
+        gc strokeOval(point.x, point.y, 2.0, 2.0)
     }
 
 }
