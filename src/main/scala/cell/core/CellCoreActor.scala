@@ -63,7 +63,7 @@ class CellCoreActor extends BasicActor {
         sensorManager ! AriadneMessage(Init,
             Init.Subtype.Greetings,
             Location.Self >> Location.Self,
-            Greetings(List(loadedInfo.sensors)))
+            Greetings(List(loadedInfo.sensors.toJson.toString())))
 
         userActor ! AriadneMessage(Init,
             Init.Subtype.Greetings,

@@ -17,7 +17,7 @@ final case class Passage(neighborId: Int,
                          startCoordinates: Point,
                          endCoordinates: Point) extends MessageContent
 
-final case class CellConfig(uri: String, sensors: String) extends MessageContent
+final case class CellConfig(uri: String, sensors: List[SensorInfoFromConfig]) extends MessageContent
 
 /**
   * This Class is a Static representation of a Cell
@@ -214,9 +214,9 @@ object CurrentPeopleUpdate {
   */
 final case class SensorInfo(categoryId: Int, value: Double) extends MessageContent
 
-final case class SensorInfoFromConfig(categoryId: Int, minValue: Double, maxValue: Double, threshold: String) extends MessageContent
+final case class SensorInfoFromConfig(categoryId: Int, minValue: Double, maxValue: Double, threshold: ThresholdInfo) extends MessageContent
 
-abstract class ThresholdInfo() extends MessageContent
+abstract class ThresholdInfo extends MessageContent
 
 final case class SingleThresholdInfo(value: Double) extends ThresholdInfo
 

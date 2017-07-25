@@ -1,10 +1,8 @@
 package cell.sensormanagement.sensors
 
-import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.{DoubleThresholdInfo, SensorInfoFromConfig, SingleThresholdInfo}
 import ontologies.sensor.SensorCategories
 import ontologies.sensor.SensorCategories._
-import spray.json._
 
 /**
   * Created by Matteo Gabellini on 24/07/2017.
@@ -69,32 +67,32 @@ object SensorsFactory {
 
     def createASensorFromConfig(sensorInfo: SensorInfoFromConfig): Sensor = SensorCategories.categoryWithId(sensorInfo.categoryId) match {
         case Temperature =>
-            val threshold = sensorInfo.threshold.parseJson.convertTo[DoubleThresholdInfo]
+            val threshold = sensorInfo.threshold.asInstanceOf[DoubleThresholdInfo]
             Simulated.createTempSensor(
                 sensorInfo.minValue,
                 sensorInfo.maxValue,
                 threshold.lowThreshold,
                 threshold.highThreshold, DEFAULT_REFRESH_RATE)
         case Smoke =>
-            val threshold = sensorInfo.threshold.parseJson.convertTo[SingleThresholdInfo]
+            val threshold = sensorInfo.threshold.asInstanceOf[SingleThresholdInfo]
             Simulated.createSmokeSensor(
                 sensorInfo.minValue,
                 sensorInfo.maxValue,
                 threshold.value, DEFAULT_REFRESH_RATE)
         case Oxygen =>
-            val threshold = sensorInfo.threshold.parseJson.convertTo[SingleThresholdInfo]
+            val threshold = sensorInfo.threshold.asInstanceOf[SingleThresholdInfo]
             Simulated.createOxygenSensor(
                 sensorInfo.minValue,
                 sensorInfo.maxValue,
                 threshold.value, DEFAULT_REFRESH_RATE)
         case CO2 =>
-            val threshold = sensorInfo.threshold.parseJson.convertTo[SingleThresholdInfo]
+            val threshold = sensorInfo.threshold.asInstanceOf[SingleThresholdInfo]
             Simulated.createCO2Sensor(
                 sensorInfo.minValue,
                 sensorInfo.maxValue,
                 threshold.value, DEFAULT_REFRESH_RATE)
         case Humidity =>
-            val threshold = sensorInfo.threshold.parseJson.convertTo[DoubleThresholdInfo]
+            val threshold = sensorInfo.threshold.asInstanceOf[DoubleThresholdInfo]
             Simulated.createHumiditySensor(
                 sensorInfo.minValue,
                 sensorInfo.maxValue,

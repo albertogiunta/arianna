@@ -1,6 +1,6 @@
 package ontologies.messages
 
-import spray.json.{DefaultJsonProtocol, RootJsonFormat}
+import spray.json.{DefaultJsonProtocol, JsValue, RootJsonFormat}
 
 /**
   * Created by Xander_C on 03/07/2017.
@@ -13,6 +13,19 @@ object AriannaJsonProtocol extends DefaultJsonProtocol {
     implicit val infoCellFormat: RootJsonFormat[InfoCell] = jsonFormat5(InfoCell.apply)
     implicit val passageFormat: RootJsonFormat[Passage] = jsonFormat3(Passage)
     implicit val sensorFormat: RootJsonFormat[SensorInfo] = jsonFormat2(SensorInfo)
+    implicit val thresholdJsonFormat: RootJsonFormat[ThresholdInfo] = new RootJsonFormat[ThresholdInfo] {
+        override def write(c: ThresholdInfo) = c match {
+            case c: SingleThresholdInfo => singleThreshold.write(c)
+            case c: DoubleThresholdInfo => doubleThreshold.write(c)
+        }
+
+        override def read(value: JsValue) = {
+            value.asJsObject.fields.size match {
+                case 1 => singleThreshold.read(value)
+                case 2 => doubleThreshold.read(value)
+            }
+        }
+    }
     implicit val sensorFormatFromConfig: RootJsonFormat[SensorInfoFromConfig] = jsonFormat4(SensorInfoFromConfig)
     implicit val cellConfig: RootJsonFormat[CellConfig] = jsonFormat2(CellConfig)
     implicit val singleThreshold: RootJsonFormat[SingleThresholdInfo] = jsonFormat1(SingleThresholdInfo)

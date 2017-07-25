@@ -27,7 +27,7 @@ class SensorManager extends BasicActor {
 
 
     override protected def init(args: List[Any]): Unit = {
-        //Load the sensor list to initialize from the config file
+
         var sensorsToLoad = args(0).asInstanceOf[String].parseJson.convertTo[List[SensorInfoFromConfig]]
         sensorsToLoad foreach (X => {
             sensors.put(X.categoryId, SensorInfo(X.categoryId, 0))
