@@ -3,7 +3,8 @@ package cell.sensormanagement.sensors
 import ontologies.sensor.{SensorCategories, SensorCategory, SingleThreshold, Threshold}
 
 /**
-  * A trait for a basic smoke sensor
+  * A trait for a generic gas sensor that measure the gas level
+  * with a Double type scale
   * Created by Matteo Gabellini on 05/07/2017.
   */
 trait GasSensor extends NumericSensor[Double] with SensorWithThreshold[Double] {
@@ -12,12 +13,18 @@ trait GasSensor extends NumericSensor[Double] with SensorWithThreshold[Double] {
     override def range: Double = maxValue - minValue
 }
 
+/**
+  * Different type of Gas
+  **/
 object Gas {
     val carbonMonoxide = "CO"
     val carbonDioxide = "CO2"
     val oxygen = "O"
 }
 
+/**
+  * A basic implementation of a sensor
+  **/
 abstract class BasicGasSensor(override val name: String,
                               override val currentValue: Double,
                           override val minValue: Double,

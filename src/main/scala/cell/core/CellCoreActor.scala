@@ -17,7 +17,8 @@ import scala.io.Source
 import scala.util.Random
 
 /**
-  * This is the main actor of a cell, it
+  * This is the main actor of a cell, it provide the main cell management and
+  * the other cell's actors initialization
   * Created by Matteo Gabellini on 14/07/2017.
   */
 class CellCoreActor extends BasicActor {
@@ -36,10 +37,11 @@ class CellCoreActor extends BasicActor {
     var userActor: ActorRef = _
     var routeManager: ActorRef = _
 
-    private val internalMessage: MessageDirection = Location.Self >> Location.Self
+    private val self2Self: MessageDirection = Location.Self >> Location.Self
     private val server2Cell: MessageDirection = Location.Server >> Location.Cell
     private val cell2Server: MessageDirection = Location.Server << Location.Cell
     private val cell2Cell: MessageDirection = Location.Cell << Location.Cell
+    private val cell2Cluster: MessageDirection = Location.Cell >> Location.Cluster
     private val cell2User: MessageDirection = Location.Cell >> Location.User
     private val user2Cell: MessageDirection = Location.Cell << Location.User
 
@@ -64,12 +66,12 @@ class CellCoreActor extends BasicActor {
 
         sensorManager ! AriadneMessage(Init,
             Init.Subtype.Greetings,
-            Location.Self >> Location.Self,
+            self2Self,
             Greetings(List(loadedInfo.sensors.toJson.toString())))
 
         userActor ! AriadneMessage(Init,
             Init.Subtype.Greetings,
-            Location.Self >> Location.Self,
+            self2Self,
             Greetings(List(greetings)))
     }
 
@@ -80,7 +82,7 @@ class CellCoreActor extends BasicActor {
             cnt.cells.foreach(X => topology.put(X.info.uri, X))
             userActor ! msg.copy(direction = cell2User)
 
-        case msg@AriadneMessage(Update, Update.Subtype.Sensors, internalMessage, cnt: SensorsInfoUpdate) =>
+        case msg@AriadneMessage(Update, Update.Subtype.Sensors, self2Self, cnt: SensorsInfoUpdate) =>
             cellPublisher ! msg.copy(content = cnt.copy(info = this.infoCell))
         case AriadneMessage(Update, Update.Subtype.Practicability, `cell2Cell`, cnt: PracticabilityUpdate) =>
             topology.put(cnt.info.uri, topology(cnt.info.uri)
@@ -109,7 +111,7 @@ class CellCoreActor extends BasicActor {
             routeManager ! AriadneMessage(
                 Route,
                 Route.Subtype.Info,
-                Location.Self >> Location.Self,
+                self2Self,
                 RouteInfo(
                     cnt,
                     AreaViewedFromACell(Random.nextInt(), topology.values.toList)
@@ -120,14 +122,17 @@ class CellCoreActor extends BasicActor {
             //route response from route manager for the user
             userActor ! msg
 
-        case msg@AriadneMessage(Alarm, _, internalMessage, cnt) =>
+        case msg@AriadneMessage(Alarm, _, self2Self, cnt) =>
             //Alarm triggered in the on in the current cell
             val currentCell: CellViewedFromACell = topology.get(infoCell.uri).get
-            val msgToSend = msg.copy(direction = cell2Server,
+            val msgToSend = msg.copy(direction = cell2Cluster,
                 content = AlarmContent(infoCell,
                     currentCell.isExitPoint,
-                    currentCell.isEntryPoint))
+                    currentCell.isEntryPoint
+                )
+            )
             cellPublisher ! msgToSend
+
         case AriadneMessage(Alarm, _, _, alarm) =>
             val (id, area) = alarm match {
                 case AlarmContent(compromisedCell, _, _) =>
@@ -143,7 +148,7 @@ class CellCoreActor extends BasicActor {
             routeManager ! AriadneMessage(
                 Route,
                 Route.Subtype.Info,
-                Location.Self >> Location.Self,
+                self2Self,
                 RouteInfo(
                     RouteRequest(id, topology(infoCell.uri).info, InfoCell.empty, isEscape = true),
                     AreaViewedFromACell(Random.nextInt(), area)
