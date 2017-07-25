@@ -17,6 +17,7 @@ import scala.io.Source
 import scala.util.Random
 
 /**
+  * This is the main actor of a cell, it
   * Created by Matteo Gabellini on 14/07/2017.
   */
 class CellCoreActor extends BasicActor {
@@ -49,7 +50,7 @@ class CellCoreActor extends BasicActor {
         cellSubscriber = context.actorOf(Props[CellSubscriber], "CellSubscriber")
 
         sensorManager = context.actorOf(Props[SensorManager], "SensorManager")
-        //userActor = context.actorOf(Props[UserManager], "UserManager")
+        userActor = context.actorOf(Props[UserManager], "UserManager")
         routeManager = context.actorOf(Props[RouteManager], "RouteManager")
     }
 
@@ -65,10 +66,10 @@ class CellCoreActor extends BasicActor {
             Location.Self >> Location.Self,
             Greetings(List(loadedInfo.sensors.toJson.toString())))
 
-        //        userActor ! AriadneMessage(Init,
-        //            Init.Subtype.Greetings,
-        //            Location.Self >> Location.Self,
-        //            Greetings(List(greetings)))
+        userActor ! AriadneMessage(Init,
+            Init.Subtype.Greetings,
+            Location.Self >> Location.Self,
+            Greetings(List(greetings)))
     }
 
     override protected def receptive: Receive = {
@@ -78,8 +79,8 @@ class CellCoreActor extends BasicActor {
             cnt.cells.foreach(X => topology.put(X.info.uri, X))
             userActor ! msg.copy(direction = cell2User)
 
-        case msg@AriadneMessage(Update, Update.Subtype.Sensors, internalMessage, cnt) =>
-            println("SENSOR UPDATE " + cnt)
+        case msg@AriadneMessage(Update, Update.Subtype.Sensors, internalMessage, cnt: SensorsInfoUpdate) =>
+            cellPublisher ! msg.copy(content = cnt.copy(info = this.infoCell))
         case AriadneMessage(Update, Update.Subtype.Practicability, `cell2Cell`, cnt: PracticabilityUpdate) =>
             topology.put(cnt.info.uri, topology(cnt.info.uri)
                 .copy(practicability = cnt.practicability))
