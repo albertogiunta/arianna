@@ -36,6 +36,7 @@ class CellCoreActor extends BasicActor {
     var userActor: ActorRef = _
     var routeManager: ActorRef = _
 
+    private val internalMessage: MessageDirection = Location.Self >> Location.Self
     private val server2Cell: MessageDirection = Location.Server >> Location.Cell
     private val cell2Server: MessageDirection = Location.Server << Location.Cell
     private val cell2Cell: MessageDirection = Location.Cell << Location.Cell
@@ -119,6 +120,14 @@ class CellCoreActor extends BasicActor {
             //route response from route manager for the user
             userActor ! msg
 
+        case msg@AriadneMessage(Alarm, _, internalMessage, cnt) =>
+            //Alarm triggered in the on in the current cell
+            val currentCell: CellViewedFromACell = topology.get(infoCell.uri).get
+            val msgToSend = msg.copy(direction = cell2Server,
+                content = AlarmContent(infoCell,
+                    currentCell.isExitPoint,
+                    currentCell.isEntryPoint))
+            cellPublisher ! msgToSend
         case AriadneMessage(Alarm, _, _, alarm) =>
             val (id, area) = alarm match {
                 case AlarmContent(compromisedCell, _, _) =>
