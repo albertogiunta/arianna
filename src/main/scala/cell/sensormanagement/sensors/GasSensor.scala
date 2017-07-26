@@ -23,7 +23,7 @@ object Gas {
 }
 
 /**
-  * A basic implementation of a sensor
+  * A basic implementation of a gas sensor
   **/
 abstract class BasicGasSensor(override val name: String,
                               override val currentValue: Double,
@@ -31,6 +31,9 @@ abstract class BasicGasSensor(override val name: String,
                           override val maxValue: Double,
                           override val gasMeasured: String) extends GasSensor
 
+/**
+  * A smoke sensor implementation, this senspr measure the CO gas level
+  **/
 case class SmokeSensor(override val name: String,
                        override val currentValue: Double,
                        override val minValue: Double,
@@ -40,11 +43,17 @@ case class SmokeSensor(override val name: String,
     override def category: SensorCategory = SensorCategories.Smoke
 }
 
-
+/**
+  * A smoke threshold, this class models also the logic to decide
+  * if the threshold is exceeded
+  **/
 case class SmokeThreshold(var value: Double) extends SingleThreshold[Double] {
     override def hasBeenExceeded(currentSensorValue: Double): Boolean = currentSensorValue > value
 }
 
+/**
+  * A CO2 sensor implementation
+  **/
 case class CO2Sensor(override val name: String,
                      override val currentValue: Double,
                      override val minValue: Double,
@@ -55,10 +64,17 @@ case class CO2Sensor(override val name: String,
 }
 
 
+/**
+  * A CO2 threshold, this class models also the logic to decide
+  * if the threshold is exceeded
+  **/
 case class CO2Threshold(var value: Double) extends SingleThreshold[Double] {
     override def hasBeenExceeded(currentSensorValue: Double): Boolean = currentSensorValue > value
 }
 
+/**
+  * A Oxygen sensor implementation
+  **/
 case class OxygenSensor(override val name: String,
                         override val currentValue: Double,
                         override val minValue: Double,
@@ -68,10 +84,18 @@ case class OxygenSensor(override val name: String,
     override def category: SensorCategory = SensorCategories.Oxygen
 }
 
+/**
+  * A Oxygen threshold, this class models also the logic to decide
+  * when the oxygen is under the specified threshold value
+  **/
 case class OxygenThreshold(var value: Double) extends SingleThreshold[Double] {
     override def hasBeenExceeded(currentSensorValue: Double): Boolean = currentSensorValue < value
 }
 
+/**
+  * This is a decoration for a gas sensor. This class provide
+  * a simulated monotonic behaviour to the decorated sensor
+  **/
 case class SimulatedMonotonicGasSensor(override val sensor: GasSensor,
                                        override val millisRefreshRate: Long,
                                        val changeStep: Double)
@@ -84,6 +108,10 @@ case class SimulatedMonotonicGasSensor(override val sensor: GasSensor,
     override def threshold: Threshold[Double] = sensor.threshold
 }
 
+/**
+  * This a decoration of a Gas sensor that provide the methods to manage a Reactivex Flowable object
+  * attached to the decorated sensor
+  **/
 class ObservableGasSensor(private val sensor: GasSensor) extends ObservableNumericSensor[Double](sensor) with GasSensor {
     override def gasMeasured: String = sensor.gasMeasured
 

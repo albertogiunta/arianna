@@ -9,47 +9,73 @@ import ontologies.sensor.{SensorCategory, Threshold}
   * a trait for a sensor
   **/
 trait Sensor {
+    /**
+      * Get the sensor name
+      **/
     def name: String
 
+    /**
+      * Get the sensor category
+      **/
     def category: SensorCategory
 }
 
 /**
   * A trait for a generic sensor
   *
-  * @tparam A the type of data managed by the sensor
+  * @tparam A the type of data managed by the sensor in order to
+  *           represents the physical quantity measured
   *           Created by Matteo Gabellini on 05/07/2017.
   */
 trait GenericSensor[A] extends Sensor {
-    def name: String
-
+    /**
+      * Get the current sensor value of type
+      **/
     def currentValue: A
 }
 
 /**
   * A trait for a sensor that works with an ordered scale of value
   * with a min and a max value
+  *
+  * @tparam B the type of data managed by the sensor
   **/
 trait OrderedScaleSensor[B] extends GenericSensor[B] {
 
+    /**
+      * Get the minimum value that the sensor can reach
+      **/
     def minValue: B
 
+    /**
+      * Get the maximum value that the sensor can reach
+      **/
     def maxValue: B
 }
 
 /**
   * A trait for a Numeric Sensor that works in a specific range of
   * numeric value
+  *
+  * @tparam C the type of data managed by the sensor
   */
 trait NumericSensor[C] extends OrderedScaleSensor[C] {
+    /**
+      * Get the range of value that the sensor can assume
+      **/
     def range: C
 }
 
 /**
   * A trait for a sensor that have a threshold where is defined
   * the threshold value and the logic that define when it is exceeded
+  *
+  * @tparam H the type of data managed by the sensor
   */
 trait SensorWithThreshold[H] extends GenericSensor[H] {
+    /**
+      * Get the sensor threshold
+      **/
     def threshold: Threshold[H]
 }
 
@@ -70,6 +96,17 @@ trait SimulationStrategy[D, S <: GenericSensor[D]] {
   **/
 object SimulationStrategies {
 
+    /**
+      * A simulation strategy implementation for sensors that manage value Double.
+      * This strategy models a behaviour for a sensor that change its value according to its scale
+      * in a monotonic way. The sensor increase its value by the specified "changeStep" parameter value until
+      * it reaches the max value. When the sensor reaches the max value, starts to decrease its value
+      * (always by the "changeStep") until it reaches the min value. After this, its restart to increase
+      * and repeats the previous operations
+      *
+      * @param changeStep the value added/subtracted to/from the sensor value at each step
+      *
+      **/
     case class MonotonicDoubleSimulation(val changeStep: Double)
         extends SimulationStrategy[Double, NumericSensor[Double]] {
         private var increasePhase: Boolean = true
@@ -91,6 +128,17 @@ object SimulationStrategies {
             this increase sensor else this decrease sensor
     }
 
+    /**
+      * A simulation strategy implementation for sensors that manage value Int.
+      * This strategy models a behaviour for a sensor that change its value according to its scale
+      * in a monotonic way. The sensor increase its value by the specified "changeStep" parameter value until
+      * it reaches the max value. When the sensor reaches the max value, starts to decrease its value
+      * (always by the "changeStep") until it reaches the min value. After this, its restart to increase
+      * and repeats the previous operations
+      *
+      * @param changeStep the value added/subtracted to/from the sensor value at each step
+      *
+      **/
     case class MonotonicIntSimulation(val changeStep: Int)
         extends SimulationStrategy[Int, NumericSensor[Int]] {
         private var increasePhase: Boolean = true
@@ -151,7 +199,13 @@ abstract class SimulatedSensor[E](val sensor: GenericSensor[E],
     override def category: SensorCategory = sensor.category
 }
 
-
+/**
+  * An decoration of a numeric sensor in order to simulate a real sensor
+  *
+  * @param sensor                a generic sensor implementation to decorate
+  * @param millisRefreshRate     rate at the sensor change its value
+  * @param numericChangeStrategy the strategy that specifies the sensor behaviour
+  */
 class SimulatedNumericSensor[F](override val sensor: NumericSensor[F],
                                 override val millisRefreshRate: Long,
                                 var numericChangeStrategy: SimulationStrategy[F, NumericSensor[F]])

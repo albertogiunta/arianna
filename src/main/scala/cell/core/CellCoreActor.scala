@@ -123,7 +123,7 @@ class CellCoreActor extends BasicActor {
             userActor ! msg
 
         case msg@AriadneMessage(Alarm, _, self2Self, cnt) =>
-            //Alarm triggered in the on in the current cell
+            //Alarm triggered in the current cell
             val currentCell: CellViewedFromACell = topology.get(infoCell.uri).get
             val msgToSend = msg.copy(direction = cell2Cluster,
                 content = AlarmContent(infoCell,

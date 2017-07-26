@@ -14,6 +14,9 @@ trait TemperatureSensor extends NumericSensor[Double] with SensorWithThreshold[D
     override def range: Double = maxValue - minValue
 }
 
+/**
+  * A Basic implementation of a temperature sensor
+  **/
 case class BasicTemperatureSensor(override val name: String,
                                   override val currentValue: Double,
                                   override val minValue: Double,
@@ -31,6 +34,10 @@ object TemperatureUnitMeasure {
     val Kelvin = "Kelvin"
 }
 
+/**
+  * This is a decoration for a temperature sensor. This class provide
+  * a simulated monotonic behaviour to the decorated sensor
+  **/
 case class SimulatedMonotonicTemperatureSensor(override val sensor: TemperatureSensor,
                                                override val millisRefreshRate: Long,
                                                val changeStep: Double)
@@ -56,7 +63,10 @@ class ObservableTemperatureSensor(private val sensor: TemperatureSensor)
     override def threshold: Threshold[Double] = sensor.threshold
 }
 
-
+/**
+  * A Temperature threshold, this class models also the logic to decide
+  * when the temperature is under or upper the specified threshold values
+  **/
 case class TemperatureThreshold(var minValue: Double, var maxValue: Double) extends DoubleThreshold[Double] {
 
     override def hasBeenExceeded(currentSensorValue: Double): Boolean =
