@@ -67,8 +67,8 @@ class ObservableTemperatureSensor(private val sensor: TemperatureSensor)
   * A Temperature threshold, this class models also the logic to decide
   * when the temperature is under or upper the specified threshold values
   **/
-case class TemperatureThreshold(var minValue: Double, var maxValue: Double) extends DoubleThreshold[Double] {
+case class TemperatureThreshold(var low: Double, var high: Double) extends DoubleThreshold[Double] {
 
     override def hasBeenExceeded(currentSensorValue: Double): Boolean =
-        currentSensorValue < minValue || currentSensorValue > maxValue
+        currentSensorValue < low || currentSensorValue > high
 }

@@ -50,8 +50,8 @@ class ObservableHumiditySensor(private val sensor: HumiditySensor)
   * A Humidity threshold, this class models also the logic to decide
   * when the humidity is under or upper the specified threshold values
   **/
-case class HumidityThreshold(var minValue: Double, var maxValue: Double) extends DoubleThreshold[Double] {
+case class HumidityThreshold(var low: Double, var high: Double) extends DoubleThreshold[Double] {
 
     override def hasBeenExceeded(currentSensorValue: Double): Boolean =
-        currentSensorValue < minValue || currentSensorValue > maxValue
+        currentSensorValue < low || currentSensorValue > high
 }

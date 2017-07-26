@@ -17,6 +17,10 @@ final case class Passage(neighborId: Int,
                          startCoordinates: Point,
                          endCoordinates: Point) extends MessageContent
 
+/**
+  * This class is a static representation of
+  * the basic configuration of a cell when it starts
+  **/
 final case class CellConfig(uri: String, sensors: List[SensorInfoFromConfig]) extends MessageContent
 
 /**
@@ -214,12 +218,39 @@ object CurrentPeopleUpdate {
   */
 final case class SensorInfo(categoryId: Int, value: Double) extends MessageContent
 
+/**
+  * This is the information that a cell load during the start up
+  * configuration relative to a sensor that must be initialized
+  *
+  * @param categoryId the sensor category
+  * @param minValue   the minimum level reachable by the sensor
+  * @param maxValue   the minimum level reachable by the sensor
+  * @param threshold  the threshold of the sensor
+  **/
 final case class SensorInfoFromConfig(categoryId: Int, minValue: Double, maxValue: Double, threshold: ThresholdInfo) extends MessageContent
 
+/**
+  * An abstract representation of information relative
+  * to a threshold of a generic sensor
+  * */
 abstract class ThresholdInfo extends MessageContent
 
+/**
+  * The concrete representation of a threshold of a sensor
+  * that has a single threshold level
+  *
+  * @param value the threshold level
+  * */
 final case class SingleThresholdInfo(value: Double) extends ThresholdInfo
 
+
+/**
+  * The concrete representation of a threshold of a sensor
+  * that has a two threshold level
+  *
+  * @param lowThreshold  the lowest level that the program's logic consider as normal value for the sensor
+  * @param highThreshold the highest level that the program's logic consider as normal value for the sensor
+  * */
 final case class DoubleThresholdInfo(lowThreshold: Double, highThreshold: Double) extends ThresholdInfo
 
 /**

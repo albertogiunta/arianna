@@ -20,11 +20,23 @@ trait Threshold[T] {
   * This trait define a Threshold with a single value
   **/
 trait SingleThreshold[T] extends Threshold[T] {
+    /**
+      * Get the threshold value level
+      **/
     def value: T
 }
 
+/**
+  * This trait define a Threshold with a
+  **/
 trait DoubleThreshold[T] extends Threshold[T] {
-    def minValue: T
+    /**
+      * Get the low threshold level
+      **/
+    def low: T
 
-    def maxValue: T
+    /**
+      * Get the high threshold level
+      **/
+    def high: T
 }
