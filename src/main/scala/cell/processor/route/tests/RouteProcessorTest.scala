@@ -276,7 +276,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
     
         val probe = TestProbe()
     
-        val core = system.actorOf(Props(new AssertActor(probe)), "AssertActor")
+        val core = system.actorOf(Props(new Tester(probe)), "Tester")
     
         "Answer with a RouteResponse holding the SHP from the specified source to the specified target" in {
             core ! AriadneMessage(
@@ -323,7 +323,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
         }
     }
     
-    private class AssertActor(probe: TestProbe) extends CustomActor {
+    private class Tester(probe: TestProbe) extends CustomActor {
         
         val routeManager: ActorRef = context.actorOf(Props[RouteManager], "RouteManager")
         

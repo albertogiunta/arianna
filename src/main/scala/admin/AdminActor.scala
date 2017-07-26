@@ -24,7 +24,7 @@ class AdminActor(interfaceView: InterfaceView) extends CustomActor {
     val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/AdminManager")
     //Se si fa partire il master
     //val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/Master/AdminManager")
-    val toServer: MessageDirection = Location.Admin >> Location.Server
+    val toServer: MessageDirection = Location.Admin >> Location.Master
 
     override def receive: Receive = {
         //Ricezione dell'aggiornamento delle celle

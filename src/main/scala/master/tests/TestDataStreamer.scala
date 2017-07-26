@@ -26,7 +26,7 @@ object TestDataStreamer extends App {
     
     val streamer = system.actorOf(Props[DataStreamer], "DataStreamer")
     
-    (0 to Int.MaxValue).foreach(_ => {
+    (0 to 10).foreach(_ => {
         val u =
             (0 to 5).map(id => ontologies.messages.Cell(
                 InfoCell(id, "uri" + id, "name" + id,

@@ -79,5 +79,5 @@
     "capacity": 30,
     "squareMeters": 20.0,
     "currentPeople": 10,
-    "practicabilityLevel": 2.0
+  "practicability": 2.0
 }

@@ -31,7 +31,7 @@ class DataStreamer extends BasicActor {
     
     private val stream = Flow[Iterable[Cell]]
         .map(map => UpdateForAdmin(map.map(c => CellDataUpdate(c)).toList))
-        .map(updates => AriadneMessage(Update, Subtype.UpdateForAdmin, Location.Server >> Location.Admin, updates))
+        .map(updates => AriadneMessage(Update, Subtype.UpdateForAdmin, Location.Master >> Location.Admin, updates))
         .throttle(1, 1000 milliseconds, 1, ThrottleMode.Shaping)
         .to(Sink.foreach(msg => handler(msg)))
     

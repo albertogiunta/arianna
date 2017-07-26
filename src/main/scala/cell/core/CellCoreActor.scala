@@ -29,9 +29,9 @@ class CellCoreActor extends BasicActor {
     var cellSubscriber: ActorRef = _
     var userActor: ActorRef = _
     var routeManager: ActorRef = _
-
-    private val server2Cell: MessageDirection = Location.Server >> Location.Cell
-    private val cell2Server: MessageDirection = Location.Server << Location.Cell
+    
+    private val server2Cell: MessageDirection = Location.Master >> Location.Cell
+    private val cell2Server: MessageDirection = Location.Master << Location.Cell
     private val cell2Cell: MessageDirection = Location.Cell << Location.Cell
     private val cell2User: MessageDirection = Location.Cell >> Location.User
     private val user2Cell: MessageDirection = Location.Cell << Location.User
@@ -50,7 +50,7 @@ class CellCoreActor extends BasicActor {
     override protected def init(args: List[Any]): Unit = {
         log.info("Hello there! the cell core has been initialized")
         userActor ! AriadneMessage(Init, Init.Subtype.Greetings,
-            Location.Server >> Location.Self, Greetings(List(greetings)))
+            Location.Master >> Location.Self, Greetings(List(greetings)))
     }
 
     override protected def receptive: Receive = {

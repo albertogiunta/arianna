@@ -24,9 +24,9 @@ class TopologySupervisor extends BasicActor {
     
     private var topology: mutable.Map[String, Cell] = mutable.HashMap.empty
     
-    private val cell2Server: MessageDirection = Location.Cell >> Location.Server
+    private val cell2Server: MessageDirection = Location.Cell >> Location.Master
     private val server2Cell: MessageDirection = cell2Server.reverse
-    private val admin2Server: MessageDirection = Location.Admin >> Location.Server
+    private val admin2Server: MessageDirection = Location.Admin >> Location.Master
     private val server2Admin: MessageDirection = admin2Server.reverse
     
     private val dataStreamer: () => ActorSelection = () => sibling("DataStreamer").get

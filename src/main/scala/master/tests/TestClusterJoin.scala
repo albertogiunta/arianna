@@ -35,7 +35,7 @@ object TestClusterJoin extends App {
     val remotemsg = AriadneMessage(
         Update,
         Update.Subtype.Sensors,
-        Location.Cell >> Location.Server,
+        Location.Cell >> Location.Master,
         SensorsUpdate(
             InfoCell(0, "uri", "name",
                 Coordinates(Point(1, 1), Point(-1, -1), Point(-1, 1), Point(1, -1)),

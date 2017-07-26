@@ -47,7 +47,7 @@ class TestPracticabilityExchange extends App {
     publisher ! AriadneMessage(
         Update,
         Update.Subtype.Practicability,
-        Location.Cell >> Location.Server,
+        Location.Cell >> Location.Master,
         PracticabilityUpdate(
             InfoCell(cellID,
                 cellUri,

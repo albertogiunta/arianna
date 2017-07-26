@@ -13,9 +13,9 @@ import ontologies.messages.MessageType.{Alarm, Handshake, Update}
 import ontologies.messages._
 
 class AdminManager extends CustomActor {
-
-    val toAdmin: MessageDirection = Location.Server >> Location.Admin
-    val fromAdmin: MessageDirection = Location.Admin >> Location.Server
+    
+    val toAdmin: MessageDirection = Location.Master >> Location.Admin
+    val fromAdmin: MessageDirection = Location.Admin >> Location.Master
     val admin = context.actorSelection("akka.tcp://adminSystem@127.0.0.1:4550/user/admin")
     val topologySupervisor: ActorSelection = sibling("TopologySupervisor").get
     val publisher: ActorSelection = sibling("Publisher").get

@@ -19,11 +19,11 @@ class MasterSubscriber extends BasicSubscriber {
     
     override val topics: Set[Topic] = Set(Topic.Alarms, Topic.Updates, Topic.HandShakes)
     
-    private val cell2Server: MessageDirection = Location.Server << Location.Cell
-    private val admin2Server: MessageDirection = Location.Admin >> Location.Server
+    private val cell2Server: MessageDirection = Location.Master << Location.Cell
+    private val admin2Server: MessageDirection = Location.Admin >> Location.Master
     
-    private val topologySupervisor: () => ActorSelection = () => sibling("Publisher").get
-    private val publisher: () => ActorSelection = () => sibling("TopologySupervisor").get
+    private val topologySupervisor: () => ActorSelection = () => sibling("TopologySupervisor").get
+    private val publisher: () => ActorSelection = () => sibling("Publisher").get
     
     override protected def receptive = {
     
@@ -45,7 +45,7 @@ class MasterSubscriber extends BasicSubscriber {
         case _ => desist _
     }
     
-    private def sociable: Receive = {
+    def sociable: Receive = {
     
         case msg@AriadneMessage(Handshake, CellToMaster, `cell2Server`, _) =>
             log.info("Resolving Handshake from {}", sender.path)
@@ -65,7 +65,7 @@ class MasterSubscriber extends BasicSubscriber {
         case _ => stash
     }
     
-    private def proactive: Receive = {
+    def proactive: Receive = {
     
         case msg@AriadneMessage(Update, _, _, _) =>
             log.info("Forwarding message {} from {} to TopologySupervisor", msg.subtype, sender.path)

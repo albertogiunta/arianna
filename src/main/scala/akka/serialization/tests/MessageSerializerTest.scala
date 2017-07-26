@@ -32,7 +32,7 @@ class MessageSerializerTest extends FunSuite with BeforeAndAfter {
     val messageForTest = AriadneMessage(
         Update,
         Update.Subtype.Sensors,
-        Location.Cell >> Location.Server,
+        Location.Cell >> Location.Master,
         toJsonObj(Update.Subtype.Sensors, jsonStr)
     )
     
