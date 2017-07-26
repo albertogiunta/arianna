@@ -5,11 +5,15 @@ import ontologies.sensor.SensorCategories
 import ontologies.sensor.SensorCategories._
 
 /**
+  * This object contains different method to facilitate the correct sensor creation
   * Created by Matteo Gabellini on 24/07/2017.
   */
 object SensorsFactory {
     val DEFAULT_REFRESH_RATE = 1000
 
+    /**
+      * A set of method can be used to create simulated sensors
+      **/
     object Simulated {
         def createTempSensor(minValue: Double,
                              maxValue: Double,
@@ -59,12 +63,25 @@ object SensorsFactory {
         }
     }
 
+    /**
+      * A method that create the correct observable sensor version
+      * relative to the sensor type passed like parameter
+      *
+      * @param sensor The sensor of which you want
+      *               to create the observable decoration
+      **/
     def createTheObservableVersion(sensor: Sensor): ObservableSensor[_ <: Any] = sensor.category match {
         case Temperature => new ObservableTemperatureSensor(sensor.asInstanceOf[TemperatureSensor])
         case Smoke | Oxygen | CO2 => new ObservableGasSensor(sensor.asInstanceOf[GasSensor])
         case Humidity => new ObservableHumiditySensor(sensor.asInstanceOf[HumiditySensor])
     }
 
+    /**
+      * A method that automatic create the correct sensor instance from a SensorInfoFromConfig
+      * loaded from the json file of the cell configuration
+      *
+      * @param sensorInfo the sensor info loaded from the config json file
+      * */
     def createASensorFromConfig(sensorInfo: SensorInfoFromConfig): Sensor = SensorCategories.categoryWithId(sensorInfo.categoryId) match {
         case Temperature =>
             val threshold = sensorInfo.threshold.asInstanceOf[DoubleThresholdInfo]
