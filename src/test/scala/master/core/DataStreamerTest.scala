@@ -1,4 +1,4 @@
-package master.tests
+package master.core
 
 import java.io.File
 import java.nio.file.Paths
@@ -7,7 +7,6 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit}
 import com.actors.CustomActor
 import com.typesafe.config.{Config, ConfigFactory}
-import master.core.{DataStreamer, TopologySupervisor}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 
 /**

@@ -1,6 +1,5 @@
-package akka.serialization.tests
+package akka.serialization
 
-import akka.serialization.{AriadneMessageSerializer, MessageSerializer}
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Update
 import ontologies.messages._

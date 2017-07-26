@@ -1,4 +1,4 @@
-package master.tests
+package master.cluster
 
 import java.io.File
 import java.nio.file.Paths
@@ -7,7 +7,6 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit, TestProbe}
 import com.actors.CustomActor
 import com.typesafe.config.{Config, ConfigFactory}
-import master.cluster.MasterSubscriber
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, ViewedFromACell}
 import ontologies.messages.MessageType.{Handshake, Init, Route, Topology, Update}

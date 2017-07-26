@@ -1,4 +1,4 @@
-package master.tests
+package master
 
 import java.io.File
 import java.nio.file.Paths

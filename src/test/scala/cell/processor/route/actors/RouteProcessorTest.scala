@@ -1,18 +1,19 @@
-package cell.processor.route.tests
+package cell.processor.route.actors
 
-import cell.processor.route.actors.RouteProcessor
+import akka.actor.{ActorRef, ActorSystem, Props}
+import akka.testkit.{ImplicitSender, TestKit, TestProbe}
+import com.actors.CustomActor
+import ontologies.messages.Location._
+import ontologies.messages.MessageType.{Init, Route}
 import ontologies.messages._
-import org.scalatest.{BeforeAndAfter, FunSuite}
+import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.duration
+import scala.concurrent.duration.FiniteDuration
 import scala.util.Random
 
-/**
-  * Created by Alessandro on 14/07/2017.
-  */
-class RouteProcessingTest extends FunSuite with BeforeAndAfter {
+class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
+    with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll {
     
     val infoCells: Map[Int, InfoCell] = (1 to 9).map(i => i ->
         InfoCell(
@@ -266,31 +267,80 @@ class RouteProcessingTest extends FunSuite with BeforeAndAfter {
             )
         ))
     
-    test("From Area to Graph and then Compute Route") {
-        
-        val fromCell = "Cell1"
-        val toCell = "Cell9"
-        
-        val future = RouteProcessor.computeRoute(fromCell, toCell, areaForRoute.cells)
-        
-        val shp: List[InfoCell] = Await.result(future, Duration.Inf)._1
-        
-        assert(shp == routeForAreaSolution)
+    override def afterAll {
+        TestKit.shutdownActorSystem(system)
     }
     
-    test("From Area to Graph and then Compute Escape") {
+    "A RouteProcessor Actor" must {
+    
+        val probe = TestProbe()
+    
+        val core = system.actorOf(Props(new Tester(probe)), "Tester")
+    
+        "Answer with a RouteResponse holding the SHP from the specified source to the specified target" in {
+            core ! AriadneMessage(
+                Route, Route.Subtype.Info,
+                Location.User >> Location.Cell,
+                RouteInfo(
+                    RouteRequest("15469", fromCell = infoCells(1), toCell = infoCells(9), isEscape = false),
+                    areaForRoute
+                )
+            )
         
-        val actualCell = infoCells(9)
+            probe.expectMsg(
+                FiniteDuration(10L, duration.SECONDS),
+                AriadneMessage(
+                    Route, Route.Subtype.Response,
+                    Location.Cell >> Location.User,
+                    RouteResponse(
+                        RouteRequest("15469", infoCells(1), infoCells(9), isEscape = false),
+                        routeForAreaSolution
+                    )
+                ))
+        }
+    
+        "Answer with a RouteResponse holding the SHP to the exit when an Escape Request is received" in {
+            core ! AriadneMessage(
+                Route, Route.Subtype.Info,
+                Location.User >> Location.Cell,
+                RouteInfo(
+                    RouteRequest("964512", fromCell = infoCells(9), InfoCell.empty, isEscape = true),
+                    areaForAlarm
+                )
+            )
         
-        val futures = areaForAlarm.cells.filter(c => c.isExitPoint)
-            .map(exit => RouteProcessor.computeRoute(actualCell.name, exit.info.name, areaForAlarm.cells))
+            probe.expectMsg(
+                FiniteDuration(10L, duration.SECONDS),
+                AriadneMessage(
+                    Route, Route.Subtype.Response,
+                    Location.Cell >> Location.User,
+                    RouteResponse(
+                        RouteRequest("964512", infoCells(9), infoCells(2), isEscape = true),
+                        routeForAlarmSolution
+                    )
+                ))
+        }
+    }
+    
+    private class Tester(probe: TestProbe) extends CustomActor {
         
-        val res = Future {
-            futures.map(f => Await.result(f, Duration.Inf)).minBy(res => res._2)._1
+        val routeManager: ActorRef = context.actorOf(Props[RouteManager], "RouteManager")
+        
+        override def preStart {
+            
+            routeManager ! AriadneMessage(
+                Init,
+                Init.Subtype.Greetings,
+                Location.Cell >> Location.Self,
+                Greetings(List.empty)
+            )
         }
         
-        val shp: List[InfoCell] = Await.result(res, Duration.Inf)
-        
-        assert(shp == routeForAlarmSolution)
+        override def receive: Receive = {
+            case msg@AriadneMessage(Route, Route.Subtype.Info, _, _) => routeManager ! msg
+            case msg@AriadneMessage(Route, Route.Subtype.Response, _, cnt: RouteResponse) =>
+                log.info(cnt.route.map(i => i.name).mkString(" -> "))
+                probe.ref forward msg
+        }
     }
 }
