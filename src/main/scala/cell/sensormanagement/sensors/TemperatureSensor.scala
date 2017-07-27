@@ -22,13 +22,13 @@ case class BasicTemperatureSensor(override val name: String,
                                   override val minValue: Double,
                                   override val maxValue: Double,
                                   override val threshold: TemperatureThreshold,
-                                  override val measureUnit: String = TemperatureUnitMeasure.Celsius
+                                  override val measureUnit: String = TemperatureMeasureUnit.Celsius
                                  ) extends TemperatureSensor
 /**
   * An object that contains the string representation
   * of the basic temperature measure unit
   */
-object TemperatureUnitMeasure {
+object TemperatureMeasureUnit {
     val Celsius = "Celsius"
     val Fahrenheit = "Fahrenheit"
     val Kelvin = "Kelvin"
@@ -58,7 +58,7 @@ case class SimulatedMonotonicTemperatureSensor(override val sensor: TemperatureS
   **/
 class ObservableTemperatureSensor(private val sensor: TemperatureSensor)
     extends ObservableNumericSensor[Double](sensor) with TemperatureSensor {
-    override def measureUnit: String = ???
+    override def measureUnit: String = sensor.measureUnit
 
     override def threshold: Threshold[Double] = sensor.threshold
 }
