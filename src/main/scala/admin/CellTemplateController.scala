@@ -4,6 +4,7 @@ import java.net.URL
 import java.util.ResourceBundle
 import javafx.fxml.{FXML, FXMLLoader, Initializable}
 import javafx.geometry.Insets
+import javafx.scene.control.Button
 import javafx.scene.layout._
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
@@ -35,6 +36,8 @@ class CellTemplateController extends Initializable {
     private var exitValue: Text = _
     @FXML
     private var header: Pane = _
+    @FXML
+    private var chartsButton: Button = _
 
     override def initialize(location: URL, resources: ResourceBundle): Unit = {}
 
@@ -79,6 +82,7 @@ class CellTemplateController extends Initializable {
                 var sensorTemplate = loader.load[HBox]
                 val sensorController = loader.getController[SensorTemplateController]
                 sensorController createSensor sensor
+                sensorsController += ((sensor.category, sensorController))
                 sensorsContainer.getChildren.add(sensorTemplate)
             })
         }
@@ -94,5 +98,9 @@ class CellTemplateController extends Initializable {
         Platform.runLater {
             header setBackground new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY))
         }
+    }
+
+    def openCharts(): Unit = {
+
     }
 }

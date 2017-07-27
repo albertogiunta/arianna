@@ -47,6 +47,7 @@ class SensorTemplateController extends Initializable {
         case 1 => "Temperature"
         case 2 => "Smoke"
         case 3 => "Humidity"
+        case 4 => "Other"
         case _ => ""
     }
 

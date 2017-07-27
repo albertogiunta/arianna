@@ -22,51 +22,86 @@
             <tabs>
                 <Tab fx:id="tabDynamic" text="Dinamic">
                     <content>
-                        <HBox fx:id="mainStaticBox" prefHeight="136.0" prefWidth="398.0">
+                        <HBox fx:id="mainStaticBox" prefHeight="136.0" prefWidth="398.0" style="-fx-padding: 10;">
                             <children>
                                 <HBox alignment="CENTER_LEFT" prefHeight="22.0" prefWidth="371.0"
                                       style="-fx-padding: 10;">
                                     <children>
-                                        <Label fx:id="currentPeopleLabel" text="Current people"/>
-                                        <Text fx:id="currentPeopleValue" strokeType="OUTSIDE" strokeWidth="0.0"
-                                              wrappingWidth="32.0"/>
+                                        <Pane prefHeight="200.0" prefWidth="200.0">
+                                            <children>
+                                                <Button fx:id="chartsButton" layoutX="8.0" layoutY="34.0"
+                                                        mnemonicParsing="false" onAction="#openCharts" prefHeight="46.0"
+                                                        prefWidth="130.0" text="Charts"/>
+                                            </children>
+                                        </Pane>
                                     </children>
                                 </HBox>
-                                <VBox fx:id="sensorsContainer" prefHeight="139.0" prefWidth="380.0"/>
+                                <Pane prefHeight="107.0" prefWidth="190.0">
+                                    <children>
+                                        <VBox fx:id="sensorsContainer" layoutX="-103.0" layoutY="-4.0"
+                                              prefHeight="159.0" prefWidth="199.0">
+                                            <children>
+                                                <HBox minHeight="30.0" prefHeight="30.0" prefWidth="199.0">
+                                                    <children>
+                                                        <Label fx:id="currentPeopleLabel" text="Current people:"
+                                                               underline="true"/>
+                                                        <Text fx:id="currentPeopleValue" strokeType="OUTSIDE"
+                                                              strokeWidth="0.0" textAlignment="RIGHT"
+                                                              wrappingWidth="42.0"/>
+                                                    </children>
+                                                </HBox>
+                                                <Label text="Sensor data" underline="true"/>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </Pane>
                             </children>
                         </HBox>
                     </content>
                 </Tab>
                 <Tab fx:id="tabStatic" text="Static">
                     <content>
-                        <VBox prefHeight="134.0" prefWidth="408.0">
+                        <Pane prefHeight="166.0" prefWidth="323.0">
                             <children>
-                                <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                <VBox layoutX="21.0" prefHeight="166.0" prefWidth="355.0">
                                     <children>
-                                        <Label fx:id="maxCapacityLabel" contentDisplay="CENTER" text="Max capacity"/>
-                                        <Text fx:id="maxCapacityValue" strokeType="OUTSIDE" strokeWidth="0.0"/>
+                                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Label fx:id="maxCapacityLabel" contentDisplay="CENTER"
+                                                       text="Max capacity"/>
+                                                <Pane prefHeight="41.0" prefWidth="52.0"/>
+                                                <Text fx:id="maxCapacityValue" strokeType="OUTSIDE" strokeWidth="0.0"
+                                                      wrappingWidth="30.0"/>
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Label fx:id="sqrMetersLabel" text="M^2"/>
+                                                <Pane prefHeight="41.0" prefWidth="107.0"/>
+                                                <Text fx:id="sqrMetersValue" strokeType="OUTSIDE" strokeWidth="0.0"
+                                                      wrappingWidth="32.0"/>
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Label fx:id="entranceLabel" text="Entry"/>
+                                                <Pane prefHeight="42.0" prefWidth="100.0"/>
+                                                <Text fx:id="entranceValue" strokeType="OUTSIDE" strokeWidth="0.0"
+                                                      wrappingWidth="33.0"/>
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Label fx:id="exitLabel1" text="Exit"/>
+                                                <Pane prefHeight="42.0" prefWidth="110.0"/>
+                                                <Text fx:id="exitValue" strokeType="OUTSIDE" strokeWidth="0.0"
+                                                      wrappingWidth="26.0"/>
+                                            </children>
+                                        </HBox>
                                     </children>
-                                </HBox>
-                                <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
-                                    <children>
-                                        <Label fx:id="sqrMetersLabel" text="M^2"/>
-                                        <Text fx:id="sqrMetersValue" strokeType="OUTSIDE" strokeWidth="0.0"/>
-                                    </children>
-                                </HBox>
-                                <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
-                                    <children>
-                                        <Label fx:id="entranceLabel" text="Entry"/>
-                                        <Text fx:id="entranceValue" strokeType="OUTSIDE" strokeWidth="0.0"/>
-                                    </children>
-                                </HBox>
-                                <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
-                                    <children>
-                                        <Label fx:id="exitLabel1" text="Exit"/>
-                                        <Text fx:id="exitValue" strokeType="OUTSIDE" strokeWidth="0.0"/>
-                                    </children>
-                                </HBox>
+                                </VBox>
                             </children>
-                        </VBox>
+                        </Pane>
                     </content>
                 </Tab>
             </tabs>

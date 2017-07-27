@@ -25,10 +25,10 @@ object TestAdminInterface extends App {
     val adminManager = system.actorOf(Props[AdminManager], "AdminManager")
     var i = 1
     Thread.sleep(10000)
-    while (!i.equals(4)) {
+    while (!i.equals(6)) {
         Thread.sleep(1000)
         var sensors: ListBuffer[Sensor] = new ListBuffer[Sensor]
-        for (i <- 1 until 4) {
+        for (i <- 1 until 5) {
             sensors += Sensor(i, (Math.random() * 10).round.toDouble, 0, 10)
         }
         println(sensors.toString)
@@ -38,5 +38,21 @@ object TestAdminInterface extends App {
         i = i + 1
     }
 
+    Thread.sleep(4000)
+
+    while (true) {
+        Thread.sleep(1000)
+        var update: ListBuffer[CellDataUpdate] = new ListBuffer[CellDataUpdate]
+        var sensors: ListBuffer[Sensor] = new ListBuffer[Sensor]
+        for (i <- 1 until 5) {
+            sensors += Sensor(i, (Math.random() * 10).round.toDouble, 0, 10)
+        }
+
+        for (i <- 1 until 6) {
+            update += new CellDataUpdate(new InfoCell(i, "uri0", "a", new Coordinates(Point(1, 1), Point(1, 1), Point(1, 1), Point(1, 1)), Point(1, 1)), (Math.random() * 50).round.toInt, sensors.toList)
+        }
+        adminManager ! AriadneMessage(MessageType.Update, MessageType.Update.Subtype.UpdateForAdmin, Location.Server >> Location.Admin,
+            new UpdateForAdmin(update.toList))
+    }
 }
 
