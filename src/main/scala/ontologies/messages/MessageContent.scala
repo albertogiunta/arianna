@@ -319,6 +319,9 @@ final case class AntennaPositions(userPosition: Point, antennaPositions: List[In
 final case class CellForSwitcher(info: InfoCell,
                                  neighbors: List[InfoCell]) extends MessageContent
 
+final case class CellForView(id: Int, name: String, currentOccupation: Int, sensors: List[Sensor]) extends MessageContent
+
+
 object CellForSwitcher {
     def apply(cell: CellForUser): CellForSwitcher =
         new CellForSwitcher(cell.info, cell.neighbors)

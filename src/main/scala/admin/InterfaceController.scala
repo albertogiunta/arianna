@@ -25,14 +25,13 @@ import scalafx.stage.FileChooser.ExtensionFilter
   * This class contains only the piece of Cell information that the interface needs in order to update the View.
   *
   **/
-sealed case class CellForView(id: Int, name: String, currentOccupation: Int, sensors: List[Sensor])
 
 /**
   * This is the main controller for the interface of the Application
   *
   **/
 class InterfaceController extends Initializable {
-    var actorRef: ActorRef = _
+    var adminActor: ActorRef = _
     var interfaceView: InterfaceView = _
     private val cellControllers: mutable.Map[Int, CellTemplateController] = new mutable.HashMap[Int, CellTemplateController]
     private var canvasController: CanvasController = _
@@ -98,7 +97,7 @@ class InterfaceController extends Initializable {
       * @param alarmContent : AlarmContent object that contains information about the Cell from which the alarm comes
       **/
     def triggerAlarm(alarmContent: AlarmContent): Unit = {
-        actorRef ! new AriadneMessage(MessageType.Alarm, MessageType.Alarm.Subtype.FromInterface, Location.Admin >> Location.Self, Empty())
+        adminActor ! new AriadneMessage(MessageType.Alarm, MessageType.Alarm.Subtype.FromInterface, Location.Admin >> Location.Self, Empty())
         println("Allarme ricevuto dal controller")
         cellControllers.get(alarmContent.info.id).get.handleAlarm
         canvasController handleAlarm alarmContent.info.id
@@ -117,7 +116,7 @@ class InterfaceController extends Initializable {
     private def parseFile(file: File): Unit = {
         val source = Source.fromFile(file).getLines.mkString
         val area = Topology.Subtype.Planimetrics.unmarshal(source)
-        actorRef ! AriadneMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, Location.Admin >> Location.Self, area)
+        adminActor ! AriadneMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, Location.Admin >> Location.Self, area)
         loadCanvas()
         createCells(area.cells)
         fileName.text = file.getName
@@ -146,6 +145,7 @@ class InterfaceController extends Initializable {
         var loader = new FXMLLoader(getClass.getResource("/cellTemplate2.fxml"))
         var node = loader.load[SplitPane]
         var controller = loader.getController[CellTemplateController]
+        controller.adminActor = adminActor
         cellControllers += ((cell.info.id, controller))
         Platform.runLater {
             controller setStaticInformation cell
