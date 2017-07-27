@@ -1,6 +1,6 @@
 package admin
 
-import javafx.application.Application
+import javafx.application.{Application, Platform}
 import javafx.fxml.FXMLLoader
 import javafx.scene.control.SplitPane
 import javafx.stage.Stage
@@ -25,7 +25,10 @@ class InterfaceView extends Application {
         val root: SplitPane = loader.load()
         controller = loader.getController[InterfaceController]
         val scene: Scene = new Scene(root)
-
+        primaryStage.setOnCloseRequest(() => {
+            Platform.exit()
+            System.exit(0)
+        })
         primaryStage setScene scene
         primaryStage.show()
     }

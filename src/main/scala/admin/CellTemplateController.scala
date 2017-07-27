@@ -9,7 +9,10 @@ import javafx.scene.layout._
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
 
-import ontologies.messages.{Cell, SensorsUpdate}
+import akka.actor.ActorRef
+import ontologies.messages.Location._
+import ontologies.messages.MessageType.Init
+import ontologies.messages.{Cell, _}
 
 import scala.collection.mutable
 import scalafx.application.Platform
@@ -19,7 +22,9 @@ import scalafx.application.Platform
   */
 class CellTemplateController extends Initializable {
 
-    private var sensorsController: mutable.Map[Int, SensorTemplateController] = new mutable.HashMap[Int, SensorTemplateController]
+    var adminActor: ActorRef = _
+    private var cellId: Int = _
+    private val sensorsController: mutable.Map[Int, SensorTemplateController] = new mutable.HashMap[Int, SensorTemplateController]
     @FXML
     private var roomName: Text = _
     @FXML
@@ -48,6 +53,7 @@ class CellTemplateController extends Initializable {
       *
       **/
     def setStaticInformation(cell: Cell): Unit = {
+        cellId = cell.info.id
         roomName setText cell.info.name
         maxCapacityValue setText cell.capacity.toString
         sqrMetersValue setText cell.squareMeters.toString
@@ -101,6 +107,6 @@ class CellTemplateController extends Initializable {
     }
 
     def openCharts(): Unit = {
-
+        adminActor ! AriadneMessage(Init, Init.Subtype.Greetings, Location.Admin >> Location.Self, Greetings(List(cellId.toString)))
     }
 }

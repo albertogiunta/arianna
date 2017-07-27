@@ -551,9 +551,9 @@ object MessageType {
 
                 override val subtypeName: String = "OpenChart"
 
-                override def unmarshal(json: String): MessageContent = json.parseJson.convertTo[InfoCell]
+                override def unmarshal(json: String): MessageContent = json.parseJson.convertTo[CellForChart]
 
-                override def marshal(obj: MessageContent): String = obj.asInstanceOf[InfoCell].toJson.toString()
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[CellForChart].toJson.toString()
             }
 
             object UpdateChart extends MessageSubtype {

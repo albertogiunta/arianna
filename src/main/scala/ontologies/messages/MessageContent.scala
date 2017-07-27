@@ -321,6 +321,7 @@ final case class CellForSwitcher(info: InfoCell,
 
 final case class CellForView(id: Int, name: String, currentOccupation: Int, sensors: List[Sensor]) extends MessageContent
 
+final case class CellForChart(info: InfoCell, sensors: List[Sensor]) extends MessageContent
 
 object CellForSwitcher {
     def apply(cell: CellForUser): CellForSwitcher =

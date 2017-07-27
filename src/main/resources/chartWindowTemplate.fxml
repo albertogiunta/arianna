@@ -6,7 +6,8 @@
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.*?>
 <GridPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-          prefHeight="546.0" prefWidth="759.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
+          prefHeight="546.0" prefWidth="759.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="chartWindowController">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
@@ -17,7 +18,7 @@
         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
     </rowConstraints>
     <children>
-        <TitledPane prefHeight="200.0" prefWidth="200.0" text="People">
+        <TitledPane fx:id="peoplePane" prefHeight="200.0" prefWidth="200.0" text="People">
             <content>
                 <LineChart fx:id="peopleChart" prefHeight="154.0" prefWidth="299.0">
                     <xAxis>

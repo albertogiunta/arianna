@@ -33,4 +33,6 @@ object AriannaJsonProtocol extends DefaultJsonProtocol {
     implicit val userAndAntennaPositionUpdateFormat: RootJsonFormat[UserAndAntennaPositionUpdate] = jsonFormat2(UserAndAntennaPositionUpdate)
     implicit val antennaPositionsFormat: RootJsonFormat[AntennaPositions] = jsonFormat2(AntennaPositions)
     implicit val cellForSwitcherFormat: RootJsonFormat[CellForSwitcher] = jsonFormat2(CellForSwitcher.apply)
+    implicit val cellForChartFormat: RootJsonFormat[CellForChart] = jsonFormat2(CellForChart)
+    implicit val cellForViewFormat: RootJsonFormat[CellForView] = jsonFormat4(CellForView)
 }

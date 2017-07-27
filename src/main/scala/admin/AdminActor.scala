@@ -5,14 +5,14 @@ import java.nio.file.Paths
 import javafx.embed.swing.JFXPanel
 import javafx.stage.Stage
 
-import akka.actor.{ActorSystem, Props}
+import akka.actor.{ActorRef, ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
 import common.CustomActor
 import ontologies.messages.Location._
-import ontologies.messages.MessageType.{Alarm, Handshake, Topology}
+import ontologies.messages.MessageType.{Alarm, Handshake, Interface, Topology}
 import ontologies.messages._
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable
 import scalafx.application.Platform
 
 /**
@@ -25,21 +25,24 @@ import scalafx.application.Platform
   */
 class AdminActor(interfaceView: InterfaceView) extends CustomActor {
 
-    var area: Area = _
-    val interfaceController: InterfaceController = interfaceView.controller
-    interfaceController.actorRef = self
+    private val interfaceController: InterfaceController = interfaceView.controller
+    interfaceController.adminActor = self
+
+    private val chartActors: mutable.Map[Int, ActorRef] = new mutable.HashMap[Int, ActorRef]
     //Se si fa partire solo l'admin manager
-    val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/AdminManager")
+    private val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/AdminManager")
     //Se si fa partire il master
     //val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/Master/AdminManager")
-    val toServer: MessageDirection = Location.Admin >> Location.Server
+    private val toServer: MessageDirection = Location.Admin >> Location.Server
 
     override def receive: Receive = {
         //Ricezione dell'aggiornamento delle celle
         case msg@AriadneMessage(_, MessageType.Update.Subtype.UpdateForAdmin, _, adminUpdate: UpdateForAdmin) => {
-            val updateCells: ListBuffer[CellForView] = new ListBuffer[CellForView]
-            adminUpdate.list.foreach(cell => updateCells += new CellForView(cell.info.id, cell.info.name, cell.currentPeople, cell.sensors))
-            interfaceController updateView updateCells.toList
+            val updateCells: mutable.Map[Int, CellForView] = new mutable.HashMap[Int, CellForView]
+            adminUpdate.list.foreach(cell => updateCells += ((cell.info.id, new CellForView(cell.info.id, cell.info.name, cell.currentPeople, cell.sensors))))
+            interfaceController updateView updateCells.values.toList
+
+            chartActors.foreach(actor => actor._2 ! AriadneMessage(Interface, Interface.Subtype.UpdateChart, Location.Admin >> Location.Self, updateCells.get(actor._1).get))
         }
         //Ricezione del messaggio iniziale dall'interfaccia con aggiornamento iniziale
         case msg@AriadneMessage(_, Topology.Subtype.Planimetrics, _, area: Area) => adminManager ! msg.copy(direction = toServer)
@@ -48,8 +51,16 @@ class AdminActor(interfaceView: InterfaceView) extends CustomActor {
 
         case msg@AriadneMessage(_, Alarm.Subtype.Basic, _, content: AlarmContent) => interfaceController triggerAlarm content
 
-        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsUpdate) => {
-            interfaceController initializeSensors sensorsInfo
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsUpdate) => interfaceController initializeSensors sensorsInfo
+
+        case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
+            var chartActor = context.actorOf(Props[ChartActor])
+            chartActors += ((cell.info.id, chartActor))
+            chartActors.get(cell.info.id).get ! msg
+        }
+
+        case msg@AriadneMessage(Interface, Interface.Subtype.CloseChart, _, cell: InfoCell) => {
+            context stop chartActors.get(cell.id).get
         }
 
         case _ => println("none")
