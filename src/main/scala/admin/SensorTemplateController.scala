@@ -31,7 +31,7 @@ class SensorTemplateController extends Initializable {
       **/
     def createSensor(sensor: Sensor): Unit = {
         sensorCategory = sensor.category
-        sensorName.setText(assignSensorName());
+        sensorName setText Sensor.categoryName(sensorCategory)
     }
 
     /**
@@ -43,12 +43,5 @@ class SensorTemplateController extends Initializable {
         sensorValue.setText(sensor.value.toString)
     }
 
-    private def assignSensorName(): String = sensorCategory match {
-        case 1 => "Temperature"
-        case 2 => "Smoke"
-        case 3 => "Humidity"
-        case 4 => "Other"
-        case _ => ""
-    }
 
 }

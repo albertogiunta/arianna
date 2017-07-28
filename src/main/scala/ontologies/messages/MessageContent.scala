@@ -214,6 +214,16 @@ object CurrentPeopleUpdate {
   */
 final case class Sensor(category: Int, value: Double, min: Double, max: Double) extends MessageContent
 
+object Sensor {
+    def categoryName(category: Int): String = category match {
+        case 1 => "Temperature"
+        case 2 => "Smoke"
+        case 3 => "Humidity"
+        case 4 => "Other"
+        case _ => ""
+    }
+}
+
 /**
   * This case Class is meant to be used as an Update of all the Sensors data
   * from a single Cell to the Master.

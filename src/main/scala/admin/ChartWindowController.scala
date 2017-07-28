@@ -31,6 +31,7 @@ class ChartWindowController extends Initializable {
             Platform.runLater {
                 val loader = new FXMLLoader(getClass().getResource("/chartTemplate.fxml"));
                 val template = loader.load[TitledPane]
+                template setText Sensor.categoryName(sensorId)
                 sensorChartControllers += ((sensorId, loader.getController[SensorChartController]))
                 var position: (Int, Int) = positions.next()
                 mainPane.add(template, position._1, position._2)
