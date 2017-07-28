@@ -26,7 +26,10 @@ class SensorChartController extends Initializable {
     }
 
     def addValue(value: Double): Unit = {
+        if (data.getData.size().equals(25)) {
+            data.getData.remove(0)
+        }
         data.getData add new XYChart.Data(time, value)
-        time = time + 1
+        time = time + 5
     }
 }

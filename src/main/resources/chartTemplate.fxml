@@ -9,7 +9,7 @@
     <content>
         <LineChart fx:id="chart">
             <xAxis>
-                <NumberAxis side="BOTTOM" tickLabelsVisible="false"/>
+                <NumberAxis forceZeroInRange="false" side="BOTTOM" tickLabelsVisible="false"/>
             </xAxis>
             <yAxis>
                 <NumberAxis side="LEFT" upperBound="50.0"/>

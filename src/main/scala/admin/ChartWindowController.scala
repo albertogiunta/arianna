@@ -52,8 +52,11 @@ class ChartWindowController extends Initializable {
 
     def updateCharts(update: CellForView): Unit = {
         Platform.runLater {
+            if (data.getData.size().equals(25)) {
+                data.getData.remove(0)
+            }
             data.getData add new XYChart.Data(time, update.currentOccupation)
-            time = time + 1
+            time = time + 5
             update.sensors.foreach(sensor => {
                 var controller = sensorChartControllers.get(sensor.category).get
                 controller.addValue(sensor.value)
