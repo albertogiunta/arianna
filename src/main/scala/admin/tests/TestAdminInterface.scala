@@ -26,7 +26,7 @@ object TestAdminInterface extends App {
     var i = 1
     Thread.sleep(10000)
     while (!i.equals(6)) {
-        Thread.sleep(1000)
+        Thread.sleep(300)
         var sensors: ListBuffer[Sensor] = new ListBuffer[Sensor]
         for (i <- 1 until 5) {
             sensors += Sensor(i, (Math.random() * 10).round.toDouble, 0, 10)
@@ -38,7 +38,7 @@ object TestAdminInterface extends App {
         i = i + 1
     }
 
-    Thread.sleep(4000)
+    Thread.sleep(1000)
 
     while (true) {
         Thread.sleep(1000)

@@ -25,7 +25,7 @@ class ChartActor extends CustomActor {
             windowController initializeCharts cell.sensorsId
         }
 
-        case msg@AriadneMessage(Interface, Interface.Subtype.UpdateChart, _, update: CellDataUpdate) => windowController updateCharts update.sensors
+        case msg@AriadneMessage(Interface, Interface.Subtype.UpdateChart, _, update: CellForView) => windowController updateCharts update
 
     }
 

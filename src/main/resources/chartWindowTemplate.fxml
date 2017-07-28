@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 
-<?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Label?>
@@ -19,7 +18,7 @@
                     <content>
                         <LineChart fx:id="peopleChart" prefHeight="154.0" prefWidth="299.0">
                             <xAxis>
-                                <CategoryAxis side="BOTTOM"/>
+                                <NumberAxis side="BOTTOM"/>
                             </xAxis>
                             <yAxis>
                                 <NumberAxis side="LEFT"/>
