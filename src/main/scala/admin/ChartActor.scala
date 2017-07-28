@@ -2,7 +2,7 @@ package admin
 
 import javafx.fxml.FXMLLoader
 import javafx.scene.Scene
-import javafx.scene.layout.GridPane
+import javafx.scene.layout.Pane
 import javafx.stage.Stage
 
 import common.CustomActor
@@ -21,6 +21,7 @@ class ChartActor extends CustomActor {
         case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
             openWindow
             cellInfo = cell.info
+            windowController initializeTitle cell.info.name
             windowController initializeCharts cell.sensorsId
         }
 
@@ -30,14 +31,14 @@ class ChartActor extends CustomActor {
 
     def openWindow(): Unit = {
         val loader = new FXMLLoader(getClass().getResource("/chartWindowTemplate.fxml"));
-        val template = loader.load[GridPane]
+        val template = loader.load[Pane]
         windowController = loader.getController[ChartWindowController]
         Platform.runLater {
             val stage = new Stage
             stage.setOnCloseRequest((e) => {
                 parent ! AriadneMessage(Interface, Interface.Subtype.CloseChart, Location.Admin >> Location.Self, cellInfo)
             })
-            stage setTitle "Charts"
+            stage setTitle "Arianna Charts"
             stage setScene new Scene(template)
             stage.show
         }

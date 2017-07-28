@@ -40,7 +40,7 @@ class SensorTemplateController extends Initializable {
       * @param sensor : Sensor object containing the current value
       * */
     def updateSensor(sensor: Sensor): Unit = {
-        sensorValue.setText(sensor.value.toString)
+        sensorValue setText sensor.value.toString
     }
 
 

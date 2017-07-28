@@ -17,7 +17,7 @@ class InterfaceView extends Application {
     var controller: InterfaceController = _
 
     override def start(primaryStage: Stage): Unit = {
-        primaryStage.title = "Admin Interface"
+        primaryStage.title = "Arianna admin Interface"
         primaryStage.height = 850
         primaryStage.width = 1200
         primaryStage.resizable = false
