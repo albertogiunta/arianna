@@ -4,11 +4,13 @@ import java.net.URL
 import java.util.ResourceBundle
 import javafx.fxml.{FXML, FXMLLoader, Initializable}
 import javafx.scene.chart.LineChart
+import javafx.scene.control.TitledPane
 import javafx.scene.layout.GridPane
 
 import ontologies.messages.Sensor
 
 import scala.collection.mutable
+import scalafx.application.Platform
 
 
 class ChartWindowController extends Initializable {
@@ -21,15 +23,18 @@ class ChartWindowController extends Initializable {
 
     private val sensorChartControllers: mutable.Map[Int, SensorChartController] = new mutable.HashMap[Int, SensorChartController]()
 
-    override def initialize(location: URL, resources: ResourceBundle): Unit = ???
+    override def initialize(location: URL, resources: ResourceBundle): Unit = {}
 
-    def initializeCharts(sensors: List[Sensor]): Unit = {
+    def initializeCharts(sensorsId: List[Int]): Unit = {
         val positions = List((1, 0), (0, 1), (1, 1), (0, 2), (1, 2)).iterator
-        sensors.foreach(sensor => {
-            val loader = new FXMLLoader(getClass().getResource("chartTemplate.fxml"));
-            val template = loader.load
-            sensorChartControllers += ((sensor.category, loader.getController[SensorChartController]))
-            mainPane.add(template, positions.next()._1, positions.next()._1)
+        sensorsId.foreach(sensorId => {
+            Platform.runLater {
+                val loader = new FXMLLoader(getClass().getResource("/chartTemplate.fxml"));
+                val template = loader.load[TitledPane]
+                sensorChartControllers += ((sensorId, loader.getController[SensorChartController]))
+                var position: (Int, Int) = positions.next()
+                mainPane.add(template, position._1, position._2)
+            }
         })
     }
 

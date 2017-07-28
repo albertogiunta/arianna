@@ -11,7 +11,7 @@ import javafx.scene.text.Text
 
 import akka.actor.ActorRef
 import ontologies.messages.Location._
-import ontologies.messages.MessageType.Init
+import ontologies.messages.MessageType.Interface
 import ontologies.messages.{Cell, _}
 
 import scala.collection.mutable
@@ -23,7 +23,7 @@ import scalafx.application.Platform
 class CellTemplateController extends Initializable {
 
     var adminActor: ActorRef = _
-    private var cellId: Int = _
+    private var cellInfo: InfoCell = _
     private val sensorsController: mutable.Map[Int, SensorTemplateController] = new mutable.HashMap[Int, SensorTemplateController]
     @FXML
     private var roomName: Text = _
@@ -53,7 +53,7 @@ class CellTemplateController extends Initializable {
       *
       **/
     def setStaticInformation(cell: Cell): Unit = {
-        cellId = cell.info.id
+        cellInfo = cell.info
         roomName setText cell.info.name
         maxCapacityValue setText cell.capacity.toString
         sqrMetersValue setText cell.squareMeters.toString
@@ -89,7 +89,7 @@ class CellTemplateController extends Initializable {
                 val sensorController = loader.getController[SensorTemplateController]
                 sensorController createSensor sensor
                 sensorsController += ((sensor.category, sensorController))
-                sensorsContainer.getChildren.add(sensorTemplate)
+                sensorsContainer.getChildren add sensorTemplate
             })
         }
         //TODO : ordina gli elementi sull'id
@@ -107,6 +107,11 @@ class CellTemplateController extends Initializable {
     }
 
     def openCharts(): Unit = {
-        adminActor ! AriadneMessage(Init, Init.Subtype.Greetings, Location.Admin >> Location.Self, Greetings(List(cellId.toString)))
+        adminActor ! AriadneMessage(Interface, Interface.Subtype.OpenChart, Location.Admin >> Location.Self, CellForChart(cellInfo, sensorsController.keys.toList))
+        chartsButton setDisable true
+    }
+
+    def enableChartButton(): Unit = {
+        chartsButton setDisable false
     }
 }

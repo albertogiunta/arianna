@@ -113,6 +113,10 @@ class InterfaceController extends Initializable {
         //Allarme lanciato dall'interfaccia
     }
 
+    def enableButton(cellId: Int): Unit = {
+        cellControllers.get(cellId).get.enableChartButton
+    }
+
     private def parseFile(file: File): Unit = {
         val source = Source.fromFile(file).getLines.mkString
         val area = Topology.Subtype.Planimetrics.unmarshal(source)

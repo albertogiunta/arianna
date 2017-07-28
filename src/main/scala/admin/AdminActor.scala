@@ -56,11 +56,12 @@ class AdminActor(interfaceView: InterfaceView) extends CustomActor {
         case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
             var chartActor = context.actorOf(Props[ChartActor])
             chartActors += ((cell.info.id, chartActor))
-            chartActors.get(cell.info.id).get ! msg
+            chartActor ! msg
         }
 
         case msg@AriadneMessage(Interface, Interface.Subtype.CloseChart, _, cell: InfoCell) => {
             context stop chartActors.get(cell.id).get
+            interfaceController enableButton cell.id
         }
 
         case _ => println("none")

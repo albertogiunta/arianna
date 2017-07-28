@@ -73,7 +73,6 @@ class CanvasController extends Initializable {
     }
 
     private def drawRoom(room: Room, color: Color): Unit = {
-        println("Disegno la stanza")
         val gc = mapCanvas.getGraphicsContext2D
         gc setStroke Color.BLACK
         gc setFill color
