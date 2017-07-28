@@ -24,7 +24,7 @@ object TestDataStreamer extends App {
     
     Thread.sleep(5000)
     
-    val streamer = system.actorOf(Props[DataStreamer], "DataStreamer")
+    val streamer = system.actorOf(Props(new DataStreamer()), "DataStreamer")
     
     (0 to 10).foreach(_ => {
         val u =
