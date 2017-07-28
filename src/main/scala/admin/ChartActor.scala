@@ -19,7 +19,7 @@ class ChartActor extends CustomActor {
 
     override def receive: Receive = {
         case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
-            openWindow()
+            openWindow
             cellInfo = cell.info
             windowController initializeCharts cell.sensorsId
         }
