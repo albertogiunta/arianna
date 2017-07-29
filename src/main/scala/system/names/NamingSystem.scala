@@ -1,0 +1,15 @@
+package system.names
+
+object NamingSystem {
+    
+    val AdminManager = "AdminManager"
+    val TopologySupervisor = "TopologySupervisor"
+    val DataStreamer = "DataStreamer"
+    val Publisher = "Publisher"
+    val Subscriber = "Subscriber"
+    val AlarmSupervisor = "AlarmSupervisor"
+    val Master = "Master"
+    val RouteProcessor = "RouteProcessor"
+    val CacheManager = "CacheManager"
+    val RouteManager = "RouteManager"
+}

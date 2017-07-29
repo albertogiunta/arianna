@@ -128,7 +128,17 @@ object MessageType {
     
                 override def marshal(obj: MessageContent): String = obj.asInstanceOf[SensorsUpdate].toJson.toString()
             }
-
+    
+            object Acknowledgement extends MessageSubtype {
+        
+                override val subtypeName = "Acknowledgement"
+        
+                override val superType = Handshake
+        
+                override def unmarshal(json: String): Empty = json.parseJson.convertTo[Empty]
+        
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[Empty].toJson.toString()
+            }
         }
 
     }

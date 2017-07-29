@@ -8,6 +8,7 @@ import com.utils.Practicability
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Route
 import ontologies.messages._
+import system.names.NamingSystem
 
 import scala.collection.immutable.HashMap
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -20,7 +21,7 @@ import scala.concurrent.{Await, Future}
   */
 class RouteProcessor(val core: ActorRef) extends CustomActor {
     
-    val cacheManager: () => ActorSelection = () => sibling("CacheManager").get
+    val cacheManager: () => ActorSelection = () => sibling(NamingSystem.CacheManager).get
     
     override def receive: Receive = {
         case RouteInfo(req, AreaViewedFromACell(_, cells)) =>

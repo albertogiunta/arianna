@@ -33,22 +33,28 @@ object MessageSubtype {
         def apply(subtypeName: String): MessageSubtype = subtypeName.toLowerCase match {
             case st if st == Init.Subtype.Greetings.toLowerCase =>
                 Init.Subtype.Greetings
+
             case st if st == Alarm.Subtype.Basic.toLowerCase =>
                 Alarm.Subtype.Basic
             case st if st == Alarm.Subtype.FromInterface.toLowerCase =>
                 Alarm.Subtype.FromInterface
+
             case st if st == Handshake.Subtype.CellToMaster.toLowerCase =>
                 Handshake.Subtype.CellToMaster
             case st if st == Handshake.Subtype.Cell2User.toLowerCase =>
                 Handshake.Subtype.Cell2User
             case st if st == Handshake.Subtype.User2Cell.toLowerCase =>
                 Handshake.Subtype.User2Cell
+            case st if st == Handshake.Subtype.Acknowledgement.toLowerCase =>
+                Handshake.Subtype.Acknowledgement
+                
             case st if st == Route.Subtype.Request.toLowerCase =>
                 Route.Subtype.Request
             case st if st == Route.Subtype.Response.toLowerCase =>
                 Route.Subtype.Response
             case st if st == Route.Subtype.Info.toLowerCase =>
                 Route.Subtype.Info
+
             case st if st == Topology.Subtype.Planimetrics.toLowerCase =>
                 Topology.Subtype.Planimetrics
             case st if st == Topology.Subtype.Practicability.toLowerCase =>
@@ -57,6 +63,7 @@ object MessageSubtype {
                 Topology.Subtype.ViewedFromACell
             case st if st == Topology.Subtype.Topology4User.toLowerCase =>
                 Topology.Subtype.Topology4User
+
             case st if st == Update.Subtype.Sensors.toLowerCase =>
                 Update.Subtype.Sensors
             case st if st == Update.Subtype.Position.UserPosition.toLowerCase =>

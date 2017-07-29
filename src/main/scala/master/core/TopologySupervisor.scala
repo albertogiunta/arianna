@@ -9,9 +9,9 @@ import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, ViewedFro
 import ontologies.messages.MessageType.Update.Subtype.{CurrentPeople, Sensors}
 import ontologies.messages.MessageType.{Handshake, Topology, Update}
 import ontologies.messages._
+import system.names.NamingSystem
 
 import scala.collection.mutable
-import scala.util.Random
 
 
 /**
@@ -24,14 +24,16 @@ class TopologySupervisor extends BasicActor {
     
     private var topology: mutable.Map[String, Cell] = mutable.HashMap.empty
     
+    private var mapVersionID: Int = 0
+    
     private val cell2Server: MessageDirection = Location.Cell >> Location.Master
     private val server2Cell: MessageDirection = cell2Server.reverse
     private val admin2Server: MessageDirection = Location.Admin >> Location.Master
     private val server2Admin: MessageDirection = admin2Server.reverse
     
-    private val dataStreamer: () => ActorSelection = () => sibling("DataStreamer").get
-    private val publisher: () => ActorSelection = () => sibling("Publisher").get
-    private val subscriber: () => ActorSelection = () => sibling("Subscriber").get
+    private val dataStreamer: () => ActorSelection = () => sibling(NamingSystem.DataStreamer).get
+    private val publisher: () => ActorSelection = () => sibling(NamingSystem.Publisher).get
+    private val subscriber: () => ActorSelection = () => sibling(NamingSystem.Subscriber).get
     
     private val synced: Counter = Counter()
     
@@ -41,7 +43,9 @@ class TopologySupervisor extends BasicActor {
             log.info("A topology has been loaded in the server...")
     
             if (topology.isEmpty) {
-                println(topology)
+    
+                mapVersionID = map.id
+                
                 topology = mutable.HashMap(map.cells.map(c => (c.info.uri, c)): _*)
                 
                 context.become(behavior = sociable, discardOld = true)
@@ -78,7 +82,7 @@ class TopologySupervisor extends BasicActor {
                     subscriber() ! AriadneMessage(
                         Topology, ViewedFromACell, server2Cell,
                         AreaViewedFromACell(
-                            Random.nextInt,
+                            mapVersionID,
                             topology.map(e => CellViewedFromACell(e._2)).toList
                         )
                     )
@@ -124,7 +128,7 @@ class TopologySupervisor extends BasicActor {
                 AriadneMessage(
                     Topology, ViewedFromACell, server2Cell,
                     AreaViewedFromACell(
-                        Random.nextInt,
+                        mapVersionID,
                         topology.map(e => CellViewedFromACell(e._2)).toList)
                 )
             )

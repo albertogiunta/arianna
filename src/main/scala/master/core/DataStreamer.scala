@@ -8,6 +8,7 @@ import ontologies.messages.Location._
 import ontologies.messages.MessageType.Update.Subtype
 import ontologies.messages.MessageType.{Handshake, Update}
 import ontologies.messages._
+import system.names.NamingSystem
 
 import scala.concurrent.duration._
 
@@ -24,7 +25,7 @@ class DataStreamer(private val handler: (AriadneMessage[_], ActorSelection) => U
     implicit private val materializer: ActorMaterializer = ActorMaterializer.create(system)
     
     private var streamer: SourceQueueWithComplete[Iterable[Cell]] = _
-    private val admin: () => ActorSelection = () => sibling("AdminManager").get
+    private val admin: () => ActorSelection = () => sibling(NamingSystem.AdminManager).get
     
     private val source = Source.queue[Iterable[Cell]](100, OverflowStrategy.dropHead)
     

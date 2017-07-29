@@ -12,6 +12,7 @@ import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, ViewedFro
 import ontologies.messages.MessageType.{Handshake, Init, Route, Topology, Update}
 import ontologies.messages._
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
+import system.names.NamingSystem
 
 import scala.io.Source
 import scala.util.Random
@@ -115,20 +116,21 @@ class MasterSubscriberTest extends TestKit(ActorSystem("SubscriberTest", MasterS
     }
     
     private class Tester(probe: ActorRef) extends CustomActor {
-        
-        val subscriber: TestActorRef[MasterSubscriber] = TestActorRef(Props[MasterSubscriber], self, "Subscriber")
+    
+        val subscriber: TestActorRef[MasterSubscriber] =
+            TestActorRef(Props[MasterSubscriber], self, NamingSystem.Subscriber)
         
         val supervisor: ActorRef = context.actorOf(Props(new CustomActor {
             override def receive: Receive = {
                 case msg => probe ! msg
             }
-        }), "TopologySupervisor")
+        }), NamingSystem.TopologySupervisor)
         
         val publisher: ActorRef = context.actorOf(Props(new CustomActor {
             override def receive: Receive = {
                 case msg => probe ! msg
             }
-        }), "Publisher")
+        }), NamingSystem.Publisher)
         
         
         override def preStart {

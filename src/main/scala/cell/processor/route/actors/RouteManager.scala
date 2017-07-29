@@ -6,6 +6,7 @@ import ontologies.messages.Location._
 import ontologies.messages.MessageType.Route
 import ontologies.messages.MessageType.Route.Subtype.{Info, Response}
 import ontologies.messages._
+import system.names.NamingSystem
 
 /**
   * This Actor manages the processing of Route from a cell A to a cell B.
@@ -23,8 +24,8 @@ class RouteManager extends BasicActor {
     
     override def preStart() = {
         super.preStart()
-        cacher = context.actorOf(Props(new CacheManager(cacheKeepAlive = 2500L)), "CacheManager")
-        processor = context.actorOf(Props(new RouteProcessor(parent)), "RouteProcessor")
+        cacher = context.actorOf(Props(new CacheManager(cacheKeepAlive = 2500L)), NamingSystem.CacheManager)
+        processor = context.actorOf(Props(new RouteProcessor(parent)), NamingSystem.RouteProcessor)
     }
     
     override protected def receptive: Receive = {

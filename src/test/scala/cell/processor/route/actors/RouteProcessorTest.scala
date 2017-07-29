@@ -7,6 +7,7 @@ import ontologies.messages.Location._
 import ontologies.messages.MessageType.{Init, Route}
 import ontologies.messages._
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
+import system.names.NamingSystem
 
 import scala.concurrent.duration
 import scala.concurrent.duration.FiniteDuration
@@ -323,8 +324,8 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
     }
     
     private class Tester(probe: TestProbe) extends CustomActor {
-        
-        val routeManager: ActorRef = context.actorOf(Props[RouteManager], "RouteManager")
+    
+        val routeManager: ActorRef = context.actorOf(Props[RouteManager], NamingSystem.RouteManager)
         
         override def preStart {
             
