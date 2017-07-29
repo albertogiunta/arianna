@@ -22,11 +22,6 @@ import scalafx.stage.FileChooser
 import scalafx.stage.FileChooser.ExtensionFilter
 
 /**
-  * This class contains only the piece of Cell information that the interface needs in order to update the View.
-  *
-  **/
-
-/**
   * This is the main controller for the interface of the Application
   *
   **/

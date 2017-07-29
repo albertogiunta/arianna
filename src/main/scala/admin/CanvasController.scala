@@ -26,6 +26,7 @@ sealed case class Room(roomVertices: Coordinates) {
   * @param endPoint   : ending point of the line
   *
   **/
+
 sealed case class PassageLine(startPoint: Point, endPoint: Point)
 
 /**
