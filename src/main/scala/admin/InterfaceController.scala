@@ -73,6 +73,7 @@ class InterfaceController extends Initializable {
       * */
     @FXML
     def handleFileLoad(): Unit = {
+        loadButton.disable = true
         val fc = new FileChooser()
         fc.title = "Get JSON"
         fc.extensionFilters += (new ExtensionFilter("JSON Files", "*.json"))
@@ -124,7 +125,6 @@ class InterfaceController extends Initializable {
         loadCanvas()
         createCells(area.cells)
         fileName.text = file.getName
-        loadButton.disable = true
     }
 
     private def loadCanvas(): Unit = {

@@ -7,6 +7,9 @@ import javafx.scene.chart.{LineChart, XYChart}
 
 import scalafx.application.Platform
 
+/**
+  * This is the Controller for the sensor chart, that initialized it and keep it updated.
+  **/
 class SensorChartController extends Initializable {
 
     @FXML
@@ -20,13 +23,16 @@ class SensorChartController extends Initializable {
     override def initialize(location: URL, resources: ResourceBundle): Unit = {
         Platform.runLater {
             chart.getData add data
-            //chart.getXAxis setAutoRanging true
-            //chart.getYAxis setAutoRanging true
         }
     }
 
+    /**
+      * This method adds a new value in the chart, and provides to keep only the last 20 values.
+      *
+      * @param value : new Double to add in the chart
+      **/
     def addValue(value: Double): Unit = {
-        if (data.getData.size().equals(25)) {
+        if (data.getData.size().equals(20)) {
             data.getData.remove(0)
         }
         data.getData add new XYChart.Data(time, value)

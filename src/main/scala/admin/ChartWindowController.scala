@@ -12,7 +12,10 @@ import ontologies.messages.{CellForView, Sensor}
 import scala.collection.mutable
 import scalafx.application.Platform
 
-
+/**
+  * This is the Controller class for the external charts window.
+  *
+  **/
 class ChartWindowController extends Initializable {
 
     @FXML
@@ -30,12 +33,28 @@ class ChartWindowController extends Initializable {
 
     private var time: Int = 0
 
-    override def initialize(location: URL, resources: ResourceBundle): Unit = {}
+    override def initialize(location: URL, resources: ResourceBundle): Unit = {
+        Platform.runLater {
+            peopleChart.getData add data
+        }
+    }
 
+    /**
+      * This method initializes the title of the window with the name of the room
+      *
+      * @param name : String containing the name of the room
+      **/
     def initializeTitle(name: String): Unit = {
         cellName setText name
-        peopleChart.getData add data
     }
+
+    /**
+      * This method initializes the charts based on the list of sensor id and add it to the
+      * GridPane, after loading the template from .fxml file
+      *
+      * @param sensorsId : List of the sensors ID which are inside the room
+      *
+      * */
     def initializeCharts(sensorsId: List[Int]): Unit = {
         val positions = List((1, 0), (0, 1), (1, 1), (0, 2), (1, 2)).iterator
         sensorsId.foreach(sensorId => {
@@ -50,17 +69,24 @@ class ChartWindowController extends Initializable {
         })
     }
 
+    /**
+      * This method is called everytime the charts are updated with new values
+      *
+      * @param update : CellForView object containing information about the room and all
+      *               the new values coming from the sensors.
+      *
+      * */
     def updateCharts(update: CellForView): Unit = {
         Platform.runLater {
-            if (data.getData.size().equals(25)) {
-                data.getData.remove(0)
-            }
-            data.getData add new XYChart.Data(time, update.currentOccupation)
-            time = time + 5
             update.sensors.foreach(sensor => {
                 var controller = sensorChartControllers.get(sensor.category).get
                 controller.addValue(sensor.value)
             })
+            if (data.getData.size().equals(20)) {
+                data.getData.remove(0)
+            }
+            data.getData add new XYChart.Data(time, update.currentOccupation)
+            time = time + 5
         }
 
     }

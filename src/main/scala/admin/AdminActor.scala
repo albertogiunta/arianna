@@ -18,7 +18,8 @@ import scalafx.application.Platform
 /**
   * This actor intermediates between the interface and the System. It sends the loaded map, handles the messages coming
   * from the System and update the Interface coherently and informs the System if the administrator sent an Alarm from
-  * the interface.
+  * the interface. It also creates a ChartActor for each chart window opened by the administrator and forward to him only
+  * the updates about the correct cell.
   *
   * @param interfaceView : the View of the Application
   *

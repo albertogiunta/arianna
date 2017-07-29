@@ -12,6 +12,12 @@ import ontologies.messages._
 
 import scalafx.application.Platform
 
+/**
+  * This actor handles the creation of a external window for charts, and it keeps them constantly updated with new
+  * values received from the System (through his parent AdminActor).
+  *
+  *
+  **/
 class ChartActor extends CustomActor {
 
     private var windowController: ChartWindowController = _
