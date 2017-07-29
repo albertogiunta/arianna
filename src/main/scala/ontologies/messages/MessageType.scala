@@ -545,6 +545,9 @@ object MessageType {
 
         object Subtype {
 
+            /**
+              * Takes a CellForChart object as MessageContent
+              */
             object OpenChart extends MessageSubtype {
 
                 override val superType: MessageType = Interface
@@ -556,6 +559,9 @@ object MessageType {
                 override def marshal(obj: MessageContent): String = obj.asInstanceOf[CellForChart].toJson.toString()
             }
 
+            /**
+              * Takes a CellForView object as MessageContent
+              */
             object UpdateChart extends MessageSubtype {
 
                 override val superType: MessageType = Interface
@@ -568,6 +574,9 @@ object MessageType {
 
             }
 
+            /**
+              * Takes a InfoCell object as MessageContent
+              */
             object CloseChart extends MessageSubtype {
 
                 override val superType: MessageType = Interface

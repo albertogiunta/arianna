@@ -85,7 +85,7 @@ class ChartWindowController extends Initializable {
             if (data.getData.size().equals(20)) {
                 data.getData.remove(0)
             }
-            data.getData add new XYChart.Data(time, update.currentOccupation)
+            data.getData add new XYChart.Data(time, update.currentPeople)
             time = time + 5
         }
 

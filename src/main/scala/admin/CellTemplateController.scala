@@ -68,7 +68,7 @@ class CellTemplateController extends Initializable {
       * @param cell : CellForView object containing only dynamic data
       * */
     def setDynamicInformation(cell: CellForView): Unit = {
-        currentPeopleValue setText cell.currentOccupation.toString
+        currentPeopleValue setText cell.currentPeople.toString
         cell.sensors.foreach(sensor => {
             val controller = sensorsController.get(sensor.category).get
             controller updateSensor sensor
@@ -92,8 +92,6 @@ class CellTemplateController extends Initializable {
                 sensorsContainer.getChildren add sensorTemplate
             })
         }
-        //TODO : ordina gli elementi sull'id
-        //sensorsContainer.getChildren.sort()
     }
 
     /**

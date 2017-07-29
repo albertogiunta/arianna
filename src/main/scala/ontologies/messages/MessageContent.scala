@@ -329,11 +329,28 @@ final case class AntennaPositions(userPosition: Point, antennaPositions: List[In
 final case class CellForSwitcher(info: InfoCell,
                                  neighbors: List[InfoCell]) extends MessageContent
 
-final case class CellForView(id: Int, name: String, currentOccupation: Int, sensors: List[Sensor]) extends MessageContent
-
-final case class CellForChart(info: InfoCell, sensorsId: List[Int]) extends MessageContent
-
 object CellForSwitcher {
     def apply(cell: CellForUser): CellForSwitcher =
         new CellForSwitcher(cell.info, cell.neighbors)
 }
+
+/**
+  * This Case Class is meant to be used as a Content for Messages inside the Admin System in order to update the view
+  * with new data from a single cell
+  *
+  * @param id            : Int representing cell ID
+  * @param name          : String containing cell name
+  * @param currentPeople : Int values how the actual number of people inside the room
+  * @param sensors       : list of Sensor object containing updated values coming from them
+  **/
+final case class CellForView(id: Int, name: String, currentPeople: Int, sensors: List[Sensor]) extends MessageContent
+
+/**
+  * This Case Class is meant to be used as a Content for Messages inside the Admin Systemi in order to initialize
+  * the charts with information about a single cell
+  *
+  * @param info      : InfoCell object containing all information about the cell
+  * @param sensorsId : list of Int representing the sensor ID inside the room
+  *
+  **/
+final case class CellForChart(info: InfoCell, sensorsId: List[Int]) extends MessageContent
