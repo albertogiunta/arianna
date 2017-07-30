@@ -31,7 +31,7 @@ class ChartWindowController extends Initializable {
 
     private val data: XYChart.Series[Int, Int] = new XYChart.Series[Int, Int]
 
-    private var time: Int = 0
+    private var time = (0 to Int.MaxValue).iterator
 
     override def initialize(location: URL, resources: ResourceBundle): Unit = {
         Platform.runLater {
@@ -85,8 +85,7 @@ class ChartWindowController extends Initializable {
             if (data.getData.size().equals(20)) {
                 data.getData.remove(0)
             }
-            data.getData add new XYChart.Data(time, update.currentPeople)
-            time = time + 5
+            data.getData add new XYChart.Data(time.next, update.currentPeople)
         }
 
     }

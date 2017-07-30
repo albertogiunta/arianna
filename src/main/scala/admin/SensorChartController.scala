@@ -17,7 +17,7 @@ class SensorChartController extends Initializable {
 
     private val data: XYChart.Series[Int, Double] = new XYChart.Series[Int, Double]
 
-    private var time: Int = 0
+    private var time = (0 to Int.MaxValue).iterator
 
 
     override def initialize(location: URL, resources: ResourceBundle): Unit = {
@@ -35,7 +35,6 @@ class SensorChartController extends Initializable {
         if (data.getData.size().equals(20)) {
             data.getData.remove(0)
         }
-        data.getData add new XYChart.Data(time, value)
-        time = time + 5
+        data.getData add new XYChart.Data(time.next, value)
     }
 }
