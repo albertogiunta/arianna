@@ -70,8 +70,7 @@ class CellTemplateController extends Initializable {
     def setDynamicInformation(cell: CellForView): Unit = {
         currentPeopleValue setText cell.currentPeople.toString
         cell.sensors.foreach(sensor => {
-            val controller = sensorsController.get(sensor.category).get
-            controller updateSensor sensor
+            sensorsController.get(sensor.category).get updateSensor sensor
         })
     }
 

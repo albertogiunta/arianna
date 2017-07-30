@@ -7,7 +7,10 @@ import javafx.scene.chart.{LineChart, XYChart}
 import javafx.scene.control.{Label, TitledPane}
 import javafx.scene.layout.GridPane
 
-import ontologies.messages.{CellForView, Sensor}
+import akka.actor.ActorRef
+import ontologies.messages.Location._
+import ontologies.messages.MessageType.Interface
+import ontologies.messages._
 
 import scala.collection.mutable
 import scalafx.application.Platform
@@ -18,6 +21,8 @@ import scalafx.application.Platform
   **/
 class ChartWindowController extends Initializable {
 
+    var chartActor: ActorRef = _
+
     @FXML
     private var mainPane: GridPane = _
 
@@ -27,11 +32,13 @@ class ChartWindowController extends Initializable {
     @FXML
     private var cellName: Label = _
 
+    private var cellInfo: InfoCell = _
+
     private val sensorChartControllers: mutable.Map[Int, SensorChartController] = new mutable.HashMap[Int, SensorChartController]()
 
     private val data: XYChart.Series[Int, Int] = new XYChart.Series[Int, Int]
 
-    private var time = (0 to Int.MaxValue).iterator
+    private var time = (0 to Int.MaxValue - 1).iterator
 
     override def initialize(location: URL, resources: ResourceBundle): Unit = {
         Platform.runLater {
@@ -39,13 +46,23 @@ class ChartWindowController extends Initializable {
         }
     }
 
+    def openView(): Unit = {
+        val view = new ChartView()
+        view.start
+    }
+
+    def closeView(): Unit = {
+        chartActor ! AriadneMessage(Interface, Interface.Subtype.CloseChart, Location.Admin >> Location.Self, cellInfo)
+    }
+
     /**
       * This method initializes the title of the window with the name of the room
       *
-      * @param name : String containing the name of the room
+      * @param info : InfoCell containing the room data
       **/
-    def initializeTitle(name: String): Unit = {
-        cellName setText name
+    def initializeWindow(info: InfoCell): Unit = {
+        cellName setText info.name
+        cellInfo = info
     }
 
     /**
@@ -62,10 +79,9 @@ class ChartWindowController extends Initializable {
             val template = loader.load[TitledPane]
             template setText Sensor.categoryName(sensorId)
             sensorChartControllers += ((sensorId, loader.getController[SensorChartController]))
-            Platform.runLater {
-                var position: (Int, Int) = positions.next()
-                mainPane.add(template, position._1, position._2)
-            }
+            var position: (Int, Int) = positions.next()
+            mainPane.add(template, position._1, position._2)
+
         })
     }
 
@@ -79,11 +95,11 @@ class ChartWindowController extends Initializable {
     def updateCharts(update: CellForView): Unit = {
         Platform.runLater {
             update.sensors.foreach(sensor => {
-                var controller = sensorChartControllers.get(sensor.category).get
-                controller.addValue(sensor.value)
-            })
+                sensorChartControllers.get(sensor.category).get.addValue(sensor.value)
+            }
+            )
             if (data.getData.size().equals(20)) {
-                data.getData.remove(0)
+                data.getData remove 0
             }
             data.getData add new XYChart.Data(time.next, update.currentPeople)
         }

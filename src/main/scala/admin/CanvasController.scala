@@ -11,6 +11,14 @@ import ontologies.messages.{Cell, Coordinates, Point}
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
+/**
+  * Class representing the room starting from a Coordinates object,
+  * with fields needed by JavaFX to draw a rectangle shape inside
+  * the Canvas.
+  *
+  * @param roomVertices : Coordinates object containing Point vertices of the room
+  *
+  **/
 sealed case class Room(roomVertices: Coordinates) {
     val x: Double = roomVertices.northWest.x
     val y: Double = roomVertices.northWest.y

@@ -1,6 +1,6 @@
 package admin
 
-import javafx.application.{Application, Platform}
+import javafx.application.Platform
 import javafx.fxml.FXMLLoader
 import javafx.scene.control.SplitPane
 import javafx.stage.Stage
@@ -12,25 +12,26 @@ import scalafx.scene.Scene
   * This class represent the interface of the Application
   *
   **/
-class InterfaceView extends Application {
+class InterfaceView {
 
     var controller: InterfaceController = _
 
-    override def start(primaryStage: Stage): Unit = {
-        primaryStage.title = "Arianna admin Interface"
-        primaryStage.height = 850
-        primaryStage.width = 1200
-        primaryStage.resizable = false
+    def start(): Unit = {
+        val mainStage = new Stage
+        mainStage.title = "Arianna admin Interface"
+        mainStage.height = 850
+        mainStage.width = 1200
+        mainStage.resizable = false
         var loader: FXMLLoader = new FXMLLoader(getClass.getResource("/interface.fxml"))
         val root: SplitPane = loader.load()
         controller = loader.getController[InterfaceController]
         val scene: Scene = new Scene(root)
-        primaryStage.setOnCloseRequest(() => {
+        mainStage.setOnCloseRequest(() => {
             Platform.exit()
             System.exit(0)
         })
-        primaryStage setScene scene
-        primaryStage.show()
+        mainStage setScene scene
+        mainStage.show()
     }
 
 }

@@ -3,13 +3,12 @@ package admin
 import java.io.File
 import java.nio.file.Paths
 import javafx.embed.swing.JFXPanel
-import javafx.stage.Stage
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
-import common.CustomActor
+import common.BasicActor
 import ontologies.messages.Location._
-import ontologies.messages.MessageType.{Alarm, Handshake, Interface, Topology}
+import ontologies.messages.MessageType.{Alarm, Handshake, Init, Interface, Topology}
 import ontologies.messages._
 
 import scala.collection.mutable
@@ -21,13 +20,12 @@ import scalafx.application.Platform
   * the interface. It also creates a ChartActor for each chart window opened by the administrator and forward to him only
   * the updates about the correct cell.
   *
-  * @param interfaceView : the View of the Application
   *
   */
-class AdminActor(interfaceView: InterfaceView) extends CustomActor {
+class AdminActor() extends BasicActor {
 
-    private val interfaceController: InterfaceController = interfaceView.controller
-    interfaceController.adminActor = self
+
+    private var interfaceController: InterfaceController = _
 
     private val chartActors: mutable.Map[Int, ActorRef] = new mutable.HashMap[Int, ActorRef]
     //Se si fa partire solo l'admin manager
@@ -36,17 +34,34 @@ class AdminActor(interfaceView: InterfaceView) extends CustomActor {
     //val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/Master/AdminManager")
     private val toServer: MessageDirection = Location.Admin >> Location.Server
 
-    override def receive: Receive = {
+    override def init(args: List[Any]): Unit = {
+        Platform.runLater {
+            val view: InterfaceView = new InterfaceView
+            view.start
+            interfaceController = view.controller
+            interfaceController.adminActor = self
+        }
+    }
+
+    override def receptive: Receive = {
+        //Ricezione del messaggio iniziale dall'interfaccia con aggiornamento iniziale
+        case msg@AriadneMessage(_, Topology.Subtype.Planimetrics, _, area: Area) => {
+            adminManager ! msg.copy(direction = toServer)
+            context.become(operational)
+        }
+
+        case _ => desist _
+
+    }
+
+    def operational: Receive = {
         //Ricezione dell'aggiornamento delle celle
         case msg@AriadneMessage(_, MessageType.Update.Subtype.UpdateForAdmin, _, adminUpdate: UpdateForAdmin) => {
             val updateCells: mutable.Map[Int, CellForView] = new mutable.HashMap[Int, CellForView]
             adminUpdate.list.foreach(cell => updateCells += ((cell.info.id, new CellForView(cell.info.id, cell.info.name, cell.currentPeople, cell.sensors))))
             interfaceController updateView updateCells.values.toList
-
             chartActors.foreach(actor => actor._2 ! AriadneMessage(Interface, Interface.Subtype.UpdateChart, Location.Admin >> Location.Self, updateCells.get(actor._1).get))
         }
-        //Ricezione del messaggio iniziale dall'interfaccia con aggiornamento iniziale
-        case msg@AriadneMessage(_, Topology.Subtype.Planimetrics, _, area: Area) => adminManager ! msg.copy(direction = toServer)
 
         case msg@AriadneMessage(_, Alarm.Subtype.FromInterface, _, _) => adminManager ! msg.copy(direction = toServer)
 
@@ -57,6 +72,7 @@ class AdminActor(interfaceView: InterfaceView) extends CustomActor {
         case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
             var chartActor = context.actorOf(Props[ChartActor])
             chartActors += ((cell.info.id, chartActor))
+            println("Invio cose!")
             chartActor ! msg
         }
 
@@ -65,7 +81,7 @@ class AdminActor(interfaceView: InterfaceView) extends CustomActor {
             interfaceController enableButton cell.id
         }
 
-        case _ => println("none")
+        case _ => desist _
 
     }
 
@@ -79,10 +95,8 @@ object App {
         var interfaceView: InterfaceView = new InterfaceView
         val config = ConfigFactory.parseFile(new File(path2Config)).resolve
         val system = ActorSystem.create("adminSystem", config)
-        Platform.runLater {
-            interfaceView start new Stage()
-            var admin = system.actorOf(Props(new AdminActor(interfaceView)), "admin")
-        }
+        var admin = system.actorOf(Props[AdminActor], "admin")
 
+        admin ! AriadneMessage(Init, Init.Subtype.Greetings, Location.Admin >> Location.Self, Greetings(List.empty))
     }
 }

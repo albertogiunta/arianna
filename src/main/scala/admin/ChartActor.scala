@@ -1,12 +1,6 @@
 package admin
 
-import javafx.fxml.FXMLLoader
-import javafx.scene.Scene
-import javafx.scene.layout.Pane
-import javafx.stage.Stage
-
 import common.CustomActor
-import ontologies.messages.Location._
 import ontologies.messages.MessageType.Interface
 import ontologies.messages._
 
@@ -25,29 +19,24 @@ class ChartActor extends CustomActor {
 
     override def receive: Receive = {
         case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
-            openWindow
+            println("Ricevo cose!")
             cellInfo = cell.info
-            windowController initializeTitle cell.info.name
-            windowController initializeCharts cell.sensorsId
+            Platform.runLater {
+                println("Apro la view oghhohohohohohohohoohohoho")
+                val view = new ChartView
+                view.start()
+                windowController = view.controller
+                windowController.chartActor = self
+                windowController initializeWindow cell.info
+                windowController initializeCharts cell.sensorsId
+            }
+
         }
 
         case msg@AriadneMessage(Interface, Interface.Subtype.UpdateChart, _, update: CellForView) => windowController updateCharts update
 
-    }
+        case msg@AriadneMessage(Interface, Interface.Subtype.CloseChart, _, _) => parent forward msg
 
-    def openWindow(): Unit = {
-        val loader = new FXMLLoader(getClass().getResource("/chartWindowTemplate.fxml"));
-        val template = loader.load[Pane]
-        windowController = loader.getController[ChartWindowController]
-        Platform.runLater {
-            val stage = new Stage
-            stage.setOnCloseRequest((e) => {
-                parent ! AriadneMessage(Interface, Interface.Subtype.CloseChart, Location.Admin >> Location.Self, cellInfo)
-            })
-            stage setTitle "Arianna Charts"
-            stage setScene new Scene(template)
-            stage.show
-        }
     }
 
 
