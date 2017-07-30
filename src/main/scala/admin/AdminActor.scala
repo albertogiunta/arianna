@@ -72,7 +72,6 @@ class AdminActor() extends BasicActor {
         case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
             var chartActor = context.actorOf(Props[ChartActor])
             chartActors += ((cell.info.id, chartActor))
-            println("Invio cose!")
             chartActor ! msg
         }
 

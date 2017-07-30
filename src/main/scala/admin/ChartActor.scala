@@ -19,10 +19,8 @@ class ChartActor extends CustomActor {
 
     override def receive: Receive = {
         case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
-            println("Ricevo cose!")
             cellInfo = cell.info
             Platform.runLater {
-                println("Apro la view oghhohohohohohohohoohohoho")
                 val view = new ChartView
                 view.start()
                 windowController = view.controller
