@@ -57,13 +57,6 @@ class HumiditySensorTest extends FlatSpec with Matchers {
     }
 
 
-    "A simulated Monotonic Humidity Sensor" should "change it current value after the refresh time" in {
-        val currentValue = simulatedHumiditySensor.currentValue
-        Thread.sleep(refreshRate)
-        simulatedHumiditySensor.currentValue should be(currentValue + changeStep)
-    }
-
-
     "A Observable humidity Sensor" should "have a same threshold of the decorated humidity sensor" in {
         oHSensor.threshold should be(simulatedHumiditySensor.threshold)
     }

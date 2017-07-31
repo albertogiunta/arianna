@@ -33,9 +33,16 @@ class SensorTest extends org.scalatest.FlatSpec with Matchers {
     }
 
     var refreshRate = 1000
+    var changeStep = 0.1
     var simulatedSensor: SimulatedNumericSensor[Double] = new SimulatedNumericSensor[Double](tSensor,
         refreshRate,
-        SimulationStrategies.MonotonicDoubleSimulation(0.1))
+        SimulationStrategies.MonotonicDoubleSimulation(changeStep))
+
+    "A simulated Monotonic Numeric Sensor" should "change its current value after the refresh time" in {
+        val currentValue = simulatedSensor.currentValue
+        Thread.sleep(refreshRate)
+        simulatedSensor.currentValue should be(currentValue + changeStep)
+    }
 
     "A Simulated sensor" should "stop the simulation after stopGeneration method invocation" in {
         simulatedSensor.stopGeneration()

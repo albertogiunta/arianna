@@ -67,13 +67,6 @@ class TemperatureSensorTest extends FlatSpec with Matchers {
     }
 
 
-    "A simulated Monotonic Temperature Sensor" should "change it current value after the refresh time" in {
-        val currentValue = simulatedTempSensor.currentValue
-        Thread.sleep(refreshRate)
-        simulatedTempSensor.currentValue should be(currentValue + changeStep)
-    }
-
-
     "A Observable Temperature Sensor" should "have a same measure unit of the decorated temperature sensor" in {
         oTSensor.measureUnit should be(simulatedTempSensor.measureUnit)
     }
