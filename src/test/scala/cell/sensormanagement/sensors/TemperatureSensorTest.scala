@@ -22,7 +22,7 @@ class TemperatureSensorTest extends FlatSpec with Matchers {
         sensor.name should be(sensorName)
     }
 
-    "A Temperature Sensor" should "have the category temperauture" in {
+    "A Temperature Sensor" should "have the category temperature" in {
         sensor.category should be(SensorCategories.Temperature)
     }
 
@@ -35,11 +35,11 @@ class TemperatureSensorTest extends FlatSpec with Matchers {
         tSensor.maxValue should be(maxValue)
     }
 
-    "A Temperature Threshold checking method" should "return true if the sensor temperature is over the high threshold" in {
+    "A Temperature Threshold checking method" should "return true if the temperature value is over the high threshold" in {
         tThreshold.hasBeenExceeded(highThreshold + 1) should be(true)
     }
 
-    "A Temperature Threshold checking method" should "return true if the sensor temperature is under the low threshold" in {
+    "A Temperature Threshold checking method" should "return true if the temperature value is under the low threshold" in {
         tThreshold.hasBeenExceeded(highThreshold + 1) should be(true)
     }
 
@@ -75,12 +75,12 @@ class TemperatureSensorTest extends FlatSpec with Matchers {
 
 
     "A Observable Temperature Sensor" should "have a same measure unit of the decorated temperature sensor" in {
-        simulatedTempSensor.measureUnit should be(tSensor.measureUnit)
+        oTSensor.measureUnit should be(simulatedTempSensor.measureUnit)
     }
 
 
     "A Observable Temperature Sensor" should "have a same threshold of the decorated temperature sensor" in {
-        simulatedTempSensor.threshold should be(tSensor.threshold)
+        oTSensor.threshold should be(simulatedTempSensor.threshold)
     }
 
 }

@@ -1,6 +1,5 @@
 package cell.sensormanagement.sensors
 
-import ontologies.sensor.SensorCategories
 import org.scalatest.Matchers
 
 /**
@@ -15,14 +14,6 @@ class SensorTest extends org.scalatest.FlatSpec with Matchers {
 
 
     var sensor: Sensor = tSensor
-
-    "A Sensor" should "have the same name assigned during the creation" in {
-        sensor.name should be(sensorName)
-    }
-
-    "A Temperature Sensor" should "have the category temperauture" in {
-        sensor.category should be(SensorCategories.Temperature)
-    }
 
     var orderedScaleSensor: OrderedScaleSensor[Double] = tSensor
 
@@ -46,7 +37,7 @@ class SensorTest extends org.scalatest.FlatSpec with Matchers {
         refreshRate,
         SimulationStrategies.MonotonicDoubleSimulation(0.1))
 
-    "A Simulated sensor" should "stop the simulation after stopGeneration method call" in {
+    "A Simulated sensor" should "stop the simulation after stopGeneration method invocation" in {
         simulatedSensor.stopGeneration()
         var oldValue = simulatedSensor.currentValue
         Thread.sleep(refreshRate)

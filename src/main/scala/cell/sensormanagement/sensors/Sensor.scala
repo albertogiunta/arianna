@@ -187,7 +187,7 @@ abstract class SimulatedSensor[E](val sensor: GenericSensor[E],
 
     private val executor = Executors.newScheduledThreadPool(1)
 
-    def changeLogic(): Runnable = () => this.currentValue = changeStrategy.execute(this)
+    private def changeLogic(): Runnable = () => this.currentValue = changeStrategy.execute(this)
 
     this.executor.scheduleAtFixedRate(changeLogic, 0L, millisRefreshRate, TimeUnit.MILLISECONDS)
 
