@@ -59,7 +59,7 @@ protected class CO2Sensor(override val name: String,
                           override val minValue: Double,
                           override val maxValue: Double,
                           override val threshold: CO2Threshold)
-    extends BasicGasSensor(name, currentValue, minValue, maxValue, Gas.carbonMonoxide) {
+    extends BasicGasSensor(name, currentValue, minValue, maxValue, Gas.carbonDioxide) {
     override def category: SensorCategory = SensorCategories.CO2
 }
 
