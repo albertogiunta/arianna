@@ -34,11 +34,11 @@ abstract class BasicGasSensor(override val name: String,
 /**
   * A smoke sensor implementation, this senspr measure the CO gas level
   **/
-case class SmokeSensor(override val name: String,
-                       override val currentValue: Double,
-                       override val minValue: Double,
-                       override val maxValue: Double,
-                       override val threshold: SmokeThreshold)
+protected class SmokeSensor(override val name: String,
+                            override val currentValue: Double,
+                            override val minValue: Double,
+                            override val maxValue: Double,
+                            override val threshold: SmokeThreshold)
     extends BasicGasSensor(name, currentValue, minValue, maxValue, Gas.carbonMonoxide) {
     override def category: SensorCategory = SensorCategories.Smoke
 }
@@ -54,11 +54,11 @@ case class SmokeThreshold(var value: Double) extends SingleThreshold[Double] {
 /**
   * A CO2 sensor implementation
   **/
-case class CO2Sensor(override val name: String,
-                     override val currentValue: Double,
-                     override val minValue: Double,
-                     override val maxValue: Double,
-                     override val threshold: CO2Threshold)
+protected class CO2Sensor(override val name: String,
+                          override val currentValue: Double,
+                          override val minValue: Double,
+                          override val maxValue: Double,
+                          override val threshold: CO2Threshold)
     extends BasicGasSensor(name, currentValue, minValue, maxValue, Gas.carbonMonoxide) {
     override def category: SensorCategory = SensorCategories.CO2
 }
@@ -75,11 +75,11 @@ case class CO2Threshold(var value: Double) extends SingleThreshold[Double] {
 /**
   * A Oxygen sensor implementation
   **/
-case class OxygenSensor(override val name: String,
-                        override val currentValue: Double,
-                        override val minValue: Double,
-                        override val maxValue: Double,
-                        override val threshold: OxygenThreshold)
+protected class OxygenSensor(override val name: String,
+                             override val currentValue: Double,
+                             override val minValue: Double,
+                             override val maxValue: Double,
+                             override val threshold: OxygenThreshold)
     extends BasicGasSensor(name, currentValue, minValue, maxValue, Gas.oxygen) {
     override def category: SensorCategory = SensorCategories.Oxygen
 }
@@ -96,9 +96,9 @@ case class OxygenThreshold(var value: Double) extends SingleThreshold[Double] {
   * This is a decoration for a gas sensor. This class provide
   * a simulated monotonic behaviour to the decorated sensor
   **/
-case class SimulatedMonotonicGasSensor(override val sensor: GasSensor,
-                                       override val millisRefreshRate: Long,
-                                       val changeStep: Double)
+protected class SimulatedMonotonicGasSensor(override val sensor: GasSensor,
+                                            override val millisRefreshRate: Long,
+                                            val changeStep: Double)
     extends SimulatedNumericSensor[Double](
         sensor,
         millisRefreshRate,

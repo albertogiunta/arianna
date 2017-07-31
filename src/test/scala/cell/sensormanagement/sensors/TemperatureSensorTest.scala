@@ -83,25 +83,4 @@ class TemperatureSensorTest extends FlatSpec with Matchers {
         simulatedTempSensor.threshold should be(tSensor.threshold)
     }
 
-    "A Observable Temperature Sensor" should "notify the new current value of the sensor if it's is changed between two refresh loop" in {
-        @volatile var waitChange = true
-        @volatile var currentSimValue = 10.0
-        @volatile var currentObsValue = 0.0
-
-        val watchDog = new Thread(() => {
-            Thread.sleep(refreshRate)
-            waitChange = false
-        })
-
-        oTSensor.createObservable(refreshRate * 10).subscribe((X: Double) => {
-            currentSimValue = simulatedTempSensor.currentValue
-            currentObsValue = X
-            waitChange = false
-            oTSensor.stopObservation()
-        })
-        watchDog.start()
-
-        while (waitChange) {}
-        currentObsValue should be(currentSimValue)
-    }
 }

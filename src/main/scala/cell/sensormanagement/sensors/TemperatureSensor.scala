@@ -17,12 +17,12 @@ trait TemperatureSensor extends NumericSensor[Double] with SensorWithThreshold[D
 /**
   * A Basic implementation of a temperature sensor
   **/
-case class BasicTemperatureSensor(override val name: String,
-                                  override val currentValue: Double,
-                                  override val minValue: Double,
-                                  override val maxValue: Double,
-                                  override val threshold: TemperatureThreshold,
-                                  override val measureUnit: String = TemperatureMeasureUnit.Celsius
+protected class BasicTemperatureSensor(override val name: String,
+                                       override val currentValue: Double,
+                                       override val minValue: Double,
+                                       override val maxValue: Double,
+                                       override val threshold: TemperatureThreshold,
+                                       override val measureUnit: String = TemperatureMeasureUnit.Celsius
                                  ) extends TemperatureSensor
 /**
   * An object that contains the string representation
@@ -38,9 +38,9 @@ object TemperatureMeasureUnit {
   * This is a decoration for a temperature sensor. This class provide
   * a simulated monotonic behaviour to the decorated sensor
   **/
-case class SimulatedMonotonicTemperatureSensor(override val sensor: TemperatureSensor,
-                                               override val millisRefreshRate: Long,
-                                               val changeStep: Double)
+protected class SimulatedMonotonicTemperatureSensor(override val sensor: TemperatureSensor,
+                                                    override val millisRefreshRate: Long,
+                                                    val changeStep: Double)
     extends SimulatedNumericSensor[Double](sensor,
         millisRefreshRate,
         SimulationStrategies.MonotonicDoubleSimulation(changeStep)) with TemperatureSensor {

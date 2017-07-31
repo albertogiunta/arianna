@@ -15,19 +15,19 @@ trait HumiditySensor extends NumericSensor[Double] with SensorWithThreshold[Doub
 /**
   * A Basic implementation of a humidity sensor
   **/
-case class BasicHumiditySensor(override val name: String,
-                               override val currentValue: Double,
-                               override val minValue: Double,
-                               override val maxValue: Double,
-                               override val threshold: HumidityThreshold) extends HumiditySensor
+protected class BasicHumiditySensor(override val name: String,
+                                    override val currentValue: Double,
+                                    override val minValue: Double,
+                                    override val maxValue: Double,
+                                    override val threshold: HumidityThreshold) extends HumiditySensor
 
 /**
   * This is a decoration for a humidity sensor. This class provide
   * a simulated monotonic behaviour to the decorated sensor
   **/
-case class SimulatedMonotonicHumiditySensor(override val sensor: HumiditySensor,
-                                            override val millisRefreshRate: Long,
-                                            val changeStep: Double)
+protected class SimulatedMonotonicHumiditySensor(override val sensor: HumiditySensor,
+                                                 override val millisRefreshRate: Long,
+                                                 val changeStep: Double)
     extends SimulatedNumericSensor[Double](sensor,
         millisRefreshRate,
         SimulationStrategies.MonotonicDoubleSimulation(changeStep)) with HumiditySensor {
