@@ -103,11 +103,18 @@ class CellTemplateController extends Initializable {
         }
     }
 
+    /**
+      * This method is called when the administrator clicks on the Chart button, in order to open the secondary
+      * window with charts.
+      **/
     def openCharts(): Unit = {
         adminActor ! AriadneMessage(Interface, Interface.Subtype.OpenChart, Location.Admin >> Location.Self, CellForChart(cellInfo, sensorsController.keys.toList))
         chartsButton setDisable true
     }
 
+    /**
+      * This method is called when the Chart button is enabled back, after closing the secondary window
+      **/
     def enableChartButton(): Unit = {
         chartsButton setDisable false
     }

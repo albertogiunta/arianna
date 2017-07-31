@@ -46,15 +46,6 @@ class ChartWindowController extends Initializable {
         }
     }
 
-    def openView(): Unit = {
-        val view = new ChartView()
-        view.start
-    }
-
-    def closeView(): Unit = {
-        chartActor ! AriadneMessage(Interface, Interface.Subtype.CloseChart, Location.Admin >> Location.Self, cellInfo)
-    }
-
     /**
       * This method initializes the title of the window with the name of the room
       *
@@ -104,6 +95,13 @@ class ChartWindowController extends Initializable {
             data.getData add new XYChart.Data(time.next, update.currentPeople)
         }
 
+    }
+
+    /**
+      * This method is called when the secondary window is closed.
+      **/
+    def closeView(): Unit = {
+        chartActor ! AriadneMessage(Interface, Interface.Subtype.CloseChart, Location.Admin >> Location.Self, cellInfo)
     }
 
 }

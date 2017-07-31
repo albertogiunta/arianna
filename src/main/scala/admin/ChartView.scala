@@ -5,6 +5,9 @@ import javafx.scene.Scene
 import javafx.scene.layout.Pane
 import javafx.stage.Stage
 
+/**
+  * This class represent the View for the secondary window containing charts.
+  **/
 class ChartView() {
 
     var controller: ChartWindowController = _

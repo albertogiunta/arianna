@@ -24,7 +24,6 @@ import scalafx.application.Platform
   */
 class AdminActor() extends BasicActor {
 
-
     private var interfaceController: InterfaceController = _
 
     private val chartActors: mutable.Map[Int, ActorRef] = new mutable.HashMap[Int, ActorRef]

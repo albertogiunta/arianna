@@ -49,7 +49,7 @@ class InterfaceController extends Initializable {
     }
 
     /**
-      * This methods updates the interface with the information about all the cells
+      * This method updates the interface with the information about all the cells
       *
       * @param update : this is a List of CellForView containing the updated data
       **/
@@ -109,6 +109,10 @@ class InterfaceController extends Initializable {
         //Allarme lanciato dall'interfaccia
     }
 
+    /**
+      * This method enables the Chart button when the secondary window is closed
+      *
+      **/
     def enableButton(cellId: Int): Unit = {
         cellControllers.get(cellId).get.enableChartButton
     }
