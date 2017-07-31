@@ -21,7 +21,8 @@ trait Sensor {
 }
 
 /**
-  * A trait for a generic sensor
+  * A trait for a generic sensor a generic sensor have only a public getter method of the current value,
+  * because the real management of it is encapsulated in the real implementation of the sensor
   *
   * @tparam A the type of data managed by the sensor in order to
   *           represents the physical quantity measured

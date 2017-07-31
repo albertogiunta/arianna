@@ -90,7 +90,6 @@ class TemperatureSensorTest extends FlatSpec with Matchers {
 
         val watchDog = new Thread(() => {
             Thread.sleep(refreshRate)
-            println("il cane è partito")
             waitChange = false
         })
 
