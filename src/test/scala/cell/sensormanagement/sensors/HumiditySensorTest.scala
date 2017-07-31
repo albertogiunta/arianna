@@ -35,7 +35,7 @@ class HumiditySensorTest extends FlatSpec with Matchers {
     }
 
     "A Humidity Threshold checking method" should "return true if the humidity value is under the low threshold" in {
-        hThreshold.hasBeenExceeded(highThreshold + 1) should be(true)
+        hThreshold.hasBeenExceeded(lowThreshold - 1) should be(true)
     }
 
     "A Humidity Threshold checking method" should "return false if the humidity value is between the two threshold values" in {

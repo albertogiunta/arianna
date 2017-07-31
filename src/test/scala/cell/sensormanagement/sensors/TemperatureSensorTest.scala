@@ -40,7 +40,7 @@ class TemperatureSensorTest extends FlatSpec with Matchers {
     }
 
     "A Temperature Threshold checking method" should "return true if the temperature value is under the low threshold" in {
-        tThreshold.hasBeenExceeded(highThreshold + 1) should be(true)
+        tThreshold.hasBeenExceeded(lowThreshold - 1) should be(true)
     }
 
     "A Temperature Threshold checking method" should "return false if the sensor temperature is between the two threshold vlues" in {
