@@ -103,8 +103,7 @@ class TopologySupervisor extends BasicActor {
             } else {
                 log.error("Received Handshake as no matching in the current loaded Topology for {}", cell.uri)
                 publisher() ! (
-                    sender.path.elements.mkString("/")
-                        .replace(NamingSystem.Publisher, NamingSystem.Subscriber),
+                    sender.path.elements.mkString("/"),
                     AriadneMessage(
                         Error, Error.Subtype.CellMappingMismatch,
                         server2Cell,
@@ -162,8 +161,7 @@ class TopologySupervisor extends BasicActor {
             log.info("Late handshake from {}...", sender.path)
     
             publisher() ! (
-                sender.path.elements.mkString("/")
-                    .replace(NamingSystem.Publisher, NamingSystem.Subscriber),
+                sender.path.elements.mkString("/"),
                 AriadneMessage(
                     Topology, ViewedFromACell, server2Cell,
                     AreaViewedFromACell(
