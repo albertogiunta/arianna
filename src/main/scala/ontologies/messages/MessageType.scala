@@ -549,6 +549,60 @@ object MessageType {
 
     }
 
+    object Interface extends MessageType {
+
+        override val typeName = "Interface"
+
+        object Subtype {
+
+            /**
+              * Takes a CellForChart object as MessageContent
+              */
+            object OpenChart extends MessageSubtype {
+
+                override val superType: MessageType = Interface
+
+                override val subtypeName: String = "OpenChart"
+
+                override def unmarshal(json: String): MessageContent = json.parseJson.convertTo[CellForChart]
+
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[CellForChart].toJson.toString()
+            }
+
+            /**
+              * Takes a CellForView object as MessageContent
+              */
+            object UpdateChart extends MessageSubtype {
+
+                override val superType: MessageType = Interface
+
+                override val subtypeName: String = "UpdateChart"
+
+                override def unmarshal(json: String): MessageContent = json.parseJson.convertTo[CellForView]
+
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[CellForView].toJson.toString()
+
+            }
+
+            /**
+              * Takes a InfoCell object as MessageContent
+              */
+            object CloseChart extends MessageSubtype {
+
+                override val superType: MessageType = Interface
+
+                override val subtypeName: String = "CloseChart"
+
+                override def unmarshal(json: String): MessageContent = json.parseJson.convertTo[InfoCell]
+
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[InfoCell].toJson.toString()
+            }
+
+        }
+
+    }
+
+
     implicit def MessageType2String(msg: MessageType): String = msg.typeName
 
     implicit def String2MessageType(str: String): MessageType = MessageType.Factory(str)
@@ -565,6 +619,7 @@ object MessageType {
             case t if t == Movement.toLowerCase => Movement
             case t if t == SignalStrength.toLowerCase => SignalStrength
             case t if t == SwitcherMsg.toLowerCase => SwitcherMsg
+            case t if t == Interface.toLowerCase => Interface
 
             case _ => null
         }

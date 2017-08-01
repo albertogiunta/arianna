@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.TitledPane?>
+<TitledPane fx:id="sensorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+            prefHeight="182.0" prefWidth="380.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="admin.SensorChartController">
+    <content>
+        <LineChart fx:id="chart">
+            <xAxis>
+                <NumberAxis forceZeroInRange="false" side="BOTTOM" tickLabelsVisible="false"/>
+            </xAxis>
+            <yAxis>
+                <NumberAxis side="LEFT" upperBound="50.0"/>
+            </yAxis>
+        </LineChart>
+    </content>
+</TitledPane>

@@ -2,22 +2,29 @@ package admin
 
 import java.net.URL
 import java.util.ResourceBundle
-import javafx.fxml.{FXML, Initializable}
-import javafx.scene.layout.{HBox, VBox}
+import javafx.fxml.{FXML, FXMLLoader, Initializable}
+import javafx.geometry.Insets
+import javafx.scene.control.Button
+import javafx.scene.layout._
+import javafx.scene.paint.Color
 import javafx.scene.text.Text
 
-import ontologies.messages.{Cell, Sensor}
+import akka.actor.ActorRef
+import ontologies.messages.Location._
+import ontologies.messages.MessageType.Interface
+import ontologies.messages.{Cell, _}
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable
+import scalafx.application.Platform
 
 /**
-  * Created by lisamazzini on 14/07/17.
+  * This class represent the controller for each Cell template inside the interface
   */
 class CellTemplateController extends Initializable {
 
-    var cellId: Int = _
-
-    var sensorsController: ListBuffer[SensorTemplateController] = new ListBuffer[SensorTemplateController]
+    var adminActor: ActorRef = _
+    private var cellInfo: InfoCell = _
+    private val sensorsController: mutable.Map[Int, SensorTemplateController] = new mutable.HashMap[Int, SensorTemplateController]
     @FXML
     private var roomName: Text = _
     @FXML
@@ -32,32 +39,83 @@ class CellTemplateController extends Initializable {
     private var entranceValue: Text = _
     @FXML
     private var exitValue: Text = _
-
+    @FXML
+    private var header: Pane = _
+    @FXML
+    private var chartsButton: Button = _
 
     override def initialize(location: URL, resources: ResourceBundle): Unit = {}
 
+    /**
+      * This method fills the interface with static information about the Cell; it's called only one time when the map is loaded
+      *
+      * @param cell : Cell object containing data
+      *
+      **/
     def setStaticInformation(cell: Cell): Unit = {
-        cellId = cell.info.id
-        roomName.setText(cell.info.name)
-        maxCapacityValue.setText(cell.capacity.toString)
-        sqrMetersValue.setText(cell.squareMeters.toString)
-        if (cell.isEntryPoint) entranceValue.setText("1") else entranceValue.setText("0")
-        if (cell.isExitPoint) exitValue.setText("1") else exitValue.setText("0")
+        cellInfo = cell.info
+        roomName setText cell.info.name
+        maxCapacityValue setText cell.capacity.toString
+        sqrMetersValue setText cell.squareMeters.toString
+        if (cell.isEntryPoint) entranceValue setText "1" else entranceValue setText "0"
+        if (cell.isExitPoint) exitValue setText "1" else exitValue setText "0"
     }
 
+    /**
+      * This method update the interface with dynamic information about the Cell; it's called everytime the Application receive
+      * an update from the System
+      *
+      * @param cell : CellForView object containing only dynamic data
+      * */
     def setDynamicInformation(cell: CellForView): Unit = {
-        currentPeopleValue.setText(cell.currentOccupation.toString)
-        cell.sensors.foreach(s => {
-            val controller = sensorsController.filter(c => c.sensorCategory.equals(s.category)).head
-            controller.updateSensor(s)
+        currentPeopleValue setText cell.currentPeople.toString
+        cell.sensors.foreach(sensor => {
+            sensorsController.get(sensor.category).get updateSensor sensor
         })
     }
 
-    def addSensorTemplate(sensorTemplate: HBox, sensor: Sensor): Unit = {
-        val controller = sensorsController.filter(c => c.sensorCategory.equals(sensor.category)).head
-        controller.createSensor(sensor)
-        sensorsContainer.getChildren.add(sensorTemplate)
-        //TODO : ordina gli elementi sull'id
-        //sensorsContainer.getChildren.sort()
+    /**
+      * This method fills the interface with data about sensors of the Cell, once the Application has received it from the System.
+      *
+      * @param sensorsInfo : SensorUpdate object containing data
+      *
+      * */
+    def addSensors(sensorsInfo: SensorsUpdate): Unit = {
+        Platform.runLater {
+            sensorsInfo.sensors.foreach(sensor => {
+                var loader = new FXMLLoader(getClass.getResource("/sensorTemplate.fxml"))
+                var sensorTemplate = loader.load[HBox]
+                val sensorController = loader.getController[SensorTemplateController]
+                sensorController createSensor sensor
+                sensorsController += ((sensor.category, sensorController))
+                sensorsContainer.getChildren add sensorTemplate
+            })
+        }
+    }
+
+    /**
+      * This method modifies the interface in order to show to the administrator that an Alarm arrived.
+      *
+      * */
+    def handleAlarm(): Unit = {
+        Platform.runLater {
+            header setBackground new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY))
+        }
+    }
+
+    /**
+      * This method is called when the administrator clicks on the Chart button, in order to open the secondary
+      * window with charts.
+      **/
+    def openCharts(): Unit = {
+        adminActor ! AriadneMessage(Interface, Interface.Subtype.OpenChart, Location.Admin >> Location.Self, CellForChart(cellInfo, sensorsController.keys.toList))
+        chartsButton setDisable true
+    }
+
+    /**
+      * This method is called when the Chart button is enabled back, after closing the secondary window
+      **/
+    def enableChartButton(): Unit = {
+        chartsButton setDisable false
     }
 }

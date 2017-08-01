@@ -6,26 +6,29 @@ import java.util.ResourceBundle
 import javafx.fxml.{FXML, FXMLLoader, Initializable}
 import javafx.scene.canvas.Canvas
 import javafx.scene.control.{Button, SplitPane}
-import javafx.scene.layout.{HBox, Pane, VBox}
+import javafx.scene.layout.{Pane, VBox}
 import javafx.scene.text.Text
 
 import akka.actor.ActorRef
 import ontologies.messages.Location._
+import ontologies.messages.MessageType.Topology
 import ontologies.messages._
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable
 import scala.io.Source
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.stage.FileChooser
 import scalafx.stage.FileChooser.ExtensionFilter
 
-final case class CellForView(id: Int, name: String, currentOccupation: Int, sensors: List[Sensor])
-
+/**
+  * This is the main controller for the interface of the Application
+  *
+  **/
 class InterfaceController extends Initializable {
-    var actorRef: ActorRef = _
+    var adminActor: ActorRef = _
     var interfaceView: InterfaceView = _
-    private val cellControllers: ListBuffer[CellTemplateController] = new ListBuffer[CellTemplateController]
+    private val cellControllers: mutable.Map[Int, CellTemplateController] = new mutable.HashMap[Int, CellTemplateController]
     private var canvasController: CanvasController = _
 
     @FXML
@@ -45,81 +48,113 @@ class InterfaceController extends Initializable {
         println("Controller initialized")
     }
 
+    /**
+      * This method updates the interface with the information about all the cells
+      *
+      * @param update : this is a List of CellForView containing the updated data
+      **/
     def updateView(update: List[CellForView]): Unit = {
         Platform.runLater {
-            update.foreach(c => {
-                var cellController = cellControllers.filter(controller => controller.cellId.equals(c.id)).head
-                cellController.setDynamicInformation(c)
+            update.foreach(cell => {
+                var cellController = cellControllers.get(cell.id).get
+                cellController setDynamicInformation cell
             })
         }
     }
 
+    /**
+      * This method is called to upload the map file from the interface (accepting only Json files)
+      *
+      * */
     @FXML
     def handleFileLoad(): Unit = {
+        loadButton.disable = true
         val fc = new FileChooser()
-        fc.setTitle("Get JSON")
-        fc.getExtensionFilters.add(new ExtensionFilter("JSON Files", "*.json"))
+        fc.title = "Get JSON"
+        fc.extensionFilters += (new ExtensionFilter("JSON Files", "*.json"))
         val json: File = fc.showOpenDialog(null)
         parseFile(json)
     }
 
+    /**
+      * This method add all the information about sensors of a single Cell after getting it from the System
+      *
+      * @param sensorsInfo : SensorUpdate object containing sensors data of a cell
+      *
+      **/
+    def initializeSensors(sensorsInfo: SensorsUpdate): Unit = {
+        var cellController = cellControllers.get(sensorsInfo.info.id).get
+        cellController addSensors sensorsInfo
+    }
+
+    /**
+      * This method is called when an Alarm comes from the System and provides to show it to the interface
+      *
+      * @param alarmContent : AlarmContent object that contains information about the Cell from which the alarm comes
+      **/
+    def triggerAlarm(alarmContent: AlarmContent): Unit = {
+        adminActor ! new AriadneMessage(MessageType.Alarm, MessageType.Alarm.Subtype.FromInterface, Location.Admin >> Location.Self, Empty())
+        println("Allarme ricevuto dal controller")
+        cellControllers.get(alarmContent.info.id).get.handleAlarm
+        canvasController handleAlarm alarmContent.info.id
+
+        //Fai qualcosa all'interfaccia
+    }
+
+    /**
+      * This method is called when the administrator press the Alarm button on the interface.
+      *
+      **/
+    def triggerAlarm(): Unit = {
+        //Allarme lanciato dall'interfaccia
+    }
+
+    /**
+      * This method enables the Chart button when the secondary window is closed
+      *
+      **/
+    def enableButton(cellId: Int): Unit = {
+        cellControllers.get(cellId).get.enableChartButton
+    }
+
     private def parseFile(file: File): Unit = {
         val source = Source.fromFile(file).getLines.mkString
-        val area = MessageType.Topology.Subtype.Planimetrics.unmarshal(source)
-        actorRef ! AriadneMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, Location.Admin >> Location.Self, area)
+        val area = Topology.Subtype.Planimetrics.unmarshal(source)
+        adminActor ! AriadneMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, Location.Admin >> Location.Self, area)
         loadCanvas()
         createCells(area.cells)
         fileName.text = file.getName
-        loadButton.disable = true
     }
 
     private def loadCanvas(): Unit = {
         var loader = new FXMLLoader(getClass.getResource("/canvasTemplate.fxml"))
         var canvas = loader.load[Canvas]
         canvasController = loader.getController[CanvasController]
-        mapContainer.getChildren.add(canvas)
+        mapContainer.getChildren += canvas
     }
 
     private def createCells(initialConfiguration: List[Cell]) = {
         nRooms.text = initialConfiguration.size.toString
-        initialConfiguration.foreach(c => {
+        initialConfiguration.foreach(cell => {
             Platform.runLater {
-                var node = createCellTemplate(c)
-                vBoxPane.getChildren.add(node)
-                canvasController.drawOnMap(c)
+                var node = createCellTemplate(cell)
+                vBoxPane.getChildren += node
+                canvasController drawOnMap cell
             }
         })
     }
-    
-    def initializeSensors(sensorsInfo: SensorsUpdate): Unit = {
-        var cellController = cellControllers.filter(c => c.cellId.equals(sensorsInfo.info.id)).head
-        Platform.runLater {
-            sensorsInfo.sensors.foreach(s => {
-                var loader = new FXMLLoader(getClass.getResource("/sensorTemplate.fxml"))
-                var sensor = loader.load[HBox]
-                val sensorController = loader.getController[SensorTemplateController]
-                sensorController.sensorCategory = s.category
-                cellController.sensorsController += sensorController
-                cellController.addSensorTemplate(sensor, s)
-            })
-        }
-    }
 
-    private def createCellTemplate(c: Cell): SplitPane = {
+    private def createCellTemplate(cell: Cell): SplitPane = {
         var loader = new FXMLLoader(getClass.getResource("/cellTemplate2.fxml"))
         var node = loader.load[SplitPane]
         var controller = loader.getController[CellTemplateController]
-        cellControllers += controller
+        controller.adminActor = adminActor
+        cellControllers += ((cell.info.id, controller))
         Platform.runLater {
-            controller.setStaticInformation(c)
+            controller setStaticInformation cell
         }
         node
     }
 
-    def triggerAlarm(): Unit = {
-        actorRef ! new AriadneMessage(MessageType.Alarm, MessageType.Alarm.Subtype.FromInterface, Location.Admin >> Location.Self, Empty())
-        println("Allarme ricevuto dal controller")
-        //Fai qualcosa all'interfaccia
-    }
 
 }

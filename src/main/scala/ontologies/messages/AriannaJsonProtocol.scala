@@ -12,7 +12,7 @@ object AriannaJsonProtocol extends DefaultJsonProtocol {
     implicit val coordinatesFormat: RootJsonFormat[Coordinates] = jsonFormat4(Coordinates)
     implicit val infoCellFormat: RootJsonFormat[InfoCell] = jsonFormat5(InfoCell.apply)
     implicit val passageFormat: RootJsonFormat[Passage] = jsonFormat3(Passage)
-    implicit val sensorFormat: RootJsonFormat[Sensor] = jsonFormat4(Sensor)
+    implicit val sensorFormat: RootJsonFormat[Sensor] = jsonFormat4(Sensor.apply)
     implicit val sensorsUpdateFormat: RootJsonFormat[SensorsUpdate] = jsonFormat2(SensorsUpdate.apply)
     implicit val cellFormat: RootJsonFormat[Cell] = jsonFormat10(ontologies.messages.Cell)
     implicit val areaFormat: RootJsonFormat[Area] = jsonFormat2(Area)
@@ -33,4 +33,6 @@ object AriannaJsonProtocol extends DefaultJsonProtocol {
     implicit val userAndAntennaPositionUpdateFormat: RootJsonFormat[UserAndAntennaPositionUpdate] = jsonFormat2(UserAndAntennaPositionUpdate)
     implicit val antennaPositionsFormat: RootJsonFormat[AntennaPositions] = jsonFormat2(AntennaPositions)
     implicit val cellForSwitcherFormat: RootJsonFormat[CellForSwitcher] = jsonFormat2(CellForSwitcher.apply)
+    implicit val cellForChartFormat: RootJsonFormat[CellForChart] = jsonFormat2(CellForChart)
+    implicit val cellForViewFormat: RootJsonFormat[CellForView] = jsonFormat4(CellForView)
 }
