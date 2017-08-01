@@ -12,6 +12,10 @@ import ontologies.messages.MessageType.Init.Subtype
 import ontologies.messages.MessageType.{Alarm, Handshake, Update}
 import ontologies.messages._
 
+/**
+  * This is the Actor inside the cluster that forwards messages to the Administrator system.
+  *
+  **/
 class AdminManager extends CustomActor {
 
     val toAdmin: MessageDirection = Location.Server >> Location.Admin
@@ -28,9 +32,7 @@ class AdminManager extends CustomActor {
         //Ricezione di un allarme da parte del sistema
         case msg@AriadneMessage(Alarm, Alarm.Subtype.Basic, _, _) => admin ! msg.copy(direction = toAdmin)
         //Ricezione di aggiornamento sensori
-        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, _) => {
-            admin ! msg
-        }
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, _) => admin ! msg
     }
 
     override def receive: Receive = {

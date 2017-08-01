@@ -8,6 +8,10 @@ import javafx.scene.text.Text
 
 import ontologies.messages.Sensor
 
+/**
+  * This class represents the controller for the Sensor element inside the interface
+  *
+  **/
 class SensorTemplateController extends Initializable {
 
     @FXML
@@ -16,24 +20,28 @@ class SensorTemplateController extends Initializable {
     @FXML
     private var sensorValue: Text = _
 
-    var sensorCategory: Int = _
-
-    def createSensor(sensor: Sensor): Unit = {
-        sensorName.setText(assignSensorName(sensor.category));
-    }
-
-    def updateSensor(sensor: Sensor): Unit = {
-        sensorValue.setText(sensor.value.toString)
-    }
-
-    private def assignSensorName(i: Int): String = i match {
-        case 1 => "Temperature"
-        case 2 => "Smoke"
-        case 3 => "Humidity"
-        case _ => ""
-    }
+    private var sensorCategory: Int = _
 
     override def initialize(location: URL, resources: ResourceBundle): Unit = {}
+
+    /**
+      * This method initializes the sensor template
+      *
+      * @param sensor : Sensor object containing data
+      **/
+    def createSensor(sensor: Sensor): Unit = {
+        sensorCategory = sensor.category
+        sensorName setText Sensor.categoryName(sensorCategory)
+    }
+
+    /**
+      * This method updates the current value of the sensor
+      *
+      * @param sensor : Sensor object containing the current value
+      * */
+    def updateSensor(sensor: Sensor): Unit = {
+        sensorValue setText sensor.value.toString
+    }
 
 
 }
