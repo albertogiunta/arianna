@@ -24,6 +24,7 @@ object SensorsFactory {
         }
 
     }
+
     /**
       * A set of method can be used to create simulated sensors
       **/
@@ -114,7 +115,7 @@ object SensorsFactory {
       * loaded from the json file of the cell configuration
       *
       * @param sensorInfo the sensor info loaded from the config json file
-      * */
+      **/
     def createASensorFromConfig(sensorInfo: SensorInfoFromConfig): Sensor = SensorCategories.categoryWithId(sensorInfo.categoryId) match {
         case Temperature =>
             val threshold = sensorInfo.threshold.asInstanceOf[DoubleThresholdInfo]

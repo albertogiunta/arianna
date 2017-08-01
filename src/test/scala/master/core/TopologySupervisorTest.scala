@@ -11,6 +11,8 @@ import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, ViewedFromACell}
 import ontologies.messages.MessageType.{Handshake, Init, Topology, Update}
 import ontologies.messages._
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import system.names.NamingSystem
 
@@ -20,6 +22,7 @@ import scala.io.Source
 /**
   * Created by Xander_C on 09/07/2017.
   */
+@RunWith(classOf[JUnitRunner])
 class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest"))
     with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll {
     
@@ -50,7 +53,7 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
         Handshake,
         Handshake.Subtype.CellToMaster,
         Location.Cell >> Location.Master,
-        SensorsUpdate(infoCell, List(Sensor(1, 10.0, 0.0, 0.0)))
+        SensorsInfoUpdate(infoCell, List(SensorInfo(1, 10.0)))
     )
     
     val currentPeopleUpdate = AriadneMessage(
@@ -64,7 +67,7 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
         Update,
         Update.Subtype.Sensors,
         Location.Cell >> Location.Master,
-        SensorsUpdate(infoCell, List(Sensor(1, 10.0, 0.0, 45.0)))
+        SensorsInfoUpdate(infoCell, List(SensorInfo(1, 10.0)))
     )
     
     override def afterAll {

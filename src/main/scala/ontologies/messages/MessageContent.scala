@@ -232,7 +232,7 @@ final case class SensorInfoFromConfig(categoryId: Int, minValue: Double, maxValu
 /**
   * An abstract representation of information relative
   * to a threshold of a generic sensor
-  * */
+  **/
 abstract class ThresholdInfo extends MessageContent
 
 /**
@@ -240,7 +240,7 @@ abstract class ThresholdInfo extends MessageContent
   * that has a single threshold level
   *
   * @param value the threshold level
-  * */
+  **/
 final case class SingleThresholdInfo(value: Double) extends ThresholdInfo
 
 
@@ -250,7 +250,7 @@ final case class SingleThresholdInfo(value: Double) extends ThresholdInfo
   *
   * @param lowThreshold  the lowest level that the program's logic consider as normal value for the sensor
   * @param highThreshold the highest level that the program's logic consider as normal value for the sensor
-  * */
+  **/
 final case class DoubleThresholdInfo(lowThreshold: Double, highThreshold: Double) extends ThresholdInfo
 
 object Sensor {
@@ -382,7 +382,7 @@ object CellForSwitcher {
   * @param currentPeople : Int values how the actual number of people inside the room
   * @param sensors       : list of Sensor object containing updated values coming from them
   **/
-final case class CellForView(id: Int, name: String, currentPeople: Int, sensors: List[Sensor]) extends MessageContent
+final case class CellForView(id: Int, name: String, currentPeople: Int, sensors: List[SensorInfo]) extends MessageContent
 
 /**
   * This Case Class is meant to be used as a Content for Messages inside the Admin Systemi in order to initialize

@@ -27,9 +27,9 @@ object Gas {
   **/
 abstract class BasicGasSensor(override val name: String,
                               override val currentValue: Double,
-                          override val minValue: Double,
-                          override val maxValue: Double,
-                          override val gasMeasured: String) extends GasSensor
+                              override val minValue: Double,
+                              override val maxValue: Double,
+                              override val gasMeasured: String) extends GasSensor
 
 /**
   * A smoke sensor implementation, this senspr measure the CO gas level

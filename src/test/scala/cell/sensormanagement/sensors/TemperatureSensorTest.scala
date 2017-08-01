@@ -1,11 +1,14 @@
 package cell.sensormanagement.sensors
 
 import ontologies.sensor.SensorCategories
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 import org.scalatest.{FlatSpec, Matchers}
 
 /**
   * Created by Matteo Gabellini on 27/07/2017.
   */
+@RunWith(classOf[JUnitRunner])
 class TemperatureSensorTest extends FlatSpec with Matchers {
     val sensorName = "tSensor"
     val minValue = -40.0

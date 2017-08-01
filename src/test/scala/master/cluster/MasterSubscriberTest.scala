@@ -20,6 +20,7 @@ import scala.util.Random
 /**
   * Created by Xander_C on 09/07/2017.
   */
+
 class MasterSubscriberTest extends TestKit(ActorSystem("SubscriberTest", MasterSubscriberTest.config))
     with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll {
     
@@ -27,9 +28,9 @@ class MasterSubscriberTest extends TestKit(ActorSystem("SubscriberTest", MasterS
         Handshake,
         Handshake.Subtype.CellToMaster,
         Location.Cell >> Location.Master,
-        SensorsUpdate(
+        SensorsInfoUpdate(
             InfoCell.empty,
-            List(Sensor(0, 0.0, 0.0, 0.0))
+            List(SensorInfo(0, 0.0))
         )
     )
     

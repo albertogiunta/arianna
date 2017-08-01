@@ -31,7 +31,7 @@ object RunMaster extends App {
     //    system.actorSelection("similUser/Master/TopologySupervisor") ! AriadneMessage(
     //        Topology,
     //        Planimetrics,
-    //        Location.Admin >> Location.Server,
+    //        Location.Admin >> Location.Master,
     //        Planimetrics.unmarshal(topology)
     //    )
     
@@ -41,7 +41,7 @@ object RunMaster extends App {
     //        AriadneMessage(
     //            Handshake,
     //            Handshake.Subtype.Cell2Master,
-    //            Location.Cell >> Location.Server,
+    //            Location.Cell >> Location.Master,
     //            InfoCell(14321, "uri", "PancoPillo",
     //                Coordinates(Point(1, 1), Point(-1, -1), Point(-1, 1), Point(1, -1)),
     //                Point(0, 0)

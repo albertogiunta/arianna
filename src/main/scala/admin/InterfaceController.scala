@@ -79,10 +79,10 @@ class InterfaceController extends Initializable {
     /**
       * This method add all the information about sensors of a single Cell after getting it from the System
       *
-      * @param sensorsInfo : SensorUpdate object containing sensors data of a cell
+      * @param sensorsInfo : SensorsInfoUpdate object containing sensors data of a cell
       *
       **/
-    def initializeSensors(sensorsInfo: SensorsUpdate): Unit = {
+    def initializeSensors(sensorsInfo: SensorsInfoUpdate): Unit = {
         var cellController = cellControllers.get(sensorsInfo.info.id).get
         cellController addSensors sensorsInfo
     }

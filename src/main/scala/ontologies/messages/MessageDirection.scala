@@ -114,8 +114,8 @@ object Location {
 object TestMessageDirection extends App {
     
     println(Location.Master >> Location.Cell)
-    
-    //val msgDir: MessageDirection = Location.Server << Location.Admin
+
+    //val msgDir: MessageDirection = Location.Master << Location.Admin
     
     //println(msgDir)
 

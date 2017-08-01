@@ -23,7 +23,7 @@ protected class BasicTemperatureSensor(override val name: String,
                                        override val maxValue: Double,
                                        override val threshold: TemperatureThreshold,
                                        override val measureUnit: String = TemperatureMeasureUnit.Celsius
-                                 ) extends TemperatureSensor
+                                      ) extends TemperatureSensor
 /**
   * An object that contains the string representation
   * of the basic temperature measure unit

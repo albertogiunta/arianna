@@ -6,12 +6,15 @@ import com.actors.CustomActor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.{Init, Update}
 import ontologies.messages._
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import system.names.NamingSystem
 
 /**
   * Created by Xander_C on 09/07/2017.
   */
+@RunWith(classOf[JUnitRunner])
 class DataStreamerTest extends TestKit(ActorSystem("DataStreamerTest"))
     with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll {
     

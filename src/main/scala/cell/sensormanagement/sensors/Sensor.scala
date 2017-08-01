@@ -160,6 +160,7 @@ object SimulationStrategies {
         override def execute(sensor: NumericSensor[Int]): Int = if (this shouldIncrease sensor)
             this increase sensor else this decrease sensor
     }
+
 }
 
 /**

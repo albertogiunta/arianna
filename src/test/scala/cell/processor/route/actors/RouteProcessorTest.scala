@@ -6,6 +6,8 @@ import com.actors.CustomActor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.{Init, Route}
 import ontologies.messages._
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import system.names.NamingSystem
 
@@ -13,6 +15,7 @@ import scala.concurrent.duration
 import scala.concurrent.duration.FiniteDuration
 import scala.util.Random
 
+@RunWith(classOf[JUnitRunner])
 class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
     with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll {
     

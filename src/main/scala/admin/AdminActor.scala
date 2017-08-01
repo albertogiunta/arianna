@@ -5,8 +5,8 @@ import java.nio.file.Paths
 import javafx.embed.swing.JFXPanel
 
 import akka.actor.{ActorRef, ActorSystem, Props}
+import com.actors.BasicActor
 import com.typesafe.config.ConfigFactory
-import common.BasicActor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.{Alarm, Handshake, Init, Interface, Topology}
 import ontologies.messages._
@@ -28,10 +28,10 @@ class AdminActor() extends BasicActor {
 
     private val chartActors: mutable.Map[Int, ActorRef] = new mutable.HashMap[Int, ActorRef]
     //Se si fa partire solo l'admin manager
-    private val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/AdminManager")
+    //    private val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/AdminManager")
     //Se si fa partire il master
-    //val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/Master/AdminManager")
-    private val toServer: MessageDirection = Location.Admin >> Location.Server
+    val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/Master/AdminManager")
+    private val toServer: MessageDirection = Location.Admin >> Location.Master
 
     override def init(args: List[Any]): Unit = {
         Platform.runLater {
@@ -66,7 +66,7 @@ class AdminActor() extends BasicActor {
 
         case msg@AriadneMessage(_, Alarm.Subtype.Basic, _, content: AlarmContent) => interfaceController triggerAlarm content
 
-        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsUpdate) => interfaceController initializeSensors sensorsInfo
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => interfaceController initializeSensors sensorsInfo
 
         case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
             var chartActor = context.actorOf(Props[ChartActor])

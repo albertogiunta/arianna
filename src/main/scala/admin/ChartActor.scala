@@ -1,6 +1,6 @@
 package admin
 
-import common.CustomActor
+import com.actors.CustomActor
 import ontologies.messages.MessageType.Interface
 import ontologies.messages._
 

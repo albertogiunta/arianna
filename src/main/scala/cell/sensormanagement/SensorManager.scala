@@ -1,7 +1,7 @@
 package cell.sensormanagement
 
 import cell.sensormanagement.sensors._
-import common.BasicActor
+import com.actors.BasicActor
 import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.{Alarm, Update}

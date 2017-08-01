@@ -70,24 +70,24 @@ class CellTemplateController extends Initializable {
     def setDynamicInformation(cell: CellForView): Unit = {
         currentPeopleValue setText cell.currentPeople.toString
         cell.sensors.foreach(sensor => {
-            sensorsController.get(sensor.category).get updateSensor sensor
+            sensorsController.get(sensor.categoryId).get updateSensor sensor
         })
     }
 
     /**
       * This method fills the interface with data about sensors of the Cell, once the Application has received it from the System.
       *
-      * @param sensorsInfo : SensorUpdate object containing data
+      * @param sensorsInfo : SensorsInfoUpdate object containing data
       *
       * */
-    def addSensors(sensorsInfo: SensorsUpdate): Unit = {
+    def addSensors(sensorsInfo: SensorsInfoUpdate): Unit = {
         Platform.runLater {
             sensorsInfo.sensors.foreach(sensor => {
                 var loader = new FXMLLoader(getClass.getResource("/sensorTemplate.fxml"))
                 var sensorTemplate = loader.load[HBox]
                 val sensorController = loader.getController[SensorTemplateController]
                 sensorController createSensor sensor
-                sensorsController += ((sensor.category, sensorController))
+                sensorsController += ((sensor.categoryId, sensorController))
                 sensorsContainer.getChildren add sensorTemplate
             })
         }

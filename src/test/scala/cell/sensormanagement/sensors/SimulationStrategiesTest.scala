@@ -1,11 +1,14 @@
 package cell.sensormanagement.sensors
 
 import ontologies.sensor.{SensorCategories, SensorCategory}
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 import org.scalatest.{FlatSpec, Matchers}
 
 /**
   * Created by Matteo Gabellini on 31/07/2017.
   */
+@RunWith(classOf[JUnitRunner])
 class SimulationStrategiesTest extends FlatSpec with Matchers {
 
 

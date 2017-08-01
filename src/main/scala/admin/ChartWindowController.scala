@@ -86,7 +86,7 @@ class ChartWindowController extends Initializable {
     def updateCharts(update: CellForView): Unit = {
         Platform.runLater {
             update.sensors.foreach(sensor => {
-                sensorChartControllers.get(sensor.category).get.addValue(sensor.value)
+                sensorChartControllers.get(sensor.categoryId).get.addValue(sensor.value)
             }
             )
             if (data.getData.size().equals(20)) {

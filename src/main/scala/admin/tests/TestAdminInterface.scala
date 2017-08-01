@@ -37,7 +37,7 @@ object TestAdminInterface extends App {
             "a",
             new Coordinates(Point(1, 1), Point(1, 1), Point(1, 1), Point(1, 1)), Point(1, 1)),
             sensors.toList)
-        adminManager ! AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, Location.Server >> Location.Admin, sensorList)
+        adminManager ! AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, Location.Master >> Location.Admin, sensorList)
         println(i.toString)
         i = i + 1
     }
@@ -47,15 +47,15 @@ object TestAdminInterface extends App {
     while (true) {
         Thread.sleep(1000)
         var update: ListBuffer[CellDataUpdate] = new ListBuffer[CellDataUpdate]
-        var sensors: ListBuffer[Sensor] = new ListBuffer[Sensor]
+        var sensors: ListBuffer[SensorInfo] = new ListBuffer[SensorInfo]
         for (i <- 1 until 5) {
-            sensors += Sensor(i, (Math.random() * 10).round.toDouble, 0, 10)
+            //            sensors += Sensor(i, (Math.random() * 10).round.toDouble, 0, 10)
         }
 
         for (i <- 1 until 6) {
             update += new CellDataUpdate(new InfoCell(i, "uri0", "a", new Coordinates(Point(1, 1), Point(1, 1), Point(1, 1), Point(1, 1)), Point(1, 1)), (Math.random() * 50).round.toInt, sensors.toList)
         }
-        adminManager ! AriadneMessage(MessageType.Update, MessageType.Update.Subtype.UpdateForAdmin, Location.Server >> Location.Admin,
+        adminManager ! AriadneMessage(MessageType.Update, MessageType.Update.Subtype.UpdateForAdmin, Location.Master >> Location.Admin,
             new UpdateForAdmin(update.toList))
     }
 }

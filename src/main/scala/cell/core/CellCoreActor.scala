@@ -2,9 +2,9 @@ package cell.core
 
 import akka.actor.{ActorRef, Props}
 import cell.cluster.{CellPublisher, CellSubscriber}
-import cell.processor.route.RouteManager
+import cell.processor.route.actors.RouteManager
 import cell.sensormanagement.SensorManager
-import common.{BasicActor, ClusterMembersListener}
+import com.actors.{BasicActor, ClusterMembersListener}
 import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology.Subtype.ViewedFromACell
@@ -38,8 +38,8 @@ class CellCoreActor extends BasicActor {
     var routeManager: ActorRef = _
 
     private val self2Self: MessageDirection = Location.Self >> Location.Self
-    private val server2Cell: MessageDirection = Location.Server >> Location.Cell
-    private val cell2Server: MessageDirection = Location.Server << Location.Cell
+    private val server2Cell: MessageDirection = Location.Master >> Location.Cell
+    private val cell2Server: MessageDirection = Location.Master << Location.Cell
     private val cell2Cell: MessageDirection = Location.Cell << Location.Cell
     private val cell2Cluster: MessageDirection = Location.Cell >> Location.Cluster
     private val cell2User: MessageDirection = Location.Cell >> Location.User

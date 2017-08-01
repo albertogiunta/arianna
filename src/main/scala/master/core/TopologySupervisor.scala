@@ -60,8 +60,8 @@ class TopologySupervisor extends BasicActor {
     }
     
     private def sociable: Receive = {
-    
-        case msg@AriadneMessage(Handshake, CellToMaster, `cell2Server`, SensorsUpdate(cell, _)) =>
+
+        case msg@AriadneMessage(Handshake, CellToMaster, `cell2Server`, SensorsInfoUpdate(cell, _)) =>
     
             log.info(msg.toString)
 
@@ -109,7 +109,7 @@ class TopologySupervisor extends BasicActor {
                 dataStreamer() ! topology.values
             }
 
-        case AriadneMessage(Update, Sensors, `cell2Server`, pkg: SensorsUpdate) =>
+        case AriadneMessage(Update, Sensors, `cell2Server`, pkg: SensorsInfoUpdate) =>
 
             if (topology.get(pkg.info.uri).nonEmpty) {
                 val news = topology(pkg.info.uri).copy(sensors = pkg.sensors)
