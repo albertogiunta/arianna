@@ -46,8 +46,9 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
     
     val infoCell = InfoCell(id = 666,
         uri = "PancoPillo:8080", name = "PancoPillo",
-        roomVertices = Coordinates(Point(0, 10), Point(10, 10), Point(0, 0), Point(10, 0)),
-        antennaPosition = Point(5, 5))
+        roomVertices = Coordinates(Point(100, 100), Point(250, 100), Point(100, 200), Point(250, 200)),
+        antennaPosition = Point(175, 150)
+    )
     
     val handshake = AriadneMessage(
         Handshake,
