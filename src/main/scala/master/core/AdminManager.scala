@@ -37,7 +37,7 @@ class AdminManager extends CustomActor {
 
     override def receive: Receive = {
         case msg@AriadneMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, _, area: Area) => {
-            //topologySupervisor ! msg
+            topologySupervisor ! msg
             println("Ricevuta mappa")
             context.become(operational)
         }

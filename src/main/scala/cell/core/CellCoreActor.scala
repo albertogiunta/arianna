@@ -73,7 +73,7 @@ class CellCoreActor extends BasicActor {
         userActor ! AriadneMessage(Init,
             Init.Subtype.Greetings,
             self2Self,
-            Greetings(List(greetings)))
+            Greetings(List(infoCell.uri, "8082")))
     }
 
     override protected def receptive: Receive = {

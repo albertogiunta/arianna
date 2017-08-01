@@ -2,65 +2,87 @@
     "id": 1,
     "cells": [
         {
-            "infoCell": {
+            "info": {
                 "id": 1,
-                "uri": "uri1",
-                "name": "cell1",
+                "uri": ":8081/uri1",
+                "name": "Room A",
                 "roomVertices": {
                     "northWest": {
-                        "x": 0,
-                        "y": 10
+                        "x": 100,
+                        "y": 100
                     },
                     "northEast": {
-                        "x": 10,
-                        "y": 10
+                        "x": 250,
+                        "y": 100
                     },
                     "southWest": {
-                        "x": 0,
-                        "y": 0
+                        "x": 100,
+                        "y": 200
                     },
                     "southEast": {
-                        "x": 10,
-                        "y": 0
+                        "x": 250,
+                        "y": 200
                     }
                 },
                 "antennaPosition": {
-                    "x": 5,
-                    "y": 5
+                    "x": 175,
+                    "y": 150
                 }
             },
-            "sensors": [
-                {
-                    "category": 1,
-                    "value": 10.0
-                }
-            ],
+            "sensors": [],
             "neighbors": [
                 {
                     "id": 2,
-                    "uri": "uri2",
-                    "name": "cell2",
+                    "uri": ":8082/uri2",
+                    "name": "Room B",
                     "roomVertices": {
                         "northWest": {
-                            "x": 10,
-                            "y": 8
+                            "x": 250,
+                            "y": 130
                         },
                         "northEast": {
-                            "x": 20,
-                            "y": 8
+                            "x": 300,
+                            "y": 130
                         },
                         "southWest": {
-                            "x": 10,
-                            "y": 2
+                            "x": 250,
+                            "y": 170
                         },
                         "southEast": {
-                            "x": 20,
-                            "y": 2
+                            "x": 300,
+                            "y": 170
                         }
                     },
                     "antennaPosition": {
-                        "x": 15,
-                        "y": 5
+                        "x": 275,
+                        "y": 150
+                    }
+                },
+                {
+                    "id": 4,
+                    "uri": ":8084/uri4",
+                    "name": "Room D",
+                    "roomVertices": {
+                        "northWest": {
+                            "x": 150,
+                            "y": 200
+                        },
+                        "northEast": {
+                            "x": 200,
+                            "y": 200
+                        },
+                        "southWest": {
+                            "x": 150,
+                            "y": 250
+                        },
+                        "southEast": {
+                            "x": 200,
+                            "y": 250
+                        }
+                    },
+                    "antennaPosition": {
+                        "x": 175,
+                        "y": 225
                     }
                 }
             ],
@@ -68,12 +90,23 @@
                 {
                     "neighborId": 2,
                     "startCoordinates": {
-                        "x": 10,
-                        "y": 2
+                        "x": 250,
+                        "y": 130
                     },
                     "endCoordinates": {
-                        "x": 10,
-                        "y": 8
+                        "x": 250,
+                        "y": 170
+                    }
+                },
+                {
+                    "neighborId": 4,
+                    "startCoordinates": {
+                        "x": 150,
+                        "y": 200
+                    },
+                    "endCoordinates": {
+                        "x": 200,
+                        "y": 200
                     }
                 }
             ],
@@ -82,7 +115,7 @@
             "capacity": 100,
             "squareMeters": 50.0,
             "currentPeople": 20,
-          "practicability": 5.0
+            "practicability": 5.0
         }
     ]
 }
