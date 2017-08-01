@@ -33,8 +33,8 @@ class UserManager extends BasicActor with ActorLogging {
 
     override protected def init(args: List[Any]): Unit = {
         vertx = Vertx.vertx()
-        //        s = new WSServer(vertx, self, args.head.asInstanceOf[String], args.take(2).last.asInstanceOf[String].toInt)
-        s = new WSServer(vertx, self, "/uri1", 8081)
+        s = new WSServer(vertx, self, "/" + args.head.asInstanceOf[String], 8081)
+        //s = new WSServer(vertx, self, "/uri1", 8081)
         c = new WSClient(vertx)
         log.info("Started actor")
         vertx.deployVerticle(s)

@@ -36,6 +36,7 @@ class SensorManager extends BasicActor {
             observableSensors += SensorsFactory.createTheObservableVersion(simSensor)
         })
         initializeSensors()
+
     }
 
     private def initializeSensors(): Unit = {
