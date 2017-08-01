@@ -24,16 +24,20 @@ object TestAdminInterface extends App {
 
     val adminManager = system.actorOf(Props[AdminManager], "AdminManager")
     var i = 1
-    Thread.sleep(10000)
+    Thread.sleep(5000)
     while (!i.equals(6)) {
-        Thread.sleep(300)
-        var sensors: ListBuffer[Sensor] = new ListBuffer[Sensor]
-        for (i <- 1 until 5) {
-            sensors += Sensor(i, (Math.random() * 10).round.toDouble, 0, 10)
+        Thread.sleep(1000)
+        var sensors: ListBuffer[SensorInfo] = new ListBuffer[SensorInfo]
+        for (i <- 1 until 4) {
+            sensors += SensorInfo(i, (Math.random() * 10).round.toDouble)
         }
         println(sensors.toString)
-        var sensorList: SensorsUpdate = SensorsUpdate(InfoCell(i, "uri0", "a", new Coordinates(Point(1, 1), Point(1, 1), Point(1, 1), Point(1, 1)), Point(1, 1)), sensors.toList)
-        adminManager ! AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, Location.Master >> Location.Admin, sensorList)
+        var sensorList: SensorsInfoUpdate = SensorsInfoUpdate(InfoCell(i,
+            "uri0",
+            "a",
+            new Coordinates(Point(1, 1), Point(1, 1), Point(1, 1), Point(1, 1)), Point(1, 1)),
+            sensors.toList)
+        adminManager ! AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, Location.Server >> Location.Admin, sensorList)
         println(i.toString)
         i = i + 1
     }

@@ -29,7 +29,7 @@ class RouteManager extends BasicActor {
     }
     
     override protected def receptive: Receive = {
-    
+
         case AriadneMessage(Route, Info, _, info: RouteInfo) =>
             
             // Se non è già presente in cache o il valore in cache è troppo vecchio
@@ -66,7 +66,7 @@ class RouteManager extends BasicActor {
     
         case _ => desist _
     }
-    
+
     private val manageEscape = (cnt: RouteInfo) => {
         log.info("Escape route request received, becoming evacuating...")
         processor forward cnt

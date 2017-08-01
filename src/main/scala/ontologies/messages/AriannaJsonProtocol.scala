@@ -1,6 +1,6 @@
 package ontologies.messages
 
-import spray.json.{DefaultJsonProtocol, RootJsonFormat}
+import spray.json.{DefaultJsonProtocol, JsValue, RootJsonFormat}
 
 /**
   * Created by Xander_C on 03/07/2017.
@@ -12,8 +12,25 @@ object AriannaJsonProtocol extends DefaultJsonProtocol {
     implicit val coordinatesFormat: RootJsonFormat[Coordinates] = jsonFormat4(Coordinates)
     implicit val infoCellFormat: RootJsonFormat[InfoCell] = jsonFormat5(InfoCell.apply)
     implicit val passageFormat: RootJsonFormat[Passage] = jsonFormat3(Passage)
-    implicit val sensorFormat: RootJsonFormat[Sensor] = jsonFormat4(Sensor.apply)
-    implicit val sensorsUpdateFormat: RootJsonFormat[SensorsUpdate] = jsonFormat2(SensorsUpdate.apply)
+    implicit val sensorFormat: RootJsonFormat[SensorInfo] = jsonFormat2(SensorInfo)
+    implicit val thresholdJsonFormat: RootJsonFormat[ThresholdInfo] = new RootJsonFormat[ThresholdInfo] {
+        override def write(c: ThresholdInfo) = c match {
+            case c: SingleThresholdInfo => singleThreshold.write(c)
+            case c: DoubleThresholdInfo => doubleThreshold.write(c)
+        }
+
+        override def read(value: JsValue) = {
+            value.asJsObject.fields.size match {
+                case 1 => singleThreshold.read(value)
+                case 2 => doubleThreshold.read(value)
+            }
+        }
+    }
+    implicit val sensorFormatFromConfig: RootJsonFormat[SensorInfoFromConfig] = jsonFormat4(SensorInfoFromConfig)
+    implicit val cellConfig: RootJsonFormat[CellConfig] = jsonFormat2(CellConfig)
+    implicit val singleThreshold: RootJsonFormat[SingleThresholdInfo] = jsonFormat1(SingleThresholdInfo)
+    implicit val doubleThreshold: RootJsonFormat[DoubleThresholdInfo] = jsonFormat2(DoubleThresholdInfo)
+    implicit val sensorsUpdateFormat: RootJsonFormat[SensorsInfoUpdate] = jsonFormat2(SensorsInfoUpdate.apply)
     implicit val cellFormat: RootJsonFormat[Cell] = jsonFormat10(ontologies.messages.Cell)
     implicit val areaFormat: RootJsonFormat[Area] = jsonFormat2(Area)
     implicit val cellForUserFormat: RootJsonFormat[CellForUser] = jsonFormat4(CellForUser.apply)

@@ -18,6 +18,12 @@ final case class Passage(neighborId: Int,
                          endCoordinates: Point) extends MessageContent
 
 /**
+  * This class is a static representation of
+  * the basic configuration of a cell when it starts
+  **/
+final case class CellConfig(uri: String, sensors: List[SensorInfoFromConfig]) extends MessageContent
+
+/**
   * This Class is a Static representation of a Cell
   *
   * @param id              The Identifier of the Room where the Cell is Located
@@ -83,7 +89,7 @@ final case class Area(id: Int,
   * @param practicability How much likely you should walk through this Room
   */
 final case class Cell(info: InfoCell,
-                      sensors: List[Sensor],
+                      sensors: List[SensorInfo],
                       neighbors: List[InfoCell],
                       passages: List[Passage],
                       isEntryPoint: Boolean,
@@ -207,12 +213,45 @@ object CurrentPeopleUpdate {
 /**
   * This case class represent a sensor.
   *
-  * @param category The Category of the Sensor
-  * @param value    The actual Value percieved from the sensor
-  * @param min      The Minimum value for which the held value is not dangerous
-  * @param max      The Maximum value for which the held value is not dangerous
+  * @param categoryId The Category of the Sensor
+  * @param value      The actual Value percieved from the sensor
   */
-final case class Sensor(category: Int, value: Double, min: Double, max: Double) extends MessageContent
+final case class SensorInfo(categoryId: Int, value: Double) extends MessageContent
+
+/**
+  * This is the information that a cell load during the start up
+  * configuration relative to a sensor that must be initialized
+  *
+  * @param categoryId the sensor category
+  * @param minValue   the minimum level reachable by the sensor
+  * @param maxValue   the minimum level reachable by the sensor
+  * @param threshold  the threshold of the sensor
+  **/
+final case class SensorInfoFromConfig(categoryId: Int, minValue: Double, maxValue: Double, threshold: ThresholdInfo) extends MessageContent
+
+/**
+  * An abstract representation of information relative
+  * to a threshold of a generic sensor
+  * */
+abstract class ThresholdInfo extends MessageContent
+
+/**
+  * The concrete representation of a threshold of a sensor
+  * that has a single threshold level
+  *
+  * @param value the threshold level
+  * */
+final case class SingleThresholdInfo(value: Double) extends ThresholdInfo
+
+
+/**
+  * The concrete representation of a threshold of a sensor
+  * that has a two threshold level
+  *
+  * @param lowThreshold  the lowest level that the program's logic consider as normal value for the sensor
+  * @param highThreshold the highest level that the program's logic consider as normal value for the sensor
+  * */
+final case class DoubleThresholdInfo(lowThreshold: Double, highThreshold: Double) extends ThresholdInfo
 
 object Sensor {
     def categoryName(category: Int): String = category match {
@@ -231,10 +270,10 @@ object Sensor {
   * @param info    The identification info of the Cells that is sending the Updates
   * @param sensors A list of sensors data
   */
-final case class SensorsUpdate(info: InfoCell, sensors: List[Sensor]) extends MessageContent
+final case class SensorsInfoUpdate(info: InfoCell, sensors: List[SensorInfo]) extends MessageContent
 
-object SensorsUpdate {
-    def apply(cell: Cell): SensorsUpdate = new SensorsUpdate(cell.info, cell.sensors)
+object SensorsInfoUpdate {
+    def apply(cell: Cell): SensorsInfoUpdate = new SensorsInfoUpdate(cell.info, cell.sensors)
 }
 
 /**
@@ -278,7 +317,7 @@ object AreaPracticability {
   */
 final case class CellDataUpdate(info: InfoCell,
                                 currentPeople: Int,
-                                sensors: List[Sensor]) extends MessageContent // To be renamed CellData
+                                sensors: List[SensorInfo]) extends MessageContent // To be renamed CellData
 
 object CellDataUpdate {
     def apply(cell: Cell): CellDataUpdate = new CellDataUpdate(cell.info, cell.currentPeople, cell.sensors)

@@ -13,21 +13,21 @@ trait CustomActor extends Actor with Stash with ActorLogging {
 
     protected val config = ConfigurationManager(context.system)
     protected val builder = ConfigPathBuilder()
-    
+
     /**
       * A shortcut method that gives the name of this actor
       *
       * @return The name of this actor
       */
     def name: String = self.path.name
-    
+
     /**
       * A shortcut method that gives the ArctorRef of the parent Actor of this Actor
       *
       * @return The parent ActorRef
       */
     def parent: ActorRef = this.context.parent
-    
+
     /**
       * A shortcut method that gives the ActorSelection of the Sibling with the
       * specified name, if exist
@@ -44,7 +44,7 @@ trait CustomActor extends Actor with Stash with ActorLogging {
       * @return Return all the siblings of this node including itself
       */
     def siblings: ActorSelection = context.actorSelection("../*")
-    
+
     /**
       * A shortcut method that gives the ActorSelection of the Child with the specified name
       *
@@ -53,7 +53,7 @@ trait CustomActor extends Actor with Stash with ActorLogging {
       */
     def child(name: String): Option[ActorSelection] =
         Option(context.actorSelection("../" + this.name + "/" + name))
-    
+
     /**
       * A shortcut method that gives all the children of this Actor
       *
@@ -82,7 +82,7 @@ abstract class BasicActor extends CustomActor {
     }
     
     override def receive: Receive = resistive
-    
+
     /**
       * The resistive method is the default behaviour of the BasicActor
       * where it waits for an InitMessage.
@@ -111,7 +111,7 @@ abstract class BasicActor extends CustomActor {
 
         case _ => desist _
     }
-    
+
     /**
       * This is the default init for the BasicActor, it simply log a message of self existence.
       *
@@ -122,7 +122,7 @@ abstract class BasicActor extends CustomActor {
     protected def init(args: List[Any]): Unit = {
         log.info("Hello there from {}!", name)
     }
-    
+
     /**
       * This method is the behaviour on which the BasicActor will be
       * after the Initialization has been completed.
@@ -130,7 +130,7 @@ abstract class BasicActor extends CustomActor {
       * @return An Actor Receive Behaviour
       */
     protected def receptive: Actor.Receive
-    
+
     /**
       * This method is the default action to be used for unhandled messages
       *

@@ -54,22 +54,22 @@ object TestCells extends App {
     val system = ActorSystem("Arianna-Cluster", config)
 
     var core = system.actorOf(Props[CellCoreActor], "CellCore")
-    var server2Cell = Location.Master >> Location.Cell
-    
-    
+    var server2Cell = Location.Server >> Location.Cell
+
+
     def readJson(filename: String): JsValue =
         Source.fromFile(filename).getLines.mkString.parseJson
-    
+
     def loadArea: Area = readJson(s"res/json/map.json").convertTo[Area]
-    
+
     def areaForCell: AreaViewedFromACell = AreaViewedFromACell(loadArea)
     
 
     Thread.sleep(500)
     private val greetings: String = "Hello there, it's time to dress-up"
     core ! AriadneMessage(Init, Init.Subtype.Greetings,
-        Location.Master >> Location.Self, Greetings(List(greetings)))
-    
+        Location.Server >> Location.Self, Greetings(List(greetings)))
+
     //println("Area sended to cell core")
     //core ! AriadneMessage(Topology, Topology4Cell, server2Cell, areaForCell)
 }

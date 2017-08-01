@@ -69,6 +69,8 @@ object Location {
 
     val Cell: Location = LocationImpl("Cell")
 
+    val Cluster: Location = LocationImpl("Cluster")
+
     val User: Location = LocationImpl("User")
 
     val Notifier: Location = LocationImpl("Notifier")

@@ -1,4 +1,4 @@
-package master
+package master.tests
 
 import java.io.File
 import java.nio.file.Paths
@@ -6,8 +6,8 @@ import java.nio.file.Paths
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator.Publish
-import com.actors.ClusterMembersListener
 import com.typesafe.config.ConfigFactory
+import common.ClusterMembersListener
 import master.cluster.{MasterPublisher, MasterSubscriber}
 import ontologies.Topic
 import ontologies.messages.Location._
@@ -35,13 +35,13 @@ object TestClusterJoin extends App {
     val remotemsg = AriadneMessage(
         Update,
         Update.Subtype.Sensors,
-        Location.Cell >> Location.Master,
-        SensorsUpdate(
+        Location.Cell >> Location.Server,
+        SensorsInfoUpdate(
             InfoCell(0, "uri", "name",
                 Coordinates(Point(1, 1), Point(-1, -1), Point(-1, 1), Point(1, -1)),
                 Point(0, 0)
             ),
-            List(Sensor(1, 2.0, 0.0, 0.0), Sensor(2, 1.55, 0.0, 0.0))
+            List(SensorInfo(1, 2.0), SensorInfo(2, 1.55))
         )
     )
     
