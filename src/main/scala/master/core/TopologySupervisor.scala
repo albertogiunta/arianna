@@ -77,8 +77,6 @@ class TopologySupervisor extends BasicActor {
             }
         
         case msg@AriadneMessage(Handshake, CellToMaster, `cell2Server`, SensorsInfoUpdate(cell, _)) =>
-    
-            log.info(msg.toString)
 
             if (topology.get(cell.uri).nonEmpty) {
                 log.info("Found a match into the loaded Topology for {}", cell.uri)
@@ -102,6 +100,16 @@ class TopologySupervisor extends BasicActor {
                         )
                     )
                 }
+            } else {
+                log.error("Received Handshake as no matching in the current loaded Topology for {}", cell.uri)
+                publisher() ! (
+                    sender().path.toString,
+                    AriadneMessage(
+                        Error, Error.Subtype.CellMappingMismatch,
+                        server2Cell,
+                        Empty()
+                    )
+                )
             }
     
         case _ => stash

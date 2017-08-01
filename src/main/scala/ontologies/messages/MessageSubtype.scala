@@ -38,7 +38,9 @@ object MessageSubtype {
                 Error.Subtype.MapAlreadyLoaded
             case st if st == Error.Subtype.MapIdentifierMismatch.toLowerCase =>
                 Error.Subtype.MapIdentifierMismatch
-            
+            case st if st == Error.Subtype.CellMappingMismatch.toLowerCase =>
+                Error.Subtype.CellMappingMismatch
+                
             case st if st == Alarm.Subtype.Basic.toLowerCase =>
                 Alarm.Subtype.Basic
             case st if st == Alarm.Subtype.FromInterface.toLowerCase =>

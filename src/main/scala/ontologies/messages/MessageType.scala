@@ -49,6 +49,7 @@ object MessageType {
         object Subtype {
             
             object MapAlreadyLoaded extends MessageSubtype {
+    
                 override val superType = Error
                 override val subtypeName = "MapAlreadyLoaded"
                 
@@ -60,12 +61,25 @@ object MessageType {
             }
             
             object MapIdentifierMismatch extends MessageSubtype {
+    
                 override val superType = Error
                 override val subtypeName = "MapIdentifierMismatch"
                 
                 override def unmarshal(json: String): Empty =
                     json.parseJson.convertTo[Empty]
                 
+                override def marshal(obj: MessageContent): String =
+                    obj.asInstanceOf[Empty].toJson.toString()
+            }
+    
+            object CellMappingMismatch extends MessageSubtype {
+        
+                override val superType = Error
+                override val subtypeName = "CellMappingMismatch"
+        
+                override def unmarshal(json: String): Empty =
+                    json.parseJson.convertTo[Empty]
+        
                 override def marshal(obj: MessageContent): String =
                     obj.asInstanceOf[Empty].toJson.toString()
             }
