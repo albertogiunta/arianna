@@ -4,7 +4,7 @@
         {
             "info": {
                 "id": 1,
-                "uri": ":8081/uri1",
+                "uri": "uri1",
                 "name": "Room A",
                 "roomVertices": {
                     "northWest": {

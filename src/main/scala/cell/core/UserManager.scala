@@ -1,21 +1,15 @@
 package cell.core
 
-import java.io.File
-import java.nio.file.Paths
-
 import _root_.io.vertx.core.Vertx
-import akka.actor.{ActorLogging, ActorSystem, Props}
+import akka.actor.ActorLogging
 import cell.WSClient
 import com.actors.BasicActor
-import com.typesafe.config.ConfigFactory
 import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology
 import ontologies.messages.MessageType.Topology.Subtype._
 import ontologies.messages._
 import spray.json._
-
-import scala.io.Source
 
 object MSGToAkka {
     val NORMAL_CONNECTION: String = "connect"
@@ -32,8 +26,10 @@ class UserManager extends BasicActor with ActorLogging {
     var area: AreaViewedFromACell = _
 
     override protected def init(args: List[Any]): Unit = {
+        if (args.size != 2) throw new Exception()
         vertx = Vertx.vertx()
-        s = new WSServer(vertx, self, "/" + args.head.asInstanceOf[String], 8081)
+        s = new WSServer(vertx, self, "/" + args(0).asInstanceOf[String], args(1).asInstanceOf[String].toInt)
+        println("ricevuta init con argomenti " + args)
         //s = new WSServer(vertx, self, "/uri1", 8081)
         c = new WSClient(vertx)
         log.info("Started actor")
@@ -91,42 +87,42 @@ class UserManager extends BasicActor with ActorLogging {
     }
 }
 
-object UserRun {
-
-    private def readJson(filename: String): JsValue = {
-        val source: String = Source.fromFile(filename).getLines.mkString
-        source.parseJson
-    }
-
-    def loadArea(): Area = {
-        val area = readJson(s"res/json/map1.json").convertTo[Area]
-        area
-    }
-
-    def areaForCell: AreaViewedFromACell = {
-        AreaViewedFromACell(area)
-    }
-
-    var area: Area = loadArea()
-
-    def main(args: Array[String]): Unit = {
-        val path2Project = Paths.get("").toFile.getAbsolutePath
-        val path2Config = path2Project + "/res/conf/akka/application.conf"
-        val config = ConfigFactory.parseFile(new File(path2Config))
-        val system = ActorSystem.create("userSystem", config.getConfig("user"))
-        val userActor = system.actorOf(Props.create(classOf[UserManager]), "user1")
-        userActor ! AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, Location.User >> Location.Self, Greetings(List("/uri1", "8080")))
-        Thread.sleep(500)
-        val userActor2 = system.actorOf(Props.create(classOf[UserManager]), "user2")
-        userActor2 ! AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, Location.User >> Location.Self, Greetings(List("/uri2", "8081")))
-        Thread.sleep(500)
-        val userActor3 = system.actorOf(Props.create(classOf[UserManager]), "user3")
-        userActor3 ! AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, Location.User >> Location.Self, Greetings(List("/uri3", "8082")))
-        Thread.sleep(500)
-        userActor ! AriadneMessage(Topology, ViewedFromACell, Location.User >> Location.Self, areaForCell)
-        Thread.sleep(500)
-        userActor2 ! AriadneMessage(Topology, ViewedFromACell, Location.User >> Location.Self, areaForCell)
-        Thread.sleep(500)
-        userActor3 ! AriadneMessage(Topology, ViewedFromACell, Location.User >> Location.Self, areaForCell)
-    }
-}
+//object UserRun {
+//
+//    private def readJson(filename: String): JsValue = {
+//        val source: String = Source.fromFile(filename).getLines.mkString
+//        source.parseJson
+//    }
+//
+//    def loadArea(): Area = {
+//        val area = readJson(s"res/json/map1.json").convertTo[Area]
+//        area
+//    }
+//
+//    def areaForCell: AreaViewedFromACell = {
+//        AreaViewedFromACell(area)
+//    }
+//
+//    var area: Area = loadArea()
+//
+//    def main(args: Array[String]): Unit = {
+//        val path2Project = Paths.get("").toFile.getAbsolutePath
+//        val path2Config = path2Project + "/res/conf/akka/application.conf"
+//        val config = ConfigFactory.parseFile(new File(path2Config))
+//        val system = ActorSystem.create("userSystem", config.getConfig("user"))
+//        val userActor = system.actorOf(Props.create(classOf[UserManager]), "user1")
+//        userActor ! AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, Location.User >> Location.Self, Greetings(List("/uri1", "8080")))
+//        Thread.sleep(500)
+//        val userActor2 = system.actorOf(Props.create(classOf[UserManager]), "user2")
+//        userActor2 ! AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, Location.User >> Location.Self, Greetings(List("/uri2", "8081")))
+//        Thread.sleep(500)
+//        val userActor3 = system.actorOf(Props.create(classOf[UserManager]), "user3")
+//        userActor3 ! AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, Location.User >> Location.Self, Greetings(List("/uri3", "8082")))
+//        Thread.sleep(500)
+//        userActor ! AriadneMessage(Topology, ViewedFromACell, Location.User >> Location.Self, areaForCell)
+//        Thread.sleep(500)
+//        userActor2 ! AriadneMessage(Topology, ViewedFromACell, Location.User >> Location.Self, areaForCell)
+//        Thread.sleep(500)
+//        userActor3 ! AriadneMessage(Topology, ViewedFromACell, Location.User >> Location.Self, areaForCell)
+//    }
+//}

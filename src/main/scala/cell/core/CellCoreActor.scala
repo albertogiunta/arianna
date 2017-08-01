@@ -3,7 +3,6 @@ package cell.core
 import akka.actor.{ActorRef, Props}
 import cell.cluster.{CellPublisher, CellSubscriber}
 import cell.processor.route.actors.RouteManager
-import cell.sensormanagement.SensorManager
 import com.actors.{BasicActor, ClusterMembersListener}
 import com.utils.Practicability
 import ontologies.messages.AriannaJsonProtocol._
@@ -24,7 +23,7 @@ import scala.util.Random
   */
 class CellCoreActor extends BasicActor {
 
-    private val greetings: String = "Hello there, it's time to dress-up"
+    private val greetings: String = "FROM CELL CORE ACTOR Hello there, it's time to dress-up"
 
     private var infoCell: InfoCell = InfoCell.empty
     private val topology: mutable.Map[String, CellViewedFromACell] = mutable.HashMap[String, CellViewedFromACell]()
@@ -50,10 +49,12 @@ class CellCoreActor extends BasicActor {
         super.preStart()
         clusterListener = context.actorOf(Props[ClusterMembersListener], "CellClusterListener")
 
-        cellPublisher = context.actorOf(Props[CellPublisher], "CellPublisher")
         cellSubscriber = context.actorOf(Props[CellSubscriber], "CellSubscriber")
+        cellPublisher = context.actorOf(Props[CellPublisher], "CellPublisher")
+        Thread.sleep(2000)
+        //        cellPublisher ! AriadneMessage(Init, Init.Subtype.Greetings, Location.Admin >> Location.Cell, Greetings(List("testa di cazzo")))
 
-        sensorManager = context.actorOf(Props[SensorManager], "SensorManager")
+        //        sensorManager = context.actorOf(Props[SensorManager], "SensorManager")
         userActor = context.actorOf(Props[UserManager], "UserManager")
         routeManager = context.actorOf(Props[RouteManager], "RouteManager")
     }
@@ -61,26 +62,29 @@ class CellCoreActor extends BasicActor {
     override protected def init(args: List[Any]): Unit = {
         log.info("Hello there! the cell core has been initialized")
 
-        val cellConfiguration = Source.fromFile(s"res/json/cell/cell1.json").getLines.mkString
+        val cellConfiguration = Source.fromFile(s"res/json/cell/cell2.json").getLines.mkString
         val loadedInfo = cellConfiguration.parseJson.convertTo[CellConfig]
         infoCell = infoCell.copy(uri = loadedInfo.uri)
 
-        sensorManager ! AriadneMessage(Init,
-            Init.Subtype.Greetings,
-            self2Self,
-            Greetings(List(loadedInfo.sensors.toJson.toString())))
-
-        userActor ! AriadneMessage(Init,
-            Init.Subtype.Greetings,
-            self2Self,
-            Greetings(List(infoCell.uri, "8082")))
+        //        sensorManager ! AriadneMessage(Init,
+        //            Init.Subtype.Greetings,
+        //            self2Self,
+        //            Greetings(List(loadedInfo.sensors.toJson.toString())))
     }
 
     override protected def receptive: Receive = {
 
+        case msg@AriadneMessage(Error, Error.Subtype.CellMappingMismatch, _, cnt: Empty) =>
+            println("errore di mapping")
+
         case msg@AriadneMessage(Topology, ViewedFromACell, `server2Cell`, cnt: AreaViewedFromACell) =>
             println(s"Area arrived from Server $cnt")
             cnt.cells.foreach(X => topology.put(X.info.uri, X))
+            userActor ! AriadneMessage(Init,
+                Init.Subtype.Greetings,
+                self2Self,
+                Greetings(List(infoCell.uri, "8081")))
+            Thread.sleep(3000)
             userActor ! msg.copy(direction = cell2User)
 
         case msg@AriadneMessage(Update, Update.Subtype.Sensors, self2Self, cnt: SensorsInfoUpdate) =>

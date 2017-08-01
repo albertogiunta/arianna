@@ -46,6 +46,8 @@ abstract class BasicPublisher extends BasicActor {
     val mediator: ActorRef = DistributedPubSub(context.system).mediator
 
     // Point 2 Point Messaging with other Actors of the cluster
-    override def preStart = mediator ! Put(self)
+    override def preStart = {
+        mediator ! Put(self)
+    }
 
 }

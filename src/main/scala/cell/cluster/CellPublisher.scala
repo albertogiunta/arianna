@@ -33,6 +33,7 @@ class CellPublisher extends BasicPublisher {
     private val antennaPosition: Point = Point(0, 0)
     
     override protected def init(args: List[Any]) = {
+        if (args(0) != "FROM CLUSTER MEMBERS LISTERNER Hello there, it's time to dress-up") throw new Exception()
         log.info("Hello there from {}!", name)
 
         log.info("Sending Handshake to Master...")

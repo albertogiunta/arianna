@@ -61,7 +61,7 @@ object TestCells extends App {
     //def areaForCell: AreaViewedFromACell = AreaViewedFromACell(loadArea)
 
     Thread.sleep(500)
-    private val greetings: String = "Hello there, it's time to dress-up"
+    private val greetings: String = "FROM TEST CELL Hello there, it's time to dress-up"
     core ! AriadneMessage(Init, Init.Subtype.Greetings,
         Location.Master >> Location.Self, Greetings(List(greetings)))
 

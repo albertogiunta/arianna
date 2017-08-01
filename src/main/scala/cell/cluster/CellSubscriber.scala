@@ -21,6 +21,7 @@ class CellSubscriber extends BasicSubscriber {
     private val server2Cell: MessageDirection = Location.Master >> Location.Cell
 
     override protected def init(args: List[Any]) = {
+        if (args(0) != "FROM CLUSTER MEMBERS LISTERNER Hello there, it's time to dress-up") throw new Exception()
         log.info("Hello there from {}!", name)
     }
 

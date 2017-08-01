@@ -159,7 +159,8 @@ class TopologySupervisor extends BasicActor {
 
         case AriadneMessage(Handshake, CellToMaster, `cell2Server`, _) =>
             log.info("Late handshake from {}...", sender.path)
-    
+            log.info(sender.path.name)
+
             publisher() ! (
                 sender.path.toString,
                 AriadneMessage(
