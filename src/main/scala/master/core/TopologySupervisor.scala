@@ -7,7 +7,7 @@ import ontologies.messages.Location._
 import ontologies.messages.MessageType.Handshake.Subtype.CellToMaster
 import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, ViewedFromACell}
 import ontologies.messages.MessageType.Update.Subtype.{CurrentPeople, Sensors}
-import ontologies.messages.MessageType.{Handshake, Topology, Update}
+import ontologies.messages.MessageType.{Error, Handshake, Topology, Update}
 import ontologies.messages._
 import system.names.NamingSystem
 
@@ -42,7 +42,7 @@ class TopologySupervisor extends BasicActor {
         case msg@AriadneMessage(Topology, Planimetrics, `admin2Server`, map: Area) =>
             log.info("A topology has been loaded in the server...")
     
-            if (topology.isEmpty) {
+            if (topology.isEmpty || map.id != mapVersionID) {
     
                 mapVersionID = map.id
                 
@@ -60,7 +60,21 @@ class TopologySupervisor extends BasicActor {
     }
     
     private def sociable: Receive = {
-
+    
+        case msg@AriadneMessage(Topology, Planimetrics, _, map: Area) =>
+        
+        
+            if (map.id != mapVersionID) {
+                log.error("A topology has already been loaded in the server...")
+            
+                dataStreamer() ! AriadneMessage(
+                    Error,
+                    Error.Subtype.MapIdentifierMismatch,
+                    server2Admin,
+                    Empty()
+                )
+            }
+        
         case msg@AriadneMessage(Handshake, CellToMaster, `cell2Server`, SensorsInfoUpdate(cell, _)) =>
     
             log.info(msg.toString)
@@ -88,10 +102,24 @@ class TopologySupervisor extends BasicActor {
                     )
                 }
             }
+    
         case _ => stash
     }
     
     private def proactive: Receive = {
+    
+        case AriadneMessage(Topology, Planimetrics, _, map: Area) =>
+        
+            if (map.id != mapVersionID) {
+                log.error("A topology has already been loaded in the server...")
+            
+                dataStreamer() ! AriadneMessage(
+                    Error,
+                    Error.Subtype.MapIdentifierMismatch,
+                    server2Admin,
+                    Empty()
+                )
+            }
     
         case AriadneMessage(Update, CurrentPeople, `cell2Server`, pkg: CurrentPeopleUpdate) =>
 
