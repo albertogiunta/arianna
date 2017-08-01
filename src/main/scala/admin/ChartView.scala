@@ -22,6 +22,7 @@ class ChartView() {
         })
         stage setTitle "Arianna Charts"
         stage setScene new Scene(template)
+        stage setResizable false
         stage.show
     }
 
