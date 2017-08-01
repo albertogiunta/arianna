@@ -56,6 +56,7 @@ class TopologySupervisor extends BasicActor {
                 log.info("Notifying the Subscriber...")
                 subscriber() ! msg
             }
+
         case _ => stash
     }
     

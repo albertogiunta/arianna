@@ -5,8 +5,8 @@ import akka.stream._
 import akka.stream.scaladsl.{Flow, Sink, Source, SourceQueueWithComplete}
 import com.actors.BasicActor
 import ontologies.messages.Location._
+import ontologies.messages.MessageType.Update
 import ontologies.messages.MessageType.Update.Subtype
-import ontologies.messages.MessageType.{Handshake, Update}
 import ontologies.messages._
 import system.names.NamingSystem
 
@@ -50,7 +50,7 @@ class DataStreamer(private val handler: (AriadneMessage[_], ActorSelection) => U
         case msg: Iterable[Cell] =>
             streamer offer msg
 
-        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, _) => admin() ! msg
+        case msg: AriadneMessage[_] => admin() ! msg
 
         case msg => log.info(msg.toString)
     }
