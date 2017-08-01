@@ -11,6 +11,7 @@ import akka.actor.ActorRef
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Interface
 import ontologies.messages._
+import ontologies.sensor.SensorCategories
 
 import scala.collection.mutable
 import scalafx.application.Platform
@@ -68,7 +69,7 @@ class ChartWindowController extends Initializable {
         sensorsId.foreach(sensorId => {
             val loader = new FXMLLoader(getClass().getResource("/chartTemplate.fxml"));
             val template = loader.load[TitledPane]
-            template setText Sensor.categoryName(sensorId)
+            template setText SensorCategories.categoryWithId(sensorId).name
             sensorChartControllers += ((sensorId, loader.getController[SensorChartController]))
             var position: (Int, Int) = positions.next()
             mainPane.add(template, position._1, position._2)

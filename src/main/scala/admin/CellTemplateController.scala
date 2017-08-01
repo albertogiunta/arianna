@@ -68,8 +68,12 @@ class CellTemplateController extends Initializable {
       * @param cell : CellForView object containing only dynamic data
       * */
     def setDynamicInformation(cell: CellForView): Unit = {
+        if (chartsButton.isDisabled) {
+            chartsButton setDisable false
+        }
         currentPeopleValue setText cell.currentPeople.toString
         cell.sensors.foreach(sensor => {
+            println("Cerco il controller " + sensor.categoryId)
             sensorsController.get(sensor.categoryId).get updateSensor sensor
         })
     }
@@ -81,16 +85,16 @@ class CellTemplateController extends Initializable {
       *
       * */
     def addSensors(sensorsInfo: SensorsInfoUpdate): Unit = {
-        Platform.runLater {
-            sensorsInfo.sensors.foreach(sensor => {
-                var loader = new FXMLLoader(getClass.getResource("/sensorTemplate.fxml"))
-                var sensorTemplate = loader.load[HBox]
-                val sensorController = loader.getController[SensorTemplateController]
-                sensorController createSensor sensor
-                sensorsController += ((sensor.categoryId, sensorController))
-                sensorsContainer.getChildren add sensorTemplate
-            })
-        }
+        sensorsInfo.sensors.foreach(sensor => {
+            var loader = new FXMLLoader(getClass.getResource("/sensorTemplate.fxml"))
+            var sensorTemplate = loader.load[HBox]
+            val sensorController = loader.getController[SensorTemplateController]
+            sensorController createSensor sensor
+            println("Aggiungo il controller del sensore " + sensor.categoryId)
+            sensorsController += ((sensor.categoryId, sensorController))
+            sensorsContainer.getChildren add sensorTemplate
+        })
+
     }
 
     /**

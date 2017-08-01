@@ -28,28 +28,27 @@ object TestAdminInterface extends App {
     while (!i.equals(6)) {
         Thread.sleep(1000)
         var sensors: ListBuffer[SensorInfo] = new ListBuffer[SensorInfo]
-        for (i <- 1 until 4) {
+        for (i <- 1 until 5) {
             sensors += SensorInfo(i, (Math.random() * 10).round.toDouble)
         }
-        println(sensors.toString)
         var sensorList: SensorsInfoUpdate = SensorsInfoUpdate(InfoCell(i,
             "uri0",
             "a",
             new Coordinates(Point(1, 1), Point(1, 1), Point(1, 1), Point(1, 1)), Point(1, 1)),
             sensors.toList)
         adminManager ! AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, Location.Master >> Location.Admin, sensorList)
-        println(i.toString)
         i = i + 1
     }
 
     Thread.sleep(1000)
 
     while (true) {
+        println("Invio aggiornamento... ")
         Thread.sleep(1000)
         var update: ListBuffer[CellDataUpdate] = new ListBuffer[CellDataUpdate]
         var sensors: ListBuffer[SensorInfo] = new ListBuffer[SensorInfo]
         for (i <- 1 until 5) {
-            //            sensors += Sensor(i, (Math.random() * 10).round.toDouble, 0, 10)
+            sensors += SensorInfo(i, (Math.random() * 10).round.toDouble)
         }
 
         for (i <- 1 until 6) {
