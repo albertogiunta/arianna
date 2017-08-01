@@ -2,13 +2,14 @@ package master.cluster
 
 import akka.actor.ActorSelection
 import akka.cluster.pubsub.DistributedPubSubMediator.{Subscribe, SubscribeAck}
-import common.BasicSubscriber
+import com.actors.BasicSubscriber
 import ontologies._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Handshake.Subtype.CellToMaster
 import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, ViewedFromACell}
 import ontologies.messages.MessageType._
 import ontologies.messages._
+import system.names.NamingSystem
 
 /**
   * A Simple Subscriber for a Clustered Publish-Subscribe Model
@@ -19,11 +20,11 @@ class MasterSubscriber extends BasicSubscriber {
     
     override val topics: Set[Topic] = Set(Topic.Alarms, Topic.Updates, Topic.HandShakes)
     
-    private val cell2Server: MessageDirection = Location.Server << Location.Cell
-    private val admin2Server: MessageDirection = Location.Admin >> Location.Server
+    private val cell2Server: MessageDirection = Location.Master << Location.Cell
+    private val admin2Server: MessageDirection = Location.Admin >> Location.Master
     
-    private val topologySupervisor: () => ActorSelection = () => sibling("Publisher").get
-    private val publisher: () => ActorSelection = () => sibling("TopologySupervisor").get
+    private val topologySupervisor: () => ActorSelection = () => sibling(NamingSystem.TopologySupervisor).get
+    private val publisher: () => ActorSelection = () => sibling(NamingSystem.Publisher).get
     
     override protected def receptive = {
     
@@ -45,7 +46,7 @@ class MasterSubscriber extends BasicSubscriber {
         case _ => desist _
     }
     
-    private def sociable: Receive = {
+    def sociable: Receive = {
     
         case msg@AriadneMessage(Handshake, CellToMaster, `cell2Server`, _) =>
             log.info("Resolving Handshake from {}", sender.path)
@@ -65,7 +66,7 @@ class MasterSubscriber extends BasicSubscriber {
         case _ => stash
     }
     
-    private def proactive: Receive = {
+    def proactive: Receive = {
     
         case msg@AriadneMessage(Update, _, _, _) =>
             log.info("Forwarding message {} from {} to TopologySupervisor", msg.subtype, sender.path)

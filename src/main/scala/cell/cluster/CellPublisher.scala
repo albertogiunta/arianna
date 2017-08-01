@@ -1,7 +1,7 @@
 package cell.cluster
 
 import akka.cluster.pubsub.DistributedPubSubMediator.Publish
-import common.BasicPublisher
+import com.actors.BasicPublisher
 import ontologies._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType._
@@ -44,7 +44,7 @@ class CellPublisher extends BasicPublisher {
                 AriadneMessage(
                     Handshake,
                     Handshake.Subtype.CellToMaster,
-                    Location.Cell >> Location.Server,
+                    Location.Cell >> Location.Master,
                     SensorsUpdate(
                         InfoCell(cellID, cellUri, cellName, roomVertices, antennaPosition),
                         List()

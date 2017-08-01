@@ -1,11 +1,12 @@
 package master.core
 
 import akka.actor.ActorSelection
-import common.BasicSubscriber
+import com.actors.BasicSubscriber
 import ontologies.Topic
 import ontologies.messages.AriadneMessage
 import ontologies.messages.MessageType.Alarm
 import ontologies.messages.MessageType.Alarm.Subtype.Basic
+import system.names.NamingSystem
 
 /**
   * Alarm Supervisor has to react only to Alarms of triggered in the system,
@@ -17,8 +18,8 @@ import ontologies.messages.MessageType.Alarm.Subtype.Basic
 class AlarmSupervisor extends BasicSubscriber {
     override val topics = Set(Topic.Alarms)
     
-    private val topologySupervisor: () => ActorSelection = () => sibling("TopologySupervisor").get
-    private val admin: () => ActorSelection = () => sibling("AdminManager").get
+    private val topologySupervisor: () => ActorSelection = () => sibling(NamingSystem.TopologySupervisor).get
+    private val admin: () => ActorSelection = () => sibling(NamingSystem.AdminManager).get
     
     override protected def receptive = {
     

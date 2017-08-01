@@ -39,7 +39,7 @@ object TestPubSubCells extends App {
     publisher ! AriadneMessage(
         MessageType.Init,
         MessageType.Init.Subtype.Greetings,
-        Location.Cell >> Location.Server,
+        Location.Cell >> Location.Master,
         Greetings(List("Hello baby.")))
 
 }

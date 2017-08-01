@@ -1,4 +1,4 @@
-package master.tests
+package master
 
 import java.io.File
 import java.nio.file.Paths
@@ -24,9 +24,9 @@ object TestDataStreamer extends App {
     
     Thread.sleep(5000)
     
-    val streamer = system.actorOf(Props[DataStreamer], "DataStreamer")
+    val streamer = system.actorOf(Props(new DataStreamer()), "DataStreamer")
     
-    (0 to Int.MaxValue).foreach(_ => {
+    (0 to 10).foreach(_ => {
         val u =
             (0 to 5).map(id => ontologies.messages.Cell(
                 InfoCell(id, "uri" + id, "name" + id,

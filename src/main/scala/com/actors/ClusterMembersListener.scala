@@ -1,4 +1,4 @@
-package common
+package com.actors
 
 import akka.actor.Address
 import akka.cluster.ClusterEvent.{CurrentClusterState, MemberEvent, MemberRemoved, MemberUp}
@@ -35,7 +35,7 @@ class ClusterMembersListener extends CustomActor {
                 log.info("Awakening Actors on Master Actor-System")
 
                 siblings ! AriadneMessage(Init, Init.Subtype.Greetings,
-                    Location.Server >> Location.Self, Greetings(List(greetings)))
+                    Location.Master >> Location.Self, Greetings(List(greetings)))
             }
         } catch {
             case ex: Throwable => ex.printStackTrace()

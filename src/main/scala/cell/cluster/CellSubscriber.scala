@@ -1,7 +1,7 @@
 package cell.cluster
 
 import akka.cluster.pubsub.DistributedPubSubMediator.{Subscribe, SubscribeAck}
-import common.BasicSubscriber
+import com.actors.BasicSubscriber
 import ontologies._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType._
@@ -16,9 +16,9 @@ import ontologies.messages.{AriadneMessage, Location, MessageDirection}
 class CellSubscriber extends BasicSubscriber {
     
     override val topics = Set(Topic.Alarms, Topic.Topologies, Topic.Practicabilities)
-
-    private val cell2Server: MessageDirection = Location.Server << Location.Cell
-    private val server2Cell: MessageDirection = Location.Server >> Location.Cell
+    
+    private val cell2Server: MessageDirection = Location.Master << Location.Cell
+    private val server2Cell: MessageDirection = Location.Master >> Location.Cell
 
     override protected def init(args: List[Any]) = {
         log.info("Hello there from {}!", name)

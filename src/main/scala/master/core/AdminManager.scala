@@ -4,8 +4,8 @@ import java.io.File
 import java.nio.file.Paths
 
 import akka.actor.{ActorSelection, ActorSystem, Props}
+import com.actors.CustomActor
 import com.typesafe.config.ConfigFactory
-import common.CustomActor
 import master.cluster.MasterPublisher
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Init.Subtype
@@ -17,9 +17,9 @@ import ontologies.messages._
   *
   **/
 class AdminManager extends CustomActor {
-
-    val toAdmin: MessageDirection = Location.Server >> Location.Admin
-    val fromAdmin: MessageDirection = Location.Admin >> Location.Server
+    
+    val toAdmin: MessageDirection = Location.Master >> Location.Admin
+    val fromAdmin: MessageDirection = Location.Admin >> Location.Master
     val admin = context.actorSelection("akka.tcp://adminSystem@127.0.0.1:4550/user/admin")
     val topologySupervisor: ActorSelection = sibling("TopologySupervisor").get
     val publisher: ActorSelection = sibling("Publisher").get

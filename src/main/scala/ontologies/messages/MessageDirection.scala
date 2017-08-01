@@ -64,8 +64,8 @@ object Location {
     final case class LocationImpl(loc: String) extends Location
 
     val Admin: Location = LocationImpl("Admin")
-
-    val Server: Location = LocationImpl("Server")
+    
+    val Master: Location = LocationImpl("Master")
 
     val Cell: Location = LocationImpl("Cell")
 
@@ -96,7 +96,7 @@ object Location {
     object Factory {
         def apply(s: String): Location = s.toLowerCase match {
             case loc if loc == Admin.toLowerCase => Admin
-            case loc if loc == Server.toLowerCase => Server
+            case loc if loc == Master.toLowerCase => Master
             case loc if loc == Cell.toLowerCase => Cell
             case loc if loc == User.toLowerCase => User
             case loc if loc == Notifier.toLowerCase => Notifier
@@ -110,8 +110,8 @@ object Location {
 }
 
 object TestMessageDirection extends App {
-
-    println(Location.Server >> Location.Cell)
+    
+    println(Location.Master >> Location.Cell)
     
     //val msgDir: MessageDirection = Location.Server << Location.Admin
     

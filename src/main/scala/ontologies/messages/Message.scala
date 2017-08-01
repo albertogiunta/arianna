@@ -17,9 +17,7 @@ trait Message[T] {
     def content: T
     
     override def toString =
-        "Message of type(" + subtype.toString + ") \n" +
-            direction.toString + "\n" +
-            "Message Content is \"" + content.toString + "\"\n"
+        "Message of type(" + subtype.toString + ")|" + direction.toString + "|Message Content is \"" + content.toString + "\"\n"
     
     override def equals(obj: Any) = obj match {
         case msg: Message[_] =>

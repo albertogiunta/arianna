@@ -1,10 +1,11 @@
 package master.cluster
 
 import akka.cluster.pubsub.DistributedPubSubMediator._
-import common.BasicPublisher
+import com.actors.BasicPublisher
 import ontologies.Topic
 import ontologies.messages.MessageType._
 import ontologies.messages._
+import system.names.NamingSystem
 
 /**
   * Created by Alessandro on 28/06/2017.
@@ -20,10 +21,10 @@ class MasterPublisher extends BasicPublisher {
         case msg@AriadneMessage(Topology, _, _, _) =>
             log.info("Forwarding... {}", msg)
             mediator ! Publish(Topic.Topologies, msg)
-        
+
         case (dest: String, cnt: AriadneMessage[_]) =>
             log.info("Forwarding Point to Point message {} to {}", cnt.toString, dest)
-            mediator ! Send(dest.replace("Publisher", "Subscriber"), cnt, localAffinity = false)
+            mediator ! Send(dest.replace(NamingSystem.Publisher, NamingSystem.Subscriber), cnt, localAffinity = false)
             
         case _ => desist _
     }

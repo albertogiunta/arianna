@@ -1,18 +1,17 @@
 package cell.core;
 
-import com.sun.tools.javac.util.Pair;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import akka.actor.ActorRef;
+import com.utils.Pair;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.ServerWebSocket;
 import ontologies.messages.RouteRequestShort;
 import ontologies.messages.RouteResponse;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class WSServer extends AbstractVerticle {
 

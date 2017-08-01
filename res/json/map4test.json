@@ -2,7 +2,7 @@
   "id": 1837463819,
   "cells": [
     {
-      "infoCell": {
+      "info": {
         "id": 666,
         "uri": "PancoPillo:8080",
         "name": "PancoPillo",
@@ -32,7 +32,9 @@
       "sensors": [
         {
           "category": 1,
-          "value": 10.0
+          "value": 10.0,
+          "min": 0.0,
+          "max": 0.0
         }
       ],
       "neighbors": [
@@ -82,7 +84,7 @@
       "capacity": 100,
       "squareMeters": 50.0,
       "currentPeople": 20,
-      "practicabilityLevel": 5.0
+      "practicability": 5.0
     }
   ]
 }

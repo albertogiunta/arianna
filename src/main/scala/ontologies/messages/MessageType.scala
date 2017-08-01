@@ -119,8 +119,8 @@ object MessageType {
               * Takes a *** object as MessageContent
               */
             object CellToMaster extends MessageSubtype {
-
-                override val subtypeName = "Cell2Master"
+    
+                override val subtypeName = "CellToMaster"
 
                 override val superType = Handshake
     
@@ -128,7 +128,17 @@ object MessageType {
     
                 override def marshal(obj: MessageContent): String = obj.asInstanceOf[SensorsUpdate].toJson.toString()
             }
-
+    
+            object Acknowledgement extends MessageSubtype {
+        
+                override val subtypeName = "Acknowledgement"
+        
+                override val superType = Handshake
+        
+                override def unmarshal(json: String): Empty = json.parseJson.convertTo[Empty]
+        
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[Empty].toJson.toString()
+            }
         }
 
     }
@@ -217,8 +227,8 @@ object MessageType {
               * Takes a AreaForCell object as MessageContent
               */
             object ViewedFromACell extends MessageSubtype {
-
-                override val subtypeName = "Topology4Cell"
+    
+                override val subtypeName = "ViewedFromACell"
 
                 override val superType = Topology
     
@@ -637,7 +647,7 @@ object TestMessageType extends App {
     val msg = AriadneMessage(
         Update,
         Update.Subtype.Sensors,
-        Location.Cell >> Location.Server,
+        Location.Cell >> Location.Master,
         jsonObj
     )
 

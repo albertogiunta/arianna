@@ -1,4 +1,4 @@
-package master.tests
+package master
 
 import java.io.File
 import java.nio.file.Paths
@@ -10,7 +10,7 @@ import master.core.Master
 /**
   * Created by Xander_C on 09/07/2017.
   */
-object TestMaster extends App {
+object RunMaster extends App {
 
     val path2Project = Paths.get("").toFile.getAbsolutePath
     val path2Config = path2Project + "/res/conf/akka/testMaster.conf"
@@ -21,20 +21,20 @@ object TestMaster extends App {
     implicit val system = ActorSystem("Arianna-Cluster", config)
     
     val master = system.actorOf(Props[Master], "Master")
-
+    
     //    val path2map = path2Project + "/res/json/map4test.json"
     //
     //    val topology = Source.fromFile(new File(path2map)).getLines.mkString
     //
     //    Thread.sleep(500)
-
+    
     //    system.actorSelection("similUser/Master/TopologySupervisor") ! AriadneMessage(
     //        Topology,
     //        Planimetrics,
     //        Location.Admin >> Location.Server,
     //        Planimetrics.unmarshal(topology)
     //    )
-
+    
     //    Thread.sleep(1000)
     //
     //    DistributedPubSub(system).mediator ! Publish(Topic.HandShakes,
