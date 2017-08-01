@@ -34,8 +34,8 @@ object MessageSubtype {
             case st if st == Init.Subtype.Greetings.toLowerCase =>
                 Init.Subtype.Greetings
 
-            case st if st == Error.Subtype.MapAlreadyLoaded.toLowerCase =>
-                Error.Subtype.MapAlreadyLoaded
+            case st if st == Error.Subtype.LookingForAMap.toLowerCase =>
+                Error.Subtype.LookingForAMap
             case st if st == Error.Subtype.MapIdentifierMismatch.toLowerCase =>
                 Error.Subtype.MapIdentifierMismatch
             case st if st == Error.Subtype.CellMappingMismatch.toLowerCase =>

@@ -21,8 +21,6 @@ class Master extends CustomActor {
         
         val topologySupervisor = context.actorOf(Props[TopologySupervisor], "TopologySupervisor")
     
-        val dataStreamer = context.actorOf(Props(new DataStreamer()), "DataStreamer")
-    
         val alarmSupervisor = context.actorOf(Props[AlarmSupervisor], "AlarmSupervisor")
 
     }
