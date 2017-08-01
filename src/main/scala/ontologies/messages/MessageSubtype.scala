@@ -34,6 +34,11 @@ object MessageSubtype {
             case st if st == Init.Subtype.Greetings.toLowerCase =>
                 Init.Subtype.Greetings
 
+            case st if st == Error.Subtype.MapAlreadyLoaded.toLowerCase =>
+                Error.Subtype.MapAlreadyLoaded
+            case st if st == Error.Subtype.MapIdentifierMismatch.toLowerCase =>
+                Error.Subtype.MapIdentifierMismatch
+            
             case st if st == Alarm.Subtype.Basic.toLowerCase =>
                 Alarm.Subtype.Basic
             case st if st == Alarm.Subtype.FromInterface.toLowerCase =>
