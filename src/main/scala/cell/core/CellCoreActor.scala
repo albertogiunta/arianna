@@ -5,6 +5,7 @@ import cell.cluster.{CellPublisher, CellSubscriber}
 import cell.processor.route.actors.RouteManager
 import cell.sensormanagement.SensorManager
 import com.actors.{BasicActor, ClusterMembersListener}
+import com.utils.Practicability
 import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology.Subtype.ViewedFromACell
@@ -93,7 +94,10 @@ class CellCoreActor extends BasicActor {
             actualSelfLoad = cnt.currentPeople
 
             topology.put(infoCell.uri, topology(infoCell.uri).copy(practicability =
-                weight(topology(infoCell.uri).capacity, cnt.currentPeople, topology(infoCell.uri).passages.length)))
+                Practicability(
+                    topology(infoCell.uri).capacity,
+                    cnt.currentPeople,
+                    topology(infoCell.uri).passages.length)))
             
             cellPublisher ! msg.copy(direction = cell2Server)
             cellPublisher ! AriadneMessage(
@@ -153,13 +157,6 @@ class CellCoreActor extends BasicActor {
                     RouteRequest(id, topology(infoCell.uri).info, InfoCell.empty, isEscape = true),
                     AreaViewedFromACell(Random.nextInt(), area)
                 )
-            )
-    }
-
-    private def weight(capacity: Int, load: Int, flows: Int): Double = {
-        val log_b: (Double, Double) => Double = (b, n) => Math.log(n) / Math.log(b)
-        1 / (load * 1.05 / capacity * (
-            if (flows == 1) 0.25 else if (flows > 4.0) log_b(3.0, 4.25) else log_b(3.0, flows))
             )
     }
 }

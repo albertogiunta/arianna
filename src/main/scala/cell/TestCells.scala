@@ -6,13 +6,9 @@ import java.nio.file.Paths
 import akka.actor.{ActorSystem, Props}
 import cell.core.CellCoreActor
 import com.typesafe.config.ConfigFactory
-import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Init
 import ontologies.messages.{AriadneMessage, Location, _}
-import spray.json.{JsValue, _}
-
-import scala.io.Source
 
 /**
   * Created by Alessandro on 28/06/2017.
@@ -57,13 +53,12 @@ object TestCells extends App {
     var server2Cell = Location.Master >> Location.Cell
 
 
-    def readJson(filename: String): JsValue =
-        Source.fromFile(filename).getLines.mkString.parseJson
+    //def readJson(filename: String): JsValue =
+    //   Source.fromFile(filename).getLines.mkString.parseJson
 
-    def loadArea: Area = readJson(s"res/json/map.json").convertTo[Area]
+    //def loadArea: Area = readJson(s"res/json/map.json").convertTo[Area]
 
-    def areaForCell: AreaViewedFromACell = AreaViewedFromACell(loadArea)
-    
+    //def areaForCell: AreaViewedFromACell = AreaViewedFromACell(loadArea)
 
     Thread.sleep(500)
     private val greetings: String = "Hello there, it's time to dress-up"
