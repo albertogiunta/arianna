@@ -24,7 +24,8 @@ class MasterPublisher extends BasicPublisher {
 
         case (dest: String, cnt: AriadneMessage[_]) =>
             log.info("Forwarding Point to Point message {} to {}", cnt.toString, dest)
-            mediator ! Send(dest.replace(NamingSystem.Publisher, NamingSystem.Subscriber), cnt, localAffinity = false)
+            mediator ! Send("/" + dest.replace(NamingSystem.Publisher, NamingSystem.Subscriber),
+                cnt, localAffinity = false)
             
         case _ => desist _
     }

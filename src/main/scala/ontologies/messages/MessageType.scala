@@ -47,11 +47,11 @@ object MessageType {
         override val typeName = "Error"
         
         object Subtype {
-            
-            object MapAlreadyLoaded extends MessageSubtype {
+    
+            object LookingForAMap extends MessageSubtype {
     
                 override val superType = Error
-                override val subtypeName = "MapAlreadyLoaded"
+                override val subtypeName = "LookingForAMap"
                 
                 override def unmarshal(json: String): Empty =
                     json.parseJson.convertTo[Empty]

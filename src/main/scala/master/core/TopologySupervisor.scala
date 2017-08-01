@@ -1,6 +1,6 @@
 package master.core
 
-import akka.actor.ActorSelection
+import akka.actor.{ActorSelection, Props}
 import com.actors.BasicActor
 import com.utils.{Counter, Practicability}
 import ontologies.messages.Location._
@@ -12,6 +12,8 @@ import ontologies.messages._
 import system.names.NamingSystem
 
 import scala.collection.mutable
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 
 /**
@@ -31,11 +33,25 @@ class TopologySupervisor extends BasicActor {
     private val admin2Server: MessageDirection = Location.Admin >> Location.Master
     private val server2Admin: MessageDirection = admin2Server.reverse
     
-    private val dataStreamer: () => ActorSelection = () => sibling(NamingSystem.DataStreamer).get
+    private val dataStreamer = context.actorOf(Props(new DataStreamer()), "DataStreamer")
     private val publisher: () => ActorSelection = () => sibling(NamingSystem.Publisher).get
     private val subscriber: () => ActorSelection = () => sibling(NamingSystem.Subscriber).get
     
     private val synced: Counter = Counter()
+    
+    override def init(args: List[Any]) = {
+        super.init(args)
+        
+        Future {
+            Thread.sleep(300L)
+        }.onComplete(_ => {
+            dataStreamer ! AriadneMessage(
+                Error, Error.Subtype.LookingForAMap,
+                server2Admin, Empty()
+            )
+        })
+        
+    }
     
     override protected def receptive = {
     
@@ -67,8 +83,8 @@ class TopologySupervisor extends BasicActor {
         
             if (map.id != mapVersionID) {
                 log.error("A topology has already been loaded in the server...")
-            
-                dataStreamer() ! AriadneMessage(
+    
+                dataStreamer ! AriadneMessage(
                     Error,
                     Error.Subtype.MapIdentifierMismatch,
                     server2Admin,
@@ -82,7 +98,7 @@ class TopologySupervisor extends BasicActor {
                 log.info("Found a match into the loaded Topology for {}", cell.uri)
                 topology.put(cell.uri, topology(cell.uri).copy(info = cell))
     
-                dataStreamer() ! msg
+                dataStreamer ! msg
                 
                 if ((synced ++) == topology.size) {
                     
@@ -103,7 +119,7 @@ class TopologySupervisor extends BasicActor {
             } else {
                 log.error("Received Handshake as no matching in the current loaded Topology for {}", cell.uri)
                 publisher() ! (
-                    sender().path.toString,
+                    sender.path.elements.mkString("/"),
                     AriadneMessage(
                         Error, Error.Subtype.CellMappingMismatch,
                         server2Cell,
@@ -121,8 +137,8 @@ class TopologySupervisor extends BasicActor {
         
             if (map.id != mapVersionID) {
                 log.error("A topology has already been loaded in the server...")
-            
-                dataStreamer() ! AriadneMessage(
+    
+                dataStreamer ! AriadneMessage(
                     Error,
                     Error.Subtype.MapIdentifierMismatch,
                     server2Admin,
@@ -143,7 +159,7 @@ class TopologySupervisor extends BasicActor {
                 )
                 
                 // Send the updated Map to the Admin
-                dataStreamer() ! topology.values
+                dataStreamer ! topology.values
             }
 
         case AriadneMessage(Update, Sensors, `cell2Server`, pkg: SensorsInfoUpdate) =>
@@ -154,7 +170,7 @@ class TopologySupervisor extends BasicActor {
                 topology.put(pkg.info.uri, news)
                 
                 // Send the updated Map to the Admin
-                dataStreamer() ! topology.values
+                dataStreamer ! topology.values
             }
 
         case AriadneMessage(Handshake, CellToMaster, `cell2Server`, _) =>
@@ -162,7 +178,7 @@ class TopologySupervisor extends BasicActor {
             log.info(sender.path.name)
 
             publisher() ! (
-                sender.path.toString,
+                sender.path.elements.mkString("/"),
                 AriadneMessage(
                     Topology, ViewedFromACell, server2Cell,
                     AreaViewedFromACell(
