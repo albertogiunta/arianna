@@ -2,6 +2,7 @@ package cell.sensormanagement
 
 import cell.sensormanagement.sensors._
 import com.actors.BasicActor
+import ontologies.messages
 import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.{Alarm, Update}
@@ -42,15 +43,15 @@ class SensorManager extends BasicActor {
     private def initializeSensors(): Unit = {
         observableSensors foreach (X => {
             var flow = X.createObservable(observationRefresh)
-            flow.subscribe((Y: Double) => self ! ontologies.messages.SensorInfo(X.category.id, Y))
+            flow.subscribe((Y: Double) => self ! SensorInfo(X.category.id, Y))
             X match {
                 case x: SensorWithThreshold[Double] => {
                     flow.filter((K: Double) => x.threshold hasBeenExceeded K)
                         .subscribe((K: Double) => self ! AriadneMessage(
                             Alarm,
-                            Alarm.Subtype.Basic,
+                            Alarm.Subtype.FromCell,
                             internalMessage,
-                            ontologies.messages.SensorInfo(X.category.id, K)))
+                            messages.SensorInfo(X.category.id, K)))
                 }
             }
         })
@@ -58,11 +59,11 @@ class SensorManager extends BasicActor {
 
 
     override protected def receptive: Receive = {
-        case msg: ontologies.messages.SensorInfo =>
+        case msg: SensorInfo =>
             this.sensors.put(msg.categoryId, msg)
             this.parent ! AriadneMessage(Update,
                 Update.Subtype.Sensors,
-                internalMessage, new SensorsInfoUpdate(InfoCell.empty, this.sensors.values.toList))
+                internalMessage, new SensorsInfoUpdate(CellInfo.empty, this.sensors.values.toList))
         case msg@AriadneMessage(Alarm, _, _, cnt: SensorInfo) =>
             this.parent ! msg
     }

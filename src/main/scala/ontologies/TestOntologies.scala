@@ -8,7 +8,7 @@ import ontologies.messages.{AriadneMessage, Empty, Message, MessageType}
 object TestOntologies extends App {
     val msg = AriadneMessage(
         MessageType.Alarm,
-        MessageType.Alarm.Subtype.Basic,
+        MessageType.Alarm.Subtype.FromCell,
         messages.Location.Self >> messages.Location.Self,
         Empty())
     

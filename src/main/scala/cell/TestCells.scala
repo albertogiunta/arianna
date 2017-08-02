@@ -8,7 +8,7 @@ import cell.core.CellCoreActor
 import com.typesafe.config.ConfigFactory
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Init
-import ontologies.messages.{AriadneMessage, Location, _}
+import ontologies.messages.{AriadneMessage, Greetings, Location, _}
 
 /**
   * Created by Alessandro on 28/06/2017.

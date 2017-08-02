@@ -1,4 +1,4 @@
-package cell.processor.route.actors
+package processor.route.actors
 
 import akka.actor.{ActorRef, Props}
 import com.actors.BasicActor
@@ -22,7 +22,7 @@ class RouteManager extends BasicActor {
     private var processor: ActorRef = _
     
     
-    override def preStart() = {
+    override def preStart = {
         super.preStart()
         cacher = context.actorOf(Props(new CacheManager(cacheKeepAlive = 2500L)), NamingSystem.CacheManager)
         processor = context.actorOf(Props(new RouteProcessor(parent)), NamingSystem.RouteProcessor)

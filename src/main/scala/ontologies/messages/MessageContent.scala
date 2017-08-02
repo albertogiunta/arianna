@@ -1,5 +1,6 @@
 package ontologies.messages
 
+
 /**
   * A trait that represent a Content for Ariadne Messages
   *
@@ -23,78 +24,95 @@ final case class Passage(neighborId: Int,
   **/
 final case class CellConfig(uri: String, sensors: List[SensorInfoFromConfig]) extends MessageContent
 
-/**
-  * This Class is a Static representation of a Cell
-  *
-  * @param id              The Identifier of the Room where the Cell is Located
-  * @param uri             The URI that point to this Cell
-  * @param name            The name of this Cell
-  * @param roomVertices    The spatial Vertices of the Room where the Cell is Located
-  * @param antennaPosition The Position of the WiFi antenna inside the Room where the Cell is Located
-  */
-final case class InfoCell(id: Int, uri: String, port: Int, name: String, roomVertices: Coordinates, antennaPosition: Point) extends MessageContent
 
-object InfoCell {
-    def empty: InfoCell =
-        InfoCell(Int.MinValue, "", 0, "", Coordinates(Point(0, 0), Point(0, 0), Point(0, 0), Point(0, 0)), Point(0, 0))
-}
+final case class Area(id: Int, rooms: List[Room]) extends MessageContent
 
 /**
-  * This class is a Static representation of a Room
+  * This class is a Dynamic representation on a Room
   *
-  * @param id              The Identifier of the Room where the Cell is Located
-  * @param name            The name of the Room
-  * @param capacity        Tha Max number of person the Room can hold at one time
-  * @param squareMeters    The area covered by the Room
-  * @param roomVertices    The spatial Vertices of the Room
-  * @param isEntryPoint    If this Cell is an Exit
-  * @param isExitPoint     If this Cell is an Entrance
-  * @param antennaPosition The Position of the WiFi antenna inside the Room
+  * @param info           The static representation of the room
+  * @param cell           The Cell associated to this room
+  * @param neighbors      The other rooms near this room
+  * @param passages       The connections between this room the its neighbor
+  * @param currentPeople  The current number of people in this room
+  * @param practicability How much likely you should walk through this Room
   */
-final case class RoomInfo(id: Int,
-                          name: String,
-                          capacity: Int,
-                          squareMeters: Double,
-                          roomVertices: Coordinates,
-                          isEntryPoint: Boolean,
-                          isExitPoint: Boolean,
-                          antennaPosition: Point) extends MessageContent
-
 final case class Room(info: RoomInfo,
-                      cell: InfoCell,
-                      sensors: List[SensorInfo],
+                      cell: Cell,
                       neighbors: List[RoomInfo],
                       passages: List[Passage],
                       currentPeople: Int,
                       practicability: Double) extends MessageContent
 
-final case class Area(id: Int,
-                      cells: List[Cell]) extends MessageContent
+/**
+  * This class is a Static representation of a Room
+  *
+  * @param id              The Identifier of the Room where the Cell is Located
+  * @param roomVertices    The spatial Vertices of the Room
+  * @param antennaPosition The Position of the WiFi antenna inside the Room
+  * @param isEntryPoint    If this Cell is an Exit
+  * @param isExitPoint     If this Cell is an Entrance
+  * @param capacity        Tha Max number of person the Room can hold at one time
+  * @param squareMeters    The area covered by the Room
+  */
+final case class RoomInfo(id: RoomID,
+                          roomVertices: Coordinates,
+                          antennaPosition: Point,
+                          isEntryPoint: Boolean,
+                          isExitPoint: Boolean,
+                          capacity: Int,
+                          squareMeters: Double) extends MessageContent
+
+/**
+  * This class rapresent a unique Identifier for a Room
+  *
+  * @param serial The Identifier of the Room where the Cell is Located
+  * @param name   The name of the Room
+  */
+final case class RoomID(serial: Int, name: String)
+
+object RoomID {
+    def empty: RoomID = RoomID(Int.MinValue, "")
+}
 
 /**
   * This is a Complete representation of a Cell, whit both Dynamic and Static properties
   *
-  * @param info           Static Info of a Cell
-  * @param sensors        The sensors that are placed in the Room and attached to the Cell
-  * @param neighbors      Cells near this cell
-  * @param passages       Openings that lead to neighbor Cells
-  * @param isEntryPoint   If this Cell is an Exit
-  * @param isExitPoint    If this Cell is an Entrance
-  * @param capacity       Tha Max number of person the Room where the Cell is located can hold at one time
-  * @param squareMeters   The area covered by the Room
-  * @param currentPeople  The current number of people occupying this Room
-  * @param practicability How much likely you should walk through this Room
+  * @param info    Static Info of a Cell
+  * @param sensors The sensors that are placed in the Room and attached to the Cell
   */
-final case class Cell(info: InfoCell,
-                      sensors: List[SensorInfo],
-                      neighbors: List[InfoCell],
-                      passages: List[Passage],
-                      isEntryPoint: Boolean,
-                      isExitPoint: Boolean,
-                      capacity: Int,
-                      squareMeters: Double,
-                      currentPeople: Int,
-                      practicability: Double) extends MessageContent
+final case class Cell(info: CellInfo, sensors: List[SensorInfo]) extends MessageContent
+
+/**
+  * This Class is a Static representation of a Cell
+  *
+  * @param uri  The URI that point to this Cell
+  * @param port The port on which the cell is listening for user connections
+  */
+final case class CellInfo(uri: String, port: Int) extends MessageContent
+
+object CellInfo {
+    def empty: CellInfo = CellInfo("", Int.MinValue)
+}
+
+/**
+  * This class wrap toeghter identification info for both a Room and a Cell
+  *
+  * @param room The room associated to the Cell
+  * @param cell The cell associated to the room
+  */
+final case class RCInfo(room: RoomID, cell: CellInfo) extends MessageContent
+
+object RCInfo {
+    
+    def empty: RCInfo = RCInfo(RoomID.empty, CellInfo.empty)
+    
+    def apply(room: Room): RCInfo = new RCInfo(room.info.id, room.cell.info)
+    
+    def apply(room: RoomViewedFromACell): RCInfo = new RCInfo(room.info.id, room.cell)
+    
+    def apply(room: RoomViewedFromAUser): RCInfo = new RCInfo(room.info.id, room.cell)
+}
 
 /**
   * This case class represent a user request of a Route from Cell X to Cell Y
@@ -103,7 +121,7 @@ final case class Cell(info: InfoCell,
   * @param fromCell The Cell where the user is located
   * @param toCell   The Cell where the user have to arrive, will an empty String for Escape Routes
   */
-final case class RouteRequest(userID: String, fromCell: InfoCell, toCell: InfoCell, isEscape: Boolean) extends MessageContent
+final case class RouteRequest(userID: String, fromCell: RoomID, toCell: RoomID, isEscape: Boolean) extends MessageContent
 
 /**
   * This case class represent info sent to the RouteManager Actor from the CellCore Actor.
@@ -123,7 +141,7 @@ final case class RouteInfo(request: RouteRequest, topology: AreaViewedFromACell)
   * @param request The wrapped RouteRequest
   * @param route   The calculated optimal route from Cell X to Cell Y
   */
-final case class RouteResponse(request: RouteRequest, route: List[InfoCell]) extends MessageContent
+final case class RouteResponse(request: RouteRequest, route: List[RoomID]) extends MessageContent
 
 /**
   * This case class represent a response to a route request that only contains the route (no additional metadata).
@@ -133,7 +151,7 @@ final case class RouteResponse(request: RouteRequest, route: List[InfoCell]) ext
   * @param route The calculated optimal route from Cell X to Cell Y
   */
 
-final case class RouteResponseShort(route: List[InfoCell]) extends MessageContent
+final case class RouteResponseShort(route: List[RoomID]) extends MessageContent
 
 
 final case class RouteRequestShort(userID: String, fromCellId: Int, toCellId: Int, isEscape: Boolean) extends MessageContent
@@ -142,36 +160,31 @@ final case class RouteRequestShort(userID: String, fromCellId: Int, toCellId: In
   * View of the Topology from the Cell perspective
   *
   * @param id    Random ID value identifying the Topology
-  * @param cells List of the Cells of the Topology
+  * @param rooms List of the Cells of the Topology
   */
-final case class AreaViewedFromACell(id: Int, cells: List[CellViewedFromACell]) extends MessageContent
+final case class AreaViewedFromACell(id: Int, rooms: List[RoomViewedFromACell]) extends MessageContent
 
 object AreaViewedFromACell {
-    def apply(area: Area): AreaViewedFromACell = new AreaViewedFromACell(area.id, area.cells.map(c => CellViewedFromACell(c)))
+    def apply(area: Area): AreaViewedFromACell = new AreaViewedFromACell(area.id, area.rooms.map(c => RoomViewedFromACell(c)))
 }
 
 /**
   * View of another Cell from the perspective of a Cell
   *
-  * @param info           Static Info of a Cell
+  * @param cell           Static Info of a Cell
   * @param neighbors      Cells near this cell
   * @param passages       Openings that lead to neighbor Cells
-  * @param isEntryPoint   If this Cell is an Exit
-  * @param isExitPoint    If this Cell is an Entrance
   * @param practicability How much likely you should walk through this Room
   */
-final case class CellViewedFromACell(info: InfoCell,
-                                     neighbors: List[InfoCell],
+final case class RoomViewedFromACell(info: RoomInfo,
+                                     cell: CellInfo,
+                                     neighbors: List[RoomInfo],
                                      passages: List[Passage],
-                                     isEntryPoint: Boolean,
-                                     isExitPoint: Boolean,
-                                     capacity: Int,
                                      practicability: Double) extends MessageContent
 
-object CellViewedFromACell {
-    def apply(cell: Cell): CellViewedFromACell =
-        new CellViewedFromACell(cell.info, cell.neighbors, cell.passages, cell.isEntryPoint,
-            cell.isExitPoint, cell.capacity, cell.practicability)
+object RoomViewedFromACell {
+    def apply(room: Room): RoomViewedFromACell =
+        new RoomViewedFromACell(room.info, room.cell.info, room.neighbors, room.passages, room.practicability)
 }
 
 /**
@@ -182,14 +195,15 @@ object CellViewedFromACell {
   * @param neighbors Cells near this cell
   * @param passages  Openings that lead to neighbor Cells
   */
-final case class CellForUser(actorPath: String,
-                             info: InfoCell,
-                             neighbors: List[InfoCell],
-                             passages: List[Passage]) extends MessageContent // To be renamed CellViewedFromAUser
+final case class RoomViewedFromAUser(actorPath: String,
+                                     info: RoomInfo,
+                                     cell: CellInfo,
+                                     neighbors: List[RoomInfo],
+                                     passages: List[Passage]) extends MessageContent // To be renamed CellViewedFromAUser
 
-object CellForUser {
-    def apply(cell: Cell, actorPath: String): CellForUser =
-        new CellForUser(actorPath, cell.info, cell.neighbors, cell.passages)
+object RoomViewedFromAUser {
+    def apply(room: Room, actorPath: String): RoomViewedFromAUser =
+        new RoomViewedFromAUser(actorPath, room.info, room.cell.info, room.neighbors, room.passages)
 }
 
 /**
@@ -198,13 +212,13 @@ object CellForUser {
   *
   * Could've also been used the LightCell View but to the master practicability isn't necessary.
   *
-  * @param info          The identification info of the cell sending the data.
+  * @param cell          The identification info of the cell sending the data.
   * @param currentPeople The actual number of people inside the Room where the cell is located into.
   */
-final case class CurrentPeopleUpdate(info: InfoCell, currentPeople: Int) extends MessageContent
+final case class CurrentPeopleUpdate(cell: CellInfo, currentPeople: Int) extends MessageContent
 
 object CurrentPeopleUpdate {
-    def apply(cell: Cell): CurrentPeopleUpdate = new CurrentPeopleUpdate(cell.info, cell.currentPeople)
+    def apply(room: Room): CurrentPeopleUpdate = new CurrentPeopleUpdate(room.cell.info, room.currentPeople)
 }
 
 /**
@@ -264,13 +278,13 @@ object Sensor {
   * This case Class is meant to be used as an Update of all the Sensors data
   * from a single Cell to the Master.
   *
-  * @param info    The identification info of the Cells that is sending the Updates
+  * @param cell    The identification info of the Cells that is sending the Updates
   * @param sensors A list of sensors data
   */
-final case class SensorsInfoUpdate(info: InfoCell, sensors: List[SensorInfo]) extends MessageContent
+final case class SensorsInfoUpdate(cell: CellInfo, sensors: List[SensorInfo]) extends MessageContent
 
 object SensorsInfoUpdate {
-    def apply(cell: Cell): SensorsInfoUpdate = new SensorsInfoUpdate(cell.info, cell.sensors)
+    def apply(room: Room): SensorsInfoUpdate = new SensorsInfoUpdate(room.cell.info, room.cell.sensors)
 }
 
 /**
@@ -279,14 +293,40 @@ object SensorsInfoUpdate {
   * This class give a simplified view of a Cell for other cells, contaning the new number of people
   * and the calculated practicability level for the cell to be updated
   *
-  * @param info           The Identification Info of the Cell to be updated
+  * @param cell           The Identification Info of the Cell to be updated
   * @param practicability The actual practicability level of the Room the Cell is located into
   */
-case class PracticabilityUpdate(info: InfoCell, practicability: Double) extends MessageContent
+case class PracticabilityUpdate(cell: CellInfo, practicability: Double) extends MessageContent
 
 object PracticabilityUpdate {
-    def apply(cell: Cell): PracticabilityUpdate = new PracticabilityUpdate(cell.info, cell.practicability)
+    def apply(room: Room): PracticabilityUpdate =
+        new PracticabilityUpdate(room.cell.info, room.practicability)
 }
+
+/**
+  * This case Class is meant to be used only under the hood of a List into UpdateForAdmin.
+  *
+  * This Class grant a simplified view of a Cell, only containing dynamic and identification Info of it
+  *
+  * @param cell          Identification Info of the cell and the room
+  * @param currentPeople Actual number of people inside the Room
+  *
+  */
+final case class RoomDataUpdate(cell: Cell,
+                                currentPeople: Int) extends MessageContent // To be renamed CellData
+
+object RoomDataUpdate {
+    def apply(room: Room): RoomDataUpdate =
+        new RoomDataUpdate(room.cell, room.currentPeople)
+}
+
+/**
+  * This Case Class is meant to be used as a Content for Messages sent to the Admin Application,
+  * in order to updates its information
+  *
+  * @param list A List of CellUpdates, containing a simplified view of a Cell
+  */
+final case class AdminUpdate(list: List[RoomDataUpdate]) extends MessageContent // to be renamed AdminUpdate
 
 /**
   * This case class is meant to be used as Content to update Cells
@@ -300,33 +340,8 @@ object PracticabilityUpdate {
 case class AreaPracticability(id: Int, cells: List[PracticabilityUpdate]) extends MessageContent // Actually not Used
 
 object AreaPracticability {
-    def apply(area: Area): AreaPracticability = new AreaPracticability(area.id, area.cells.map(c => PracticabilityUpdate(c)))
+    def apply(area: Area): AreaPracticability = new AreaPracticability(area.id, area.rooms.map(c => PracticabilityUpdate(c)))
 }
-
-/**
-  * This case Class is meant to be used only under the hood of a List into UpdateForAdmin.
-  *
-  * This Class grant a simplified view of a Cell, only containing dynamic and identification Info of it
-  *
-  * @param info          Identification Info of the cell
-  * @param currentPeople Actual number of people inside the Room
-  * @param sensors       A List of Sensors containing the new values sensed by them
-  */
-final case class CellDataUpdate(info: InfoCell,
-                                currentPeople: Int,
-                                sensors: List[SensorInfo]) extends MessageContent // To be renamed CellData
-
-object CellDataUpdate {
-    def apply(cell: Cell): CellDataUpdate = new CellDataUpdate(cell.info, cell.currentPeople, cell.sensors)
-}
-
-/**
-  * This Case Class is meant to be used as a Content for Messages sent to the Admin Application,
-  * in order to updates its information
-  *
-  * @param list A List of CellUpdates, containing a simplified view of a Cell
-  */
-final case class UpdateForAdmin(list: List[CellDataUpdate]) extends MessageContent // to be renamed AdminUpdate
 
 /**
   * This case class is meant to be used as a Content for Initialization Messages,
@@ -342,14 +357,13 @@ final case class Greetings(args: List[String]) extends MessageContent
 /**
   * This case class in meant to be sent as Content for Alarm sent by Cells to other Cells and the Master
   *
-  * @param info         The Info of the Cell tha gave origin to the Alarm
-  * @param isExitPoint  Is the Cell located in a Room with Exits?
-  * @param isEntryPoint Is the Cell Located in a Room with Entries?
+  * @param info The info of the cell associated to the room that had the alarm triggered
+  * @param room The room where the Alarm has originated
   */
-final case class AlarmContent(info: InfoCell, isExitPoint: Boolean, isEntryPoint: Boolean) extends MessageContent
+final case class AlarmContent(info: CellInfo, room: RoomInfo) extends MessageContent
 
 object AlarmContent {
-    def apply(cell: Cell): AlarmContent = new AlarmContent(cell.info, cell.isExitPoint, cell.isEntryPoint)
+    def apply(room: Room): AlarmContent = new AlarmContent(room.cell.info, room.info)
 }
 
 /**
@@ -357,18 +371,6 @@ object AlarmContent {
   *
   */
 final case class Empty() extends MessageContent
-
-final case class UserAndAntennaPositionUpdate(userPosition: Point, antennaPosition: Point) extends MessageContent
-
-final case class AntennaPositions(userPosition: Point, antennaPositions: List[InfoCell]) extends MessageContent
-
-final case class CellForSwitcher(info: InfoCell,
-                                 neighbors: List[InfoCell]) extends MessageContent
-
-object CellForSwitcher {
-    def apply(cell: CellForUser): CellForSwitcher =
-        new CellForSwitcher(cell.info, cell.neighbors)
-}
 
 /**
   * This Case Class is meant to be used as a Content for Messages inside the Admin System in order to update the view
@@ -385,8 +387,8 @@ final case class CellForView(id: Int, name: String, currentPeople: Int, sensors:
   * This Case Class is meant to be used as a Content for Messages inside the Admin Systemi in order to initialize
   * the charts with information about a single cell
   *
-  * @param info      : InfoCell object containing all information about the cell
+  * @param cell      : RCInfo object containing all information about the cell
   * @param sensorsId : list of Int representing the sensor ID inside the room
   *
   **/
-final case class CellForChart(info: InfoCell, sensorsId: List[Int]) extends MessageContent
+final case class CellForChart(cell: CellInfo, sensorsId: List[Int]) extends MessageContent

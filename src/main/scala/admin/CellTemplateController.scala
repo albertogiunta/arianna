@@ -12,7 +12,7 @@ import javafx.scene.text.Text
 import akka.actor.ActorRef
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Interface
-import ontologies.messages.{Cell, _}
+import ontologies.messages._
 
 import scala.collection.mutable
 import scalafx.application.Platform
@@ -23,7 +23,7 @@ import scalafx.application.Platform
 class CellTemplateController extends Initializable {
 
     var adminActor: ActorRef = _
-    private var cellInfo: InfoCell = _
+    private var cellInfo: CellInfo = _
     private val sensorsController: mutable.Map[Int, SensorTemplateController] = new mutable.HashMap[Int, SensorTemplateController]
     @FXML
     private var roomName: Text = _
@@ -52,7 +52,7 @@ class CellTemplateController extends Initializable {
       * @param cell : Cell object containing data
       *
       **/
-    def setStaticInformation(cell: Cell): Unit = {
+    def setStaticInformation(cell: Room): Unit = {
         cellInfo = cell.info
         roomName setText cell.info.name
         maxCapacityValue setText cell.capacity.toString

@@ -31,7 +31,7 @@ object TestAdminInterface extends App {
         for (i <- 1 until 5) {
             sensors += SensorInfo(i, (Math.random() * 10).round.toDouble)
         }
-        var sensorList: SensorsInfoUpdate = SensorsInfoUpdate(InfoCell(i, "uri0", 0, "a", new Coordinates(Point(1, 1), Point(1, 1), Point(1, 1), Point(1, 1)), Point(1, 1)),
+        var sensorList: SensorsInfoUpdate = SensorsInfoUpdate(CellInfo(i, "uri0", 0, "a", new Coordinates(Point(1, 1), Point(1, 1), Point(1, 1), Point(1, 1)), Point(1, 1)),
             sensors.toList)
         adminManager ! AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, Location.Master >> Location.Admin, sensorList)
         i = i + 1
@@ -42,17 +42,17 @@ object TestAdminInterface extends App {
     while (true) {
         println("Invio aggiornamento... ")
         Thread.sleep(1000)
-        var update: ListBuffer[CellDataUpdate] = new ListBuffer[CellDataUpdate]
+        var update: ListBuffer[RoomDataUpdate] = new ListBuffer[RoomDataUpdate]
         var sensors: ListBuffer[SensorInfo] = new ListBuffer[SensorInfo]
         for (i <- 1 until 5) {
             sensors += SensorInfo(i, (Math.random() * 10).round.toDouble)
         }
 
         for (i <- 1 until 6) {
-            update += new CellDataUpdate(new InfoCell(i, "uri0", 0, "a", new Coordinates(Point(1, 1), Point(1, 1), Point(1, 1), Point(1, 1)), Point(1, 1)), (Math.random() * 50).round.toInt, sensors.toList)
+            update += new RoomDataUpdate(new CellInfo(i, "uri0", 0, "a", new Coordinates(Point(1, 1), Point(1, 1), Point(1, 1), Point(1, 1)), Point(1, 1)), (Math.random() * 50).round.toInt, sensors.toList)
         }
-        adminManager ! AriadneMessage(MessageType.Update, MessageType.Update.Subtype.UpdateForAdmin, Location.Master >> Location.Admin,
-            new UpdateForAdmin(update.toList))
+        adminManager ! AriadneMessage(MessageType.Update, MessageType.Update.Subtype.Admin, Location.Master >> Location.Admin,
+            new AdminUpdate(update.toList))
     }
 }
 

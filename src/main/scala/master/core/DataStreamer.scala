@@ -3,12 +3,11 @@ package master.core
 import akka.actor.ActorSelection
 import akka.stream._
 import akka.stream.scaladsl.{Flow, Sink, Source, SourceQueueWithComplete}
-import com.actors.BasicActor
+import com.actors.CustomActor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Update
 import ontologies.messages.MessageType.Update.Subtype
 import ontologies.messages._
-import system.names.NamingSystem
 
 import scala.concurrent.duration._
 
@@ -17,23 +16,23 @@ import scala.concurrent.duration._
   *
   * Created by Alessandro on 06/07/2017.
   */
-class DataStreamer(private val handler: (AriadneMessage[_], ActorSelection) => Unit = (msg, target) => target ! msg)
-    extends BasicActor {
+class DataStreamer(private val target: ActorSelection,
+                   private val handler: (AriadneMessage[_], ActorSelection) => Unit = (msg, dest) => dest ! msg)
+    extends CustomActor {
     
     implicit private val system = context.system
     implicit private val executionContext = system.dispatcher
     implicit private val materializer: ActorMaterializer = ActorMaterializer.create(system)
     
-    private var streamer: SourceQueueWithComplete[Iterable[Cell]] = _
-    private val admin: () => ActorSelection = () => sibling(NamingSystem.AdminManager).get
+    private var streamer: SourceQueueWithComplete[Iterable[Room]] = _
     
-    private val source = Source.queue[Iterable[Cell]](100, OverflowStrategy.dropHead)
+    private val source = Source.queue[Iterable[Room]](100, OverflowStrategy.dropHead)
     
-    private val stream = Flow[Iterable[Cell]]
-        .map(map => UpdateForAdmin(map.map(c => CellDataUpdate(c)).toList))
-        .map(updates => AriadneMessage(Update, Subtype.UpdateForAdmin, Location.Master >> Location.Admin, updates))
+    private val stream = Flow[Iterable[Room]]
+        .map(map => AdminUpdate(map.map(c => RoomDataUpdate(c)).toList))
+        .map(updates => AriadneMessage(Update, Subtype.Admin, Location.Master >> Location.Admin, updates))
         .throttle(1, 1000 milliseconds, 1, ThrottleMode.Shaping)
-        .to(Sink.foreach(msg => handler(msg, admin())))
+        .to(Sink.foreach(msg => handler(msg, target)))
     
     override def preStart = {
         streamer = stream.async.runWith(source)
@@ -45,12 +44,13 @@ class DataStreamer(private val handler: (AriadneMessage[_], ActorSelection) => U
         super.postStop
     }
     
-    override protected def receptive: Receive = {
-    
-        case msg: Iterable[Cell] =>
+    override def receive: Receive = {
+        
+        case msg: Iterable[Room] =>
             streamer offer msg
-
-        case msg: AriadneMessage[_] => admin() ! msg
+        
+        case msg: AriadneMessage[_] =>
+            target ! msg
 
         case msg => log.info(msg.toString)
     }

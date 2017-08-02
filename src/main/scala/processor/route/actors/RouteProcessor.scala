@@ -1,13 +1,13 @@
-package cell.processor.route.actors
+package processor.route.actors
 
 import akka.actor.{ActorRef, ActorSelection}
-import cell.processor.route.algorithms.AStarSearch
-import cell.processor.route.algorithms.AStarSearch.Graph
 import com.actors.CustomActor
 import com.utils.Practicability
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Route
 import ontologies.messages._
+import processor.route.algorithms.AStarSearch
+import processor.route.algorithms.AStarSearch.Graph
 import system.names.NamingSystem
 
 import scala.collection.immutable.HashMap
@@ -24,11 +24,11 @@ class RouteProcessor(val core: ActorRef) extends CustomActor {
     val cacheManager: () => ActorSelection = () => sibling(NamingSystem.CacheManager).get
     
     override def receive: Receive = {
-        case RouteInfo(req, AreaViewedFromACell(_, cells)) =>
+        case RouteInfo(req, AreaViewedFromACell(_, rooms)) =>
             req match {
-                case RouteRequest(_, actualCell, _, true) =>
-                    val futures = cells.filter(c => c.isExitPoint)
-                        .map(exit => RouteProcessor.computeRoute(actualCell.name, exit.info.name, cells))
+                case RouteRequest(_, actualRoom, _, true) =>
+                    val futures = rooms.filter(r => r.info.isExitPoint)
+                        .map(exit => RouteProcessor.computeRoute(actualRoom.name, exit.info.id.name, rooms))
                     
                     Future {
                         futures.map(f => Await.result(f, Duration.Inf)).minBy(res => res._2)
@@ -38,7 +38,7 @@ class RouteProcessor(val core: ActorRef) extends CustomActor {
                     })
 
                 case RouteRequest(_, fromCell, toCell, false) =>
-                    RouteProcessor.computeRoute(fromCell.name, toCell.name, cells)
+                    RouteProcessor.computeRoute(fromCell.name, toCell.name, rooms)
                         .onComplete(p => if (p.isSuccess) {
     
                             log.info("Found route {} with a cost of {}", p.get._1.mkString(" -> "), p.get._2)
@@ -54,7 +54,7 @@ class RouteProcessor(val core: ActorRef) extends CustomActor {
         case _ => // Ignore
     }
     
-    private val ResponseMessage = (req: RouteRequest, route: List[InfoCell]) =>
+    private val ResponseMessage = (req: RouteRequest, route: List[RoomID]) =>
         AriadneMessage(
             Route,
             Route.Subtype.Response,
@@ -72,18 +72,18 @@ object RouteProcessor {
       *
       * @param fromCell The source cell on which compute the SHP
       * @param toCell   The terget cell on which compute the SHP
-      * @param cells    The List of cell composing the graph
+      * @param rooms    The List of cell composing the graph
       * @return A Future that will Asynchronously compute the Route
       */
-    def computeRoute(fromCell: String, toCell: String, cells: List[CellViewedFromACell]): Future[(List[InfoCell], Double)] =
-        Future[(List[InfoCell], Double)] {
-            val asMap: Map[String, CellViewedFromACell] = HashMap(cells.map(c => c.info.name -> c): _*)
+    def computeRoute(fromCell: String, toCell: String, rooms: List[RoomViewedFromACell]): Future[(List[RoomID], Double)] =
+        Future[(List[RoomID], Double)] {
+            val asMap: Map[String, RoomViewedFromACell] = HashMap(rooms.map(c => c.info.id.name -> c): _*)
     
             val graph: Graph[String] = toGraph(asMap)
             
             val (shp, cost) = AStarSearch.A_*(graph)(fromCell, toCell)(AStarSearch.Extractors.toList)
-    
-            (shp.map(s => asMap(s).info), cost)
+        
+            (shp.map(s => asMap(s).info.id), cost)
         }
     
     /**
@@ -92,16 +92,16 @@ object RouteProcessor {
       * @param map The Map of cells to transform
       * @return The Normalized Graph
       */
-    def toGraph(map: Map[String, CellViewedFromACell]): Graph[String] = {
+    def toGraph(map: Map[String, RoomViewedFromACell]): Graph[String] = {
         var min: Double = 0.0
         
         val graph = HashMap(
             map.values.toList.map(cell =>
-                cell.info.name -> HashMap(
+                cell.info.id.name -> HashMap(
                     cell.neighbors.map(n => {
-                        val tmp = Practicability.toWeight(cell.practicability, map(n.name).practicability)
+                        val tmp = Practicability.toWeight(cell.practicability, map(n.id.name).practicability)
                         if (tmp < min) min = tmp
-                        n.name -> tmp
+                        n.id.name -> tmp
                     }): _*)
             ): _*)
         

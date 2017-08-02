@@ -126,7 +126,7 @@ class InterfaceController extends Initializable {
         val area = Topology.Subtype.Planimetrics.unmarshal(source)
         adminActor ! AriadneMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, Location.Admin >> Location.Self, area)
         loadCanvas()
-        createCells(area.cells)
+        createCells(area.rooms)
         fileName.text = file.getName
     }
 
@@ -137,7 +137,7 @@ class InterfaceController extends Initializable {
         mapContainer.getChildren += canvas
     }
 
-    private def createCells(initialConfiguration: List[Cell]) = {
+    private def createCells(initialConfiguration: List[Room]) = {
         initialConfiguration.foreach(cell => {
             Platform.runLater {
                 var node = createCellTemplate(cell)
@@ -147,7 +147,7 @@ class InterfaceController extends Initializable {
         })
     }
 
-    private def createCellTemplate(cell: Cell): SplitPane = {
+    private def createCellTemplate(cell: Room): SplitPane = {
         var loader = new FXMLLoader(getClass.getResource("/cellTemplate2.fxml"))
         var node = loader.load[SplitPane]
         var controller = loader.getController[CellTemplateController]

@@ -29,7 +29,7 @@ class MasterSubscriberTest extends TestKit(ActorSystem("SubscriberTest", MasterS
         Handshake.Subtype.CellToMaster,
         Location.Cell >> Location.Master,
         SensorsInfoUpdate(
-            InfoCell.empty,
+            CellInfo.empty,
             List(SensorInfo(0, 0.0))
         )
     )
@@ -56,7 +56,7 @@ class MasterSubscriberTest extends TestKit(ActorSystem("SubscriberTest", MasterS
         Update,
         Update.Subtype.CurrentPeople,
         Location.Cell >> Location.Master,
-        CurrentPeopleUpdate(InfoCell.empty, 0)
+        CurrentPeopleUpdate(CellInfo.empty, 0)
     )
     
     override def afterAll {
@@ -91,7 +91,7 @@ class MasterSubscriberTest extends TestKit(ActorSystem("SubscriberTest", MasterS
                 Route,
                 Route.Subtype.Request,
                 Location.User >> Location.Cell,
-                RouteRequest(Random.nextInt().toString, InfoCell.empty, InfoCell.empty, isEscape = false)
+                RouteRequest(Random.nextInt().toString, RoomID.empty, RoomID.empty, isEscape = false)
             )
             
             probe.expectNoMsg()

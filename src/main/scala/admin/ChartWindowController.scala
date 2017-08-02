@@ -33,7 +33,7 @@ class ChartWindowController extends Initializable {
     @FXML
     private var cellName: Label = _
 
-    private var cellInfo: InfoCell = _
+    private var cellInfo: CellInfo = _
 
     private val sensorChartControllers: mutable.Map[Int, SensorChartController] = new mutable.HashMap[Int, SensorChartController]()
 
@@ -52,7 +52,7 @@ class ChartWindowController extends Initializable {
       *
       * @param info : InfoCell containing the room data
       **/
-    def initializeWindow(info: InfoCell): Unit = {
+    def initializeWindow(info: CellInfo): Unit = {
         cellName setText info.name
         cellInfo = info
     }

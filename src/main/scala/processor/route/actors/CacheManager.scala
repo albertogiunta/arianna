@@ -1,4 +1,4 @@
-package cell.processor.route.actors
+package processor.route.actors
 
 import com.actors.CustomActor
 import ontologies.messages._
@@ -11,7 +11,7 @@ import scala.collection.mutable
   */
 class CacheManager(val cacheKeepAlive: Long) extends CustomActor {
     
-    private val routeCache: mutable.Map[(String, String), List[InfoCell]] = mutable.HashMap.empty
+    private val routeCache: mutable.Map[(String, String), List[RoomID]] = mutable.HashMap.empty
     
     private val routesTimelife: mutable.Map[(String, String), Long] = mutable.HashMap.empty
     

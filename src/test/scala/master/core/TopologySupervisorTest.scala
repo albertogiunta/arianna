@@ -9,7 +9,7 @@ import com.actors.CustomActor
 import com.utils.Practicability
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, ViewedFromACell}
-import ontologies.messages.MessageType.{Handshake, Init, Topology, Update}
+import ontologies.messages.MessageType.{Error, Handshake, Init, Topology, Update}
 import ontologies.messages._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -44,28 +44,28 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
         Location.Master >> Location.Cell,
         AreaViewedFromACell(planimetric.content)
     )
-
-    val infoCell = InfoCell(id = 666, uri = "PancoPillo:8080", 0, name = "PancoPillo", roomVertices = Coordinates(Point(100, 100), Point(250, 100), Point(100, 200), Point(250, 200)), antennaPosition = Point(175, 150))
+    
+    val cellInfo = CellInfo(uri = "PancoPillo", port = 8080)
     
     val handshake = AriadneMessage(
         Handshake,
         Handshake.Subtype.CellToMaster,
         Location.Cell >> Location.Master,
-        SensorsInfoUpdate(infoCell, List(SensorInfo(1, 10.0)))
+        SensorsInfoUpdate(cellInfo, List(SensorInfo(1, 10.0)))
     )
     
     val currentPeopleUpdate = AriadneMessage(
         Update,
         Update.Subtype.CurrentPeople,
         Location.Cell >> Location.Master,
-        CurrentPeopleUpdate(infoCell, 666)
+        CurrentPeopleUpdate(cellInfo, 666)
     )
     
     val sensorsUpdate = AriadneMessage(
         Update,
         Update.Subtype.Sensors,
         Location.Cell >> Location.Master,
-        SensorsInfoUpdate(infoCell, List(SensorInfo(1, 10.0)))
+        SensorsInfoUpdate(cellInfo, List(SensorInfo(1, 10.0)))
     )
     
     override def afterAll {
@@ -76,6 +76,17 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
         
         val probe = TestProbe()
         val tester: TestActorRef[Tester] = TestActorRef(Props(new Tester(probe.ref)), "Tester")
+    
+        "At start time" must {
+            "lack of the map and notify the admin" in {
+                probe.expectMsg(
+                    AriadneMessage(
+                        Error, Error.Subtype.LookingForAMap,
+                        Location.Master >> Location.Admin, Empty()
+                    )
+                )
+            }
+        }
         
         "When receptive" must {
             
@@ -97,7 +108,7 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
             "wait for the Handshakes to be forwarded" in {
                 tester ! handshake
                 probe.expectMsg(handshake)
-                assert(probe.sender == tester.underlyingActor.streamer)
+                assert(probe.sender == tester.underlyingActor.admin)
             }
             
             "once all the expected handshakes have been mapped, should notify the subscriber, sending the Topology and becoming proactive" in {
@@ -116,34 +127,40 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
             }
             
             "accept new sensors values" in {
-                
-                val topology = mutable.HashMap(planimetric.content.cells.map(c => c.info.uri -> c): _*)
-                val news = topology(handshake.content.info.uri)
-                    .copy(info = handshake.content.info,
+    
+                val topology = mutable.HashMap(planimetric.content.rooms.map(r => r.cell.info.uri -> r): _*)
+                val newCell = topology(handshake.content.cell.uri).cell
+                    .copy(
+                        info = handshake.content.cell,
                         sensors = sensorsUpdate.content.sensors
                     )
-                
-                topology.put(handshake.content.info.uri, news)
+                val newRoom = topology(handshake.content.cell.uri).copy(cell = newCell)
+                topology.put(handshake.content.cell.uri, newRoom)
                 tester ! sensorsUpdate
-                probe.expectMsg(topology.values.toList)
+                probe.expectMsg(AdminUpdate(topology.values.map(c => RoomDataUpdate(c)).toList))
             }
             
             "accept new current people" in {
-                val topology: mutable.Map[String, Cell] =
-                    mutable.HashMap(planimetric.content.cells.map(c => c.info.uri -> c): _*)
-                val old = topology(handshake.content.info.uri)
-                val news: Cell = topology(handshake.content.info.uri)
+                val topology: mutable.Map[String, Room] =
+                    mutable.HashMap(planimetric.content.rooms.map(r => r.cell.info.uri -> r): _*)
+    
+                val oldRoom = topology(handshake.content.cell.uri)
+    
+                val news: Room = topology(handshake.content.cell.uri)
                     .copy(
-                        info = handshake.content.info,
+                        cell = ontologies.messages.Cell(handshake.content.cell, sensorsUpdate.content.sensors),
                         currentPeople = currentPeopleUpdate.content.currentPeople,
-                        sensors = sensorsUpdate.content.sensors,
-                        practicability = Practicability(old.capacity, currentPeopleUpdate.content.currentPeople, old.passages.length)
+                        practicability = Practicability(
+                            oldRoom.info.capacity,
+                            currentPeopleUpdate.content.currentPeople,
+                            oldRoom.passages.length
+                        )
                     )
-                
-                topology.put(handshake.content.info.uri, news)
+    
+                topology.put(handshake.content.cell.uri, news)
                 
                 tester ! currentPeopleUpdate
-                probe.expectMsg(topology.values.toList)
+                probe.expectMsg(AdminUpdate(topology.values.map(c => RoomDataUpdate(c)).toList))
             }
         }
     }
@@ -156,7 +173,7 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
         val publisher: TestActorRef[CustomActor] = TestActorRef(Props(new CustomActor {
             override def receive: Receive = {
                 case msg: AriadneMessage[_] => probe ! msg
-                case msg@(dest: String, cnt: AriadneMessage[_]) => probe ! cnt
+                case (_: String, cnt: AriadneMessage[_]) => probe ! cnt
             }
         }), self, NamingSystem.Publisher)
     
@@ -166,12 +183,13 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
             }
         }), self, NamingSystem.Subscriber)
     
-        val streamer: TestActorRef[CustomActor] = TestActorRef(Props(new CustomActor {
+        val admin: TestActorRef[CustomActor] = TestActorRef(Props(new CustomActor {
             override def receive: Receive = {
-                case msg: Iterable[_] => probe ! msg.toList
+                case AriadneMessage(Update, Update.Subtype.Admin, _, cnt: AdminUpdate) =>
+                    probe ! cnt
                 case msg => probe ! msg
             }
-        }), self, NamingSystem.DataStreamer)
+        }), self, NamingSystem.AdminManager)
         
         override def preStart {
             
@@ -188,4 +206,5 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
             case msg => supervisor forward msg
         }
     }
+    
 }

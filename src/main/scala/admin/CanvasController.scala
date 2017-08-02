@@ -6,7 +6,8 @@ import javafx.fxml.{FXML, Initializable}
 import javafx.scene.canvas.Canvas
 import javafx.scene.paint.Color
 
-import ontologies.messages.{Cell, Coordinates, Point}
+import ontologies.messages
+import ontologies.messages.{Coordinates, Point, Room}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -56,8 +57,8 @@ class CanvasController extends Initializable {
       * @param cell : cell to be drawn
       *
       * */
-    def drawOnMap(cell: Cell): Unit = {
-        val room: Room = Room(cell.info.roomVertices)
+    def drawOnMap(cell: Room): Unit = {
+        val room: Room = messages.Room(cell.info.roomVertices)
         val passages: ListBuffer[PassageLine] = new ListBuffer[PassageLine]
         cell.passages.foreach(passage => {
             passages += PassageLine(passage.startCoordinates, passage.endCoordinates)

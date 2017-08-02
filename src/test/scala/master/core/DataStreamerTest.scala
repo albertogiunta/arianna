@@ -4,7 +4,7 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit, TestProbe}
 import com.actors.CustomActor
 import ontologies.messages.Location._
-import ontologies.messages.MessageType.{Init, Update}
+import ontologies.messages.MessageType.Update
 import ontologies.messages._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -23,16 +23,9 @@ class DataStreamerTest extends TestKit(ActorSystem("DataStreamerTest"))
         val probe = TestProbe()
         val tester: TestActorRef[Tester] = TestActorRef(Props(new Tester(probe.ref)), "Tester")
         
-        tester ! AriadneMessage(
-            Init,
-            Init.Subtype.Greetings,
-            Location.Cell >> Location.Self,
-            Greetings(List.empty)
-        )
-        
         "Submit incoming collection to the Hot Stream" in {
-            
-            tester ! List.empty[Cell]
+    
+            tester ! List.empty[Room]
             
             probe.expectMsg("I'm the hot stream")
         }
@@ -41,9 +34,9 @@ class DataStreamerTest extends TestKit(ActorSystem("DataStreamerTest"))
             
             probe.expectMsg(AriadneMessage(
                 Update,
-                Update.Subtype.UpdateForAdmin,
+                Update.Subtype.Admin,
                 Location.Master >> Location.User,
-                UpdateForAdmin(List.empty[Cell].map(c => CellDataUpdate(c)))
+                AdminUpdate(List.empty[Room].map(c => RoomDataUpdate(c)))
             ))
             
             assert(probe.sender == tester.underlyingActor.admin)
@@ -52,17 +45,20 @@ class DataStreamerTest extends TestKit(ActorSystem("DataStreamerTest"))
     
     private class Tester(probe: ActorRef) extends CustomActor {
     
-        val streamer: TestActorRef[TopologySupervisor] =
-            TestActorRef(Props(new DataStreamer((msg, target) => {
-                probe ! "I'm the hot stream"
-                target ! msg
-            })), self, NamingSystem.DataStreamer)
-    
         val admin: TestActorRef[CustomActor] = TestActorRef(Props(new CustomActor {
             override def receive: Receive = {
                 case msg => probe ! msg
             }
         }), self, NamingSystem.AdminManager)
+    
+        val streamer: TestActorRef[TopologySupervisor] =
+            TestActorRef(Props(new DataStreamer(
+                target = child(NamingSystem.AdminManager).get,
+                (msg, dest) => {
+                    probe ! "I'm the hot stream"
+                    dest ! msg
+                })
+            ), self, NamingSystem.DataStreamer)
         
         override def receive: Receive = {
             case msg if sender == streamer => probe forward msg

@@ -30,7 +30,7 @@ class TestPublisher extends Actor with ActorLogging {
     
             val topicName = Topic.Alarms.toString
             mediator ! Publish(topicName,
-                AriadneMessage(Alarm, Alarm.Subtype.Basic, dir, cnt))
+                AriadneMessage(Alarm, Alarm.Subtype.FromCell, dir, cnt))
     
             println(s"[" + self.path.name + "] Message published on " + Topic.Alarms)
 

@@ -5,7 +5,7 @@ import com.actors.BasicSubscriber
 import ontologies.Topic
 import ontologies.messages.AriadneMessage
 import ontologies.messages.MessageType.Alarm
-import ontologies.messages.MessageType.Alarm.Subtype.Basic
+import ontologies.messages.MessageType.Alarm.Subtype.FromCell
 import system.names.NamingSystem
 
 /**
@@ -27,7 +27,7 @@ class AlarmSupervisor extends BasicSubscriber {
             log.info("Got {} from {}", msg.toString, sender.path.name)
         
             subtype match {
-                case Basic => admin() forward msg
+                case FromCell => admin() forward msg
                 case _ => // Ignore
             }
     

@@ -1,4 +1,4 @@
-package cell.processor.route.algorithms
+package processor.route.algorithms
 
 import scala.annotation.tailrec
 import scala.collection.mutable

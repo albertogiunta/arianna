@@ -50,16 +50,16 @@ class AdminActor() extends BasicActor {
 
     def operational: Receive = {
         //Ricezione dell'aggiornamento delle celle
-        case msg@AriadneMessage(_, MessageType.Update.Subtype.UpdateForAdmin, _, adminUpdate: UpdateForAdmin) => {
+        case msg@AriadneMessage(_, MessageType.Update.Subtype.Admin, _, adminUpdate: AdminUpdate) => {
             val updateCells: mutable.Map[Int, CellForView] = new mutable.HashMap[Int, CellForView]
-            adminUpdate.list.foreach(cell => updateCells += ((cell.info.id, new CellForView(cell.info.id, cell.info.name, cell.currentPeople, cell.sensors))))
+            adminUpdate.list.foreach(room => updateCells += ((room.id, new CellForView(room.id, room.name, room.currentPeople, room.sensors))))
             interfaceController updateView updateCells.values.toList
             chartActors.foreach(actor => actor._2 ! AriadneMessage(Interface, Interface.Subtype.UpdateChart, Location.Admin >> Location.Self, updateCells.get(actor._1).get))
         }
 
         case msg@AriadneMessage(_, Alarm.Subtype.FromInterface, _, _) => adminManager ! msg.copy(direction = toServer)
 
-        case msg@AriadneMessage(_, Alarm.Subtype.Basic, _, content: AlarmContent) => interfaceController triggerAlarm content
+        case msg@AriadneMessage(_, Alarm.Subtype.FromCell, _, content: AlarmContent) => interfaceController triggerAlarm content
 
         case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => {
             interfaceController initializeSensors sensorsInfo
@@ -67,11 +67,11 @@ class AdminActor() extends BasicActor {
 
         case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
             var chartActor = context.actorOf(Props[ChartActor])
-            chartActors += ((cell.info.id, chartActor))
+            chartActors += ((cell.id, chartActor))
             chartActor ! msg
         }
 
-        case msg@AriadneMessage(Interface, Interface.Subtype.CloseChart, _, cell: InfoCell) => {
+        case msg@AriadneMessage(Interface, Interface.Subtype.CloseChart, _, cell: CellInfo) => {
             context stop chartActors.get(cell.id).get
             interfaceController enableButton cell.id
         }

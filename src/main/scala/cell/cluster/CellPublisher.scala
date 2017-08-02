@@ -24,7 +24,7 @@ class CellPublisher extends BasicPublisher {
             Handshake,
             Handshake.Subtype.Acknowledgement,
             self2Self,
-            SensorsInfoUpdate(InfoCell.empty, List.empty[SensorInfo])
+            SensorsInfoUpdate(CellInfo.empty, List.empty[SensorInfo])
         )
 
     }

@@ -8,6 +8,7 @@ import com.typesafe.config.ConfigFactory
 import master.core.{AdminManager, DataStreamer}
 import ontologies.messages._
 
+import scala.collection.immutable.HashMap
 import scala.util.Random
 
 /**
@@ -24,21 +25,30 @@ object TestDataStreamer extends App {
     
     Thread.sleep(5000)
     
-    val streamer = system.actorOf(Props(new DataStreamer()), "DataStreamer")
+    val streamer = system.actorOf(Props(
+        new DataStreamer(system.actorSelection(adminManager.path))), "DataStreamer")
+    
+    val roomsInfo = HashMap((0 to 5).map(id =>
+        id -> RoomInfo(
+            RoomID(id, "Room" + id),
+            isExitPoint = true,
+            isEntryPoint = true,
+            capacity = 100,
+            squareMeters = 1000,
+            roomVertices = Coordinates(Point(0, 0), Point(0, 0), Point(0, 0), Point(0, 0)),
+            antennaPosition = Point(0, 0)
+        )
+    ): _ *)
     
     (0 to 10).foreach(_ => {
         val u =
-            (0 to 5).map(id => ontologies.messages.Cell(
-                InfoCell(id, "uri" + id, 0, "name" + id, Coordinates(Point(1, 1), Point(-1, -1), Point(-1, 1), Point(1, -1)), Point(0, 0)),
-                neighbors = List(InfoCell(Random.nextInt(5), "uri" + Random.nextInt(5), 0, "name" + Random.nextInt(5), Coordinates(Point(1, 1), Point(-1, -1), Point(-1, 1), Point(1, -1)), Point(0, 0)), InfoCell(Random.nextInt(5), "uri" + Random.nextInt(5), 0, "name" + Random.nextInt(5), Coordinates(Point(1, 1), Point(-1, -1), Point(-1, 1), Point(1, -1)), Point(0, 0))),
-                isExitPoint = true,
-                isEntryPoint = true,
-                capacity = 100,
+            (0 to 5).map(id => Room(
+                roomsInfo(id),
+                Cell(CellInfo("uri" + id, 0), sensors = List(SensorInfo(0, Random.nextDouble() * Random.nextInt(30)), SensorInfo(1, 2.0), SensorInfo(2, 1.55))),
+                neighbors = List(),
+                passages = List(Passage(Random.nextInt(1000), Point(1, 1), Point(2, 1))),
                 currentPeople = Random.nextInt(95),
                 practicability = 0.0,
-                squareMeters = 1000,
-                passages = List(Passage(Random.nextInt(1000), Point(1, 1), Point(2, 1))),
-                sensors = List(SensorInfo(0, Random.nextDouble() * Random.nextInt(30)), SensorInfo(1, 2.0), SensorInfo(2, 1.55))
             ))
         
         Thread.sleep(100)

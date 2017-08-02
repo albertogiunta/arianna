@@ -82,9 +82,9 @@ class UserManager extends BasicActor with ActorLogging {
         // todo tell CellCoreActore
         case msg: RouteRequestShort =>
             // use for test
-            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest("", getCellWithId(msg.fromCellId), getCellWithId(msg.toCellId), isEscape = false), area.cells.map(c => c.info)))
+            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest("", getCellWithId(msg.fromCellId), getCellWithId(msg.toCellId), isEscape = false), area.rooms.map(c => c.cell)))
             Thread.sleep(500)
-            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest("", area.cells.head.info, area.cells.tail.head.info, isEscape = true), area.cells.map(c => c.info)))
+            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest("", area.rooms.head.cell, area.rooms.tail.head.cell, isEscape = true), area.rooms.map(c => c.cell)))
         // use in production
         //            parent ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell, RouteRequest(msg.userID, getCellWithId(msg.fromCellId), getCellWithId(msg.toCellId), isEscape = false))
         //            parent ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell, RouteRequest(msg.userID, getCellWithId(msg.fromCellId), getCellWithId(msg.toCellId), isEscape = true))
@@ -96,8 +96,8 @@ class UserManager extends BasicActor with ActorLogging {
         case _ => ""
     }
 
-    def getCellWithId(id: Int): InfoCell = {
-        area.cells.filter(c => c.info.id == id).map(c => c.info).head
+    def getCellWithId(id: Int): CellInfo = {
+        area.rooms.filter(c => c.cell.id == id).map(c => c.info).head
     }
 }
 

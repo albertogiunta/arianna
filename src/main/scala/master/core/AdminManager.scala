@@ -26,11 +26,11 @@ class AdminManager extends CustomActor {
 
     def operational: Receive = {
         //Ricezione di un update dal server
-        case msg@AriadneMessage(Update, Update.Subtype.UpdateForAdmin, _, _) => admin ! msg.copy(direction = toAdmin)
+        case msg@AriadneMessage(Update, Update.Subtype.Admin, _, _) => admin ! msg.copy(direction = toAdmin)
         //Ricezione di un allarme dall'admin
         case msg@AriadneMessage(Alarm, Alarm.Subtype.FromInterface, fromAdmin, _) => publisher ! msg.copy(direction = fromAdmin)
         //Ricezione di un allarme da parte del sistema
-        case msg@AriadneMessage(Alarm, Alarm.Subtype.Basic, _, _) => admin ! msg.copy(direction = toAdmin)
+        case msg@AriadneMessage(Alarm, Alarm.Subtype.FromCell, _, _) => admin ! msg.copy(direction = toAdmin)
         //Ricezione di aggiornamento sensori
         case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, _) => admin ! msg
     }

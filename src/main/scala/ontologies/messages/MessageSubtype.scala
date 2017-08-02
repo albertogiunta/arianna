@@ -40,18 +40,18 @@ object MessageSubtype {
                 Error.Subtype.MapIdentifierMismatch
             case st if st == Error.Subtype.CellMappingMismatch.toLowerCase =>
                 Error.Subtype.CellMappingMismatch
-                
-            case st if st == Alarm.Subtype.Basic.toLowerCase =>
-                Alarm.Subtype.Basic
+
+            case st if st == Alarm.Subtype.FromCell.toLowerCase =>
+                Alarm.Subtype.FromCell
             case st if st == Alarm.Subtype.FromInterface.toLowerCase =>
                 Alarm.Subtype.FromInterface
 
             case st if st == Handshake.Subtype.CellToMaster.toLowerCase =>
                 Handshake.Subtype.CellToMaster
-            case st if st == Handshake.Subtype.Cell2User.toLowerCase =>
-                Handshake.Subtype.Cell2User
-            case st if st == Handshake.Subtype.User2Cell.toLowerCase =>
-                Handshake.Subtype.User2Cell
+            case st if st == Handshake.Subtype.CellToUser.toLowerCase =>
+                Handshake.Subtype.CellToUser
+            case st if st == Handshake.Subtype.UserToCell.toLowerCase =>
+                Handshake.Subtype.UserToCell
             case st if st == Handshake.Subtype.Acknowledgement.toLowerCase =>
                 Handshake.Subtype.Acknowledgement
                 
@@ -79,8 +79,8 @@ object MessageSubtype {
                 Update.Subtype.Position.AntennaPosition
             case st if st == Update.Subtype.CurrentPeople.toLowerCase =>
                 Update.Subtype.CurrentPeople
-            case st if st == Update.Subtype.UpdateForAdmin.toLowerCase =>
-                Update.Subtype.UpdateForAdmin
+            case st if st == Update.Subtype.Admin.toLowerCase =>
+                Update.Subtype.Admin
             case st if st == Update.Subtype.Practicability.toLowerCase =>
                 Update.Subtype.Practicability
             case st if st == Update.Subtype.CurrentPeople.toLowerCase =>

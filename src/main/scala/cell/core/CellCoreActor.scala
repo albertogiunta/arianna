@@ -2,7 +2,7 @@ package cell.core
 
 import akka.actor.{ActorRef, Props}
 import cell.cluster.{CellPublisher, CellSubscriber}
-import cell.processor.route.actors.RouteManager
+import processor.route.actors.RouteManager
 import cell.sensormanagement.SensorManager
 import com.actors.{BasicActor, ClusterMembersListener}
 import com.utils.Practicability
@@ -26,9 +26,9 @@ class CellCoreActor extends BasicActor {
 
     private val greetings: String = "FROM CELL CORE ACTOR Hello there, it's time to dress-up"
 
-    private var infoCell: InfoCell = InfoCell.empty
+    private var infoCell: CellInfo = CellInfo.empty
     private var sensorsMounted: List[SensorInfo] = List.empty[SensorInfo]
-    private val topology: mutable.Map[String, CellViewedFromACell] = mutable.HashMap[String, CellViewedFromACell]()
+    private val topology: mutable.Map[String, RoomViewedFromACell] = mutable.HashMap[String, RoomViewedFromACell]()
 
     private var actualSelfLoad: Int = 0
 
@@ -76,7 +76,7 @@ class CellCoreActor extends BasicActor {
 
         case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, this.self2Self, _) =>
             //Acknowledgement request from an internal actor
-            if (infoCell == InfoCell.empty || sensorsMounted.isEmpty) stash()
+            if (infoCell == CellInfo.empty || sensorsMounted.isEmpty) stash()
             sender() ! msg.copy(content = SensorsInfoUpdate(infoCell, sensorsMounted))
 
         case msg@AriadneMessage(Error, Error.Subtype.CellMappingMismatch, _, cnt: Empty) =>
@@ -84,7 +84,7 @@ class CellCoreActor extends BasicActor {
 
         case msg@AriadneMessage(Topology, ViewedFromACell, this.server2Cell, cnt: AreaViewedFromACell) => {
             println(s"Area arrived from Server $cnt")
-            cnt.cells.foreach(X => topology.put(X.info.uri, X))
+            cnt.rooms.foreach(X => topology.put(X.cell.uri, X))
             userActor ! AriadneMessage(Init,
                 Init.Subtype.Greetings,
                 self2Self,
@@ -104,7 +104,7 @@ class CellCoreActor extends BasicActor {
         }
 
         case AriadneMessage(Update, Update.Subtype.Practicability, `cell2Cell`, cnt: PracticabilityUpdate) =>
-            topology.put(cnt.info.uri, topology(cnt.info.uri)
+            topology.put(cnt.cell.uri, topology(cnt.cell.uri)
                 .copy(practicability = cnt.practicability))
 
         case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, this.user2Cell, cnt: CurrentPeopleUpdate) => {
@@ -123,7 +123,7 @@ class CellCoreActor extends BasicActor {
                 Update.Subtype.Practicability,
                 cell2Cell,
                 PracticabilityUpdate(
-                    topology(infoCell.uri).info,
+                    topology(infoCell.uri).cell,
                     topology(infoCell.uri).practicability
                 )
             )
@@ -150,7 +150,7 @@ class CellCoreActor extends BasicActor {
             //Alarm triggered in the current cell
             //Check if the topology is initialized
             if (topology.size != 0) {
-                val currentCell: CellViewedFromACell = topology.get(infoCell.uri).get
+                val currentCell: RoomViewedFromACell = topology.get(infoCell.uri).get
                 val msgToSend = msg.copy(direction = cell2Cluster,
                     content = AlarmContent(infoCell,
                         currentCell.isExitPoint,
@@ -165,7 +165,7 @@ class CellCoreActor extends BasicActor {
             val (id, area) = alarm match {
                 case AlarmContent(compromisedCell, _, _) =>
                     ("-1", topology.values.map(cell => {
-                        if (cell.info.uri == compromisedCell.uri)
+                        if (cell.cell.uri == compromisedCell.uri)
                             cell.copy(practicability = Double.PositiveInfinity)
                         else cell
                     }).toList)
@@ -178,7 +178,7 @@ class CellCoreActor extends BasicActor {
                 Route.Subtype.Info,
                 self2Self,
                 RouteInfo(
-                    RouteRequest(id, topology(infoCell.uri).info, InfoCell.empty, isEscape = true),
+                    RouteRequest(id, topology(infoCell.uri).cell, CellInfo.empty, isEscape = true),
                     AreaViewedFromACell(Random.nextInt(), area)
                 )
             )
