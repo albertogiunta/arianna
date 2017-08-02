@@ -16,6 +16,7 @@ object SensorsFactory {
     object DefaultValues {
         val refreshRate = 1000
         val startValue = 0
+        val humiditySensorStartValue = 40
 
         object ChangeStep {
             val temperature = 0.1
@@ -89,7 +90,7 @@ object SensorsFactory {
                                  refreshRate: Long): HumiditySensor = {
             val sensor = new BasicHumiditySensor(
                 "SimulatedHumiditySensor",
-                DefaultValues.startValue,
+                DefaultValues.humiditySensorStartValue,
                 minValue,
                 maxValue,
                 new HumidityThreshold(minThreshold, maxThreshold))

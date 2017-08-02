@@ -3,6 +3,7 @@ package cell.core
 import akka.actor.{ActorRef, Props}
 import cell.cluster.{CellPublisher, CellSubscriber}
 import cell.processor.route.actors.RouteManager
+import cell.sensormanagement.SensorManager
 import com.actors.{BasicActor, ClusterMembersListener}
 import com.utils.Practicability
 import ontologies.messages.AriannaJsonProtocol._
@@ -51,10 +52,8 @@ class CellCoreActor extends BasicActor {
 
         cellSubscriber = context.actorOf(Props[CellSubscriber], "CellSubscriber")
         cellPublisher = context.actorOf(Props[CellPublisher], "CellPublisher")
-        Thread.sleep(2000)
-        //        cellPublisher ! AriadneMessage(Init, Init.Subtype.Greetings, Location.Admin >> Location.Cell, Greetings(List("testa di cazzo")))
 
-        //        sensorManager = context.actorOf(Props[SensorManager], "SensorManager")
+        sensorManager = context.actorOf(Props[SensorManager], "SensorManager")
         userActor = context.actorOf(Props[UserManager], "UserManager")
         routeManager = context.actorOf(Props[RouteManager], "RouteManager")
     }
@@ -66,10 +65,10 @@ class CellCoreActor extends BasicActor {
         val loadedInfo = cellConfiguration.parseJson.convertTo[CellConfig]
         infoCell = infoCell.copy(uri = loadedInfo.uri)
 
-        //        sensorManager ! AriadneMessage(Init,
-        //            Init.Subtype.Greetings,
-        //            self2Self,
-        //            Greetings(List(loadedInfo.sensors.toJson.toString())))
+        sensorManager ! AriadneMessage(Init,
+            Init.Subtype.Greetings,
+            self2Self,
+            Greetings(List(loadedInfo.sensors.toJson.toString())))
     }
 
     override protected def receptive: Receive = {
@@ -130,18 +129,22 @@ class CellCoreActor extends BasicActor {
             //route response from route manager for the user
             userActor ! msg
 
-        case msg@AriadneMessage(Alarm, _, self2Self, cnt) =>
+        case msg@AriadneMessage(Alarm, _, this.self2Self, cnt) => {
             //Alarm triggered in the current cell
-            val currentCell: CellViewedFromACell = topology.get(infoCell.uri).get
-            val msgToSend = msg.copy(direction = cell2Cluster,
-                content = AlarmContent(infoCell,
-                    currentCell.isExitPoint,
-                    currentCell.isEntryPoint
+            //Check if the topology is initialized
+            if (topology.size != 0) {
+                val currentCell: CellViewedFromACell = topology.get(infoCell.uri).get
+                val msgToSend = msg.copy(direction = cell2Cluster,
+                    content = AlarmContent(infoCell,
+                        currentCell.isExitPoint,
+                        currentCell.isEntryPoint
+                    )
                 )
-            )
-            cellPublisher ! msgToSend
+                cellPublisher ! msgToSend
+            }
+        }
 
-        case AriadneMessage(Alarm, _, _, alarm) =>
+        case AriadneMessage(Alarm, _, this.cell2Cluster, alarm) => {
             val (id, area) = alarm match {
                 case AlarmContent(compromisedCell, _, _) =>
                     ("-1", topology.values.map(cell => {
@@ -162,5 +165,6 @@ class CellCoreActor extends BasicActor {
                     AreaViewedFromACell(Random.nextInt(), area)
                 )
             )
+        }
     }
 }
