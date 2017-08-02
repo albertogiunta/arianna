@@ -105,11 +105,11 @@ object AStarSearch {
             if (source == target) (Map(source -> target), 0.0)
             else {
                 @tailrec def go(sp: Map[N, N], current: N, successor: N, cost: Double): (Map[N, N], Double) = {
-                    if (current == source) (sp.updated(source, successor), cost)
+                    if (current == source) (sp.updated(source, successor), cost + graph(current)(successor))
                     else go(sp.updated(current, successor), parents(current), current, cost + graph(current)(successor))
                 }
-        
-                go(Map.empty, parents(target), target, graph(parents(target))(target))
+    
+                go(sp = Map.empty, current = parents(target), successor = target, cost = 0.0)
             }
         }
         
@@ -127,11 +127,11 @@ object AStarSearch {
             if (source == target) (List(target), 0.0)
             else {
                 @tailrec def go(sp: List[N], current: N, successor: N, cost: Double): (List[N], Double) = {
-                    if (current == source) (source :: sp, cost)
+                    if (current == source) (source :: sp, cost + graph(current)(successor))
                     else go(current :: sp, parents(current), current, cost + graph(current)(successor))
                 }
-        
-                go(List(target), parents(target), target, graph(parents(target))(target))
+    
+                go(sp = List(target), current = parents(target), successor = target, cost = 0.0)
             }
         }
     }

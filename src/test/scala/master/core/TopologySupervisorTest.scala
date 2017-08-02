@@ -1,12 +1,12 @@
 package master.core
 
 import java.io.File
+import java.nio.file.Paths
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit, TestProbe}
 import com.actors.CustomActor
 import com.utils.Practicability
-import master.cluster.MasterSubscriberTest
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, ViewedFromACell}
 import ontologies.messages.MessageType.{Handshake, Init, Topology, Update}
@@ -26,7 +26,8 @@ import scala.io.Source
 class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest"))
     with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll {
     
-    val path2map: String = MasterSubscriberTest.path2Project + "/res/json/map4test.json"
+    val path2Project: String = Paths.get("").toFile.getAbsolutePath
+    val path2map: String = path2Project + "/res/json/map4test.json"
     
     val plan: String = Source.fromFile(new File(path2map)).getLines.mkString
     
