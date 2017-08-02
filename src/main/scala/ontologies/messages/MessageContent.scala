@@ -43,24 +43,30 @@ object InfoCell {
   * This class is a Static representation of a Room
   *
   * @param id              The Identifier of the Room where the Cell is Located
+  * @param name            The name of the Room
   * @param capacity        Tha Max number of person the Room can hold at one time
   * @param squareMeters    The area covered by the Room
   * @param roomVertices    The spatial Vertices of the Room
-  * @param neighbors       Rooms near this Room
-  * @param passages        Openings that lead to neighbor Rooms
   * @param isEntryPoint    If this Cell is an Exit
   * @param isExitPoint     If this Cell is an Entrance
   * @param antennaPosition The Position of the WiFi antenna inside the Room
   */
-final case class Room(id: Int,
-                      capacity: Int,
-                      squareMeters: Double,
-                      roomVertices: Coordinates,
-                      neighbors: List[InfoCell],
+final case class RoomInfo(id: Int,
+                          name: String,
+                          capacity: Int,
+                          squareMeters: Double,
+                          roomVertices: Coordinates,
+                          isEntryPoint: Boolean,
+                          isExitPoint: Boolean,
+                          antennaPosition: Point) extends MessageContent
+
+final case class Room(info: RoomInfo,
+                      cell: InfoCell,
+                      sensors: List[SensorInfo],
+                      neighbors: List[RoomInfo],
                       passages: List[Passage],
-                      isEntryPoint: Boolean,
-                      isExitPoint: Boolean,
-                      antennaPosition: Point) extends MessageContent
+                      currentPeople: Int,
+                      practicability: Double) extends MessageContent
 
 final case class Area(id: Int,
                       cells: List[Cell]) extends MessageContent
