@@ -63,7 +63,7 @@ class SensorManager extends BasicActor {
             this.parent ! AriadneMessage(Update,
                 Update.Subtype.Sensors,
                 internalMessage, new SensorsInfoUpdate(InfoCell.empty, this.sensors.values.toList))
-        case msg@AriadneMessage(Alarm, _, _, _) =>
+        case msg@AriadneMessage(Alarm, _, _, cnt: SensorInfo) =>
             this.parent ! msg
     }
 
