@@ -23,8 +23,8 @@ class CellPublisher extends BasicPublisher {
         parent ! AriadneMessage(
             Handshake,
             Handshake.Subtype.Acknowledgement,
-            Location.Cell >> Location.Master,
-            _
+            self2Self,
+            SensorsInfoUpdate(InfoCell.empty, List.empty[SensorInfo])
         )
 
     }
