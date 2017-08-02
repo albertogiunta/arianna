@@ -27,6 +27,7 @@ class CellCoreActor extends BasicActor {
     private val greetings: String = "FROM CELL CORE ACTOR Hello there, it's time to dress-up"
 
     private var infoCell: InfoCell = InfoCell.empty
+    private var sensorsMounted: List[SensorInfo] = List.empty[SensorInfo]
     private val topology: mutable.Map[String, CellViewedFromACell] = mutable.HashMap[String, CellViewedFromACell]()
 
     private var actualSelfLoad: Int = 0
@@ -73,10 +74,15 @@ class CellCoreActor extends BasicActor {
 
     override protected def receptive: Receive = {
 
-        case msg@AriadneMessage(Error, Error.Subtype.CellMappingMismatch, _, cnt: Empty) =>
-            println("errore di mapping")
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, this.self2Self, _) =>
+            //Acknowledgement request from an internal actor
+            if (infoCell == InfoCell.empty || sensorsMounted.isEmpty) stash()
+            sender() ! msg.copy(content = SensorsInfoUpdate(infoCell, sensorsMounted))
 
-        case msg@AriadneMessage(Topology, ViewedFromACell, `server2Cell`, cnt: AreaViewedFromACell) =>
+        case msg@AriadneMessage(Error, Error.Subtype.CellMappingMismatch, _, cnt: Empty) =>
+            log.error("Mapping Error")
+
+        case msg@AriadneMessage(Topology, ViewedFromACell, this.server2Cell, cnt: AreaViewedFromACell) => {
             println(s"Area arrived from Server $cnt")
             cnt.cells.foreach(X => topology.put(X.info.uri, X))
             userActor ! AriadneMessage(Init,
@@ -85,14 +91,23 @@ class CellCoreActor extends BasicActor {
                 Greetings(List(infoCell.uri, infoCell.port.toString)))
             Thread.sleep(3000)
             userActor ! msg.copy(direction = cell2User)
+        }
 
-        case msg@AriadneMessage(Update, Update.Subtype.Sensors, self2Self, cnt: SensorsInfoUpdate) =>
-            cellPublisher ! msg.copy(content = cnt.copy(info = this.infoCell))
+        case msg@AriadneMessage(Update, Update.Subtype.Sensors, this.self2Self, cnt: SensorsInfoUpdate) => {
+            if (sensorsMounted.isEmpty) {
+                sensorsMounted = cnt.sensors
+                unstashAll()
+            } else {
+                sensorsMounted = cnt.sensors
+                cellPublisher ! msg.copy(content = cnt.copy(info = this.infoCell))
+            }
+        }
+
         case AriadneMessage(Update, Update.Subtype.Practicability, `cell2Cell`, cnt: PracticabilityUpdate) =>
             topology.put(cnt.info.uri, topology(cnt.info.uri)
                 .copy(practicability = cnt.practicability))
 
-        case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, `user2Cell`, cnt: CurrentPeopleUpdate) =>
+        case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, this.user2Cell, cnt: CurrentPeopleUpdate) => {
 
             actualSelfLoad = cnt.currentPeople
 
@@ -101,7 +116,7 @@ class CellCoreActor extends BasicActor {
                     topology(infoCell.uri).capacity,
                     cnt.currentPeople,
                     topology(infoCell.uri).passages.length)))
-            
+
             cellPublisher ! msg.copy(direction = cell2Server)
             cellPublisher ! AriadneMessage(
                 Update,
@@ -112,8 +127,9 @@ class CellCoreActor extends BasicActor {
                     topology(infoCell.uri).practicability
                 )
             )
+        }
 
-        case AriadneMessage(Route, Route.Subtype.Request, `user2Cell`, cnt: RouteRequest) =>
+        case AriadneMessage(Route, Route.Subtype.Request, this.user2Cell, cnt: RouteRequest) => {
             //route request from user management
             routeManager ! AriadneMessage(
                 Route,
@@ -124,8 +140,9 @@ class CellCoreActor extends BasicActor {
                     AreaViewedFromACell(Random.nextInt(), topology.values.toList)
                 )
             )
+        }
 
-        case msg@AriadneMessage(Route, Route.Subtype.Response, `cell2User`, _) =>
+        case msg@AriadneMessage(Route, Route.Subtype.Response, this.cell2User, _) =>
             //route response from route manager for the user
             userActor ! msg
 

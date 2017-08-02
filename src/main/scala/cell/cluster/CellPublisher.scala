@@ -7,58 +7,48 @@ import ontologies.messages.Location._
 import ontologies.messages.MessageType._
 import ontologies.messages._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-
 /**
   * Actor that manages the sending of messages to the main server
   * Created by Matteo Gabellini on 29/06/2017.
   */
 class CellPublisher extends BasicPublisher {
 
-    /*
-    * Provisional constants that represents the cell's info.
-    * In the future this info will be modelled in a different way
-    * */
-    private val cellID: Int = 12345
-    private val cellUri: String = "uri1"
-    private val cellPort: Int = 12345
-    private val cellName: String = "cell1"
-    private val roomVertices: Coordinates = Coordinates(
-        Point(0, 0),
-        Point(2, 2),
-        Point(0, 2),
-        Point(2, 0)
-    )
-    
-    private val antennaPosition: Point = Point(0, 0)
-    
+    private val self2Self: MessageDirection = Location.Self >> Location.Self
+
+
     override protected def init(args: List[Any]) = {
         if (args(0) != "FROM CLUSTER MEMBERS LISTERNER Hello there, it's time to dress-up") throw new Exception()
         log.info("Hello there from {}!", name)
 
-        log.info("Sending Handshake to Master...")
+        parent ! AriadneMessage(
+            Handshake,
+            Handshake.Subtype.Acknowledgement,
+            Location.Cell >> Location.Master,
+            _
+        )
 
-        Future {
-            Thread.sleep(1000)
-        }.onComplete(_ =>
+    }
+
+    override protected def receptive = {
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, this.self2Self, sensorsInfoUpdate: SensorsInfoUpdate) => {
+            log.info("Sending Handshake to Master...")
             mediator ! Publish(Topic.HandShakes,
                 AriadneMessage(
                     Handshake,
                     Handshake.Subtype.CellToMaster,
                     Location.Cell >> Location.Master,
-                    SensorsInfoUpdate(
-                        InfoCell(cellID, cellUri, cellPort, cellName, roomVertices, antennaPosition),
-                        List()
-                    )
+                    sensorsInfoUpdate
                 )
             )
-        )
+            this.context.become(cultured, discardOld = true)
+        }
+        case _ => //ignore
     }
 
-    override protected def receptive = {
-        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, _) =>
-            mediator ! Publish(Topic.HandShakes, msg)
+
+    private def cultured: Receive = {
+        case msg@AriadneMessage(Alarm, _, _, _) =>
+            mediator ! Publish(Topic.Alarms, msg)
 
         case msg@AriadneMessage(Update, Update.Subtype.Sensors, _, _) =>
             mediator ! Publish(Topic.Updates, msg)
