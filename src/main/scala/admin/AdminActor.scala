@@ -23,9 +23,9 @@ class AdminActor() extends BasicActor {
 
     private val chartActors: mutable.Map[Int, ActorRef] = new mutable.HashMap[Int, ActorRef]
     //Se si fa partire solo l'admin manager
-    private val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/AdminManager")
+    //    private val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/AdminManager")
     //Se si fa partire il master
-    //val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/Master/AdminManager")
+    val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/Master/AdminManager")
     private val toServer: MessageDirection = Location.Admin >> Location.Master
 
     override def init(args: List[Any]): Unit = {

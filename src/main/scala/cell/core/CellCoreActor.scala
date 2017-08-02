@@ -83,7 +83,7 @@ class CellCoreActor extends BasicActor {
             userActor ! AriadneMessage(Init,
                 Init.Subtype.Greetings,
                 self2Self,
-                Greetings(List(infoCell.uri, "8081")))
+                Greetings(List(infoCell.uri, infoCell.port.toString)))
             Thread.sleep(3000)
             userActor ! msg.copy(direction = cell2User)
 

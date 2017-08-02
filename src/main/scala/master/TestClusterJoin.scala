@@ -37,10 +37,7 @@ object TestClusterJoin extends App {
         Update.Subtype.Sensors,
         Location.Cell >> Location.Master,
         SensorsInfoUpdate(
-            InfoCell(0, "uri", "name",
-                Coordinates(Point(1, 1), Point(-1, -1), Point(-1, 1), Point(1, -1)),
-                Point(0, 0)
-            ),
+            InfoCell(0, "uri", 0, "name", Coordinates(Point(1, 1), Point(-1, -1), Point(-1, 1), Point(1, -1)), Point(0, 0)),
             List(SensorInfo(1, 2.0), SensorInfo(2, 1.55))
         )
     )

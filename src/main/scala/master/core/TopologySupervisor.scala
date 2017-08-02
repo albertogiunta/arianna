@@ -99,8 +99,8 @@ class TopologySupervisor extends BasicActor {
                 topology.put(cell.uri, topology(cell.uri).copy(info = cell))
     
                 dataStreamer ! msg
-                
-                if ((synced ++) == topology.size) {
+
+                //                if ((synced ++) == topology.size) {
                     
                     context.become(behavior = proactive, discardOld = true)
                     log.info("I've become ProActive")
@@ -115,7 +115,7 @@ class TopologySupervisor extends BasicActor {
                             topology.map(e => CellViewedFromACell(e._2)).toList
                         )
                     )
-                }
+                //                }
             } else {
                 log.error("Received Handshake as no matching in the current loaded Topology for {}", cell.uri)
                 publisher() ! (

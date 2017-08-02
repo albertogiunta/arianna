@@ -32,20 +32,11 @@ final case class CellConfig(uri: String, sensors: List[SensorInfoFromConfig]) ex
   * @param roomVertices    The spatial Vertices of the Room where the Cell is Located
   * @param antennaPosition The Position of the WiFi antenna inside the Room where the Cell is Located
   */
-final case class InfoCell(id: Int,
-                          uri: String,
-                          name: String,
-                          roomVertices: Coordinates,
-                          antennaPosition: Point) extends MessageContent
+final case class InfoCell(id: Int, uri: String, port: Int, name: String, roomVertices: Coordinates, antennaPosition: Point) extends MessageContent
 
 object InfoCell {
     def empty: InfoCell =
-        InfoCell(
-            Int.MinValue,
-            "", "",
-            Coordinates(Point(0, 0), Point(0, 0), Point(0, 0), Point(0, 0)),
-            Point(0, 0)
-        )
+        InfoCell(Int.MinValue, "", 0, "", Coordinates(Point(0, 0), Point(0, 0), Point(0, 0), Point(0, 0)), Point(0, 0))
 }
 
 /**

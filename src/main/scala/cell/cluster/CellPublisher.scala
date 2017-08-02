@@ -22,6 +22,7 @@ class CellPublisher extends BasicPublisher {
     * */
     private val cellID: Int = 12345
     private val cellUri: String = "uri1"
+    private val cellPort: Int = 12345
     private val cellName: String = "cell1"
     private val roomVertices: Coordinates = Coordinates(
         Point(0, 0),
@@ -47,7 +48,7 @@ class CellPublisher extends BasicPublisher {
                     Handshake.Subtype.CellToMaster,
                     Location.Cell >> Location.Master,
                     SensorsInfoUpdate(
-                        InfoCell(cellID, cellUri, cellName, roomVertices, antennaPosition),
+                        InfoCell(cellID, cellUri, cellPort, cellName, roomVertices, antennaPosition),
                         List()
                     )
                 )
