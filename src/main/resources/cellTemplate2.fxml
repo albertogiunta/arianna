@@ -4,11 +4,11 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 <SplitPane dividerPositions="0.11353711790393013" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-           minWidth="-Infinity" orientation="VERTICAL" prefHeight="231.0" prefWidth="398.0"
+           minWidth="-Infinity" orientation="VERTICAL" prefHeight="231.0" prefWidth="380.0"
            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="admin.CellTemplateController">
     <items>
-        <Pane fx:id="header" prefHeight="29.0" prefWidth="396.0">
+        <Pane fx:id="header" prefHeight="29.0" prefWidth="380.0">
             <children>
                 <Text fx:id="roomName" layoutX="88.0" layoutY="17.0" strokeType="OUTSIDE" strokeWidth="0.0"
                       textAlignment="CENTER" wrappingWidth="221.0">
@@ -18,7 +18,7 @@
                 </Text>
             </children>
         </Pane>
-        <TabPane fx:id="tabPane" prefHeight="169.0" prefWidth="400.0" tabClosingPolicy="UNAVAILABLE">
+        <TabPane fx:id="tabPane" prefHeight="169.0" prefWidth="380.0" tabClosingPolicy="UNAVAILABLE">
             <tabs>
                 <Tab fx:id="tabDynamic" text="Dinamic">
                     <content>
@@ -29,7 +29,7 @@
                                     <children>
                                         <Pane prefHeight="200.0" prefWidth="200.0">
                                             <children>
-                                                <Button fx:id="chartsButton" layoutX="8.0" layoutY="34.0"
+                                                <Button fx:id="chartsButton" disable="true" layoutX="8.0" layoutY="34.0"
                                                         mnemonicParsing="false" onAction="#openCharts" prefHeight="46.0"
                                                         prefWidth="130.0" text="Charts"/>
                                             </children>

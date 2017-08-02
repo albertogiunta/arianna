@@ -1,14 +1,9 @@
 package admin
 
-import java.io.File
-import java.nio.file.Paths
-import javafx.embed.swing.JFXPanel
-
-import akka.actor.{ActorRef, ActorSystem, Props}
+import akka.actor.{ActorRef, Props}
 import com.actors.BasicActor
-import com.typesafe.config.ConfigFactory
 import ontologies.messages.Location._
-import ontologies.messages.MessageType.{Alarm, Handshake, Init, Interface, Topology}
+import ontologies.messages.MessageType.{Alarm, Handshake, Interface, Topology}
 import ontologies.messages._
 
 import scala.collection.mutable
@@ -66,7 +61,9 @@ class AdminActor() extends BasicActor {
 
         case msg@AriadneMessage(_, Alarm.Subtype.Basic, _, content: AlarmContent) => interfaceController triggerAlarm content
 
-        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => interfaceController initializeSensors sensorsInfo
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => {
+            interfaceController initializeSensors sensorsInfo
+        }
 
         case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
             var chartActor = context.actorOf(Props[ChartActor])
@@ -83,18 +80,4 @@ class AdminActor() extends BasicActor {
 
     }
 
-}
-
-object App {
-    def main(args: Array[String]): Unit = {
-        new JFXPanel
-        val path2Project = Paths.get("").toFile.getAbsolutePath
-        val path2Config = path2Project + "/res/conf/akka/admin.conf"
-        var interfaceView: InterfaceView = new InterfaceView
-        val config = ConfigFactory.parseFile(new File(path2Config)).resolve
-        val system = ActorSystem.create("adminSystem", config)
-        var admin = system.actorOf(Props[AdminActor], "admin")
-
-        admin ! AriadneMessage(Init, Init.Subtype.Greetings, Location.Admin >> Location.Self, Greetings(List.empty))
-    }
 }

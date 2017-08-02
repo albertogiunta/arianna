@@ -17,13 +17,7 @@ import scala.util.Random
 class RouteProcessingTest extends FunSuite with BeforeAndAfter {
     
     val infoCells: Map[Int, InfoCell] = (1 to 9).map(i => i ->
-        InfoCell(
-            id = i,
-            uri = "http://Arianna/Cell" + i + "@127.0.0.1:" + Random.nextInt(65535) + "/",
-            name = "Cell" + i,
-            roomVertices = Coordinates(Point(0, 0), Point(0, 6), Point(6, 0), Point(6, 6)),
-            antennaPosition = Point(3, 3)
-        )
+        InfoCell(id = i, uri = "http://Arianna/Cell" + i + "@127.0.0.1:" + Random.nextInt(65535) + "/", 0, name = "Cell" + i, roomVertices = Coordinates(Point(0, 0), Point(0, 6), Point(6, 0), Point(6, 6)), antennaPosition = Point(3, 3))
     ).toMap
     
     val routeForAlarmSolution = List(infoCells(9), infoCells(6), infoCells(4), infoCells(5), infoCells(1), infoCells(2))

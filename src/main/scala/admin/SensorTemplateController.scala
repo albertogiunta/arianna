@@ -6,7 +6,8 @@ import javafx.fxml.{FXML, Initializable}
 import javafx.scene.control.Label
 import javafx.scene.text.Text
 
-import ontologies.messages.{Sensor, SensorInfo}
+import ontologies.messages.SensorInfo
+import ontologies.sensor.SensorCategories
 
 /**
   * This class represents the controller for the Sensor element inside the interface
@@ -31,7 +32,7 @@ class SensorTemplateController extends Initializable {
       **/
     def createSensor(sensor: SensorInfo): Unit = {
         sensorCategory = sensor.categoryId
-        sensorName setText Sensor.categoryName(sensorCategory)
+        sensorName setText SensorCategories.categoryWithId(sensorCategory).name
     }
 
     /**

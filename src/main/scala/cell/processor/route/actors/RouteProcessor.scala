@@ -108,7 +108,7 @@ object RouteProcessor {
         if (min < 0.0)
             HashMap(
                 graph.map(n =>
-                    n._1 -> HashMap(n._2.mapValues(d => d + Math.abs(min)).toSeq: _*)
+                    n._1 -> HashMap(n._2.mapValues(d => d - min).toSeq: _*)
                 ).toSeq: _*)
         else graph
     }

@@ -36,6 +36,7 @@ class TestPracticabilityExchange extends App {
 
     private val cellID: Int = 12345
     private val cellUri: String = "uri"
+    private val cellPort: Int = 0
     private val cellName: String = "Gondor"
     private val roomVertices: Coordinates = Coordinates(Point(1, 1),
         Point(-1, -1),
@@ -49,11 +50,7 @@ class TestPracticabilityExchange extends App {
         Update.Subtype.Practicability,
         Location.Cell >> Location.Master,
         PracticabilityUpdate(
-            InfoCell(cellID,
-                cellUri,
-                cellName,
-                roomVertices,
-                antennaPosition),
+            InfoCell(cellID, cellUri, cellPort, cellName, roomVertices, antennaPosition),
             50.0)
     )
 }

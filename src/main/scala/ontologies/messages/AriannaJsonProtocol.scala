@@ -10,7 +10,7 @@ object AriannaJsonProtocol extends DefaultJsonProtocol {
     implicit val emptyFormat: RootJsonFormat[Empty] = jsonFormat0(Empty)
     implicit val pointFormat: RootJsonFormat[Point] = jsonFormat2(Point.apply)
     implicit val coordinatesFormat: RootJsonFormat[Coordinates] = jsonFormat4(Coordinates)
-    implicit val infoCellFormat: RootJsonFormat[InfoCell] = jsonFormat5(InfoCell.apply)
+    implicit val infoCellFormat: RootJsonFormat[InfoCell] = jsonFormat6((id: Int, uri: String, port: Int, name: String, roomVertices: Coordinates, antennaPosition: Point) => InfoCell.apply(id, uri, port, name, roomVertices, antennaPosition))
     implicit val passageFormat: RootJsonFormat[Passage] = jsonFormat3(Passage)
     implicit val sensorFormat: RootJsonFormat[SensorInfo] = jsonFormat2(SensorInfo)
     implicit val thresholdJsonFormat: RootJsonFormat[ThresholdInfo] = new RootJsonFormat[ThresholdInfo] {

@@ -32,17 +32,15 @@ class InterfaceController extends Initializable {
     private var canvasController: CanvasController = _
 
     @FXML
-    var nRooms: Text = _
+    private var fileName: Text = _
     @FXML
-    var fileName: Text = _
+    private var loadButton: Button = _
     @FXML
-    var loadButton: Button = _
+    private var alarmButton: Button = _
     @FXML
-    var alarmButton: Button = _
+    private var vBoxPane: VBox = _
     @FXML
-    var vBoxPane: VBox = _
-    @FXML
-    var mapContainer: Pane = _
+    private var mapContainer: Pane = _
 
     override def initialize(location: URL, resources: ResourceBundle): Unit = {
         println("Controller initialized")
@@ -55,6 +53,9 @@ class InterfaceController extends Initializable {
       **/
     def updateView(update: List[CellForView]): Unit = {
         Platform.runLater {
+            if (alarmButton.isDisabled) {
+                alarmButton setDisable false
+            }
             update.foreach(cell => {
                 var cellController = cellControllers.get(cell.id).get
                 cellController setDynamicInformation cell
@@ -83,8 +84,11 @@ class InterfaceController extends Initializable {
       *
       **/
     def initializeSensors(sensorsInfo: SensorsInfoUpdate): Unit = {
+        println("Inizializzo i sensori?????????")
         var cellController = cellControllers.get(sensorsInfo.info.id).get
-        cellController addSensors sensorsInfo
+        Platform.runLater {
+            cellController addSensors sensorsInfo
+        }
     }
 
     /**
@@ -134,7 +138,6 @@ class InterfaceController extends Initializable {
     }
 
     private def createCells(initialConfiguration: List[Cell]) = {
-        nRooms.text = initialConfiguration.size.toString
         initialConfiguration.foreach(cell => {
             Platform.runLater {
                 var node = createCellTemplate(cell)

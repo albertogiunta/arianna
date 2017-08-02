@@ -22,7 +22,7 @@ object TestAlarm extends App {
 
     val adminManager = system.actorOf(Props[AdminManager], "AdminManager")
     Thread.sleep(10000)
-    val alarmContent = AlarmContent(InfoCell(2, "uri2", "cell2", new Coordinates(Point(1, 1), Point(1, 1), Point(1, 1), Point(1, 1)), Point(1, 1)), false, false)
+    val alarmContent = AlarmContent(InfoCell(2, "uri2", 0, "cell2", new Coordinates(Point(1, 1), Point(1, 1), Point(1, 1), Point(1, 1)), Point(1, 1)), false, false)
     adminManager ! AriadneMessage(Alarm, Alarm.Subtype.Basic, Location.Master >> Location.Admin, alarmContent)
 
 }
