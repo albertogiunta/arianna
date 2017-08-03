@@ -70,20 +70,20 @@ object RouteProcessor {
       * This compute the SHP from Cell A to Cell B,
       * doing the need transformation from the given list of cells to a graph
       *
-      * @param fromCell The source cell on which compute the SHP
-      * @param toCell   The terget cell on which compute the SHP
+      * @param fromRoom The source cell on which compute the SHP
+      * @param toRoom   The terget cell on which compute the SHP
       * @param rooms    The List of cell composing the graph
       * @return A Future that will Asynchronously compute the Route
       */
-    def computeRoute(fromCell: String, toCell: String, rooms: List[RoomViewedFromACell]): Future[(List[RoomID], Double)] =
+    def computeRoute(fromRoom: String, toRoom: String, rooms: List[RoomViewedFromACell]): Future[(List[RoomID], Double)] =
         Future[(List[RoomID], Double)] {
-            val asMap: Map[String, RoomViewedFromACell] = HashMap(rooms.map(c => c.info.id.name -> c): _*)
+            val indexByName: Map[String, RoomViewedFromACell] = HashMap(rooms.map(c => c.info.id.name -> c): _*)
     
-            val graph: Graph[String] = toGraph(asMap)
-            
-            val (shp, cost) = AStarSearch.A_*(graph)(fromCell, toCell)(AStarSearch.Extractors.toList)
-        
-            (shp.map(s => asMap(s).info.id), cost)
+            val graph: Graph[String] = toGraph(indexByName)
+    
+            val (shp, cost) = AStarSearch.A_*(graph)(fromRoom, toRoom)(AStarSearch.Extractors.toList)
+    
+            (shp.map(s => indexByName(s).info.id), cost)
         }
     
     /**
@@ -96,12 +96,12 @@ object RouteProcessor {
         var min: Double = 0.0
         
         val graph = HashMap(
-            map.values.toList.map(cell =>
-                cell.info.id.name -> HashMap(
-                    cell.neighbors.map(n => {
-                        val tmp = Practicability.toWeight(cell.practicability, map(n.id.name).practicability)
+            map.values.toList.map(room =>
+                room.info.id.name -> HashMap(
+                    room.neighbors.map(n => {
+                        val tmp = Practicability.toWeight(room.practicability, map(n.name).practicability)
                         if (tmp < min) min = tmp
-                        n.id.name -> tmp
+                        n.name -> tmp
                     }): _*)
             ): _*)
         
