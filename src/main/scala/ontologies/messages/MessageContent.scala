@@ -190,20 +190,33 @@ object RoomViewedFromACell {
 /**
   * View of a Cell from the Perspective of a User
   *
-  * @param actorPath The URL pointing the Cell that the User have to connect to
   * @param info      Static Info of a Cell
   * @param neighbors Cells near this cell
   * @param passages  Openings that lead to neighbor Cells
   */
-final case class RoomViewedFromAUser(actorPath: String,
-                                     info: RoomInfo,
+final case class RoomViewedFromAUser(info: RoomInfo,
                                      cell: CellInfo,
                                      neighbors: List[RoomID],
                                      passages: List[Passage]) extends MessageContent // To be renamed CellViewedFromAUser
 
 object RoomViewedFromAUser {
     def apply(room: Room, actorPath: String): RoomViewedFromAUser =
-        new RoomViewedFromAUser(actorPath, room.info, room.cell.info, room.neighbors, room.passages)
+        new RoomViewedFromAUser(room.info, room.cell.info, room.neighbors, room.passages)
+
+    def apply(room: Room): RoomViewedFromAUser =
+        new RoomViewedFromAUser(room.info, room.cell.info, room.neighbors, room.passages)
+}
+
+/**
+  * View of the Topology from the Cell perspective
+  *
+  * @param id    Random ID value identifying the Topology
+  * @param rooms List of the Cells of the Topology
+  */
+final case class AreaViewedFromAUser(id: Int, rooms: List[RoomViewedFromAUser]) extends MessageContent
+
+object AreaViewedFromAUser {
+    def apply(area: Area): AreaViewedFromAUser = new AreaViewedFromAUser(area.id, area.rooms.map(c => RoomViewedFromAUser(c)))
 }
 
 /**
