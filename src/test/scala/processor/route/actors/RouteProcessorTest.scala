@@ -42,7 +42,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
             RoomViewedFromACell(
                 infoCells(1)._2,
                 infoCells(1)._1,
-                neighbors = List(infoCells(2)._2, infoCells(5)._2),
+                neighbors = List(infoCells(2)._2.id, infoCells(5)._2.id),
                 passages = List(
                     Passage(infoCells(2)._2.id.serial, Point(3, 6), Point(3, 6)),
                     Passage(infoCells(5)._2.id.serial, Point(6, 3), Point(6, 3))
@@ -52,7 +52,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
             RoomViewedFromACell(
                 infoCells(2)._2,
                 infoCells(2)._1,
-                neighbors = List(infoCells(1)._2, infoCells(3)._2, infoCells(4)._2),
+                neighbors = List(infoCells(1)._2.id, infoCells(3)._2.id, infoCells(4)._2.id),
                 passages = List(
                     Passage(infoCells(1)._2.id.serial, Point(3, 0), Point(3, 0)),
                     Passage(infoCells(3)._2.id.serial, Point(3, 6), Point(3, 6)),
@@ -63,7 +63,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
             RoomViewedFromACell(
                 infoCells(3)._2,
                 infoCells(3)._1,
-                neighbors = List(infoCells(2)._2, infoCells(6)._2),
+                neighbors = List(infoCells(2)._2.id, infoCells(6)._2.id),
                 passages = List(
                     Passage(infoCells(2)._2.id.serial, Point(3, 0), Point(3, 0)),
                     Passage(infoCells(6)._2.id.serial, Point(6, 3), Point(6, 3))
@@ -73,7 +73,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
             RoomViewedFromACell(
                 infoCells(4)._2,
                 infoCells(4)._1,
-                neighbors = List(infoCells(2)._2, infoCells(5)._2, infoCells(6)._2, infoCells(8)._2),
+                neighbors = List(infoCells(2)._2.id, infoCells(5)._2.id, infoCells(6)._2.id, infoCells(8)._2.id),
                 passages = List(
                     Passage(infoCells(2)._2.id.serial, Point(0, 3), Point(0, 3)),
                     Passage(infoCells(5)._2.id.serial, Point(3, 0), Point(3, 0)),
@@ -85,7 +85,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
             RoomViewedFromACell(
                 infoCells(5) _2,
                 infoCells(5) _1,
-                neighbors = List(infoCells(1)._2, infoCells(4)._2, infoCells(7)._2),
+                neighbors = List(infoCells(1)._2.id, infoCells(4)._2.id, infoCells(7)._2.id),
                 passages = List(
                     Passage(infoCells(1)._2.id.serial, Point(0, 3), Point(0, 3)),
                     Passage(infoCells(4)._2.id.serial, Point(3, 6), Point(3, 6)),
@@ -96,7 +96,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
             RoomViewedFromACell(
                 infoCells(6) _2,
                 infoCells(6) _1,
-                neighbors = List(infoCells(3)._2, infoCells(4)._2, infoCells(9)._2),
+                neighbors = List(infoCells(3)._2.id, infoCells(4)._2.id, infoCells(9)._2.id),
                 passages = List(
                     Passage(infoCells(4)._2.id.serial, Point(0, 3), Point(0, 3)),
                     Passage(infoCells(3)._2.id.serial, Point(3, 0), Point(3, 0)),
@@ -107,7 +107,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
             RoomViewedFromACell(
                 infoCells(7) _2,
                 infoCells(7) _1,
-                neighbors = List(infoCells(8)._2, infoCells(5)._2),
+                neighbors = List(infoCells(8)._2.id, infoCells(5)._2.id),
                 passages = List(
                     Passage(infoCells(4)._2.id.serial, Point(0, 3), Point(0, 3)),
                     Passage(infoCells(8)._2.id.serial, Point(3, 6), Point(3, 6))
@@ -117,7 +117,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
             RoomViewedFromACell(
                 infoCells(8) _2,
                 infoCells(8) _1,
-                neighbors = List(infoCells(4)._2, infoCells(7)._2, infoCells(9)._2),
+                neighbors = List(infoCells(4)._2.id, infoCells(7)._2.id, infoCells(9)._2.id),
                 passages = List(
                     Passage(infoCells(4)._2.id.serial, Point(0, 3), Point(0, 3)),
                     Passage(infoCells(7)._2.id.serial, Point(3, 0), Point(3, 0)),
@@ -128,7 +128,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
             RoomViewedFromACell(
                 infoCells(9) _2,
                 infoCells(9) _1,
-                neighbors = List(infoCells(6)._2, infoCells(8)._2),
+                neighbors = List(infoCells(6)._2.id, infoCells(8)._2.id),
                 passages = List(
                     Passage(infoCells(6)._2.id.serial, Point(0, 3), Point(0, 3)),
                     Passage(infoCells(8)._2.id.serial, Point(3, 0), Point(3, 0))
@@ -145,7 +145,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
             RoomViewedFromACell(
                 infoCells(1)._2,
                 infoCells(1)._1,
-                neighbors = List(infoCells(2)._2, infoCells(5)._2),
+                neighbors = List(infoCells(2)._2.id, infoCells(5)._2.id),
                 passages = List(
                     Passage(infoCells(2)._2.id.serial, Point(3, 6), Point(3, 6)),
                     Passage(infoCells(5)._2.id.serial, Point(6, 3), Point(6, 3))
@@ -155,7 +155,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
             RoomViewedFromACell(
                 infoCells(2)._2,
                 infoCells(2)._1,
-                neighbors = List(infoCells(1)._2, infoCells(3)._2, infoCells(4)._2),
+                neighbors = List(infoCells(1)._2.id, infoCells(3)._2.id, infoCells(4)._2.id),
                 passages = List(
                     Passage(infoCells(1)._2.id.serial, Point(3, 0), Point(3, 0)),
                     Passage(infoCells(3)._2.id.serial, Point(3, 6), Point(3, 6)),
@@ -166,7 +166,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
             RoomViewedFromACell(
                 infoCells(3)._2,
                 infoCells(3)._1,
-                neighbors = List(infoCells(2)._2, infoCells(6)._2),
+                neighbors = List(infoCells(2)._2.id, infoCells(6)._2.id),
                 passages = List(
                     Passage(infoCells(2)._2.id.serial, Point(3, 0), Point(3, 0)),
                     Passage(infoCells(6)._2.id.serial, Point(6, 3), Point(6, 3))
@@ -176,7 +176,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
             RoomViewedFromACell(
                 infoCells(4)._2,
                 infoCells(4)._1,
-                neighbors = List(infoCells(2)._2, infoCells(5)._2, infoCells(6)._2, infoCells(8)._2),
+                neighbors = List(infoCells(2)._2.id, infoCells(5)._2.id, infoCells(6)._2.id, infoCells(8)._2.id),
                 passages = List(
                     Passage(infoCells(2)._2.id.serial, Point(0, 3), Point(0, 3)),
                     Passage(infoCells(5)._2.id.serial, Point(3, 0), Point(3, 0)),
@@ -188,7 +188,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
             RoomViewedFromACell(
                 infoCells(5) _2,
                 infoCells(5) _1,
-                neighbors = List(infoCells(1)._2, infoCells(4)._2, infoCells(7)._2),
+                neighbors = List(infoCells(1)._2.id, infoCells(4)._2.id, infoCells(7)._2.id),
                 passages = List(
                     Passage(infoCells(1)._2.id.serial, Point(0, 3), Point(0, 3)),
                     Passage(infoCells(4)._2.id.serial, Point(3, 6), Point(3, 6)),
@@ -199,7 +199,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
             RoomViewedFromACell(
                 infoCells(6) _2,
                 infoCells(6) _1,
-                neighbors = List(infoCells(3)._2, infoCells(4)._2, infoCells(9)._2),
+                neighbors = List(infoCells(3)._2.id, infoCells(4)._2.id, infoCells(9)._2.id),
                 passages = List(
                     Passage(infoCells(4)._2.id.serial, Point(0, 3), Point(0, 3)),
                     Passage(infoCells(3)._2.id.serial, Point(3, 0), Point(3, 0)),
@@ -210,7 +210,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
             RoomViewedFromACell(
                 infoCells(7) _2,
                 infoCells(7) _1,
-                neighbors = List(infoCells(8)._2, infoCells(5)._2),
+                neighbors = List(infoCells(8)._2.id, infoCells(5)._2.id),
                 passages = List(
                     Passage(infoCells(4)._2.id.serial, Point(0, 3), Point(0, 3)),
                     Passage(infoCells(8)._2.id.serial, Point(3, 6), Point(3, 6))
@@ -220,7 +220,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
             RoomViewedFromACell(
                 infoCells(8) _2,
                 infoCells(8) _1,
-                neighbors = List(infoCells(4)._2, infoCells(7)._2, infoCells(9)._2),
+                neighbors = List(infoCells(4)._2.id, infoCells(7)._2.id, infoCells(9)._2.id),
                 passages = List(
                     Passage(infoCells(4)._2.id.serial, Point(0, 3), Point(0, 3)),
                     Passage(infoCells(7)._2.id.serial, Point(3, 0), Point(3, 0)),
@@ -231,7 +231,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
             RoomViewedFromACell(
                 infoCells(9) _2,
                 infoCells(9) _1,
-                neighbors = List(infoCells(6)._2, infoCells(8)._2),
+                neighbors = List(infoCells(6)._2.id, infoCells(8)._2.id),
                 passages = List(
                     Passage(infoCells(6)._2.id.serial, Point(0, 3), Point(0, 3)),
                     Passage(infoCells(8)._2.id.serial, Point(3, 0), Point(3, 0))

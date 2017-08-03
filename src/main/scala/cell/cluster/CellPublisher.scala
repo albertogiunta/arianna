@@ -20,9 +20,10 @@ class CellPublisher extends BasicPublisher {
         if (args(0) != "FROM CLUSTER MEMBERS LISTERNER Hello there, it's time to dress-up") throw new Exception()
         log.info("Hello there from {}!", name)
 
+        //Ask to the core actor the cell information in order to continue the handshake task
         parent ! AriadneMessage(
-            Handshake,
-            Handshake.Subtype.Acknowledgement,
+            Info,
+            Info.Subtype.Request,
             self2Self,
             SensorsInfoUpdate(CellInfo.empty, List.empty[SensorInfo])
         )
@@ -30,7 +31,7 @@ class CellPublisher extends BasicPublisher {
     }
 
     override protected def receptive = {
-        case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, this.self2Self, sensorsInfoUpdate: SensorsInfoUpdate) => {
+        case msg@AriadneMessage(Info, Info.Subtype.Response, this.self2Self, sensorsInfoUpdate: SensorsInfoUpdate) => {
             log.info("Sending Handshake to Master...")
             mediator ! Publish(Topic.HandShakes,
                 AriadneMessage(
