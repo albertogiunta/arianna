@@ -44,9 +44,10 @@ object AriannaJsonProtocol extends DefaultJsonProtocol {
     implicit val sensorsUpdateFormat: RootJsonFormat[SensorsInfoUpdate] = jsonFormat2(SensorsInfoUpdate.apply)
     
     implicit val roomViewedFromACellFormat: RootJsonFormat[RoomViewedFromACell] = jsonFormat5(RoomViewedFromACell.apply)
-    implicit val roomForUserFormat: RootJsonFormat[RoomViewedFromAUser] = jsonFormat5(RoomViewedFromAUser.apply)
+    implicit val roomForUserFormat: RootJsonFormat[RoomViewedFromAUser] = jsonFormat4(RoomViewedFromAUser.apply)
     implicit val areaViewedFromACellFormat: RootJsonFormat[AreaViewedFromACell] = jsonFormat2(AreaViewedFromACell.apply)
-    
+    implicit val areaViewedFromAUserFormat: RootJsonFormat[AreaViewedFromAUser] = jsonFormat2(AreaViewedFromAUser.apply)
+
     implicit val roomUpdateFormat: RootJsonFormat[RoomDataUpdate] = jsonFormat2(RoomDataUpdate.apply)
     implicit val updateForAdminFormat: RootJsonFormat[AdminUpdate] = jsonFormat1(AdminUpdate)
     implicit val practicabilityUpdateFormat: RootJsonFormat[PracticabilityUpdate] = jsonFormat2(PracticabilityUpdate.apply)
