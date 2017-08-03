@@ -154,7 +154,7 @@ final case class RouteResponse(request: RouteRequest, route: List[RoomID]) exten
 final case class RouteResponseShort(route: List[RoomID]) extends MessageContent
 
 
-final case class RouteRequestShort(userID: String, fromCellId: Int, toCellId: Int, isEscape: Boolean) extends MessageContent
+final case class RouteRequestShort(userID: String, fromCellUri: String, toCellUri: String, isEscape: Boolean) extends MessageContent
 
 /**
   * View of the Topology from the Cell perspective
