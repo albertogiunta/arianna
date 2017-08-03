@@ -74,10 +74,17 @@ class CellCoreActor extends BasicActor {
 
     override protected def receptive: Receive = {
 
-        case msg@AriadneMessage(Info, Info.Subtype.Request, this.self2Self, cnt: SensorsInfoUpdate) =>
+        case msg@AriadneMessage(Info, Info.Subtype.Request, this.self2Self, cnt: SensorsInfoUpdate) => {
             //Informations request from the cell publisher in order to complete the handshake task with the master
-            if (infoCell == CellInfo.empty || sensorsMounted.isEmpty) stash()
-            sender() ! msg.copy(subtype = Info.Subtype.Response, content = SensorsInfoUpdate(infoCell, sensorsMounted))
+            if (infoCell == CellInfo.empty || sensorsMounted.isEmpty) {
+                stash()
+            } else {
+                sender() ! msg.copy(
+                    subtype = Info.Subtype.Response,
+                    content = SensorsInfoUpdate(infoCell, sensorsMounted)
+                )
+            }
+        }
 
         case msg@AriadneMessage(Error, Error.Subtype.CellMappingMismatch, _, cnt: Empty) =>
             log.error("Mapping Error")
@@ -103,7 +110,7 @@ class CellCoreActor extends BasicActor {
             }
         }
 
-        case AriadneMessage(Update, Update.Subtype.Practicability, `cell2Cell`, cnt: PracticabilityUpdate) =>
+        case AriadneMessage(Update, Update.Subtype.Practicability, this.cell2Cell, cnt: PracticabilityUpdate) =>
             topology.put(cnt.cell.uri, topology(cnt.cell.uri)
                 .copy(practicability = cnt.practicability))
 
