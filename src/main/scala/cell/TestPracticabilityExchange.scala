@@ -50,7 +50,7 @@ class TestPracticabilityExchange extends App {
         Update.Subtype.Practicability,
         Location.Cell >> Location.Master,
         PracticabilityUpdate(
-            RCInfo(RoomID(cellID, cellName), CellInfo(cellUri, cellPort)),
+            CellInfo(cellUri, cellPort),
             practicability = 50.0
         )
     )

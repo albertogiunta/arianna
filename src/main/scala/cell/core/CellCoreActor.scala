@@ -2,7 +2,6 @@ package cell.core
 
 import akka.actor.{ActorRef, Props}
 import cell.cluster.{CellPublisher, CellSubscriber}
-import processor.route.actors.RouteManager
 import cell.sensormanagement.SensorManager
 import com.actors.{BasicActor, ClusterMembersListener}
 import com.utils.Practicability
@@ -11,6 +10,7 @@ import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology.Subtype.ViewedFromACell
 import ontologies.messages.MessageType._
 import ontologies.messages._
+import processor.route.actors.RouteManager
 import spray.json._
 
 import scala.collection.mutable
@@ -74,16 +74,16 @@ class CellCoreActor extends BasicActor {
 
     override protected def receptive: Receive = {
 
-        case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, this.self2Self, _) =>
-            //Acknowledgement request from an internal actor
+        case msg@AriadneMessage(Info, Info.Subtype.Request, this.self2Self, cnt: SensorsInfoUpdate) =>
+            //Informations request from the cell publisher in order to complete the handshake task with the master
             if (infoCell == CellInfo.empty || sensorsMounted.isEmpty) stash()
-            sender() ! msg.copy(content = SensorsInfoUpdate(infoCell, sensorsMounted))
+            sender() ! msg.copy(subtype = Info.Subtype.Response, content = SensorsInfoUpdate(infoCell, sensorsMounted))
 
         case msg@AriadneMessage(Error, Error.Subtype.CellMappingMismatch, _, cnt: Empty) =>
             log.error("Mapping Error")
 
         case msg@AriadneMessage(Topology, ViewedFromACell, this.server2Cell, cnt: AreaViewedFromACell) => {
-            println(s"Area arrived from Server $cnt")
+            log.info(s"Area arrived from Server $cnt")
             cnt.rooms.foreach(X => topology.put(X.cell.uri, X))
             userActor ! AriadneMessage(Init,
                 Init.Subtype.Greetings,
@@ -99,7 +99,7 @@ class CellCoreActor extends BasicActor {
                 unstashAll()
             } else {
                 sensorsMounted = cnt.sensors
-                cellPublisher ! msg.copy(content = cnt.copy(info = this.infoCell))
+                cellPublisher ! msg.copy(content = cnt.copy(cell = this.infoCell))
             }
         }
 
@@ -113,7 +113,7 @@ class CellCoreActor extends BasicActor {
 
             topology.put(infoCell.uri, topology(infoCell.uri).copy(practicability =
                 Practicability(
-                    topology(infoCell.uri).capacity,
+                    topology(infoCell.uri).info.capacity,
                     cnt.currentPeople,
                     topology(infoCell.uri).passages.length)))
 
@@ -152,10 +152,7 @@ class CellCoreActor extends BasicActor {
             if (topology.size != 0) {
                 val currentCell: RoomViewedFromACell = topology.get(infoCell.uri).get
                 val msgToSend = msg.copy(direction = cell2Cluster,
-                    content = AlarmContent(infoCell,
-                        currentCell.isExitPoint,
-                        currentCell.isEntryPoint
-                    )
+                    content = AlarmContent(infoCell, currentCell.info)
                 )
                 cellPublisher ! msgToSend
             }
@@ -163,7 +160,7 @@ class CellCoreActor extends BasicActor {
 
         case AriadneMessage(Alarm, _, this.cell2Cluster, alarm) => {
             val (id, area) = alarm match {
-                case AlarmContent(compromisedCell, _, _) =>
+                case AlarmContent(compromisedCell, _) =>
                     ("-1", topology.values.map(cell => {
                         if (cell.cell.uri == compromisedCell.uri)
                             cell.copy(practicability = Double.PositiveInfinity)
@@ -178,7 +175,7 @@ class CellCoreActor extends BasicActor {
                 Route.Subtype.Info,
                 self2Self,
                 RouteInfo(
-                    RouteRequest(id, topology(infoCell.uri).cell, CellInfo.empty, isEscape = true),
+                    RouteRequest(id, topology(infoCell.uri).info.id, RoomID.empty, isEscape = true),
                     AreaViewedFromACell(Random.nextInt(), area)
                 )
             )

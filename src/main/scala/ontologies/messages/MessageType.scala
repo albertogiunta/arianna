@@ -504,14 +504,13 @@ object MessageType {
         }
 
     }
-    
-    
+
     object SignalStrength extends MessageType {
 
         override val typeName = "SignalStrength"
 
         object Subtype {
-    
+
             /**
               * Takes a Empty object as MessageContent
               */
@@ -524,7 +523,7 @@ object MessageType {
 
                 override def marshal(obj: MessageContent): String = obj.asInstanceOf[Empty].toJson.toString()
             }
-    
+
             /**
               * Takes a Empty object as MessageContent
               */
@@ -537,7 +536,7 @@ object MessageType {
 
                 override def marshal(obj: MessageContent): String = obj.asInstanceOf[Empty].toJson.toString()
             }
-    
+
             /**
               * Takes a Empty object as MessageContent
               */
@@ -550,7 +549,7 @@ object MessageType {
 
                 override def marshal(obj: MessageContent): String = obj.asInstanceOf[Empty].toJson.toString()
             }
-    
+
             /**
               * Takes a Empty object as MessageContent
               */
@@ -611,9 +610,9 @@ object MessageType {
                 override val superType: MessageType = Interface
 
                 override val subtypeName: String = "CloseChart"
-    
+
                 override def unmarshal(json: String): MessageContent = json.parseJson.convertTo[CellInfo]
-    
+
                 override def marshal(obj: MessageContent): String = obj.asInstanceOf[CellInfo].toJson.toString()
             }
 
@@ -621,6 +620,44 @@ object MessageType {
 
     }
 
+    object Info extends MessageType {
+
+        override val typeName = "Info"
+
+        object Subtype {
+
+            /**
+              * A generic info request that an actor 'A' do to another actor 'B' to ask the information that it needs
+              * in order to complete a specific job
+              **/
+            object Request extends MessageSubtype {
+
+                override val subtypeName = "InfoRequest"
+
+                override val superType = Info
+
+                override def unmarshal(json: String): Empty = json.parseJson.convertTo[Empty]
+
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[Empty].toJson.toString()
+            }
+
+            /**
+              * A generic info response of actor 'B' after a request from the actor 'A'
+              **/
+            object Response extends MessageSubtype {
+
+                override val subtypeName = "InfoResponse"
+
+                override val superType = Info
+
+                override def unmarshal(json: String): Empty = json.parseJson.convertTo[Empty]
+
+                override def marshal(obj: MessageContent): String = obj.asInstanceOf[Empty].toJson.toString()
+            }
+
+        }
+
+    }
 
     implicit def MessageType2String(msg: MessageType): String = msg.typeName
 
@@ -639,6 +676,7 @@ object MessageType {
             case t if t == SignalStrength.toLowerCase => SignalStrength
             case t if t == SwitcherMsg.toLowerCase => SwitcherMsg
             case t if t == Interface.toLowerCase => Interface
+            case t if t == Info.toLowerCase => Info
 
             case _ => null
         }
