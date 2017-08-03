@@ -46,65 +46,13 @@
           "id": {
             "serial": 2,
             "name": "Room B"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 250,
-              "y": 130
-            },
-            "northEast": {
-              "x": 300,
-              "y": 130
-            },
-            "southWest": {
-              "x": 250,
-              "y": 170
-            },
-            "southEast": {
-              "x": 300,
-              "y": 170
-            }
-          },
-          "antennaPosition": {
-            "x": 275,
-            "y": 150
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         },
         {
           "id": {
             "serial": 4,
             "name": "Room D"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 150,
-              "y": 200
-            },
-            "northEast": {
-              "x": 200,
-              "y": 200
-            },
-            "southWest": {
-              "x": 150,
-              "y": 250
-            },
-            "southEast": {
-              "x": 200,
-              "y": 250
-            }
-          },
-          "antennaPosition": {
-            "x": 175,
-            "y": 225
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         }
       ],
       "passages": [
@@ -179,65 +127,13 @@
           "id": {
             "serial": 1,
             "name": "Room A"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 100,
-              "y": 100
-            },
-            "northEast": {
-              "x": 250,
-              "y": 100
-            },
-            "southWest": {
-              "x": 100,
-              "y": 200
-            },
-            "southEast": {
-              "x": 250,
-              "y": 200
-            }
-          },
-          "antennaPosition": {
-            "x": 175,
-            "y": 150
-          },
-          "isEntryPoint": true,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         },
         {
           "id": {
             "serial": 3,
             "name": "Room C"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 300,
-              "y": 100
-            },
-            "northEast": {
-              "x": 480,
-              "y": 100
-            },
-            "southWest": {
-              "x": 300,
-              "y": 200
-            },
-            "southEast": {
-              "x": 480,
-              "y": 200
-            }
-          },
-          "antennaPosition": {
-            "x": 390,
-            "y": 150
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         }
       ],
       "passages": [
@@ -312,65 +208,13 @@
           "id": {
             "serial": 2,
             "name": "Room B"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 250,
-              "y": 130
-            },
-            "northEast": {
-              "x": 300,
-              "y": 130
-            },
-            "southWest": {
-              "x": 250,
-              "y": 170
-            },
-            "southEast": {
-              "x": 300,
-              "y": 170
-            }
-          },
-          "antennaPosition": {
-            "x": 275,
-            "y": 150
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         },
         {
           "id": {
             "serial": 5,
             "name": "Room E"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 400,
-              "y": 200
-            },
-            "northEast": {
-              "x": 450,
-              "y": 200
-            },
-            "southWest": {
-              "x": 400,
-              "y": 250
-            },
-            "southEast": {
-              "x": 450,
-              "y": 250
-            }
-          },
-          "antennaPosition": {
-            "x": 425,
-            "y": 225
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         }
       ],
       "passages": [
@@ -445,65 +289,13 @@
           "id": {
             "serial": 1,
             "name": "Room A"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 100,
-              "y": 100
-            },
-            "northEast": {
-              "x": 250,
-              "y": 100
-            },
-            "southWest": {
-              "x": 100,
-              "y": 200
-            },
-            "southEast": {
-              "x": 250,
-              "y": 200
-            }
-          },
-          "antennaPosition": {
-            "x": 175,
-            "y": 150
-          },
-          "isEntryPoint": true,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         },
         {
           "id": {
             "serial": 6,
             "name": "Room F"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 100,
-              "y": 250
-            },
-            "northEast": {
-              "x": 260,
-              "y": 250
-            },
-            "southWest": {
-              "x": 100,
-              "y": 400
-            },
-            "southEast": {
-              "x": 260,
-              "y": 400
-            }
-          },
-          "antennaPosition": {
-            "x": 175,
-            "y": 325
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         }
       ],
       "passages": [
@@ -578,65 +370,13 @@
           "id": {
             "serial": 3,
             "name": "Room C"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 300,
-              "y": 100
-            },
-            "northEast": {
-              "x": 480,
-              "y": 100
-            },
-            "southWest": {
-              "x": 300,
-              "y": 200
-            },
-            "southEast": {
-              "x": 480,
-              "y": 200
-            }
-          },
-          "antennaPosition": {
-            "x": 390,
-            "y": 150
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         },
         {
           "id": {
             "serial": 8,
             "name": "Room H"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 300,
-              "y": 250
-            },
-            "northEast": {
-              "x": 480,
-              "y": 250
-            },
-            "southWest": {
-              "x": 300,
-              "y": 400
-            },
-            "southEast": {
-              "x": 480,
-              "y": 400
-            }
-          },
-          "antennaPosition": {
-            "x": 390,
-            "y": 325
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         }
       ],
       "passages": [
@@ -711,97 +451,19 @@
           "id": {
             "serial": 4,
             "name": "Room D"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 150,
-              "y": 200
-            },
-            "northEast": {
-              "x": 200,
-              "y": 200
-            },
-            "southWest": {
-              "x": 150,
-              "y": 250
-            },
-            "southEast": {
-              "x": 200,
-              "y": 250
-            }
-          },
-          "antennaPosition": {
-            "x": 175,
-            "y": 225
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         },
         {
           "id": {
             "serial": 7,
             "name": "Room G"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 260,
-              "y": 280
-            },
-            "northEast": {
-              "x": 300,
-              "y": 280
-            },
-            "southWest": {
-              "x": 260,
-              "y": 370
-            },
-            "southEast": {
-              "x": 300,
-              "y": 370
-            }
-          },
-          "antennaPosition": {
-            "x": 280,
-            "y": 325
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         },
         {
           "id": {
             "serial": 11,
             "name": "Room K"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 150,
-              "y": 400
-            },
-            "northEast": {
-              "x": 200,
-              "y": 400
-            },
-            "southWest": {
-              "x": 150,
-              "y": 450
-            },
-            "southEast": {
-              "x": 200,
-              "y": 450
-            }
-          },
-          "antennaPosition": {
-            "x": 175,
-            "y": 425
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         }
       ],
       "passages": [
@@ -887,65 +549,13 @@
           "id": {
             "serial": 6,
             "name": "Room F"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 100,
-              "y": 250
-            },
-            "northEast": {
-              "x": 260,
-              "y": 250
-            },
-            "southWest": {
-              "x": 100,
-              "y": 400
-            },
-            "southEast": {
-              "x": 260,
-              "y": 400
-            }
-          },
-          "antennaPosition": {
-            "x": 175,
-            "y": 325
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         },
         {
           "id": {
             "serial": 8,
             "name": "Room H"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 300,
-              "y": 250
-            },
-            "northEast": {
-              "x": 480,
-              "y": 250
-            },
-            "southWest": {
-              "x": 300,
-              "y": 400
-            },
-            "southEast": {
-              "x": 480,
-              "y": 400
-            }
-          },
-          "antennaPosition": {
-            "x": 390,
-            "y": 325
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         }
       ],
       "passages": [
@@ -1020,129 +630,25 @@
           "id": {
             "serial": 5,
             "name": "Room E"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 400,
-              "y": 200
-            },
-            "northEast": {
-              "x": 450,
-              "y": 200
-            },
-            "southWest": {
-              "x": 400,
-              "y": 250
-            },
-            "southEast": {
-              "x": 450,
-              "y": 250
-            }
-          },
-          "antennaPosition": {
-            "x": 425,
-            "y": 225
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         },
         {
           "id": {
             "serial": 7,
             "name": "Room G"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 260,
-              "y": 280
-            },
-            "northEast": {
-              "x": 300,
-              "y": 280
-            },
-            "southWest": {
-              "x": 260,
-              "y": 370
-            },
-            "southEast": {
-              "x": 300,
-              "y": 370
-            }
-          },
-          "antennaPosition": {
-            "x": 280,
-            "y": 325
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         },
         {
           "id": {
             "serial": 9,
             "name": "Room I"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 480,
-              "y": 280
-            },
-            "northEast": {
-              "x": 510,
-              "y": 280
-            },
-            "southWest": {
-              "x": 480,
-              "y": 370
-            },
-            "southEast": {
-              "x": 510,
-              "y": 370
-            }
-          },
-          "antennaPosition": {
-            "x": 495,
-            "y": 325
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         },
         {
           "id": {
             "serial": 12,
             "name": "Room L"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 400,
-              "y": 400
-            },
-            "northEast": {
-              "x": 450,
-              "y": 400
-            },
-            "southWest": {
-              "x": 400,
-              "y": 450
-            },
-            "southEast": {
-              "x": 450,
-              "y": 450
-            }
-          },
-          "antennaPosition": {
-            "x": 425,
-            "y": 425
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         }
       ],
       "passages": [
@@ -1239,65 +745,13 @@
           "id": {
             "serial": 8,
             "name": "Room H"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 300,
-              "y": 250
-            },
-            "northEast": {
-              "x": 480,
-              "y": 250
-            },
-            "southWest": {
-              "x": 300,
-              "y": 400
-            },
-            "southEast": {
-              "x": 480,
-              "y": 400
-            }
-          },
-          "antennaPosition": {
-            "x": 390,
-            "y": 325
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         },
         {
           "id": {
             "serial": 10,
             "name": "Room J"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 510,
-              "y": 210
-            },
-            "northEast": {
-              "x": 610,
-              "y": 210
-            },
-            "southWest": {
-              "x": 510,
-              "y": 450
-            },
-            "southEast": {
-              "x": 610,
-              "y": 450
-            }
-          },
-          "antennaPosition": {
-            "x": 560,
-            "y": 325
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         }
       ],
       "passages": [
@@ -1372,33 +826,7 @@
           "id": {
             "serial": 9,
             "name": "Room I"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 480,
-              "y": 280
-            },
-            "northEast": {
-              "x": 510,
-              "y": 280
-            },
-            "southWest": {
-              "x": 480,
-              "y": 370
-            },
-            "southEast": {
-              "x": 510,
-              "y": 370
-            }
-          },
-          "antennaPosition": {
-            "x": 495,
-            "y": 325
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         }
       ],
       "passages": [
@@ -1462,65 +890,13 @@
           "id": {
             "serial": 6,
             "name": "Room F"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 100,
-              "y": 250
-            },
-            "northEast": {
-              "x": 260,
-              "y": 250
-            },
-            "southWest": {
-              "x": 100,
-              "y": 400
-            },
-            "southEast": {
-              "x": 260,
-              "y": 400
-            }
-          },
-          "antennaPosition": {
-            "x": 175,
-            "y": 325
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         },
         {
           "id": {
             "serial": 13,
             "name": "Room M"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 100,
-              "y": 450
-            },
-            "northEast": {
-              "x": 270,
-              "y": 450
-            },
-            "southWest": {
-              "x": 100,
-              "y": 600
-            },
-            "southEast": {
-              "x": 270,
-              "y": 600
-            }
-          },
-          "antennaPosition": {
-            "x": 175,
-            "y": 525
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         }
       ],
       "passages": [
@@ -1595,65 +971,13 @@
           "id": {
             "serial": 8,
             "name": "Room H"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 300,
-              "y": 250
-            },
-            "northEast": {
-              "x": 480,
-              "y": 250
-            },
-            "southWest": {
-              "x": 300,
-              "y": 400
-            },
-            "southEast": {
-              "x": 480,
-              "y": 400
-            }
-          },
-          "antennaPosition": {
-            "x": 390,
-            "y": 325
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         },
         {
           "id": {
             "serial": 15,
             "name": "Room O"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 300,
-              "y": 450
-            },
-            "northEast": {
-              "x": 480,
-              "y": 450
-            },
-            "southWest": {
-              "x": 300,
-              "y": 600
-            },
-            "southEast": {
-              "x": 480,
-              "y": 600
-            }
-          },
-          "antennaPosition": {
-            "x": 390,
-            "y": 525
-          },
-          "isEntryPoint": true,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         }
       ],
       "passages": [
@@ -1728,65 +1052,13 @@
           "id": {
             "serial": 11,
             "name": "Room K"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 150,
-              "y": 400
-            },
-            "northEast": {
-              "x": 200,
-              "y": 400
-            },
-            "southWest": {
-              "x": 150,
-              "y": 450
-            },
-            "southEast": {
-              "x": 200,
-              "y": 450
-            }
-          },
-          "antennaPosition": {
-            "x": 175,
-            "y": 425
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         },
         {
           "id": {
             "serial": 14,
             "name": "Room N"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 270,
-              "y": 490
-            },
-            "northEast": {
-              "x": 300,
-              "y": 490
-            },
-            "southWest": {
-              "x": 270,
-              "y": 560
-            },
-            "southEast": {
-              "x": 300,
-              "y": 560
-            }
-          },
-          "antennaPosition": {
-            "x": 285,
-            "y": 525
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         }
       ],
       "passages": [
@@ -1861,65 +1133,13 @@
           "id": {
             "serial": 13,
             "name": "Room M"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 100,
-              "y": 450
-            },
-            "northEast": {
-              "x": 270,
-              "y": 450
-            },
-            "southWest": {
-              "x": 100,
-              "y": 600
-            },
-            "southEast": {
-              "x": 270,
-              "y": 600
-            }
-          },
-          "antennaPosition": {
-            "x": 175,
-            "y": 525
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         },
         {
           "id": {
             "serial": 15,
             "name": "Room O"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 300,
-              "y": 450
-            },
-            "northEast": {
-              "x": 480,
-              "y": 450
-            },
-            "southWest": {
-              "x": 300,
-              "y": 600
-            },
-            "southEast": {
-              "x": 480,
-              "y": 600
-            }
-          },
-          "antennaPosition": {
-            "x": 390,
-            "y": 525
-          },
-          "isEntryPoint": true,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         }
       ],
       "passages": [
@@ -1994,65 +1214,13 @@
           "id": {
             "serial": 12,
             "name": "Room L"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 400,
-              "y": 400
-            },
-            "northEast": {
-              "x": 450,
-              "y": 400
-            },
-            "southWest": {
-              "x": 400,
-              "y": 450
-            },
-            "southEast": {
-              "x": 450,
-              "y": 450
-            }
-          },
-          "antennaPosition": {
-            "x": 425,
-            "y": 425
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         },
         {
           "id": {
             "serial": 14,
             "name": "Room N"
-          },
-          "roomVertices": {
-            "northWest": {
-              "x": 270,
-              "y": 490
-            },
-            "northEast": {
-              "x": 300,
-              "y": 490
-            },
-            "southWest": {
-              "x": 270,
-              "y": 560
-            },
-            "southEast": {
-              "x": 300,
-              "y": 560
-            }
-          },
-          "antennaPosition": {
-            "x": 285,
-            "y": 525
-          },
-          "isEntryPoint": false,
-          "isExitPoint": false,
-          "capacity": 100,
-          "squareMeters": 50.0
+          }
         }
       ],
       "passages": [

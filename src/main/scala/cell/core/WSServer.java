@@ -60,11 +60,11 @@ public class WSServer extends AbstractVerticle {
             } else if (ws.path().equals(baseUrl + "/route")) {
                 ws.handler(data -> {
                     System.out.println("asked route " + data.toString());
-                    Integer idStart = Integer.parseInt(data.toString().split("-")[0]);
-                    Integer idEnd   = Integer.parseInt(data.toString().split("-")[1]);
-                    Pair    p       = new Pair<>(idStart, idEnd);
+                    String uriStart = data.toString().split("-")[0];
+                    String uriEnd   = data.toString().split("-")[1];
+                    Pair   p        = new Pair<>(uriStart, uriEnd);
                     usersWaitingForRoute.computeIfAbsent(p, k -> new LinkedList<>()).add(new Pair<>(ws.textHandlerID(), ws));
-                    userActor.tell(new RouteRequestShort(ws.textHandlerID(), idStart, idEnd, false), ActorRef.noSender());
+                    userActor.tell(new RouteRequestShort(ws.textHandlerID(), uriStart, uriEnd, false), ActorRef.noSender());
                 });
             } else if (ws.path().equals(baseUrl + "/alarm")) {
                 this.usersReadyForAlarm.put(ws.textHandlerID(), ws);

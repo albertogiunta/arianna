@@ -39,7 +39,7 @@ final case class Area(id: Int, rooms: List[Room]) extends MessageContent
   */
 final case class Room(info: RoomInfo,
                       cell: Cell,
-                      neighbors: List[RoomInfo],
+                      neighbors: List[RoomID],
                       passages: List[Passage],
                       currentPeople: Int,
                       practicability: Double) extends MessageContent
@@ -178,7 +178,7 @@ object AreaViewedFromACell {
   */
 final case class RoomViewedFromACell(info: RoomInfo,
                                      cell: CellInfo,
-                                     neighbors: List[RoomInfo],
+                                     neighbors: List[RoomID],
                                      passages: List[Passage],
                                      practicability: Double) extends MessageContent
 
@@ -198,7 +198,7 @@ object RoomViewedFromACell {
 final case class RoomViewedFromAUser(actorPath: String,
                                      info: RoomInfo,
                                      cell: CellInfo,
-                                     neighbors: List[RoomInfo],
+                                     neighbors: List[RoomID],
                                      passages: List[Passage]) extends MessageContent // To be renamed CellViewedFromAUser
 
 object RoomViewedFromAUser {
