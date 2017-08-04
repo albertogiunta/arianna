@@ -25,6 +25,7 @@ class TopologySupervisor extends BasicActor {
     
     private var topology: mutable.Map[String, Room] = mutable.HashMap.empty
     private var indexByUri: mutable.Map[String, String] = mutable.HashMap.empty
+    
     private var mapVersionID: Int = 0
     
     private val cell2Master: MessageDirection = Location.Cell >> Location.Master
