@@ -37,7 +37,7 @@ class SensorManager extends BasicActor {
             observableSensors += SensorsFactory.createTheObservableVersion(simSensor)
         })
         initializeSensors()
-
+        log.info(s"[{}] {} sensor/s initialized", this.name, sensorsToLoad.size)
     }
 
     private def initializeSensors(): Unit = {

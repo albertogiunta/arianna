@@ -44,13 +44,14 @@ class TestPracticabilityExchange extends App {
         Point(1, -1))
     private val antennaPosition: Point = Point(0, 0)
 
+    private val testRoomID: RoomID = new RoomID(1, "testPracticability")
 
     publisher ! AriadneMessage(
         Update,
         Update.Subtype.Practicability,
         Location.Cell >> Location.Master,
         PracticabilityUpdate(
-            CellInfo(cellUri, cellPort),
+            testRoomID,
             practicability = 50.0
         )
     )

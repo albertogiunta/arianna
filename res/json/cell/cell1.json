@@ -1,5 +1,8 @@
 {
-    "uri": "uri1",
+    "cellInfo": {
+        "uri": "uri1",
+        "port": 8080
+    },
     "sensors": [
         {
             "categoryId": 1,
