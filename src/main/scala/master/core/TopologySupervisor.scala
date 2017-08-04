@@ -24,13 +24,13 @@ import scala.collection.mutable
 class TopologySupervisor extends BasicActor {
     
     private var topology: mutable.Map[String, Room] = mutable.HashMap.empty
-    
+    private var indexByUri: mutable.Map[String, String] = mutable.HashMap.empty
     private var mapVersionID: Int = 0
     
-    private val cell2Server: MessageDirection = Location.Cell >> Location.Master
-    private val server2Cell: MessageDirection = cell2Server.reverse
-    private val admin2Server: MessageDirection = Location.Admin >> Location.Master
-    private val server2Admin: MessageDirection = admin2Server.reverse
+    private val cell2Master: MessageDirection = Location.Cell >> Location.Master
+    private val master2Cell: MessageDirection = cell2Master.reverse
+    private val admin2Master: MessageDirection = Location.Admin >> Location.Master
+    private val master2Admin: MessageDirection = admin2Master.reverse
     
     private val dataStreamer = context.actorOf(Props(
         new DataStreamer(target = sibling(NamingSystem.AdminManager).get)), "DataStreamer")
@@ -41,25 +41,27 @@ class TopologySupervisor extends BasicActor {
     private val synced: Counter = Counter()
     
     override def init(args: List[Any]) = {
+    
         super.init(args)
     
         dataStreamer ! AriadneMessage(
             Error, Error.Subtype.LookingForAMap,
-            server2Admin, Empty()
+            master2Admin, Empty()
         )
         
     }
     
     override protected def receptive = {
     
-        case msg@AriadneMessage(Topology, Planimetrics, `admin2Server`, map: Area) =>
+        case msg@AriadneMessage(Topology, Planimetrics, `admin2Master`, map: Area) =>
             log.info("A topology has been loaded in the server...")
     
             if (topology.isEmpty || map.id != mapVersionID) {
     
                 mapVersionID = map.id
     
-                topology = mutable.HashMap(map.rooms.map(c => c.cell.info.uri -> c): _*)
+                topology = mutable.HashMap(map.rooms.map(room => room.info.id.name -> room): _*)
+                indexByUri = mutable.HashMap(map.rooms.map(room => room.cell.info.uri -> room.info.id.name): _*)
                 
                 context.become(behavior = sociable, discardOld = true)
                 log.info("I've become Sociable...")
@@ -83,18 +85,23 @@ class TopologySupervisor extends BasicActor {
                 dataStreamer ! AriadneMessage(
                     Error,
                     Error.Subtype.MapIdentifierMismatch,
-                    server2Admin,
+                    master2Admin,
                     Empty()
                 )
             }
-    
-        case msg@AriadneMessage(Handshake, CellToMaster, `cell2Server`, SensorsInfoUpdate(cell, sensors)) =>
 
-            if (topology.get(cell.uri).nonEmpty) {
+        case msg@AriadneMessage(Handshake, CellToMaster, `cell2Master`, SensorsInfoUpdate(cell, sensors)) =>
+    
+            val roomName = indexByUri.get(cell.uri)
+    
+            if (roomName.nonEmpty) {
+                
                 log.info("Found a match into the loaded Topology for {}", cell.uri)
+        
                 val newCell = messages.Cell(cell, sensors)
-                val newRoom = topology(cell.uri).copy(cell = newCell)
-                topology.put(cell.uri, newRoom)
+                val newRoom = topology(roomName.get).copy(cell = newCell)
+        
+                topology.put(roomName.get, newRoom)
     
                 dataStreamer ! msg
     
@@ -107,7 +114,7 @@ class TopologySupervisor extends BasicActor {
     
                     // Update all the Cells but first notify the subscriber
                     subscriber() ! AriadneMessage(
-                        Topology, ViewedFromACell, server2Cell,
+                        Topology, ViewedFromACell, master2Cell,
                         AreaViewedFromACell(
                             mapVersionID,
                             topology.map(e => RoomViewedFromACell(e._2)).toList
@@ -120,7 +127,7 @@ class TopologySupervisor extends BasicActor {
                     sender.path.elements.mkString("/"),
                     AriadneMessage(
                         Error, Error.Subtype.CellMappingMismatch,
-                        server2Cell,
+                        master2Cell,
                         Empty()
                     )
                 )
@@ -139,17 +146,17 @@ class TopologySupervisor extends BasicActor {
                 dataStreamer ! AriadneMessage(
                     Error,
                     Error.Subtype.MapIdentifierMismatch,
-                    server2Admin,
+                    master2Admin,
                     Empty()
                 )
             }
+
+        case AriadneMessage(Update, CurrentPeople, `cell2Master`, pkg: CurrentPeopleUpdate) =>
     
-        case AriadneMessage(Update, CurrentPeople, `cell2Server`, pkg: CurrentPeopleUpdate) =>
-    
-            if (topology.get(pkg.cell.uri).nonEmpty) {
-                val oldRoom = topology(pkg.cell.uri)
+            if (topology.get(pkg.room.name).nonEmpty) {
+                val oldRoom = topology(pkg.room.name)
         
-                topology.put(pkg.cell.uri,
+                topology.put(pkg.room.name,
                     oldRoom.copy(
                         currentPeople = pkg.currentPeople,
                         practicability = Practicability(oldRoom.info.capacity, pkg.currentPeople, oldRoom.passages.length)
@@ -160,7 +167,7 @@ class TopologySupervisor extends BasicActor {
                 dataStreamer ! topology.values
             }
 
-        case AriadneMessage(Update, Sensors, `cell2Server`, pkg: SensorsInfoUpdate) =>
+        case AriadneMessage(Update, Sensors, `cell2Master`, pkg: SensorsInfoUpdate) =>
     
             if (topology.get(pkg.cell.uri).nonEmpty) {
                 val newCell = topology(pkg.cell.uri).cell.copy(sensors = pkg.sensors)
@@ -171,14 +178,14 @@ class TopologySupervisor extends BasicActor {
                 dataStreamer ! topology.values
             }
 
-        case AriadneMessage(Handshake, CellToMaster, `cell2Server`, _) =>
+        case AriadneMessage(Handshake, CellToMaster, `cell2Master`, _) =>
             log.info("Late handshake from {}...", sender.path)
             log.info(sender.path.name)
 
             publisher() ! (
                 sender.path.elements.mkString("/"),
                 AriadneMessage(
-                    Topology, ViewedFromACell, server2Cell,
+                    Topology, ViewedFromACell, master2Cell,
                     AreaViewedFromACell(
                         mapVersionID,
                         topology.map(e => RoomViewedFromACell(e._2)).toList)

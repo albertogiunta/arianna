@@ -24,19 +24,18 @@ import scala.util.Random
 class MasterSubscriberTest extends TestKit(ActorSystem("SubscriberTest", MasterSubscriberTest.config))
     with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll {
     
+    val path2map: String = MasterSubscriberTest.path2Project + "/res/json/map4test.json"
+    
+    val plan: String = Source.fromFile(new File(path2map)).getLines.mkString
+    
+    val cellInfo = CellInfo(uri = "PancoPillo", port = 8080)
+    
     val handshake = AriadneMessage(
         Handshake,
         Handshake.Subtype.CellToMaster,
         Location.Cell >> Location.Master,
-        SensorsInfoUpdate(
-            CellInfo.empty,
-            List(SensorInfo(0, 0.0))
-        )
+        SensorsInfoUpdate(cellInfo, List(SensorInfo(1, 10.0)))
     )
-    
-    val path2map: String = MasterSubscriberTest.path2Project + "/res/json/map4test.json"
-    
-    val plan: String = Source.fromFile(new File(path2map)).getLines.mkString
     
     val planimetric = AriadneMessage(
         Topology,
@@ -56,7 +55,7 @@ class MasterSubscriberTest extends TestKit(ActorSystem("SubscriberTest", MasterS
         Update,
         Update.Subtype.CurrentPeople,
         Location.Cell >> Location.Master,
-        CurrentPeopleUpdate(CellInfo.empty, 0)
+        CurrentPeopleUpdate(RoomID(serial = 666, name = "PancoPillo"), 0)
     )
     
     override def afterAll {

@@ -23,13 +23,13 @@ import scala.util.Random
   * Created by Matteo Gabellini on 14/07/2017.
   */
 class CellCoreActor extends BasicActor {
-
-    private val greetings: String = "FROM CELL CORE ACTOR Hello there, it's time to dress-up"
-
+    
     private var infoCell: CellInfo = CellInfo.empty
     private var sensorsMounted: List[SensorInfo] = List.empty[SensorInfo]
-    private val topology: mutable.Map[String, RoomViewedFromACell] = mutable.HashMap[String, RoomViewedFromACell]()
-
+    
+    private val topology: mutable.Map[String, RoomViewedFromACell] = mutable.HashMap.empty
+    private val indexByUri: mutable.Map[String, String] = mutable.HashMap.empty
+    
     private var actualSelfLoad: Int = 0
 
     var clusterListener: ActorRef = _
@@ -47,7 +47,7 @@ class CellCoreActor extends BasicActor {
     private val cell2User: MessageDirection = Location.Cell >> Location.User
     private val user2Cell: MessageDirection = Location.Cell << Location.User
 
-    override def preStart(): Unit = {
+    override def preStart: Unit = {
         super.preStart()
         clusterListener = context.actorOf(Props[ClusterMembersListener], "CellClusterListener")
 
@@ -91,7 +91,10 @@ class CellCoreActor extends BasicActor {
 
         case msg@AriadneMessage(Topology, ViewedFromACell, this.server2Cell, cnt: AreaViewedFromACell) => {
             log.info(s"Area arrived from Server $cnt")
-            cnt.rooms.foreach(X => topology.put(X.cell.uri, X))
+            
+            cnt.rooms.foreach(room => topology.put(room.info.id.name, room))
+            cnt.rooms.foreach(room => indexByUri.put(room.cell.uri, room.info.id.name))
+            
             userActor ! AriadneMessage(Init,
                 Init.Subtype.Greetings,
                 self2Self,
@@ -111,14 +114,14 @@ class CellCoreActor extends BasicActor {
         }
 
         case AriadneMessage(Update, Update.Subtype.Practicability, this.cell2Cell, cnt: PracticabilityUpdate) =>
-            topology.put(cnt.cell.uri, topology(cnt.cell.uri)
+            topology.put(cnt.room.name, topology(cnt.room.name)
                 .copy(practicability = cnt.practicability))
 
         case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, this.user2Cell, cnt: CurrentPeopleUpdate) => {
 
             actualSelfLoad = cnt.currentPeople
-
-            topology.put(infoCell.uri, topology(infoCell.uri).copy(practicability =
+            
+            topology.put(cnt.room.name, topology(infoCell.uri).copy(practicability =
                 Practicability(
                     topology(infoCell.uri).info.capacity,
                     cnt.currentPeople,

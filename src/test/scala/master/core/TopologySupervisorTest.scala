@@ -58,7 +58,7 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
         Update,
         Update.Subtype.CurrentPeople,
         Location.Cell >> Location.Master,
-        CurrentPeopleUpdate(cellInfo, 666)
+        CurrentPeopleUpdate(RoomID(serial = 666, name = "PancoPillo"), 666)
     )
     
     val sensorsUpdate = AriadneMessage(
@@ -129,24 +129,29 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
             "accept new sensors values" in {
     
                 val topology = mutable.HashMap(planimetric.content.rooms.map(r => r.cell.info.uri -> r): _*)
+    
                 val newCell = topology(handshake.content.cell.uri).cell
                     .copy(
                         info = handshake.content.cell,
                         sensors = sensorsUpdate.content.sensors
                     )
+    
                 val newRoom = topology(handshake.content.cell.uri).copy(cell = newCell)
+    
                 topology.put(handshake.content.cell.uri, newRoom)
                 tester ! sensorsUpdate
-                probe.expectMsg(AdminUpdate(topology.values.map(c => RoomDataUpdate(c)).toList))
+                probe.expectMsg(AdminUpdate(0, topology.values.map(c => RoomDataUpdate(c)).toList))
             }
             
             "accept new current people" in {
+    
                 val topology: mutable.Map[String, Room] =
-                    mutable.HashMap(planimetric.content.rooms.map(r => r.cell.info.uri -> r): _*)
+                    mutable.HashMap(planimetric.content
+                        .rooms.map(room => room.cell.info.uri -> room): _*)
     
                 val oldRoom = topology(handshake.content.cell.uri)
     
-                val news: Room = topology(handshake.content.cell.uri)
+                val newRoom: Room = topology(handshake.content.cell.uri)
                     .copy(
                         cell = ontologies.messages.Cell(handshake.content.cell, sensorsUpdate.content.sensors),
                         currentPeople = currentPeopleUpdate.content.currentPeople,
@@ -157,10 +162,11 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
                         )
                     )
     
-                topology.put(handshake.content.cell.uri, news)
+                topology.put(handshake.content.cell.uri, newRoom)
                 
                 tester ! currentPeopleUpdate
-                probe.expectMsg(AdminUpdate(topology.values.map(c => RoomDataUpdate(c)).toList))
+    
+                probe.expectMsg(AdminUpdate(0, topology.values.map(c => RoomDataUpdate(c)).toList))
             }
         }
     }
