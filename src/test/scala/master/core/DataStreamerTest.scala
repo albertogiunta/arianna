@@ -36,7 +36,7 @@ class DataStreamerTest extends TestKit(ActorSystem("DataStreamerTest"))
                 Update,
                 Update.Subtype.Admin,
                 Location.Master >> Location.User,
-                AdminUpdate(List.empty[Room].map(c => RoomDataUpdate(c)))
+                AdminUpdate(0, List.empty[Room].map(c => RoomDataUpdate(c)))
             ))
             
             assert(probe.sender == tester.underlyingActor.admin)

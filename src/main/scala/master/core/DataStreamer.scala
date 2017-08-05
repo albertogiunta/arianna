@@ -29,7 +29,7 @@ class DataStreamer(private val target: ActorSelection,
     private val source = Source.queue[Iterable[Room]](100, OverflowStrategy.dropHead)
     
     private val stream = Flow[Iterable[Room]]
-        .map(map => AdminUpdate(map.map(c => RoomDataUpdate(c)).toList))
+        .map(map => AdminUpdate(0, map.map(c => RoomDataUpdate(c)).toList))
         .map(updates => AriadneMessage(Update, Subtype.Admin, Location.Master >> Location.Admin, updates))
         .throttle(1, 1000 milliseconds, 1, ThrottleMode.Shaping)
         .to(Sink.foreach(msg => handler(msg, target)))

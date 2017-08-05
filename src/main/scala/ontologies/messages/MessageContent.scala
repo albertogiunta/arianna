@@ -19,10 +19,15 @@ final case class Passage(neighborId: Int,
                          endCoordinates: Point) extends MessageContent
 
 /**
-  * This class is a static representation of
-  * the basic configuration of a cell when it starts
+  * This class is the correspondent class-mapping of
+  * the json configuration file used by a cell during
+  * its boot
+  *
+  * @param cellInfo represent the cell basic information
+  *                 used to set up the cell actors (uri & connection port)
+  * @param sensors  is the list of Sensor configurations to load
   **/
-final case class CellConfig(uri: String, sensors: List[SensorInfoFromConfig]) extends MessageContent
+final case class CellConfig(cellInfo: CellInfo, sensors: List[SensorInfoFromConfig]) extends MessageContent
 
 
 final case class Area(id: Int, rooms: List[Room]) extends MessageContent
@@ -225,17 +230,18 @@ object AreaViewedFromAUser {
   *
   * Could've also been used the LightCell View but to the master practicability isn't necessary.
   *
-  * @param cell          The identification info of the cell sending the data.
-  * @param currentPeople The actual number of people inside the Room where the cell is located into.
+  * @param room          The identification info of the room sending the data.
+  * @param currentPeople The actual number of people inside the Room.
   */
-final case class CurrentPeopleUpdate(cell: CellInfo, currentPeople: Int) extends MessageContent
+final case class CurrentPeopleUpdate(room: RoomID, currentPeople: Int) extends MessageContent
 
 object CurrentPeopleUpdate {
-    def apply(room: Room): CurrentPeopleUpdate = new CurrentPeopleUpdate(room.cell.info, room.currentPeople)
+    def apply(room: Room): CurrentPeopleUpdate = new CurrentPeopleUpdate(room.info.id, room.currentPeople)
 }
 
 /**
-  * This case class represent a sensor.
+  * This case class represent a sensor information
+  * exchanged between system actors.
   *
   * @param categoryId The Category of the Sensor
   * @param value      The actual Value percieved from the sensor
@@ -306,14 +312,14 @@ object SensorsInfoUpdate {
   * This class give a simplified view of a Cell for other cells, contaning the new number of people
   * and the calculated practicability level for the cell to be updated
   *
-  * @param cell           The Identification Info of the Cell to be updated
-  * @param practicability The actual practicability level of the Room the Cell is located into
+  * @param room           The Identification Info of the room to be updated.
+  * @param practicability The actual practicability level of the Room.
   */
-case class PracticabilityUpdate(cell: CellInfo, practicability: Double) extends MessageContent
+case class PracticabilityUpdate(room: RoomID, practicability: Double) extends MessageContent
 
 object PracticabilityUpdate {
     def apply(room: Room): PracticabilityUpdate =
-        new PracticabilityUpdate(room.cell.info, room.practicability)
+        new PracticabilityUpdate(room.info.id, room.practicability)
 }
 
 /**
@@ -325,12 +331,11 @@ object PracticabilityUpdate {
   * @param currentPeople Actual number of people inside the Room
   *
   */
-final case class RoomDataUpdate(cell: Cell,
-                                currentPeople: Int) extends MessageContent // To be renamed CellData
+final case class RoomDataUpdate(room: RoomID, cell: Cell, currentPeople: Int) extends MessageContent // To be renamed CellData
 
 object RoomDataUpdate {
     def apply(room: Room): RoomDataUpdate =
-        new RoomDataUpdate(room.cell, room.currentPeople)
+        new RoomDataUpdate(room.info.id, room.cell, room.currentPeople)
 }
 
 /**
@@ -339,7 +344,7 @@ object RoomDataUpdate {
   *
   * @param list A List of CellUpdates, containing a simplified view of a Cell
   */
-final case class AdminUpdate(list: List[RoomDataUpdate]) extends MessageContent // to be renamed AdminUpdate
+final case class AdminUpdate(id: Int, list: List[RoomDataUpdate]) extends MessageContent // to be renamed AdminUpdate
 
 /**
   * This case class is meant to be used as Content to update Cells
