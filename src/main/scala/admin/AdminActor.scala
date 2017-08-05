@@ -1,13 +1,10 @@
 package admin
 
-import akka.actor.{ActorRef, Props}
+import akka.actor.Props
 import com.actors.BasicActor
 import ontologies.messages.Location._
-import ontologies.messages.MessageType.{Alarm, Handshake, Interface, Topology}
+import ontologies.messages.MessageType.{Alarm, Error, Handshake, Init, Topology}
 import ontologies.messages._
-
-import scala.collection.mutable
-import scalafx.application.Platform
 
 /**
   * This actor intermediates between the interface and the System. It sends the loaded map, handles the messages coming
@@ -19,31 +16,22 @@ import scalafx.application.Platform
   */
 class AdminActor() extends BasicActor {
 
-    private var interfaceController: InterfaceController = _
-
-    private var roomIDs: mutable.Map[CellInfo, RoomID] = new mutable.HashMap[CellInfo, RoomID]
-
-    private val chartActors: mutable.Map[RoomID, ActorRef] = new mutable.HashMap[RoomID, ActorRef]
     //Se si fa partire solo l'admin manager
     private val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/AdminManager")
     //Se si fa partire il master
     //val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/Master/AdminManager")
-
+    private val interfaceActor = context.actorOf(Props[InterfaceActor])
+    private var areaLoaded: Area = _
     private val toServer: MessageDirection = Location.Admin >> Location.Master
 
     override def init(args: List[Any]): Unit = {
-        Platform.runLater {
-            val view: InterfaceView = new InterfaceView
-            view.start
-            interfaceController = view.controller
-            interfaceController.adminActor = self
-        }
+        interfaceActor ! AriadneMessage(Init, Init.Subtype.Greetings, Location.Admin >> Location.Self, Greetings(List.empty))
     }
 
     override def receptive: Receive = {
         //Ricezione del messaggio iniziale dall'interfaccia con aggiornamento iniziale
         case msg@AriadneMessage(_, Topology.Subtype.Planimetrics, _, area: Area) => {
-            area.rooms.foreach(r => roomIDs += ((r.cell.info, r.info.id)))
+            areaLoaded = area
             adminManager ! msg.copy(direction = toServer)
             context.become(operational)
         }
@@ -53,32 +41,18 @@ class AdminActor() extends BasicActor {
     }
 
     def operational: Receive = {
-        //Ricezione dell'aggiornamento delle celle
-        case msg@AriadneMessage(_, MessageType.Update.Subtype.Admin, _, adminUpdate: AdminUpdate) => {
-            val updateCells: mutable.Map[RoomID, RoomDataUpdate] = new mutable.HashMap[RoomID, RoomDataUpdate]
-            adminUpdate.list.foreach(update => updateCells += ((update.room, update)))
-            interfaceController updateView updateCells.values.toList
-            chartActors.foreach(actor => actor._2 ! AriadneMessage(Interface, Interface.Subtype.UpdateChart, Location.Admin >> Location.Self, updateCells.get(actor._1).get))
-        }
+
+        case msg@AriadneMessage(_, MessageType.Update.Subtype.Admin, _, adminUpdate: AdminUpdate) => interfaceActor ! msg.copy(direction = Location.Admin >> Location.Self)
 
         case msg@AriadneMessage(_, Alarm.Subtype.FromInterface, _, _) => adminManager ! msg.copy(direction = toServer)
 
-        case msg@AriadneMessage(_, Alarm.Subtype.FromCell, _, content: AlarmContent) => interfaceController triggerAlarm content
+        case msg@AriadneMessage(_, Alarm.Subtype.FromCell, _, content: AlarmContent) => interfaceActor ! msg
 
-        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => {
-            interfaceController.initializeSensors(sensorsInfo, roomIDs.get(sensorsInfo.cell).get)
-        }
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => interfaceActor ! msg
 
-        case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
-            var chartActor = context.actorOf(Props[ChartActor])
-            chartActors += ((cell.cell.id, chartActor))
-            chartActor ! msg
-        }
+        case msg@AriadneMessage(Error, Error.Subtype.LookingForAMap, _, _) => adminManager ! AriadneMessage(Topology, Topology.Subtype.Planimetrics, Location.Admin >> Location.Master, areaLoaded)
 
-        case msg@AriadneMessage(Interface, Interface.Subtype.CloseChart, _, cell: RoomInfo) => {
-            context stop chartActors.get(cell.id).get
-            interfaceController enableButton cell.id
-        }
+        case msg@AriadneMessage(Error, Error.Subtype.MapIdentifierMismatch, _, _) => interfaceActor ! AriadneMessage(Error, Error.Subtype.Generic, Location.Admin >> Location.Self, new Empty)
 
         case _ => desist _
 
