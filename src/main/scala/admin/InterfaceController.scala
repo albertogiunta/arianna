@@ -28,7 +28,7 @@ import scalafx.stage.FileChooser.ExtensionFilter
 class InterfaceController extends Initializable {
     var adminActor: ActorRef = _
     var interfaceView: InterfaceView = _
-    private val cellControllers: mutable.Map[Int, CellTemplateController] = new mutable.HashMap[Int, CellTemplateController]
+    private val cellControllers: mutable.Map[RoomID, CellTemplateController] = new mutable.HashMap[RoomID, CellTemplateController]
     private var canvasController: CanvasController = _
 
     @FXML
@@ -51,14 +51,15 @@ class InterfaceController extends Initializable {
       *
       * @param update : this is a List of CellForView containing the updated data
       **/
-    def updateView(update: List[CellForView]): Unit = {
+    def updateView(update: List[RoomDataUpdate]): Unit = {
         Platform.runLater {
             if (alarmButton.isDisabled) {
                 alarmButton setDisable false
             }
-            update.foreach(cell => {
-                var cellController = cellControllers.get(cell.id).get
-                cellController setDynamicInformation cell
+            update.foreach(update => {
+                println(update.room.toString)
+                var cellController = cellControllers.get(update.room).get
+                cellController setDynamicInformation update
             })
         }
     }
@@ -83,9 +84,8 @@ class InterfaceController extends Initializable {
       * @param sensorsInfo : SensorsInfoUpdate object containing sensors data of a cell
       *
       **/
-    def initializeSensors(sensorsInfo: SensorsInfoUpdate): Unit = {
-        println("Inizializzo i sensori?????????")
-        var cellController = cellControllers.get(sensorsInfo.info.id).get
+    def initializeSensors(sensorsInfo: SensorsInfoUpdate, roomID: RoomID): Unit = {
+        var cellController = cellControllers.get(roomID).get
         Platform.runLater {
             cellController addSensors sensorsInfo
         }
@@ -98,11 +98,8 @@ class InterfaceController extends Initializable {
       **/
     def triggerAlarm(alarmContent: AlarmContent): Unit = {
         adminActor ! new AriadneMessage(MessageType.Alarm, MessageType.Alarm.Subtype.FromInterface, Location.Admin >> Location.Self, Empty())
-        println("Allarme ricevuto dal controller")
-        cellControllers.get(alarmContent.info.id).get.handleAlarm
-        canvasController handleAlarm alarmContent.info.id
-
-        //Fai qualcosa all'interfaccia
+        cellControllers.get(alarmContent.room.id).get.handleAlarm
+        canvasController handleAlarm alarmContent.info.uri
     }
 
     /**
@@ -117,7 +114,7 @@ class InterfaceController extends Initializable {
       * This method enables the Chart button when the secondary window is closed
       *
       **/
-    def enableButton(cellId: Int): Unit = {
+    def enableButton(cellId: RoomID): Unit = {
         cellControllers.get(cellId).get.enableChartButton
     }
 

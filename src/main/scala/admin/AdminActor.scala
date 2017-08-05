@@ -21,11 +21,14 @@ class AdminActor() extends BasicActor {
 
     private var interfaceController: InterfaceController = _
 
-    private val chartActors: mutable.Map[Int, ActorRef] = new mutable.HashMap[Int, ActorRef]
+    private var roomIDs: mutable.Map[CellInfo, RoomID] = new mutable.HashMap[CellInfo, RoomID]
+
+    private val chartActors: mutable.Map[RoomID, ActorRef] = new mutable.HashMap[RoomID, ActorRef]
     //Se si fa partire solo l'admin manager
-    //    private val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/AdminManager")
+    private val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/AdminManager")
     //Se si fa partire il master
-    val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/Master/AdminManager")
+    //val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/Master/AdminManager")
+
     private val toServer: MessageDirection = Location.Admin >> Location.Master
 
     override def init(args: List[Any]): Unit = {
@@ -40,6 +43,7 @@ class AdminActor() extends BasicActor {
     override def receptive: Receive = {
         //Ricezione del messaggio iniziale dall'interfaccia con aggiornamento iniziale
         case msg@AriadneMessage(_, Topology.Subtype.Planimetrics, _, area: Area) => {
+            area.rooms.foreach(r => roomIDs += ((r.cell.info, r.info.id)))
             adminManager ! msg.copy(direction = toServer)
             context.become(operational)
         }
@@ -51,8 +55,8 @@ class AdminActor() extends BasicActor {
     def operational: Receive = {
         //Ricezione dell'aggiornamento delle celle
         case msg@AriadneMessage(_, MessageType.Update.Subtype.Admin, _, adminUpdate: AdminUpdate) => {
-            val updateCells: mutable.Map[Int, CellForView] = new mutable.HashMap[Int, CellForView]
-            adminUpdate.list.foreach(room => updateCells += ((room.id, new CellForView(room.id, room.name, room.currentPeople, room.sensors))))
+            val updateCells: mutable.Map[RoomID, RoomDataUpdate] = new mutable.HashMap[RoomID, RoomDataUpdate]
+            adminUpdate.list.foreach(update => updateCells += ((update.room, update)))
             interfaceController updateView updateCells.values.toList
             chartActors.foreach(actor => actor._2 ! AriadneMessage(Interface, Interface.Subtype.UpdateChart, Location.Admin >> Location.Self, updateCells.get(actor._1).get))
         }
@@ -62,16 +66,16 @@ class AdminActor() extends BasicActor {
         case msg@AriadneMessage(_, Alarm.Subtype.FromCell, _, content: AlarmContent) => interfaceController triggerAlarm content
 
         case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => {
-            interfaceController initializeSensors sensorsInfo
+            interfaceController.initializeSensors(sensorsInfo, roomIDs.get(sensorsInfo.cell).get)
         }
 
         case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
             var chartActor = context.actorOf(Props[ChartActor])
-            chartActors += ((cell.id, chartActor))
+            chartActors += ((cell.cell.id, chartActor))
             chartActor ! msg
         }
 
-        case msg@AriadneMessage(Interface, Interface.Subtype.CloseChart, _, cell: CellInfo) => {
+        case msg@AriadneMessage(Interface, Interface.Subtype.CloseChart, _, cell: RoomInfo) => {
             context stop chartActors.get(cell.id).get
             interfaceController enableButton cell.id
         }

@@ -409,4 +409,4 @@ final case class CellForView(id: Int, name: String, currentPeople: Int, sensors:
   * @param sensorsId : list of Int representing the sensor ID inside the room
   *
   **/
-final case class CellForChart(cell: CellInfo, sensorsId: List[Int]) extends MessageContent
+final case class CellForChart(cell: RoomInfo, sensorsId: List[Int]) extends MessageContent
