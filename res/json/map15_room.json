@@ -56,6 +56,17 @@
         }
       ],
       "passages": [
+          {
+              "neighborId": -1,
+              "startCoordinates": {
+                  "x": 100,
+                  "y": 140
+              },
+              "endCoordinates": {
+                  "x": 100,
+                  "y": 160
+              }
+          },
         {
           "neighborId": 2,
           "startCoordinates": {
@@ -712,7 +723,7 @@
             "y": 280
           },
           "northEast": {
-            "x": 510,
+              "x": 520,
             "y": 280
           },
           "southWest": {
@@ -720,7 +731,7 @@
             "y": 370
           },
           "southEast": {
-            "x": 510,
+              "x": 520,
             "y": 370
           }
         },
@@ -789,24 +800,24 @@
         },
         "roomVertices": {
           "northWest": {
-            "x": 510,
+              "x": 520,
             "y": 210
           },
           "northEast": {
-            "x": 610,
+              "x": 650,
             "y": 210
           },
           "southWest": {
-            "x": 510,
+              "x": 520,
             "y": 450
           },
           "southEast": {
-            "x": 610,
+              "x": 640,
             "y": 450
           }
         },
         "antennaPosition": {
-          "x": 560,
+            "x": 580,
           "y": 325
         },
         "isEntryPoint": false,
