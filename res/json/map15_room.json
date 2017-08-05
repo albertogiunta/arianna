@@ -43,19 +43,26 @@
       },
       "neighbors": [
         {
-          "id": {
-            "serial": 2,
-            "name": "Room B"
-          }
+          "serial": 2,
+          "name": "Room B"
         },
         {
-          "id": {
-            "serial": 4,
-            "name": "Room D"
-          }
+          "serial": 4,
+          "name": "Room D"
         }
       ],
       "passages": [
+          {
+              "neighborId": -1,
+              "startCoordinates": {
+                  "x": 100,
+                  "y": 140
+              },
+              "endCoordinates": {
+                  "x": 100,
+                  "y": 160
+              }
+          },
         {
           "neighborId": 2,
           "startCoordinates": {
@@ -124,16 +131,12 @@
       },
       "neighbors": [
         {
-          "id": {
             "serial": 1,
             "name": "Room A"
-          }
         },
         {
-          "id": {
             "serial": 3,
             "name": "Room C"
-          }
         }
       ],
       "passages": [
@@ -205,16 +208,12 @@
       },
       "neighbors": [
         {
-          "id": {
             "serial": 2,
             "name": "Room B"
-          }
         },
         {
-          "id": {
             "serial": 5,
             "name": "Room E"
-          }
         }
       ],
       "passages": [
@@ -286,16 +285,13 @@
       },
       "neighbors": [
         {
-          "id": {
             "serial": 1,
             "name": "Room A"
-          }
         },
         {
-          "id": {
             "serial": 6,
             "name": "Room F"
-          }
+
         }
       ],
       "passages": [
@@ -367,16 +363,14 @@
       },
       "neighbors": [
         {
-          "id": {
             "serial": 3,
             "name": "Room C"
-          }
+
         },
         {
-          "id": {
             "serial": 8,
             "name": "Room H"
-          }
+
         }
       ],
       "passages": [
@@ -448,22 +442,17 @@
       },
       "neighbors": [
         {
-          "id": {
             "serial": 4,
             "name": "Room D"
-          }
+
         },
         {
-          "id": {
             "serial": 7,
             "name": "Room G"
-          }
         },
         {
-          "id": {
             "serial": 11,
             "name": "Room K"
-          }
         }
       ],
       "passages": [
@@ -546,16 +535,12 @@
       },
       "neighbors": [
         {
-          "id": {
             "serial": 6,
             "name": "Room F"
-          }
         },
         {
-          "id": {
             "serial": 8,
             "name": "Room H"
-          }
         }
       ],
       "passages": [
@@ -627,28 +612,20 @@
       },
       "neighbors": [
         {
-          "id": {
             "serial": 5,
             "name": "Room E"
-          }
         },
         {
-          "id": {
             "serial": 7,
             "name": "Room G"
-          }
         },
         {
-          "id": {
             "serial": 9,
             "name": "Room I"
-          }
         },
         {
-          "id": {
             "serial": 12,
             "name": "Room L"
-          }
         }
       ],
       "passages": [
@@ -742,16 +719,12 @@
       },
       "neighbors": [
         {
-          "id": {
             "serial": 8,
             "name": "Room H"
-          }
         },
         {
-          "id": {
             "serial": 10,
             "name": "Room J"
-          }
         }
       ],
       "passages": [
@@ -793,7 +766,7 @@
             "y": 210
           },
           "northEast": {
-            "x": 610,
+              "x": 650,
             "y": 210
           },
           "southWest": {
@@ -801,12 +774,12 @@
             "y": 450
           },
           "southEast": {
-            "x": 610,
+              "x": 640,
             "y": 450
           }
         },
         "antennaPosition": {
-          "x": 560,
+            "x": 580,
           "y": 325
         },
         "isEntryPoint": false,
@@ -823,10 +796,8 @@
       },
       "neighbors": [
         {
-          "id": {
             "serial": 9,
             "name": "Room I"
-          }
         }
       ],
       "passages": [
@@ -887,16 +858,12 @@
       },
       "neighbors": [
         {
-          "id": {
             "serial": 6,
             "name": "Room F"
-          }
         },
         {
-          "id": {
             "serial": 13,
             "name": "Room M"
-          }
         }
       ],
       "passages": [
@@ -968,16 +935,12 @@
       },
       "neighbors": [
         {
-          "id": {
             "serial": 8,
             "name": "Room H"
-          }
         },
         {
-          "id": {
             "serial": 15,
             "name": "Room O"
-          }
         }
       ],
       "passages": [
@@ -1049,16 +1012,12 @@
       },
       "neighbors": [
         {
-          "id": {
             "serial": 11,
             "name": "Room K"
-          }
         },
         {
-          "id": {
             "serial": 14,
             "name": "Room N"
-          }
         }
       ],
       "passages": [
@@ -1130,16 +1089,12 @@
       },
       "neighbors": [
         {
-          "id": {
             "serial": 13,
             "name": "Room M"
-          }
         },
         {
-          "id": {
             "serial": 15,
             "name": "Room O"
-          }
         }
       ],
       "passages": [
@@ -1211,16 +1166,12 @@
       },
       "neighbors": [
         {
-          "id": {
             "serial": 12,
             "name": "Room L"
-          }
         },
         {
-          "id": {
             "serial": 14,
             "name": "Room N"
-          }
         }
       ],
       "passages": [

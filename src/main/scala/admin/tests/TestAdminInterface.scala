@@ -23,6 +23,7 @@ object TestAdminInterface extends App {
     val system = ActorSystem.create("Arianna-Cluster", config)
 
     val adminManager = system.actorOf(Props[AdminManager], "AdminManager")
+
     var i = 1
     Thread.sleep(5000)
     while (!i.equals(6)) {
@@ -31,13 +32,20 @@ object TestAdminInterface extends App {
         for (i <- 1 until 5) {
             sensors += SensorInfo(i, (Math.random() * 10).round.toDouble)
         }
-        var sensorList: SensorsInfoUpdate = SensorsInfoUpdate(CellInfo(i, "uri0", 0, "a", new Coordinates(Point(1, 1), Point(1, 1), Point(1, 1), Point(1, 1)), Point(1, 1)),
+        var sensorList: SensorsInfoUpdate = SensorsInfoUpdate(CellInfo("uri" + i.toString, 8080 + i),
             sensors.toList)
         adminManager ! AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, Location.Master >> Location.Admin, sensorList)
         i = i + 1
     }
 
     Thread.sleep(1000)
+    val roomNames: ListBuffer[String] = new ListBuffer[String]()
+    roomNames += "Room A"
+    roomNames += "Room B"
+    roomNames += "Room C"
+    roomNames += "Room D"
+    roomNames += "Room E"
+    var iter: Iterator[String] = roomNames.iterator
 
     while (true) {
         println("Invio aggiornamento... ")
@@ -49,10 +57,16 @@ object TestAdminInterface extends App {
         }
 
         for (i <- 1 until 6) {
-            update += new RoomDataUpdate(new CellInfo(i, "uri0", 0, "a", new Coordinates(Point(1, 1), Point(1, 1), Point(1, 1), Point(1, 1)), Point(1, 1)), (Math.random() * 50).round.toInt, sensors.toList)
+            var id = RoomID(i, iter.next())
+            println(id.toString)
+            if (iter.hasNext) {
+                update += new RoomDataUpdate(id, ontologies.messages.Cell(CellInfo("uri" + i.toString, 8080 + i), sensors.toList), (Math.random() * 50).toInt)
+            } else {
+                iter = roomNames.iterator
+            }
         }
         adminManager ! AriadneMessage(MessageType.Update, MessageType.Update.Subtype.Admin, Location.Master >> Location.Admin,
-            new AdminUpdate(update.toList))
+            new AdminUpdate(1, update.toList))
     }
 }
 

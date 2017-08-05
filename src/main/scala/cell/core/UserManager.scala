@@ -101,7 +101,7 @@ class UserManager extends BasicActor with ActorLogging {
     }
 }
 
-object UserRun {
+object RunUser {
 
     private def readJson(filename: String): JsValue = {
         val source: String = Source.fromFile(filename).getLines.mkString
@@ -109,7 +109,7 @@ object UserRun {
     }
 
     def loadArea(): Area = {
-        val area = readJson(s"res/json/map15.json").convertTo[Area]
+        val area = readJson(s"res/json/map15_room.json").convertTo[Area]
         area
     }
 

@@ -8,7 +8,7 @@ import cell.core.CellCoreActor
 import com.typesafe.config.ConfigFactory
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Init
-import ontologies.messages.{AriadneMessage, Greetings, Location, _}
+import ontologies.messages.{AriadneMessage, Greetings, Location}
 
 /**
   * Created by Alessandro on 28/06/2017.
@@ -61,9 +61,9 @@ object TestCells extends App {
     //def areaForCell: AreaViewedFromACell = AreaViewedFromACell(loadArea)
 
     Thread.sleep(500)
-    private val greetings: String = "FROM TEST CELL Hello there, it's time to dress-up"
+    private val configPath: String = "res/json/cell/cell2.json"
     core ! AriadneMessage(Init, Init.Subtype.Greetings,
-        Location.Master >> Location.Self, Greetings(List(greetings)))
+        Location.Master >> Location.Self, Greetings(List(configPath)))
 
     //println("Area sended to cell core")
     //core ! AriadneMessage(Topology, Topology4Cell, server2Cell, areaForCell)

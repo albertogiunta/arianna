@@ -19,10 +19,15 @@ final case class Passage(neighborId: Int,
                          endCoordinates: Point) extends MessageContent
 
 /**
-  * This class is a static representation of
-  * the basic configuration of a cell when it starts
+  * This class is the correspondent class-mapping of
+  * the json configuration file used by a cell during
+  * its boot
+  *
+  * @param cellInfo represent the cell basic information
+  *                 used to set up the cell actors (uri & connection port)
+  * @param sensors  is the list of Sensor configurations to load
   **/
-final case class CellConfig(uri: String, sensors: List[SensorInfoFromConfig]) extends MessageContent
+final case class CellConfig(cellInfo: CellInfo, sensors: List[SensorInfoFromConfig]) extends MessageContent
 
 
 final case class Area(id: Int, rooms: List[Room]) extends MessageContent
@@ -235,7 +240,8 @@ object CurrentPeopleUpdate {
 }
 
 /**
-  * This case class represent a sensor.
+  * This case class represent a sensor information
+  * exchanged between system actors.
   *
   * @param categoryId The Category of the Sensor
   * @param value      The actual Value percieved from the sensor
@@ -403,4 +409,4 @@ final case class CellForView(id: Int, name: String, currentPeople: Int, sensors:
   * @param sensorsId : list of Int representing the sensor ID inside the room
   *
   **/
-final case class CellForChart(cell: CellInfo, sensorsId: List[Int]) extends MessageContent
+final case class CellForChart(cell: RoomInfo, sensorsId: List[Int]) extends MessageContent
