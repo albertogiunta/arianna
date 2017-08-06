@@ -1,5 +1,7 @@
-package admin
+package admin.actors
 
+import admin.controller.ChartWindowController
+import admin.view.ChartView
 import com.actors.CustomActor
 import ontologies.messages.MessageType.Interface
 import ontologies.messages._

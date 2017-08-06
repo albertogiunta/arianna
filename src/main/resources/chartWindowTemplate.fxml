@@ -8,7 +8,7 @@
 <?import javafx.scene.text.Font?>
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0"
       prefWidth="759.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="admin.ChartWindowController">
+      fx:controller="admin.controller.ChartWindowController">
     <children>
         <GridPane fx:id="mainPane" layoutY="48.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                   minWidth="-Infinity" prefHeight="546.0" prefWidth="759.0">

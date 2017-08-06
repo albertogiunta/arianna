@@ -1,9 +1,11 @@
-package admin
+package admin.view
 
 import javafx.application.Platform
 import javafx.fxml.FXMLLoader
 import javafx.scene.control.SplitPane
 import javafx.stage.Stage
+
+import admin.controller.InterfaceController
 
 import scalafx.Includes._
 import scalafx.scene.Scene

@@ -1,4 +1,4 @@
-package admin
+package admin.actors
 
 import akka.actor.Props
 import com.actors.BasicActor

@@ -1,4 +1,4 @@
-package admin
+package admin.controller
 
 import java.io.File
 import java.net.URL
@@ -10,6 +10,7 @@ import javafx.scene.control.{Alert, Button, SplitPane}
 import javafx.scene.layout.{Pane, VBox}
 import javafx.scene.text.Text
 
+import admin.view.InterfaceView
 import akka.actor.ActorRef
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.{Init, Topology}

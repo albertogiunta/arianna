@@ -1,5 +1,7 @@
-package admin
+package admin.actors
 
+import admin.controller.InterfaceController
+import admin.view.InterfaceView
 import akka.actor.{ActorRef, Props}
 import com.actors.BasicActor
 import ontologies.messages.Location._
