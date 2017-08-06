@@ -67,11 +67,11 @@ class ChartWindowController extends Initializable {
     def initializeCharts(sensorsId: List[Int]): Unit = {
         val positions = List((1, 0), (0, 1), (1, 1), (0, 2), (1, 2)).iterator
         sensorsId.foreach(sensorId => {
-            val loader = new FXMLLoader(getClass().getResource("/chartTemplate.fxml"));
+            val loader = new FXMLLoader(getClass.getResource("/chartTemplate.fxml"));
             val template = loader.load[TitledPane]
             template setText SensorCategories.categoryWithId(sensorId).name
             sensorChartControllers += ((sensorId, loader.getController[SensorChartController]))
-            var position: (Int, Int) = positions.next()
+            var position: (Int, Int) = positions.next
             mainPane.add(template, position._1, position._2)
 
         })
@@ -91,7 +91,7 @@ class ChartWindowController extends Initializable {
                 sensorChartControllers.get(sensor.categoryId).get.addValue(sensor.value)
             }
             )
-            if (data.getData.size().equals(20)) {
+            if (data.getData.size.equals(20)) {
                 data.getData remove 0
             }
             data.getData add new XYChart.Data(time.next, update.currentPeople)

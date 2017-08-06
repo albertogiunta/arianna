@@ -73,7 +73,7 @@ class InterfaceController extends Initializable {
     @FXML
     def handleFileLoad(): Unit = {
         loadButton.disable = true
-        val fc = new FileChooser()
+        val fc = new FileChooser
         fc.title = "Get JSON"
         fc.extensionFilters += (new ExtensionFilter("JSON Files", "*.json"))
         val json: File = fc.showOpenDialog(null)
@@ -129,7 +129,7 @@ class InterfaceController extends Initializable {
         val source = Source.fromFile(file).getLines.mkString
         val area = Topology.Subtype.Planimetrics.unmarshal(source)
         interfaceActor ! AriadneMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, Location.Admin >> Location.Self, area)
-        loadCanvas()
+        loadCanvas
         createCells(area.rooms)
         fileName.text = file.getName
     }

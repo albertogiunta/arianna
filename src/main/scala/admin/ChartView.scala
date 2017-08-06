@@ -13,12 +13,12 @@ class ChartView() {
     var controller: ChartWindowController = _
 
     def start(): Unit = {
-        val loader = new FXMLLoader(getClass().getResource("/chartWindowTemplate.fxml"));
+        val loader = new FXMLLoader(getClass.getResource("/chartWindowTemplate.fxml"));
         val template = loader.load[Pane]
         controller = loader.getController[ChartWindowController]
         val stage = new Stage
         stage.setOnCloseRequest((e) => {
-            controller.closeView()
+            controller.closeView
         })
         stage setTitle "Arianna Charts"
         stage setScene new Scene(template)

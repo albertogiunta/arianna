@@ -23,15 +23,15 @@ class InterfaceView {
         mainStage.width = 1200
         mainStage.resizable = false
         var loader: FXMLLoader = new FXMLLoader(getClass.getResource("/interface.fxml"))
-        val root: SplitPane = loader.load()
+        val root: SplitPane = loader.load[SplitPane]
         controller = loader.getController[InterfaceController]
         val scene: Scene = new Scene(root)
         mainStage.setOnCloseRequest(() => {
-            Platform.exit()
+            Platform.exit
             System.exit(0)
         })
         mainStage setScene scene
-        mainStage.show()
+        mainStage.show
     }
 
 }

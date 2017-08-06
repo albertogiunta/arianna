@@ -20,7 +20,7 @@ class ChartActor extends CustomActor {
         case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
             Platform.runLater {
                 val view = new ChartView
-                view.start()
+                view.start
                 windowController = view.controller
                 windowController.chartActor = self
                 windowController initializeWindow cell.cell

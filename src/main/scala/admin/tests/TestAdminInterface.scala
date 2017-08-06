@@ -30,7 +30,7 @@ object TestAdminInterface extends App {
         Thread.sleep(1000)
         var sensors: ListBuffer[SensorInfo] = new ListBuffer[SensorInfo]
         for (i <- 1 until 5) {
-            sensors += SensorInfo(i, (Math.random() * 10).round.toDouble)
+            sensors += SensorInfo(i, (Math.random * 10).round.toDouble)
         }
         var sensorList: SensorsInfoUpdate = SensorsInfoUpdate(CellInfo("uri" + i.toString, 8080 + i),
             sensors.toList)
@@ -53,14 +53,14 @@ object TestAdminInterface extends App {
         var update: ListBuffer[RoomDataUpdate] = new ListBuffer[RoomDataUpdate]
         var sensors: ListBuffer[SensorInfo] = new ListBuffer[SensorInfo]
         for (i <- 1 until 5) {
-            sensors += SensorInfo(i, (Math.random() * 10).round.toDouble)
+            sensors += SensorInfo(i, (Math.random * 10).round.toDouble)
         }
 
         for (i <- 1 until 6) {
-            var id = RoomID(i, iter.next())
+            var id = RoomID(i, iter.next)
             println(id.toString)
             if (iter.hasNext) {
-                update += new RoomDataUpdate(id, ontologies.messages.Cell(CellInfo("uri" + i.toString, 8080 + i), sensors.toList), (Math.random() * 50).toInt)
+                update += new RoomDataUpdate(id, ontologies.messages.Cell(CellInfo("uri" + i.toString, 8080 + i), sensors.toList), (Math.random * 50).toInt)
             } else {
                 iter = roomNames.iterator
             }

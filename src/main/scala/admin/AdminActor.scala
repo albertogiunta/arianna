@@ -17,12 +17,13 @@ import ontologies.messages._
 class AdminActor() extends BasicActor {
 
     //Se si fa partire solo l'admin manager
-    private val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/AdminManager")
+    //private val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/AdminManager")
     //Se si fa partire il master
-    //val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/Master/AdminManager")
+    val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/Master/AdminManager")
     private val interfaceActor = context.actorOf(Props[InterfaceActor])
     private var areaLoaded: Area = _
     private val toServer: MessageDirection = Location.Admin >> Location.Master
+    private val toSelf: MessageDirection = Location.Admin >> Location.Self
 
     override def init(args: List[Any]): Unit = {
         interfaceActor ! AriadneMessage(Init, Init.Subtype.Greetings, Location.Admin >> Location.Self, Greetings(List.empty))
@@ -42,17 +43,17 @@ class AdminActor() extends BasicActor {
 
     def operational: Receive = {
 
-        case msg@AriadneMessage(_, MessageType.Update.Subtype.Admin, _, adminUpdate: AdminUpdate) => interfaceActor ! msg.copy(direction = Location.Admin >> Location.Self)
+        case msg@AriadneMessage(_, MessageType.Update.Subtype.Admin, _, adminUpdate: AdminUpdate) => interfaceActor ! msg.copy(direction = toSelf)
 
         case msg@AriadneMessage(_, Alarm.Subtype.FromInterface, _, _) => adminManager ! msg.copy(direction = toServer)
 
-        case msg@AriadneMessage(_, Alarm.Subtype.FromCell, _, content: AlarmContent) => interfaceActor ! msg
+        case msg@AriadneMessage(_, Alarm.Subtype.FromCell, _, content: AlarmContent) => interfaceActor ! msg.copy(direction = toSelf)
 
-        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => interfaceActor ! msg
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => interfaceActor ! msg.copy(direction = toSelf)
 
-        case msg@AriadneMessage(Error, Error.Subtype.LookingForAMap, _, _) => adminManager ! AriadneMessage(Topology, Topology.Subtype.Planimetrics, Location.Admin >> Location.Master, areaLoaded)
+        case msg@AriadneMessage(Error, Error.Subtype.LookingForAMap, _, _) => adminManager ! AriadneMessage(Topology, Topology.Subtype.Planimetrics, toServer, areaLoaded)
 
-        case msg@AriadneMessage(Error, Error.Subtype.MapIdentifierMismatch, _, _) => interfaceActor ! AriadneMessage(Error, Error.Subtype.Generic, Location.Admin >> Location.Self, new Empty)
+        case msg@AriadneMessage(Error, Error.Subtype.MapIdentifierMismatch, _, _) => interfaceActor ! AriadneMessage(Error, Error.Subtype.Generic, toSelf, new Empty)
 
         case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => adminManager ! msg.copy(direction = toServer)
 
