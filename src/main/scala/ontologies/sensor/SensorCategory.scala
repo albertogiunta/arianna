@@ -14,15 +14,15 @@ abstract class BasicSensorCategory(val name: String, val id: Int) extends Sensor
 
 object SensorCategories {
 
-    object Temperature extends BasicSensorCategory("temperature sensor", 1)
+    object Temperature extends BasicSensorCategory("Temperature", 1)
 
-    object Smoke extends BasicSensorCategory("smoke sensor", 2)
+    object Smoke extends BasicSensorCategory("Smoke", 2)
 
-    object Humidity extends BasicSensorCategory("humidity sensor", 3)
+    object Humidity extends BasicSensorCategory("Humidity", 3)
 
-    object Oxygen extends BasicSensorCategory("oxygen sensor", 4)
+    object Oxygen extends BasicSensorCategory("Oxygen", 4)
 
-    object CO2 extends BasicSensorCategory("CO2 Sensor", 5)
+    object CO2 extends BasicSensorCategory("CO2", 5)
 
 
     def categoryWithId(id: Int): SensorCategory = id match {

@@ -22,7 +22,7 @@ import scala.collection.mutable
 class CellTemplateController extends Initializable {
 
     var adminActor: ActorRef = _
-    private var cellInfo: Room = _
+    private var roomInfo: RoomInfo = _
     private val sensorsController: mutable.Map[Int, SensorTemplateController] = new mutable.HashMap[Int, SensorTemplateController]
     @FXML
     private var roomName: Text = _
@@ -52,7 +52,7 @@ class CellTemplateController extends Initializable {
       *
       **/
     def setStaticInformation(room: Room): Unit = {
-        cellInfo = room
+        roomInfo = room.info
         roomName setText room.info.id.name
         maxCapacityValue setText room.info.capacity.toString
         sqrMetersValue setText room.info.squareMeters.toString
@@ -67,9 +67,6 @@ class CellTemplateController extends Initializable {
       * @param update : CellForView object containing only dynamic data
       * */
     def setDynamicInformation(update: RoomDataUpdate): Unit = {
-        if (chartsButton.isDisabled) {
-            chartsButton setDisable false
-        }
         currentPeopleValue setText update.currentPeople.toString
         update.cell.sensors.foreach(sensor => {
             sensorsController.get(sensor.categoryId).get updateSensor sensor
@@ -83,6 +80,7 @@ class CellTemplateController extends Initializable {
       *
       * */
     def addSensors(sensorsInfo: SensorsInfoUpdate): Unit = {
+        chartsButton setDisable false
         sensorsInfo.sensors.foreach(sensor => {
             var loader = new FXMLLoader(getClass.getResource("/sensorTemplate.fxml"))
             var sensorTemplate = loader.load[HBox]
@@ -107,7 +105,7 @@ class CellTemplateController extends Initializable {
       * window with charts.
       **/
     def openCharts(): Unit = {
-        adminActor ! AriadneMessage(Interface, Interface.Subtype.OpenChart, Location.Admin >> Location.Self, CellForChart(cellInfo.info, sensorsController.keys.toList))
+        adminActor ! AriadneMessage(Interface, Interface.Subtype.OpenChart, Location.Admin >> Location.Self, CellForChart(roomInfo, sensorsController.keys.toList))
         chartsButton setDisable true
     }
 

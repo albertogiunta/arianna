@@ -83,14 +83,12 @@ class ChartWindowController extends Initializable {
       *
       * */
     def updateCharts(update: RoomDataUpdate): Unit = {
+        update.cell.sensors.foreach(sensor => sensorChartControllers.get(sensor.categoryId).get.addValue(sensor.value))
+        if (data.getData.size.equals(20)) {
+            data.getData remove 0
+        }
+        data.getData add new XYChart.Data(time.next, update.currentPeople)
 
-        Platform.runLater(() => {
-            update.cell.sensors.foreach(sensor => sensorChartControllers.get(sensor.categoryId).get.addValue(sensor.value))
-            if (data.getData.size.equals(20)) {
-                data.getData remove 0
-            }
-            data.getData add new XYChart.Data(time.next, update.currentPeople)
-        })
     }
 
     /**

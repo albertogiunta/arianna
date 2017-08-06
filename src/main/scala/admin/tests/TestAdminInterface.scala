@@ -25,7 +25,7 @@ object TestAdminInterface extends App {
     val adminManager = system.actorOf(Props[AdminManager], "AdminManager")
 
     var i = 1
-    Thread.sleep(5000)
+    Thread.sleep(10000)
     while (!i.equals(6)) {
         Thread.sleep(1000)
         var sensors: ListBuffer[SensorInfo] = new ListBuffer[SensorInfo]
@@ -48,7 +48,6 @@ object TestAdminInterface extends App {
     var iter: Iterator[String] = roomNames.iterator
 
     while (true) {
-        println("Invio aggiornamento... ")
         Thread.sleep(1000)
         var update: ListBuffer[RoomDataUpdate] = new ListBuffer[RoomDataUpdate]
         var sensors: ListBuffer[SensorInfo] = new ListBuffer[SensorInfo]
@@ -58,7 +57,6 @@ object TestAdminInterface extends App {
 
         for (i <- 1 until 6) {
             var id = RoomID(i, iter.next)
-            println(id.toString)
             if (iter.hasNext) {
                 update += new RoomDataUpdate(id, ontologies.messages.Cell(CellInfo("uri" + i.toString, 8080 + i), sensors.toList), (Math.random * 50).toInt)
             } else {

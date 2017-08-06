@@ -33,7 +33,9 @@ class ChartActor extends CustomActor {
         }
 
         case msg@AriadneMessage(Interface, Interface.Subtype.UpdateChart, _, update: RoomDataUpdate) => {
-            windowController updateCharts update
+            Platform.runLater(() => {
+                windowController updateCharts update
+            })
         }
 
         case msg@AriadneMessage(Interface, Interface.Subtype.CloseChart, _, _) => parent forward msg
