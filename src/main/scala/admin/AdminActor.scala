@@ -8,9 +8,8 @@ import ontologies.messages._
 
 /**
   * This actor intermediates between the interface and the System. It sends the loaded map, handles the messages coming
-  * from the System and update the Interface coherently and informs the System if the administrator sent an Alarm from
-  * the interface. It also creates a ChartActor for each chart window opened by the administrator and forward to him only
-  * the updates about the correct cell.
+  * from the System and communicates them to the InterfaceActor in order to update the interface. It keeps a copy of the loaded map
+  * if the System goes down and asks it again.
   *
   *
   */
@@ -26,7 +25,7 @@ class AdminActor() extends BasicActor {
     private val toSelf: MessageDirection = Location.Admin >> Location.Self
 
     override def init(args: List[Any]): Unit = {
-        interfaceActor ! AriadneMessage(Init, Init.Subtype.Greetings, Location.Admin >> Location.Self, Greetings(List.empty))
+        interfaceActor ! AriadneMessage(Init, Init.Subtype.Greetings, toSelf, Greetings(List.empty))
     }
 
     override def receptive: Receive = {
@@ -53,7 +52,7 @@ class AdminActor() extends BasicActor {
 
         case msg@AriadneMessage(Error, Error.Subtype.LookingForAMap, _, _) => adminManager ! AriadneMessage(Topology, Topology.Subtype.Planimetrics, toServer, areaLoaded)
 
-        case msg@AriadneMessage(Error, Error.Subtype.MapIdentifierMismatch, _, _) => interfaceActor ! AriadneMessage(Error, Error.Subtype.Generic, toSelf, new Empty)
+        case msg@AriadneMessage(Error, Error.Subtype.MapIdentifierMismatch, _, _) => interfaceActor ! msg.copy(direction = toSelf)
 
         case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => adminManager ! msg.copy(direction = toServer)
 

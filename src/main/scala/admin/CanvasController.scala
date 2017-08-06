@@ -81,6 +81,18 @@ class CanvasController extends Initializable {
         drawPassages(roomData._2)
     }
 
+    /**
+      * This method handles the alarm, when it's launched by the administrator, redrawing all the map with
+      * all rooms colored in red.
+      *
+      **/
+    def handleAlarm(): Unit = {
+        rooms.foreach(roomData => {
+            drawRoom(roomData._2._1, Color.RED)
+            drawPassages(roomData._2._2)
+        })
+    }
+
     private def drawRoom(room: RoomData, color: Color): Unit = {
         val gc = mapCanvas.getGraphicsContext2D
         gc setStroke Color.BLACK

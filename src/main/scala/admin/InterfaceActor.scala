@@ -3,12 +3,18 @@ package admin
 import akka.actor.{ActorRef, Props}
 import com.actors.BasicActor
 import ontologies.messages.Location._
-import ontologies.messages.MessageType.{Alarm, Handshake, Init, Interface, Topology}
+import ontologies.messages.MessageType.{Alarm, Error, Handshake, Init, Interface, Topology}
 import ontologies.messages._
 
 import scala.collection.mutable
 import scalafx.application.Platform
 
+/**
+  * This actor keeps the interface updated when it receives messages from its parent and t also creates
+  * a ChartActor for each chart window opened by the administrator and forward to it only
+  * the updates about the correct cell.
+  *
+  **/
 class InterfaceActor extends BasicActor {
 
     private var interfaceController: InterfaceController = _
@@ -71,6 +77,8 @@ class InterfaceActor extends BasicActor {
         }
 
         case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => parent ! msg
+
+        case msg@AriadneMessage(Error, Error.Subtype.MapIdentifierMismatch, _, _) => interfaceController.showErrorDialog
 
         case _ => desist _
 

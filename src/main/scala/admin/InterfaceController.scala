@@ -5,7 +5,8 @@ import java.net.URL
 import java.util.ResourceBundle
 import javafx.fxml.{FXML, FXMLLoader, Initializable}
 import javafx.scene.canvas.Canvas
-import javafx.scene.control.{Button, SplitPane}
+import javafx.scene.control.Alert.AlertType
+import javafx.scene.control.{Alert, Button, SplitPane}
 import javafx.scene.layout.{Pane, VBox}
 import javafx.scene.text.Text
 
@@ -114,7 +115,7 @@ class InterfaceController extends Initializable {
       *
       **/
     def triggerAlarm(): Unit = {
-        //Allarme lanciato dall'interfaccia
+        canvasController.handleAlarm
     }
 
     /**
@@ -123,6 +124,14 @@ class InterfaceController extends Initializable {
       **/
     def enableButton(cellId: RoomID): Unit = {
         cellControllers.get(cellId).get.enableChartButton
+    }
+
+    def showErrorDialog(): Unit = {
+        val alert = new Alert(AlertType.ERROR)
+        alert setTitle "Fatal Error"
+        alert setHeaderText "Wrong Map loaded!"
+        alert setContentText "The System already has a Map, try again loading the correct map"
+        loadButton setDisable false
     }
 
     private def parseFile(file: File): Unit = {
