@@ -54,6 +54,8 @@ class AdminActor() extends BasicActor {
 
         case msg@AriadneMessage(Error, Error.Subtype.MapIdentifierMismatch, _, _) => interfaceActor ! AriadneMessage(Error, Error.Subtype.Generic, Location.Admin >> Location.Self, new Empty)
 
+        case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => adminManager ! msg.copy(direction = toServer)
+
         case _ => desist _
 
     }

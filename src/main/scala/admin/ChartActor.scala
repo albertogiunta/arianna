@@ -15,7 +15,6 @@ import scalafx.application.Platform
 class ChartActor extends CustomActor {
 
     private var windowController: ChartWindowController = _
-    private var cellInfo: CellInfo = _
 
     override def receive: Receive = {
         case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {

@@ -9,7 +9,7 @@ import com.typesafe.config.ConfigFactory
 import master.cluster.MasterPublisher
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Init.Subtype
-import ontologies.messages.MessageType.{Alarm, Handshake, Update}
+import ontologies.messages.MessageType.{Alarm, Handshake, Init, Update}
 import ontologies.messages._
 
 /**
@@ -33,6 +33,9 @@ class AdminManager extends CustomActor {
         case msg@AriadneMessage(Alarm, Alarm.Subtype.FromCell, _, _) => admin ! msg.copy(direction = toAdmin)
         //Ricezione di aggiornamento sensori
         case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, _) => admin ! msg
+
+        case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => parent ! msg.copy(direction = fromAdmin)
+
     }
 
     override def receive: Receive = {

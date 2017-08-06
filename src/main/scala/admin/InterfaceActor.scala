@@ -3,7 +3,7 @@ package admin
 import akka.actor.{ActorRef, Props}
 import com.actors.BasicActor
 import ontologies.messages.Location._
-import ontologies.messages.MessageType.{Alarm, Handshake, Interface, Topology}
+import ontologies.messages.MessageType.{Alarm, Handshake, Init, Interface, Topology}
 import ontologies.messages._
 
 import scala.collection.mutable
@@ -21,7 +21,7 @@ class InterfaceActor extends BasicActor {
             val view: InterfaceView = new InterfaceView
             view.start
             interfaceController = view.controller
-            interfaceController.adminActor = self
+            interfaceController.interfaceActor = self
         }
     }
 
@@ -69,6 +69,8 @@ class InterfaceActor extends BasicActor {
             context stop chartActors.get(cell.id).get
             interfaceController enableButton cell.id
         }
+
+        case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => parent ! msg
 
         case _ => desist _
 

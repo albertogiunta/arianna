@@ -11,7 +11,7 @@ import javafx.scene.text.Text
 
 import akka.actor.ActorRef
 import ontologies.messages.Location._
-import ontologies.messages.MessageType.Topology
+import ontologies.messages.MessageType.{Init, Topology}
 import ontologies.messages._
 
 import scala.collection.mutable
@@ -26,7 +26,7 @@ import scalafx.stage.FileChooser.ExtensionFilter
   *
   **/
 class InterfaceController extends Initializable {
-    var adminActor: ActorRef = _
+    var interfaceActor: ActorRef = _
     var interfaceView: InterfaceView = _
     private val cellControllers: mutable.Map[RoomID, CellTemplateController] = new mutable.HashMap[RoomID, CellTemplateController]
     private var canvasController: CanvasController = _
@@ -37,6 +37,8 @@ class InterfaceController extends Initializable {
     private var loadButton: Button = _
     @FXML
     private var alarmButton: Button = _
+    @FXML
+    private var closeButton: Button = _
     @FXML
     private var vBoxPane: VBox = _
     @FXML
@@ -78,6 +80,11 @@ class InterfaceController extends Initializable {
         parseFile(json)
     }
 
+    @FXML
+    def handleClosing(): Unit = {
+        interfaceActor ! AriadneMessage(Init, Init.Subtype.Goodbyes, Location.Admin >> Location.Self, new Empty)
+    }
+
     /**
       * This method add all the information about sensors of a single Cell after getting it from the System
       *
@@ -97,7 +104,7 @@ class InterfaceController extends Initializable {
       * @param alarmContent : AlarmContent object that contains information about the Cell from which the alarm comes
       **/
     def triggerAlarm(alarmContent: AlarmContent): Unit = {
-        adminActor ! new AriadneMessage(MessageType.Alarm, MessageType.Alarm.Subtype.FromInterface, Location.Admin >> Location.Self, Empty())
+        interfaceActor ! new AriadneMessage(MessageType.Alarm, MessageType.Alarm.Subtype.FromInterface, Location.Admin >> Location.Self, Empty())
         cellControllers.get(alarmContent.room.id).get.handleAlarm
         canvasController handleAlarm alarmContent.info.uri
     }
@@ -121,7 +128,7 @@ class InterfaceController extends Initializable {
     private def parseFile(file: File): Unit = {
         val source = Source.fromFile(file).getLines.mkString
         val area = Topology.Subtype.Planimetrics.unmarshal(source)
-        adminActor ! AriadneMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, Location.Admin >> Location.Self, area)
+        interfaceActor ! AriadneMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, Location.Admin >> Location.Self, area)
         loadCanvas()
         createCells(area.rooms)
         fileName.text = file.getName
@@ -148,7 +155,7 @@ class InterfaceController extends Initializable {
         var loader = new FXMLLoader(getClass.getResource("/cellTemplate2.fxml"))
         var node = loader.load[SplitPane]
         var controller = loader.getController[CellTemplateController]
-        controller.adminActor = adminActor
+        controller.adminActor = interfaceActor
         cellControllers += ((cell.info.id, controller))
         Platform.runLater {
             controller setStaticInformation cell

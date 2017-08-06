@@ -65,14 +65,14 @@ class CellTemplateController extends Initializable {
       * This method update the interface with dynamic information about the Cell; it's called everytime the Application receive
       * an update from the System
       *
-      * @param cell : CellForView object containing only dynamic data
+      * @param update : CellForView object containing only dynamic data
       * */
-    def setDynamicInformation(cell: RoomDataUpdate): Unit = {
+    def setDynamicInformation(update: RoomDataUpdate): Unit = {
         if (chartsButton.isDisabled) {
             chartsButton setDisable false
         }
-        currentPeopleValue setText cell.currentPeople.toString
-        cell.cell.sensors.foreach(sensor => {
+        currentPeopleValue setText update.currentPeople.toString
+        update.cell.sensors.foreach(sensor => {
             sensorsController.get(sensor.categoryId).get updateSensor sensor
         })
     }

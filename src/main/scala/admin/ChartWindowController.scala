@@ -33,7 +33,7 @@ class ChartWindowController extends Initializable {
     @FXML
     private var cellName: Label = _
 
-    private var cellInfo: RoomInfo = _
+    private var roomInfo: RoomInfo = _
 
     private val sensorChartControllers: mutable.Map[Int, SensorChartController] = new mutable.HashMap[Int, SensorChartController]()
 
@@ -54,7 +54,7 @@ class ChartWindowController extends Initializable {
       **/
     def initializeWindow(info: RoomInfo): Unit = {
         cellName setText info.id.name
-        cellInfo = info
+        roomInfo = info
     }
 
     /**
@@ -103,7 +103,7 @@ class ChartWindowController extends Initializable {
       * This method is called when the secondary window is closed.
       **/
     def closeView(): Unit = {
-        chartActor ! AriadneMessage(Interface, Interface.Subtype.CloseChart, Location.Admin >> Location.Self, cellInfo)
+        chartActor ! AriadneMessage(Interface, Interface.Subtype.CloseChart, Location.Admin >> Location.Self, roomInfo)
     }
 
 }
