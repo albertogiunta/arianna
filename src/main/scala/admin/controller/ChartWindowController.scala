@@ -2,6 +2,7 @@ package admin.controller
 
 import java.net.URL
 import java.util.ResourceBundle
+import javafx.application.Platform
 import javafx.fxml.{FXML, FXMLLoader, Initializable}
 import javafx.scene.chart.{LineChart, XYChart}
 import javafx.scene.control.{Label, TitledPane}
@@ -14,7 +15,6 @@ import ontologies.messages._
 import ontologies.sensor.SensorCategories
 
 import scala.collection.mutable
-import scalafx.application.Platform
 
 /**
   * This is the Controller class for the external charts window.
@@ -42,9 +42,7 @@ class ChartWindowController extends Initializable {
     private var time = (0 to Int.MaxValue - 1).iterator
 
     override def initialize(location: URL, resources: ResourceBundle): Unit = {
-        Platform.runLater {
-            peopleChart.getData add data
-        }
+        Platform.runLater(() => peopleChart.getData add data)
     }
 
     /**
@@ -86,17 +84,13 @@ class ChartWindowController extends Initializable {
       * */
     def updateCharts(update: RoomDataUpdate): Unit = {
 
-        Platform.runLater {
-            update.cell.sensors.foreach(sensor => {
-                sensorChartControllers.get(sensor.categoryId).get.addValue(sensor.value)
-            }
-            )
+        Platform.runLater(() => {
+            update.cell.sensors.foreach(sensor => sensorChartControllers.get(sensor.categoryId).get.addValue(sensor.value))
             if (data.getData.size.equals(20)) {
                 data.getData remove 0
             }
             data.getData add new XYChart.Data(time.next, update.currentPeople)
-        }
-
+        })
     }
 
     /**

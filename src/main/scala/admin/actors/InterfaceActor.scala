@@ -1,5 +1,7 @@
 package admin.actors
 
+import javafx.application.Platform
+
 import admin.controller.InterfaceController
 import admin.view.InterfaceView
 import akka.actor.{ActorRef, Props}
@@ -9,7 +11,6 @@ import ontologies.messages.MessageType.{Alarm, Error, Handshake, Init, Interface
 import ontologies.messages._
 
 import scala.collection.mutable
-import scalafx.application.Platform
 
 /**
   * This actor keeps the interface updated when it receives messages from its parent and t also creates
@@ -25,12 +26,12 @@ class InterfaceActor extends BasicActor {
 
 
     override def init(args: List[Any]): Unit = {
-        Platform.runLater {
+        Platform.runLater(() => {
             val view: InterfaceView = new InterfaceView
             view.start
             interfaceController = view.controller
             interfaceController.interfaceActor = self
-        }
+        })
     }
 
     /**

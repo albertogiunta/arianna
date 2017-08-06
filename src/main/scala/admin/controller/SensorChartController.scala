@@ -2,10 +2,9 @@ package admin.controller
 
 import java.net.URL
 import java.util.ResourceBundle
+import javafx.application.Platform
 import javafx.fxml.{FXML, Initializable}
 import javafx.scene.chart.{LineChart, XYChart}
-
-import scalafx.application.Platform
 
 /**
   * This is the Controller for the sensor chart, that initialized it and keep it updated.
@@ -21,9 +20,7 @@ class SensorChartController extends Initializable {
 
 
     override def initialize(location: URL, resources: ResourceBundle): Unit = {
-        Platform.runLater {
-            chart.getData add data
-        }
+        Platform.runLater(() => chart.getData add data)
     }
 
     /**

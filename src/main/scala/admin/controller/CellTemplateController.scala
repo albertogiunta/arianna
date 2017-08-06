@@ -15,7 +15,6 @@ import ontologies.messages.MessageType.Interface
 import ontologies.messages._
 
 import scala.collection.mutable
-import scalafx.application.Platform
 
 /**
   * This class represent the controller for each Cell template inside the interface
@@ -100,9 +99,7 @@ class CellTemplateController extends Initializable {
       *
       * */
     def handleAlarm(): Unit = {
-        Platform.runLater {
-            header setBackground new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY))
-        }
+        header setBackground new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY))
     }
 
     /**

@@ -3,12 +3,15 @@ package admin.controller
 import java.io.File
 import java.net.URL
 import java.util.ResourceBundle
+import javafx.application.Platform
 import javafx.fxml.{FXML, FXMLLoader, Initializable}
 import javafx.scene.canvas.Canvas
 import javafx.scene.control.Alert.AlertType
 import javafx.scene.control.{Alert, Button, SplitPane}
 import javafx.scene.layout.{Pane, VBox}
 import javafx.scene.text.Text
+import javafx.stage.FileChooser
+import javafx.stage.FileChooser.ExtensionFilter
 
 import admin.view.InterfaceView
 import akka.actor.ActorRef
@@ -18,10 +21,6 @@ import ontologies.messages._
 
 import scala.collection.mutable
 import scala.io.Source
-import scalafx.Includes._
-import scalafx.application.Platform
-import scalafx.stage.FileChooser
-import scalafx.stage.FileChooser.ExtensionFilter
 
 /**
   * This is the main controller for the interface of the Application
@@ -46,9 +45,7 @@ class InterfaceController extends Initializable {
     @FXML
     private var mapContainer: Pane = _
 
-    override def initialize(location: URL, resources: ResourceBundle): Unit = {
-        println("Controller initialized")
-    }
+    override def initialize(location: URL, resources: ResourceBundle): Unit = {}
 
     /**
       * This method updates the interface with the information about all the cells
@@ -56,7 +53,7 @@ class InterfaceController extends Initializable {
       * @param update : this is a List of CellForView containing the updated data
       **/
     def updateView(update: List[RoomDataUpdate]): Unit = {
-        Platform.runLater {
+        Platform.runLater(() => {
             if (alarmButton.isDisabled) {
                 alarmButton setDisable false
             }
@@ -65,7 +62,7 @@ class InterfaceController extends Initializable {
                 var cellController = cellControllers.get(update.room).get
                 cellController setDynamicInformation update
             })
-        }
+        })
     }
 
     /**
@@ -74,10 +71,10 @@ class InterfaceController extends Initializable {
       * */
     @FXML
     def handleFileLoad(): Unit = {
-        loadButton.disable = true
+        loadButton setDisable true
         val fc = new FileChooser
-        fc.title = "Get JSON"
-        fc.extensionFilters += (new ExtensionFilter("JSON Files", "*.json"))
+        fc setTitle "Get JSON Map"
+        fc setSelectedExtensionFilter new ExtensionFilter("JSON Files", "*.json")
         val json: File = fc.showOpenDialog(null)
         parseFile(json)
     }
@@ -95,9 +92,7 @@ class InterfaceController extends Initializable {
       **/
     def initializeSensors(sensorsInfo: SensorsInfoUpdate, roomID: RoomID): Unit = {
         var cellController = cellControllers.get(roomID).get
-        Platform.runLater {
-            cellController addSensors sensorsInfo
-        }
+        Platform.runLater(() => cellController addSensors sensorsInfo)
     }
 
     /**
@@ -107,8 +102,10 @@ class InterfaceController extends Initializable {
       **/
     def triggerAlarm(alarmContent: AlarmContent): Unit = {
         interfaceActor ! new AriadneMessage(MessageType.Alarm, MessageType.Alarm.Subtype.FromInterface, Location.Admin >> Location.Self, Empty())
-        cellControllers.get(alarmContent.room.id).get.handleAlarm
-        canvasController handleAlarm alarmContent.info.uri
+        Platform.runLater(() => {
+            cellControllers.get(alarmContent.room.id).get.handleAlarm
+            canvasController handleAlarm alarmContent.info.uri
+        })
     }
 
     /**
@@ -116,7 +113,10 @@ class InterfaceController extends Initializable {
       *
       **/
     def triggerAlarm(): Unit = {
-        canvasController.handleAlarm
+        Platform.runLater(() => {
+            cellControllers.values.foreach(cellController => cellController.handleAlarm)
+            canvasController.handleAlarm
+        })
     }
 
     /**
@@ -124,14 +124,21 @@ class InterfaceController extends Initializable {
       *
       **/
     def enableButton(cellId: RoomID): Unit = {
-        cellControllers.get(cellId).get.enableChartButton
+        Platform.runLater(() => cellControllers.get(cellId).get.enableChartButton)
     }
 
+    /**
+      * This method shows an alert dialog when the System already has a map and
+      * another map is loaded from the GUI.
+      *
+      **/
     def showErrorDialog(): Unit = {
         val alert = new Alert(AlertType.ERROR)
         alert setTitle "Fatal Error"
         alert setHeaderText "Wrong Map loaded!"
         alert setContentText "The System already has a Map, try again loading the correct map"
+
+        alert.showAndWait
         loadButton setDisable false
     }
 
@@ -141,23 +148,23 @@ class InterfaceController extends Initializable {
         interfaceActor ! AriadneMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, Location.Admin >> Location.Self, area)
         loadCanvas
         createCells(area.rooms)
-        fileName.text = file.getName
+        fileName setText file.getName
     }
 
     private def loadCanvas(): Unit = {
         var loader = new FXMLLoader(getClass.getResource("/canvasTemplate.fxml"))
         var canvas = loader.load[Canvas]
         canvasController = loader.getController[CanvasController]
-        mapContainer.getChildren += canvas
+        mapContainer.getChildren add canvas
     }
 
     private def createCells(initialConfiguration: List[Room]) = {
         initialConfiguration.foreach(cell => {
-            Platform.runLater {
+            Platform.runLater(() => {
                 var node = createCellTemplate(cell)
-                vBoxPane.getChildren += node
+                vBoxPane.getChildren add node
                 canvasController drawOnMap cell
-            }
+            })
         })
     }
 
@@ -167,9 +174,7 @@ class InterfaceController extends Initializable {
         var controller = loader.getController[CellTemplateController]
         controller.adminActor = interfaceActor
         cellControllers += ((cell.info.id, controller))
-        Platform.runLater {
-            controller setStaticInformation cell
-        }
+        Platform.runLater(() => controller setStaticInformation cell)
         node
     }
 

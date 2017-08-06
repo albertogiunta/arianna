@@ -59,10 +59,7 @@ class CanvasController extends Initializable {
     def drawOnMap(room: Room): Unit = {
         val roomData: RoomData = RoomData(room.info.roomVertices)
         val passages: ListBuffer[PassageLine] = new ListBuffer[PassageLine]
-        room.passages.foreach(passage => {
-            passages += PassageLine(passage.startCoordinates, passage.endCoordinates)
-        })
-
+        room.passages.foreach(passage => passages += PassageLine(passage.startCoordinates, passage.endCoordinates))
         rooms += ((room.cell.info.uri, (roomData, passages)))
         drawRoom(roomData, Color.WHITE)
         drawPassages(passages)

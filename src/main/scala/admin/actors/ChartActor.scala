@@ -1,12 +1,13 @@
 package admin.actors
 
+import javafx.application.Platform
+
 import admin.controller.ChartWindowController
 import admin.view.ChartView
 import com.actors.CustomActor
 import ontologies.messages.MessageType.Interface
 import ontologies.messages._
 
-import scalafx.application.Platform
 
 /**
   * This actor handles the creation of a external window for charts, and it keeps them constantly updated with new
@@ -20,18 +21,20 @@ class ChartActor extends CustomActor {
 
     override def receive: Receive = {
         case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
-            Platform.runLater {
+            Platform.runLater(() => {
                 val view = new ChartView
                 view.start
                 windowController = view.controller
                 windowController.chartActor = self
                 windowController initializeWindow cell.cell
                 windowController initializeCharts cell.sensorsId
-            }
+            })
 
         }
 
-        case msg@AriadneMessage(Interface, Interface.Subtype.UpdateChart, _, update: RoomDataUpdate) => windowController updateCharts update
+        case msg@AriadneMessage(Interface, Interface.Subtype.UpdateChart, _, update: RoomDataUpdate) => {
+            windowController updateCharts update
+        }
 
         case msg@AriadneMessage(Interface, Interface.Subtype.CloseChart, _, _) => parent forward msg
 
