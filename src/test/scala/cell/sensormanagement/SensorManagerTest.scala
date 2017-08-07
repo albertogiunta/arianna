@@ -28,6 +28,7 @@ class SensorManagerTest extends TestKit(ActorSystem("SensorManagerTest",
     val configPath: String = "res/json/cell/cell4Test.json"
     val config = Source.fromFile(configPath).getLines.mkString
     var loadedConfig: CellConfig = config.parseJson.convertTo[CellConfig]
+    val sensorsNumber = loadedConfig.sensors.size
 
     val testSensorInfoMsg: SensorInfo = new SensorInfo(1, 0.5)
 
@@ -44,7 +45,7 @@ class SensorManagerTest extends TestKit(ActorSystem("SensorManagerTest",
         "initialize the same number of sensor of the configuration" in {
             val sManager = system.actorOf(Props[SensorManager], actorName)
 
-            EventFilter.info(message = "[" + actorName + "] 3 sensor/s initialized", occurrences = 1) intercept {
+            EventFilter.info(message = "[" + actorName + "] " + sensorsNumber + " sensor/s initialized", occurrences = 1) intercept {
                 sManager ! sensorManagerInitMsg
             }
 
