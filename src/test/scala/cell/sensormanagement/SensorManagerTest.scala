@@ -51,9 +51,7 @@ class SensorManagerTest extends TestKit(ActorSystem("SensorManagerTest",
 
             system.stop(sManager)
         }
-    }
 
-    "A Sensor Manager" should {
         "sends sensor updates to its parent after the initialization" in {
             val proxy = TestProbe()
             val parent = system.actorOf(Props(new TestParent(proxy.ref, actorName)), "TestParent")
@@ -64,9 +62,7 @@ class SensorManagerTest extends TestKit(ActorSystem("SensorManagerTest",
             system.stop(proxy.ref)
             system.stop(parent)
         }
-    }
 
-    "A Sensor Manager" should {
         "sends an alarm when a sensor exceeds the threshold" in {
             val proxy = TestProbe()
             val parent = system.actorOf(Props(new TestParent(proxy.ref, actorName)), "TestParent")
@@ -82,7 +78,6 @@ class SensorManagerTest extends TestKit(ActorSystem("SensorManagerTest",
             system.stop(parent)
         }
     }
-
 }
 
 class TestParent(proxy: ActorRef, sonName: String) extends CustomActor {
