@@ -11,11 +11,11 @@ import ontologies.messages._
 
 /**
   * This actor handles the creation of a external window for charts, and it keeps them constantly updated with new
-  * values received from the System (through his parent AdminActor).
+  * values received from the System (through his parent InterfaceManager).
   *
   *
   **/
-class ChartActor extends CustomActor {
+class ChartManager extends CustomActor {
 
     private var windowController: ChartWindowController = _
 
@@ -38,7 +38,7 @@ class ChartActor extends CustomActor {
             })
         }
 
-        case msg@AriadneMessage(Interface, Interface.Subtype.CloseChart, _, _) => parent forward msg
+        case msg@AriadneMessage(Interface, Interface.Subtype.CloseChart, _, _) => parent ! msg
 
     }
 

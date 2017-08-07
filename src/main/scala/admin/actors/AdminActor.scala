@@ -19,18 +19,19 @@ class AdminActor() extends BasicActor {
     private val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/AdminManager")
     //Se si fa partire il master
     //val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/Master/AdminManager")
-    private val interfaceActor = context.actorOf(Props[InterfaceActor])
+    private val interfaceManager = context.actorOf(Props[InterfaceManager], "InterfaceManager")
     private var areaLoaded: Area = _
     private val toServer: MessageDirection = Location.Admin >> Location.Master
     private val toSelf: MessageDirection = Location.Admin >> Location.Self
 
     override def init(args: List[Any]): Unit = {
-        interfaceActor ! AriadneMessage(Init, Init.Subtype.Greetings, toSelf, Greetings(List.empty))
+        interfaceManager ! AriadneMessage(Init, Init.Subtype.Greetings, toSelf, Greetings(List.empty))
     }
 
     override def receptive: Receive = {
         //Ricezione del messaggio iniziale dall'interfaccia con aggiornamento iniziale
         case msg@AriadneMessage(_, Topology.Subtype.Planimetrics, _, area: Area) => {
+            println("Ricevuta area")
             areaLoaded = area
             adminManager ! msg.copy(direction = toServer)
             context.become(operational)
@@ -42,17 +43,20 @@ class AdminActor() extends BasicActor {
 
     def operational: Receive = {
 
-        case msg@AriadneMessage(_, MessageType.Update.Subtype.Admin, _, adminUpdate: AdminUpdate) => interfaceActor ! msg.copy(direction = toSelf)
+        case msg@AriadneMessage(_, MessageType.Update.Subtype.Admin, _, adminUpdate: AdminUpdate) => {
+            println("Ricevuta update")
+            interfaceManager ! msg.copy(direction = toSelf)
+        }
 
         case msg@AriadneMessage(_, Alarm.Subtype.FromInterface, _, _) => adminManager ! msg.copy(direction = toServer)
 
-        case msg@AriadneMessage(_, Alarm.Subtype.FromCell, _, content: AlarmContent) => interfaceActor ! msg.copy(direction = toSelf)
+        case msg@AriadneMessage(_, Alarm.Subtype.FromCell, _, content: AlarmContent) => interfaceManager ! msg.copy(direction = toSelf)
 
-        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => interfaceActor ! msg.copy(direction = toSelf)
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => interfaceManager ! msg.copy(direction = toSelf)
 
         case msg@AriadneMessage(Error, Error.Subtype.LookingForAMap, _, _) => adminManager ! AriadneMessage(Topology, Topology.Subtype.Planimetrics, toServer, areaLoaded)
 
-        case msg@AriadneMessage(Error, Error.Subtype.MapIdentifierMismatch, _, _) => interfaceActor ! msg.copy(direction = toSelf)
+        case msg@AriadneMessage(Error, Error.Subtype.MapIdentifierMismatch, _, _) => interfaceManager ! msg.copy(direction = toSelf)
 
         case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => adminManager ! msg.copy(direction = toServer)
 

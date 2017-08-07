@@ -4,7 +4,7 @@ import javafx.application.Platform
 
 import admin.controller.InterfaceController
 import admin.view.InterfaceView
-import akka.actor.{ActorRef, Props}
+import akka.actor.{ActorRef, PoisonPill, Props}
 import com.actors.BasicActor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.{Alarm, Error, Handshake, Init, Interface, Topology}
@@ -18,7 +18,7 @@ import scala.collection.mutable
   * the updates about the correct cell.
   *
   **/
-class InterfaceActor extends BasicActor {
+class InterfaceManager extends BasicActor {
 
     private var interfaceController: InterfaceController = _
     private val chartActors: mutable.Map[RoomID, ActorRef] = new mutable.HashMap[RoomID, ActorRef]
@@ -69,13 +69,13 @@ class InterfaceActor extends BasicActor {
         case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => interfaceController.initializeSensors(sensorsInfo, roomIDs.get(sensorsInfo.cell).get)
 
         case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
-            var chartActor = context.actorOf(Props[ChartActor])
+            var chartActor = context.actorOf(Props[ChartManager])
             chartActors += ((cell.cell.id, chartActor))
             chartActor ! msg
         }
 
         case msg@AriadneMessage(Interface, Interface.Subtype.CloseChart, _, cell: RoomInfo) => {
-            context stop chartActors.get(cell.id).get
+            chartActors.get(cell.id).get ! PoisonPill
             interfaceController enableButton cell.id
         }
 
