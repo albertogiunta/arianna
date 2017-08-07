@@ -17,7 +17,7 @@ import ontologies.messages._
 /**
   * Created by Alessandro on 29/06/2017.
   */
-object TestClusterJoin extends App {
+object TryClusterJoin extends App {
     val path2Project = Paths.get("").toFile.getAbsolutePath
     val path2Config = path2Project + "/res/conf/akka/cell.conf"
 
