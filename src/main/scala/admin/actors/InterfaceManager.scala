@@ -9,12 +9,13 @@ import com.actors.BasicActor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.{Alarm, Error, Handshake, Init, Interface, Topology}
 import ontologies.messages._
+import system.names.NamingSystem
 
 import scala.collection.mutable
 
 /**
-  * This actor keeps the interface updated when it receives messages from its parent and t also creates
-  * a ChartActor for each chart window opened by the administrator and forward to it only
+  * This actor keeps the interface updated when it receives messages from its parent and it also creates
+  * a ChartManager for each chart window opened by the administrator and forward to it only
   * the updates about the correct cell.
   *
   **/
@@ -69,7 +70,7 @@ class InterfaceManager extends BasicActor {
         case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => interfaceController.initializeSensors(sensorsInfo, roomIDs.get(sensorsInfo.cell).get)
 
         case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
-            var chartActor = context.actorOf(Props[ChartManager])
+            var chartActor = context.actorOf(Props[ChartManager], NamingSystem.ChartManager + chartActors.size.toString)
             chartActors += ((cell.cell.id, chartActor))
             chartActor ! msg
         }

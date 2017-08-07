@@ -158,7 +158,7 @@ class InterfaceController extends Initializable {
         mapContainer.getChildren add canvas
     }
 
-    private def createCells(initialConfiguration: List[Room]) = {
+    private def createCells(initialConfiguration: List[Room]): Unit = {
         initialConfiguration.foreach(cell => {
             Platform.runLater(() => {
                 var node = createCellTemplate(cell)

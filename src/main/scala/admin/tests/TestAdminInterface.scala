@@ -26,7 +26,7 @@ object TestAdminInterface extends App {
 
     var i = 1
     Thread.sleep(10000)
-    while (!i.equals(6)) {
+    while (!i.equals(5)) {
         Thread.sleep(1000)
         var sensors: ListBuffer[SensorInfo] = new ListBuffer[SensorInfo]
         for (i <- 1 until 5) {
