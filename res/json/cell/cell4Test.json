@@ -27,7 +27,7 @@
             "maxValue": 100,
             "threshold": {
                 "lowThreshold": 20,
-                "highThreshold": 80
+                "highThreshold": 50
             }
         }
     ]

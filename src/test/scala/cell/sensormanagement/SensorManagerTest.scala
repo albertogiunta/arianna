@@ -8,10 +8,10 @@ import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType._
 import ontologies.messages._
-import ontologies.sensor.SensorCategories
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import spray.json._
 
+import scala.concurrent.duration._
 import scala.io.Source
 
 /**
@@ -29,18 +29,7 @@ class SensorManagerTest extends TestKit(ActorSystem("SensorManagerTest",
     val config = Source.fromFile(configPath).getLines.mkString
     var loadedConfig: CellConfig = config.parseJson.convertTo[CellConfig]
 
-    //    var updateMsgExpected = AriadneMessage(Update,
-    //        Update.Subtype.Sensors,
-    //        Location.Self >> Location.Self,
-    //        new SensorsInfoUpdate(CellInfo.empty, List[SensorInfo]))
-
     val testSensorInfoMsg: SensorInfo = new SensorInfo(1, 0.5)
-    val testAlarm = AriadneMessage(
-        Alarm,
-        Alarm.Subtype.FromCell,
-        Location.Self >> Location.Self,
-        new SensorInfo(SensorCategories.Temperature.id, 99.0)
-    )
 
     val sensorManagerInitMsg = AriadneMessage(Init,
         Init.Subtype.Greetings,
@@ -75,6 +64,24 @@ class SensorManagerTest extends TestKit(ActorSystem("SensorManagerTest",
             system.stop(parent)
         }
     }
+
+    "A Sensor Manager" should {
+        "sends an alarm when a sensor exceeds the threshold" in {
+            val proxy = TestProbe()
+            val parent = system.actorOf(Props(new TestParent(proxy.ref, actorName)), "TestParent")
+            //Time related to the threshold specified in the configuration file for the test
+            //The monotonic humidity sensor must exceed the threshold after 10 seconds
+            proxy.send(parent, sensorManagerInitMsg)
+            proxy.ignoreMsg {
+                case msg: String => msg != "Alarm Received"
+            }
+            proxy.expectMsg(15 seconds, "Alarm Received")
+
+            system.stop(proxy.ref)
+            system.stop(parent)
+        }
+    }
+
 }
 
 class TestParent(proxy: ActorRef, sonName: String) extends CustomActor {
@@ -86,6 +93,8 @@ class TestParent(proxy: ActorRef, sonName: String) extends CustomActor {
     override def receive: Receive = {
         case msg@AriadneMessage(Update, Update.Subtype.Sensors, this.self2Self, cnt: SensorsInfoUpdate)
             if sender == child => proxy ! "Update Received"
+        case msg@AriadneMessage(Alarm, _, _, cnt: SensorInfo) if sender == child =>
+            proxy ! "Alarm Received"
         case x => child forward x
     }
 }
