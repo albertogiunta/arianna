@@ -1,7 +1,5 @@
 package ontologies.messages
 
-import ontologies.messages.MessageType.{Init, _}
-
 /**
   * Created by Matteo Gabellini on 28/06/2017.
   */
@@ -30,11 +28,3 @@ final case class AriadneMessage[T <: MessageContent](supertype: MessageType,
                                                      subtype: MessageSubtype,
                                                      direction: MessageDirection,
                                                      content: T) extends Message[T]
-
-object TestMessage extends App {
-    val s: String = Init
-    
-    println(Init == "Init")
-    
-    println(MessageType.Factory("INIT"))
-}
