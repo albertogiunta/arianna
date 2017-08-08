@@ -1,5 +1,7 @@
 package ontologies.messages
 
+import scala.collection.mutable
+
 
 /**
   * A trait that represent a Content for Ariadne Messages
@@ -67,6 +69,10 @@ final case class RoomInfo(id: RoomID,
                           isExitPoint: Boolean,
                           capacity: Int,
                           squareMeters: Double) extends MessageContent
+
+object RoomInfo {
+//    def emtpy: RoomInfo = RoomInfo(RoomID.empty, Coordinates.em)
+}
 
 /**
   * This class rapresent a unique Identifier for a Room
@@ -171,6 +177,7 @@ final case class AreaViewedFromACell(id: Int, rooms: List[RoomViewedFromACell]) 
 
 object AreaViewedFromACell {
     def apply(area: Area): AreaViewedFromACell = new AreaViewedFromACell(area.id, area.rooms.map(c => RoomViewedFromACell(c)))
+//    def empty: AreaViewedFromACell = AreaViewedFromACell("11", List[RoomViewedFromACell])
 }
 
 /**

@@ -4,7 +4,7 @@ import java.io.File
 import java.nio.file.Paths
 
 import _root_.io.vertx.core.Vertx
-import akka.actor.{ActorLogging, ActorSystem, Props}
+import akka.actor.{ActorLogging, ActorRef, ActorSystem, Props}
 import cell.WSClient
 import com.actors.BasicActor
 import com.typesafe.config.ConfigFactory
@@ -15,6 +15,7 @@ import ontologies.messages.MessageType.Topology.Subtype._
 import ontologies.messages._
 import spray.json._
 
+import scala.collection.mutable
 import scala.io.Source
 
 object MSGToAkka {
@@ -84,9 +85,10 @@ class UserManager extends BasicActor with ActorLogging {
         // todo tell CellCoreActore
         case msg: RouteRequestShort =>
             // use for test
-            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest("", getCellWithId(msg.fromCellUri), getCellWithId(msg.toCellUri), isEscape = false), areaForCell.rooms.map(c => c.info.id)))
-            Thread.sleep(500)
+            Thread.sleep(1500)
             self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest("", areaForCell.rooms.head.info.id, areaForCell.rooms.tail.head.info.id, isEscape = true), areaForCell.rooms.map(c => c.info.id)))
+            Thread.sleep(1500)
+            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest("", getCellWithId(msg.fromCellUri), getCellWithId(msg.toCellUri), isEscape = false), areaForCell.rooms.map(c => c.info.id)))
         // use in production
         //            parent ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell, RouteRequest(msg.userID, getCellWithId(msg.fromCellId), getCellWithId(msg.toCellId), isEscape = false))
         //            parent ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell, RouteRequest(msg.userID, getCellWithId(msg.fromCellId), getCellWithId(msg.toCellId), isEscape = true))
@@ -122,23 +124,26 @@ object RunUser {
     var area: Area = loadArea()
 
     def main(args: Array[String]): Unit = {
+
         val path2Project = Paths.get("").toFile.getAbsolutePath
         val path2Config = path2Project + "/res/conf/akka/application.conf"
         val config = ConfigFactory.parseFile(new File(path2Config))
         val system = ActorSystem.create("userSystem", config.getConfig("user"))
-        val userActor = system.actorOf(Props.create(classOf[UserManager]), "user1")
-        userActor ! AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, Location.User >> Location.Self, Greetings(List("uri1", "8081")))
-        Thread.sleep(500)
-        val userActor2 = system.actorOf(Props.create(classOf[UserManager]), "user2")
-        userActor2 ! AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, Location.User >> Location.Self, Greetings(List("uri2", "8082")))
-        Thread.sleep(500)
-        val userActor3 = system.actorOf(Props.create(classOf[UserManager]), "user3")
-        userActor3 ! AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, Location.User >> Location.Self, Greetings(List("uri3", "8083")))
-        Thread.sleep(500)
-        userActor ! AriadneMessage(Topology, ViewedFromACell, Location.User >> Location.Self, areaForCell)
-        Thread.sleep(500)
-        userActor2 ! AriadneMessage(Topology, ViewedFromACell, Location.User >> Location.Self, areaForCell)
-        Thread.sleep(500)
-        userActor3 ! AriadneMessage(Topology, ViewedFromACell, Location.User >> Location.Self, areaForCell)
+
+        val map: mutable.LinkedHashMap[String, Greetings] = mutable.LinkedHashMap()
+        val actors: mutable.MutableList[ActorRef] = mutable.MutableList()
+
+        for (i <- 1 to 15) {
+            map.put(s"user$i", Greetings(List(s"uri$i", (8080+i).toString)))
+        }
+
+        map.foreach(u => {
+            val userActor = system.actorOf(Props.create(classOf[UserManager]), u._1)
+            userActor ! AriadneMessage(MessageType.Init, MessageType.Init.Subtype.Greetings, Location.User >> Location.Self, u._2)
+            Thread.sleep(1000)
+            userActor ! AriadneMessage(Topology, ViewedFromACell, Location.User >> Location.Self, areaForCell)
+            Thread.sleep(500)
+            actors += userActor
+        })
     }
 }

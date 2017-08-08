@@ -109,7 +109,7 @@ public class WSServer extends AbstractVerticle {
     }
 
     public void sendRouteToUsers(RouteResponse route, String routeAsJson) {
-        Pair<Integer, Integer> p = new Pair<>(route.request().fromCell().serial(), route.request().toCell().serial());
+        Pair<String, String> p = new Pair<>("uri"+route.request().fromCell().serial(), "uri"+route.request().toCell().serial());
         this.usersWaitingForRoute.get(p).forEach(u -> u.snd.writeTextMessage(routeAsJson));
         this.usersWaitingForRoute.remove(p);
     }
