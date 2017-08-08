@@ -16,12 +16,12 @@ import ontologies.messages.{AriadneMessage, Greetings, Location}
   * [link: http://doc.akka.io/docs/akka/current/scala/cluster-usage.html]
   */
 class ClusterMembersListener extends CustomActor {
-    
-    private val greetings: String = "Hello there, it's time to dress-up"
 
-    private val cluster = Cluster(context.system)
+    protected val greetings: String = "Hello there, it's time to dress-up"
 
-    private var nodes = Set.empty[Address]
+    protected val cluster = Cluster(context.system)
+
+    protected var nodes = Set.empty[Address]
 
     override def preStart = {
         cluster.subscribe(self, classOf[MemberUp], classOf[MemberEvent])
