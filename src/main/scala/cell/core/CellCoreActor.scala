@@ -1,9 +1,9 @@
 package cell.core
 
 import akka.actor.{ActorRef, Props}
-import cell.cluster.{CellPublisher, CellSubscriber}
+import cell.cluster.{CellClusterSupervisor, CellPublisher, CellSubscriber}
 import cell.sensormanagement.SensorManager
-import com.actors.{BasicActor, ClusterMembersListener}
+import com.actors.BasicActor
 import com.utils.Practicability
 import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.Location._
@@ -48,7 +48,7 @@ class CellCoreActor extends BasicActor {
 
     override def preStart: Unit = {
         super.preStart()
-        clusterListener = context.actorOf(Props[ClusterMembersListener], "CellClusterListener")
+        clusterListener = context.actorOf(Props[CellClusterSupervisor], "CellClusterSupervisor")
 
         cellSubscriber = context.actorOf(Props[CellSubscriber], "CellSubscriber")
         cellPublisher = context.actorOf(Props[CellPublisher], "CellPublisher")
