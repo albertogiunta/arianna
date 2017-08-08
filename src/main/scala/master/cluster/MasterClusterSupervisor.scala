@@ -11,6 +11,8 @@ class MasterClusterSupervisor extends ClusterMembersListener {
     override def preStart: Unit = {
         
         super.preStart
+    
+        Thread.sleep(5000L)
         
         // If this is the master node, Actors should be already Initialized
         try {

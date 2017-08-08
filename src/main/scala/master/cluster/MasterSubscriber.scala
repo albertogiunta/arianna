@@ -18,7 +18,7 @@ import system.names.NamingSystem
   */
 class MasterSubscriber extends BasicSubscriber {
     
-    override val topics: Set[Topic] = Set(Topic.Alarms, Topic.Updates, Topic.HandShakes)
+    override val topics: Set[Topic] = Set(Topic.Updates, Topic.HandShakes)
     
     private val cell2Server: MessageDirection = Location.Master << Location.Cell
     private val admin2Server: MessageDirection = Location.Admin >> Location.Master
@@ -50,10 +50,11 @@ class MasterSubscriber extends BasicSubscriber {
     
         case msg@AriadneMessage(Handshake, CellToMaster, `cell2Server`, _) =>
             log.info("Resolving Handshake from {}", sender.path)
-            publisher() ! (
-                sender.path.elements.mkString("/"),
-                AriadneMessage(Handshake, Acknowledgement, Location.Master >> Location.Cell, Empty())
-            )
+            publisher() ! AriadneMessage(Handshake, Acknowledgement, Location.Master >> Location.Cell, Empty())
+            //                (
+            //                sender.path.elements.mkString("/"),
+            //                AriadneMessage(Handshake, Acknowledgement, Location.Master >> Location.Cell, Empty())
+            //            )
             topologySupervisor() forward msg
     
         case msg@AriadneMessage(Topology, ViewedFromACell, _, _) =>
@@ -77,10 +78,11 @@ class MasterSubscriber extends BasicSubscriber {
 
         case msg@AriadneMessage(Handshake, CellToMaster, `cell2Server`, _) =>
             log.info("Late handshake from {}... Forwarding to Supervisor...", sender.path)
-            publisher() ! (
-                sender.path.elements.mkString("/"),
-                AriadneMessage(Handshake, Acknowledgement, Location.Master >> Location.Cell, Empty())
-            )
+            publisher() ! AriadneMessage(Handshake, Acknowledgement, Location.Master >> Location.Cell, Empty())
+            //                (
+            //                sender.path.elements.mkString("/"),
+            //                AriadneMessage(Handshake, Acknowledgement, Location.Master >> Location.Cell, Empty())
+            //            )
             topologySupervisor() forward msg
         
         case _ => desist _

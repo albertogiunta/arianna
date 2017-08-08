@@ -1,6 +1,7 @@
 package master.core
 
 import akka.actor.ActorSelection
+import akka.cluster.pubsub.DistributedPubSubMediator.{Subscribe, SubscribeAck}
 import com.actors.BasicSubscriber
 import ontologies.Topic
 import ontologies.messages.AriadneMessage
@@ -22,7 +23,9 @@ class AlarmSupervisor extends BasicSubscriber {
     private val admin: () => ActorSelection = () => sibling(NamingSystem.AdminManager).get
     
     override protected def receptive = {
-    
+        case SubscribeAck(Subscribe(topic, None, `self`)) =>
+            log.info("{} Successfully Subscribed to {}", name, topic)
+            
         case msg@AriadneMessage(Alarm, subtype, _, _) =>
             log.info("Got {} from {}", msg.toString, sender.path.name)
         
