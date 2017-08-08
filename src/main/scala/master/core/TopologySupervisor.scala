@@ -45,7 +45,7 @@ class TopologySupervisor extends BasicActor {
     
         super.init(args)
     
-        dataStreamer ! AriadneMessage(
+        admin() ! AriadneMessage(
             Error, Error.Subtype.LookingForAMap,
             master2Admin, Empty()
         )
