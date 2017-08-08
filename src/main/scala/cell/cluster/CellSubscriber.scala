@@ -31,8 +31,6 @@ class CellSubscriber extends BasicSubscriber {
             log.info("{} Successfully Subscribed to {}", name, topic)
         case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, _, cnt) =>
             log.info("Got ack {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
-        case SubscribeAck(Subscribe(topic, None, `self`)) =>
-            log.info("{} Successfully Subscribed to {}", name, topic)
         case msg@AriadneMessage(Topology, Topology.Subtype.ViewedFromACell, _, cnt) =>
             log.info("I received the topology: {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
 

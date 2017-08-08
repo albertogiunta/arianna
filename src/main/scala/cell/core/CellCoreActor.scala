@@ -89,6 +89,15 @@ class CellCoreActor extends BasicActor {
             }
         }
 
+        case msg@AriadneMessage(Update, Update.Subtype.Sensors, this.self2Self, cnt: SensorsInfoUpdate) => {
+            if (sensorsMounted.isEmpty) {
+                sensorsMounted = cnt.sensors
+                unstashAll()
+            } else {
+                sensorsMounted = cnt.sensors
+            }
+        }
+
         //        case msg@AriadneMessage(Error, Error.Subtype.CellMappingMismatch, _, cnt: Empty) =>
         //            log.error("Mapping Error")
 
@@ -105,14 +114,12 @@ class CellCoreActor extends BasicActor {
             userActor ! msg.copy(direction = cell2User)
         }
 
+        case _ => desist _
+    }
+
+    protected def cultured: Receive = {
         case msg@AriadneMessage(Update, Update.Subtype.Sensors, this.self2Self, cnt: SensorsInfoUpdate) => {
-            if (sensorsMounted.isEmpty) {
-                sensorsMounted = cnt.sensors
-                unstashAll()
-                //            } else {
-                //                sensorsMounted = cnt.sensors
-                //                cellPublisher ! msg.copy(content = cnt.copy(cell = this.localCellInfo))
-            }
+            cellPublisher ! msg.copy(content = cnt.copy(cell = this.localCellInfo))
         }
 
         case AriadneMessage(Update, Update.Subtype.Practicability, this.cell2Cell, cnt: PracticabilityUpdate) =>
@@ -192,5 +199,7 @@ class CellCoreActor extends BasicActor {
                 )
             )
         }
+
+        case _ => desist _
     }
 }
