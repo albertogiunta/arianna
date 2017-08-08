@@ -19,6 +19,6 @@ class CellClusterSupervisor extends ClusterMembersListener {
                 Location.Cell >> Location.Self, Greetings(List(greetings)))
         }
     }
-
-    override protected def whenMemeberRemoved(member: Member, previousStatus: MemberStatus): Unit = {}
+    
+    override protected def whenMemberRemoved(member: Member, previousStatus: MemberStatus): Unit = {}
 }

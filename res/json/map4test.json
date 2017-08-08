@@ -4,7 +4,7 @@
     {
       "info": {
         "id": {
-          "serial": 666,
+          "serial": 777,
           "name": "PancoPillo"
         },
         "roomVertices": {
@@ -44,7 +44,7 @@
       "neighbors": [],
       "passages": [
         {
-          "neighborId": 777,
+          "neighborId": 555,
           "startCoordinates": {
             "x": 250,
             "y": 130

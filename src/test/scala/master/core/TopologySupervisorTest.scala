@@ -58,7 +58,7 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
         Update,
         Update.Subtype.CurrentPeople,
         Location.Cell >> Location.Master,
-        CurrentPeopleUpdate(RoomID(serial = 666, name = "PancoPillo"), 666)
+        CurrentPeopleUpdate(RoomID(serial = 777, name = "PancoPillo"), 777)
     )
     
     val sensorsUpdate = AriadneMessage(

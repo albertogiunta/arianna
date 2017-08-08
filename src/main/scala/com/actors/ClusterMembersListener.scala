@@ -49,6 +49,6 @@ abstract class ClusterMembersListener extends CustomActor {
 
 
     protected def whenMemberUp(member: Member): Unit
-
-    protected def whenMemeberRemoved(member: Member, previousStatus: MemberStatus): Unit
+    
+    protected def whenMemberRemoved(member: Member, previousStatus: MemberStatus): Unit
 }

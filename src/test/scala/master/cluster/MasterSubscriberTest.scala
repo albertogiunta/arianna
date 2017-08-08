@@ -55,7 +55,7 @@ class MasterSubscriberTest extends TestKit(ActorSystem("SubscriberTest", MasterS
         Update,
         Update.Subtype.CurrentPeople,
         Location.Cell >> Location.Master,
-        CurrentPeopleUpdate(RoomID(serial = 666, name = "PancoPillo"), 0)
+        CurrentPeopleUpdate(RoomID(serial = 777, name = "PancoPillo"), 0)
     )
     
     override def afterAll {
