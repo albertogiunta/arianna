@@ -1,83 +1,34 @@
 {
-    "infoCell": {
-        "id": 3,
+    "cellInfo": {
         "uri": "uri3",
-        "name": "cell3",
-        "roomVertices": {
-            "northWest": {
-                "x": 20,
-                "y": 10
-            },
-            "northEast": {
-                "x": 30,
-                "y": 10
-            },
-            "southWest": {
-                "x": 20,
-                "y": 0
-            },
-            "southEast": {
-                "x": 30,
-                "y": 0
-            }
-        },
-        "antennaPosition": {
-            "x": 25,
-            "y": 5
-        }
+        "port": 8083
     },
     "sensors": [
         {
-            "category": 1,
-            "value": 30.0
-        }
-    ],
-    "neighbors": [
+            "categoryId": 1,
+            "minValue": -40.0,
+            "maxValue": 100.0,
+            "threshold": {
+                "lowThreshold": -10,
+                "highThreshold": 50
+            }
+        },
         {
-            "id": 2,
-            "uri": "uri2",
-            "name": "cell2",
-            "roomVertices": {
-                "northWest": {
-                    "x": 10,
-                    "y": 10
-                },
-                "northEast": {
-                    "x": 20,
-                    "y": 10
-                },
-                "southWest": {
-                    "x": 10,
-                    "y": 0
-                },
-                "southEast": {
-                    "x": 20,
-                    "y": 0
-                }
-            },
-            "antennaPosition": {
-                "x": 15,
-                "y": 5
+            "categoryId": 2,
+            "minValue": 0.0,
+            "maxValue": 50.0,
+            "threshold": {
+                "value": 30
+            }
+        },
+        {
+            "categoryId": 3,
+            "minValue": 0,
+            "maxValue": 100,
+            "threshold": {
+                "lowThreshold": 20,
+                "highThreshold": 80
             }
         }
-    ],
-    "passages": [
-        {
-            "neighborId": 1,
-            "startCoordinates": {
-                "x": 10,
-                "y": 7
-            },
-            "endCoordinates": {
-                "x": 10,
-                "y": 8
-            }
-        }
-    ],
-    "isEntryPoint": false,
-    "isExitPoint": true,
-    "capacity": 30,
-    "squareMeters": 20.0,
-    "currentPeople": 10,
-  "practicability": 2.0
+    ]
 }

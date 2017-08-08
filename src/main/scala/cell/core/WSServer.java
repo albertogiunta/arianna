@@ -19,11 +19,11 @@ public class WSServer extends AbstractVerticle {
     private final Vertx    vertx;
     private final ActorRef userActor;
 
-    private Map<String, ServerWebSocket>                                     usersWaitingForDisconnection;
-    private Map<String, ServerWebSocket>                                     usersWaitingForConnectionOk;
-    private Map<String, ServerWebSocket>                                     usersWaitingForArea;
-    private Map<String, ServerWebSocket>                                     usersReadyForAlarm;
-    private Map<Pair<Integer, Integer>, List<Pair<String, ServerWebSocket>>> usersWaitingForRoute;
+    private Map<String, ServerWebSocket>                                   usersWaitingForDisconnection;
+    private Map<String, ServerWebSocket>                                   usersWaitingForConnectionOk;
+    private Map<String, ServerWebSocket>                                   usersWaitingForArea;
+    private Map<String, ServerWebSocket>                                   usersReadyForAlarm;
+    private Map<Pair<String, String>, List<Pair<String, ServerWebSocket>>> usersWaitingForRoute;
 
     private String  baseUrl  = "";
     private Integer basePort = 0;
@@ -60,9 +60,9 @@ public class WSServer extends AbstractVerticle {
             } else if (ws.path().equals(baseUrl + "/route")) {
                 ws.handler(data -> {
                     System.out.println("asked route " + data.toString());
-                    String uriStart = data.toString().split("-")[0];
-                    String uriEnd   = data.toString().split("-")[1];
-                    Pair   p        = new Pair<>(uriStart, uriEnd);
+                    String               uriStart = data.toString().split("-")[0];
+                    String               uriEnd   = data.toString().split("-")[1];
+                    Pair<String, String> p        = new Pair<>(uriStart, uriEnd);
                     usersWaitingForRoute.computeIfAbsent(p, k -> new LinkedList<>()).add(new Pair<>(ws.textHandlerID(), ws));
                     userActor.tell(new RouteRequestShort(ws.textHandlerID(), uriStart, uriEnd, false), ActorRef.noSender());
                 });
