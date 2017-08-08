@@ -18,4 +18,5 @@ object NamingSystem {
     val CellCore = "CellCore"
     val SensorManager = "SensorManager"
     val UserManager = "UserManager"
+    val CellClusterSupervisor = "CellClusterSupervisor"
 }

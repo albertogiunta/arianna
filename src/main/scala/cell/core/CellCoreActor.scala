@@ -62,7 +62,7 @@ class CellCoreActor extends BasicActor {
     override protected def init(args: List[Any]): Unit = {
         log.info("Hello there! the cell core is being initialized")
 
-        clusterListener = context.actorOf(Props[CellClusterSupervisor], "CellClusterSupervisor")
+        clusterListener = context.actorOf(Props[CellClusterSupervisor], NamingSystem.CellClusterSupervisor)
 
         val cellConfiguration = Source.fromFile(args.head.asInstanceOf[String]).getLines.mkString
         val loadedConfig = cellConfiguration.parseJson.convertTo[CellConfig]
