@@ -1,6 +1,6 @@
 package com.actors
 
-import akka.actor.ActorRef
+import akka.actor.{Actor, ActorRef}
 import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator.{Put, Subscribe, SubscribeAck}
 import ontologies.Topic
@@ -18,6 +18,7 @@ import ontologies.Topic
 abstract class BasicSubscriber extends BasicActor {
 
     val topics: Set[Topic] // To Override Necessarily
+    var ackTopicReceived: Integer = 0
 
     var mediator: ActorRef = _
 
@@ -28,12 +29,18 @@ abstract class BasicSubscriber extends BasicActor {
         topics.foreach(topic => mediator ! Subscribe(topic, self))
     }
 
-    override protected def resistive = {
+    override protected def receptive = {
         case SubscribeAck(Subscribe(topic, None, this.self)) =>
             log.info("{} Successfully Subscribed to {}", name, topic)
+            ackTopicReceived = ackTopicReceived + 1
+            if (ackTopicReceived == topics.size) {
+                this.context.become(subscribed, discardOld = true)
+            }
 
         case msg => super.resistive(msg)
     }
+
+    protected def subscribed: Actor.Receive = ???
 }
 
 /**

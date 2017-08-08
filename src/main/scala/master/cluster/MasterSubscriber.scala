@@ -1,7 +1,6 @@
 package master.cluster
 
 import akka.actor.ActorSelection
-import akka.cluster.pubsub.DistributedPubSubMediator.{Subscribe, SubscribeAck}
 import com.actors.BasicSubscriber
 import ontologies._
 import ontologies.messages.Location._
@@ -25,11 +24,11 @@ class MasterSubscriber extends BasicSubscriber {
     
     private val topologySupervisor: () => ActorSelection = () => sibling(NamingSystem.TopologySupervisor).get
     private val publisher: () => ActorSelection = () => sibling(NamingSystem.Publisher).get
-    
-    override protected def receptive = {
-    
-        case SubscribeAck(Subscribe(topic, None, `self`)) =>
-            log.info("{} Successfully Subscribed to {}", name, topic)
+
+    override protected def subscribed = {
+
+        //        case SubscribeAck(Subscribe(topic, None, `self`)) =>
+        //            log.info("{} Successfully Subscribed to {}", name, topic)
 
         case AriadneMessage(Handshake, CellToMaster, `cell2Server`, _) =>
             log.info("Stashing handshake from {} for later administration...", sender.path)
