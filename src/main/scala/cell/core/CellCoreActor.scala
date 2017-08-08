@@ -48,7 +48,7 @@ class CellCoreActor extends BasicActor {
 
     override def preStart: Unit = {
         super.preStart()
-        clusterListener = context.actorOf(Props[CellClusterSupervisor], "CellClusterSupervisor")
+        //        clusterListener = context.actorOf(Props[CellClusterSupervisor], "CellClusterSupervisor")
 
         cellSubscriber = context.actorOf(Props[CellSubscriber], "CellSubscriber")
         cellPublisher = context.actorOf(Props[CellPublisher], "CellPublisher")
@@ -61,7 +61,9 @@ class CellCoreActor extends BasicActor {
     override protected def init(args: List[Any]): Unit = {
         log.info("Hello there! the cell core is being initialized")
 
-        val cellConfiguration = Source.fromFile(args(0).asInstanceOf[String]).getLines.mkString
+        clusterListener = context.actorOf(Props[CellClusterSupervisor], "CellClusterSupervisor")
+
+        val cellConfiguration = Source.fromFile(args.head.asInstanceOf[String]).getLines.mkString
         val loadedConfig = cellConfiguration.parseJson.convertTo[CellConfig]
         localCellInfo = loadedConfig.cellInfo
 
@@ -74,6 +76,7 @@ class CellCoreActor extends BasicActor {
     override protected def receptive: Receive = {
 
         case msg@AriadneMessage(Info, Info.Subtype.Request, this.self2Self, cnt: SensorsInfoUpdate) => {
+            println("aaa 1")
             //Informations request from the cell publisher in order to complete the handshake task with the master
             if (localCellInfo == CellInfo.empty || sensorsMounted.isEmpty) {
                 stash()
@@ -82,6 +85,7 @@ class CellCoreActor extends BasicActor {
                     subtype = Info.Subtype.Response,
                     content = SensorsInfoUpdate(localCellInfo, sensorsMounted)
                 )
+                println("aaa 2")
             }
         }
 
@@ -105,9 +109,9 @@ class CellCoreActor extends BasicActor {
             if (sensorsMounted.isEmpty) {
                 sensorsMounted = cnt.sensors
                 unstashAll()
-            } else {
-                sensorsMounted = cnt.sensors
-                cellPublisher ! msg.copy(content = cnt.copy(cell = this.localCellInfo))
+                //            } else {
+                //                sensorsMounted = cnt.sensors
+                //                cellPublisher ! msg.copy(content = cnt.copy(cell = this.localCellInfo))
             }
         }
 
@@ -154,11 +158,11 @@ class CellCoreActor extends BasicActor {
             //route response from route manager for the user
             userActor ! msg
 
-        case msg@AriadneMessage(Alarm, _, this.self2Self, cnt) => {
+        case msg@AriadneMessage(Alarm, _, this.self2Self, _) => {
             //Alarm triggered in the current cell
             //Check if the topology is initialized
-            if (topology.size != 0) {
-                val currentCell: RoomViewedFromACell = topology.get(localCellInfo.uri).get
+            if (topology.nonEmpty) {
+                val currentCell: RoomViewedFromACell = topology(localCellInfo.uri)
                 val msgToSend = msg.copy(direction = cell2Cluster,
                     content = AlarmContent(localCellInfo, currentCell.info)
                 )

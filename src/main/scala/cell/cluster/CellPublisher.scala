@@ -1,7 +1,7 @@
 package cell.cluster
 
 import akka.cluster.pubsub.DistributedPubSubMediator.Publish
-import com.actors.BasicPublisher
+import com.actors.{BasicPublisher, ClusterMembersListener}
 import ontologies._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType._
@@ -17,10 +17,12 @@ class CellPublisher extends BasicPublisher {
 
 
     override protected def init(args: List[Any]) = {
-        if (args(0) != "FROM CLUSTER MEMBERS LISTERNER Hello there, it's time to dress-up") throw new Exception()
+        super.init(args)
+        if (args.head != ClusterMembersListener.greetings) throw new Exception()
         log.info("Hello there from {}!", name)
 
         //Ask to the core actor the cell information in order to continue the handshake task
+        println("aaa 0")
         parent ! AriadneMessage(
             Info,
             Info.Subtype.Request,
@@ -32,6 +34,7 @@ class CellPublisher extends BasicPublisher {
 
     override protected def receptive = {
         case msg@AriadneMessage(Info, Info.Subtype.Response, this.self2Self, sensorsInfoUpdate: SensorsInfoUpdate) => {
+            println("aaa 3")
             log.info("Sending Handshake to Master...")
             mediator ! Publish(Topic.HandShakes,
                 AriadneMessage(

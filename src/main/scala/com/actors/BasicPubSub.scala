@@ -19,13 +19,13 @@ abstract class BasicSubscriber extends BasicActor {
 
     val topics: Set[Topic] // To Override Necessarily
 
-    val mediator: ActorRef = DistributedPubSub(context.system).mediator
+    var mediator: ActorRef = _
 
-    override def preStart() = {
-
-        topics.foreach(topic => mediator ! Subscribe(topic, self))
-
+    override protected def init(args: List[Any]): Unit = {
+        super.init(args)
+        mediator = DistributedPubSub(context.system).mediator
         mediator ! Put(self) // Point 2 Point Messaging with other Actors of the cluster
+        topics.foreach(topic => mediator ! Subscribe(topic, self))
     }
 
     override protected def resistive = {
@@ -43,11 +43,14 @@ abstract class BasicSubscriber extends BasicActor {
 abstract class BasicPublisher extends BasicActor {
 
     // activate the extension
-    val mediator: ActorRef = DistributedPubSub(context.system).mediator
+    var mediator: ActorRef = _
 
     // Point 2 Point Messaging with other Actors of the cluster
-    override def preStart = {
-        mediator ! Put(self)
+
+    override protected def init(args: List[Any]): Unit = {
+        super.init(args)
+        mediator = DistributedPubSub(context.system).mediator
+        mediator ! Put(self) // Point 2 Point Messaging with other Actors of the cluster
     }
 
 }

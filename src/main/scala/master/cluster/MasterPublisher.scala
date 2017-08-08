@@ -13,6 +13,8 @@ import system.names.NamingSystem
 class MasterPublisher extends BasicPublisher {
 
     override protected def receptive = {
+
+
         case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) =>
             log.info("Forwarding system shut-down... ")
             mediator ! Publish(Topic.ShutDown, msg)

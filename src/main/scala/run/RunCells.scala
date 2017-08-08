@@ -23,11 +23,19 @@ object RunCells extends App {
 
     val system = ActorSystem("Arianna-Cluster", config)
 
+    //    (1 to 15) map {
+    //        i =>
+    //            val core = system.actorOf(Props[CellCoreActor], "CellCore" + i)
+    //            val configPath: String = "res/json/cell/cell" + i + ".json"
+    //            core ! AriadneMessage(Init, Init.Subtype.Greetings,
+    //                Location.Master >> Location.Self, Greetings(List(configPath)))
+    //    }
+
     var core = system.actorOf(Props[CellCoreActor], "CellCore")
     var server2Cell = Location.Master >> Location.Cell
 
     Thread.sleep(500)
-    private val configPath: String = "res/json/cell/cell2.json"
+    private val configPath: String = "res/json/cell/cell1.json"
     core ! AriadneMessage(Init, Init.Subtype.Greetings,
         Location.Master >> Location.Self, Greetings(List(configPath)))
 }

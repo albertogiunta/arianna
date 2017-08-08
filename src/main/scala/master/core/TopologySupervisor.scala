@@ -94,6 +94,7 @@ class TopologySupervisor extends BasicActor {
         case msg@AriadneMessage(Handshake, CellToMaster, `cell2Master`, SensorsInfoUpdate(cell, sensors)) =>
     
             val roomName = indexByUri.get(cell.uri)
+            log.info("Received handshake from cell {}", roomName)
     
             if (roomName.nonEmpty) {
                 

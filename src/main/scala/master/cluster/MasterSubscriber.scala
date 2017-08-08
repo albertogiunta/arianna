@@ -5,7 +5,7 @@ import akka.cluster.pubsub.DistributedPubSubMediator.{Subscribe, SubscribeAck}
 import com.actors.BasicSubscriber
 import ontologies._
 import ontologies.messages.Location._
-import ontologies.messages.MessageType.Handshake.Subtype.CellToMaster
+import ontologies.messages.MessageType.Handshake.Subtype.{Acknowledgement, CellToMaster}
 import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, ViewedFromACell}
 import ontologies.messages.MessageType._
 import ontologies.messages._
@@ -50,7 +50,10 @@ class MasterSubscriber extends BasicSubscriber {
     
         case msg@AriadneMessage(Handshake, CellToMaster, `cell2Server`, _) =>
             log.info("Resolving Handshake from {}", sender.path)
-    
+            publisher() ! (
+                sender.path.elements.mkString("/"),
+                AriadneMessage(Handshake, Acknowledgement, Location.Master >> Location.Cell, Empty())
+            )
             topologySupervisor() forward msg
     
         case msg@AriadneMessage(Topology, ViewedFromACell, _, _) =>
@@ -74,6 +77,10 @@ class MasterSubscriber extends BasicSubscriber {
 
         case msg@AriadneMessage(Handshake, CellToMaster, `cell2Server`, _) =>
             log.info("Late handshake from {}... Forwarding to Supervisor...", sender.path)
+            publisher() ! (
+                sender.path.elements.mkString("/"),
+                AriadneMessage(Handshake, Acknowledgement, Location.Master >> Location.Cell, Empty())
+            )
             topologySupervisor() forward msg
         
         case _ => desist _

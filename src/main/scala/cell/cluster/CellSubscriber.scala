@@ -1,7 +1,7 @@
 package cell.cluster
 
 import akka.cluster.pubsub.DistributedPubSubMediator.{Subscribe, SubscribeAck}
-import com.actors.BasicSubscriber
+import com.actors.{BasicSubscriber, ClusterMembersListener}
 import ontologies._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType._
@@ -21,11 +21,14 @@ class CellSubscriber extends BasicSubscriber {
     private val server2Cell: MessageDirection = Location.Master >> Location.Cell
 
     override protected def init(args: List[Any]) = {
-        if (args(0) != "FROM CLUSTER MEMBERS LISTENER Hello there, it's time to dress-up") throw new Exception()
+        super.init(args)
+        if (args.head != ClusterMembersListener.greetings) throw new Exception()
         log.info("Hello there from {}!", name)
     }
 
     override protected def receptive = {
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, _, cnt) =>
+            log.info("Got ack {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
         case SubscribeAck(Subscribe(topic, None, `self`)) =>
             log.info("{} Successfully Subscribed to {}", name, topic)
         case msg@AriadneMessage(Topology, Topology.Subtype.ViewedFromACell, _, cnt) =>
@@ -52,7 +55,7 @@ class CellSubscriber extends BasicSubscriber {
         case msg@AriadneMessage(Route, _, _, cnt) =>
             log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
         case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, _, cnt) =>
-            log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
+            log.info("Got ack {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
         case _ => desist _
     }
 }

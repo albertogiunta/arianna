@@ -1,6 +1,6 @@
 package cell.cluster
 
-import akka.cluster.{Member, MemberStatus}
+import akka.cluster.Member
 import com.actors.ClusterMembersListener
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Init
@@ -16,7 +16,7 @@ class CellClusterSupervisor extends ClusterMembersListener {
             //init actors of current node that must interact in the cluster
             log.info("Awakening Actors on Cell Actor-System")
             siblings ! AriadneMessage(Init, Init.Subtype.Greetings,
-                Location.Cell >> Location.Self, Greetings(List(greetings)))
+                Location.Cell >> Location.Self, Greetings(List(ClusterMembersListener.greetings)))
         }
     }
 

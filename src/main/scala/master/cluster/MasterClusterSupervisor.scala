@@ -1,6 +1,6 @@
 package master.cluster
 
-import akka.cluster.{Member, MemberStatus}
+import akka.cluster.Member
 import com.actors.ClusterMembersListener
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Init
@@ -20,7 +20,7 @@ class MasterClusterSupervisor extends ClusterMembersListener {
                 log.info("Awakening Actors on {}", cluster.selfAddress.toString)
                 
                 siblings ! AriadneMessage(Init, Init.Subtype.Greetings,
-                    Location.Master >> Location.Self, Greetings(List(greetings)))
+                    Location.Master >> Location.Self, Greetings(List(ClusterMembersListener.greetings)))
             }
         } catch {
             case ex: Throwable =>

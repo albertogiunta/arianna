@@ -1,7 +1,7 @@
 package cell.sensormanagement
 
 import cell.sensormanagement.sensors._
-import com.actors.BasicActor
+import com.actors.{BasicActor, ClusterMembersListener}
 import ontologies.messages
 import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.Location._
@@ -28,8 +28,8 @@ class SensorManager extends BasicActor {
 
 
     override protected def init(args: List[Any]): Unit = {
-
-        var sensorsToLoad = args(0).asInstanceOf[String].parseJson.convertTo[List[SensorInfoFromConfig]]
+        if (args.head == ClusterMembersListener.greetings) throw new Exception()
+        var sensorsToLoad = args.head.asInstanceOf[String].parseJson.convertTo[List[SensorInfoFromConfig]]
         sensorsToLoad foreach (X => {
             sensors.put(X.categoryId, SensorInfo(X.categoryId, 0))
             val simSensor = SensorsFactory.createASensorFromConfig(X)

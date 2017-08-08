@@ -3,12 +3,9 @@ package cell
 import java.io.File
 import java.nio.file.Paths
 
-import akka.actor.{ActorSystem, Props}
-import cell.core.CellCoreActor
+import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
-import ontologies.messages.Location._
-import ontologies.messages.MessageType.Init
-import ontologies.messages.{AriadneMessage, Greetings, Location}
+import ontologies.messages.Location
 
 /**
   * Created by Alessandro on 28/06/2017.
@@ -49,13 +46,13 @@ object TestCells extends App {
 
     val system = ActorSystem("Arianna-Cluster", config)
 
-    (1 to 15) map {
-        i =>
-            val core = system.actorOf(Props[CellCoreActor], "CellCore" + i)
-            val configPath: String = "res/json/cell/cell" + i + ".json"
-            core ! AriadneMessage(Init, Init.Subtype.Greetings,
-                Location.Master >> Location.Self, Greetings(List(configPath)))
-    }
+    //    (1 to 15) map {
+    //        i =>
+    //            val core = system.actorOf(Props[CellCoreActor], "CellCore" + i)
+    //            val configPath: String = "res/json/cell/cell" + i + ".json"
+    //            core ! AriadneMessage(Init, Init.Subtype.Greetings,
+    //                Location.Master >> Location.Self, Greetings(List(configPath)))
+    //    }
 
     var server2Cell = Location.Master >> Location.Cell
 
@@ -68,7 +65,7 @@ object TestCells extends App {
     //def areaForCell: AreaViewedFromACell = AreaViewedFromACell(loadArea)
 
     //    Thread.sleep(500)
-    //    private val configPath: String = "res/json/cell/cell2.json"
+    //    private val configPath: String = "res/json/cell/cell1.json"
     //    core ! AriadneMessage(Init, Init.Subtype.Greetings,
     //        Location.Master >> Location.Self, Greetings(List(configPath)))
 
