@@ -4,6 +4,9 @@ import akka.actor.{Actor, ActorRef}
 import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator.{Put, Subscribe, SubscribeAck}
 import ontologies.Topic
+import ontologies.messages.Location._
+import ontologies.messages.MessageType.Init
+import ontologies.messages.{AriadneMessage, Greetings, Location}
 
 /**
   * This class gives a common template for a Akka Subscriber.
@@ -35,6 +38,8 @@ abstract class BasicSubscriber extends BasicActor {
             ackTopicReceived = ackTopicReceived + 1
             if (ackTopicReceived == topics.size) {
                 this.context.become(subscribed, discardOld = true)
+                siblings ! AriadneMessage(Init, Init.Subtype.Greetings,
+                    Location.Cell >> Location.Self, Greetings(List(ClusterMembersListener.greetings)))
                 log.info("I've become Subscribed!")
             }
 

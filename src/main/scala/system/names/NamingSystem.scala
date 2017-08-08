@@ -16,4 +16,6 @@ object NamingSystem {
     val InterfaceManager = "InterfaceManager"
     val ChartManager = "ChartManager"
     val CellCore = "CellCore"
+    val SensorManager = "SensorManager"
+    val UserManager = "UserManager"
 }
