@@ -14,7 +14,7 @@ import scala.util.Random
 /**
   * Created by Xander_C on 09/07/2017.
   */
-object TestDataStreamer extends App {
+object TryDataStreamer extends App {
     
     val path2Project = Paths.get("").toFile.getAbsolutePath
     val path2Config = path2Project + "/res/conf/akka/application.conf"

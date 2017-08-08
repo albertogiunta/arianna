@@ -32,7 +32,9 @@ case class AriadneTopic(override val topic: String, override val subTopic: Optio
 }
 
 object Topic {
-
+    
+    val ShutDown = AriadneTopic(MessageType.Init, Option(MessageType.Init.Subtype.Goodbyes))
+    
     val Alarms = AriadneTopic(MessageType.Alarm, Option.empty)
 
     val Topologies = AriadneTopic(MessageType.Topology, Option.empty)
@@ -50,9 +52,4 @@ object Topic {
     implicit def Topic2MessageType(topic: Topic): MessageType = topic.associatedMessageType
 
     implicit def Topic2MessageSubtype(topic: Topic): MessageSubtype = topic.associatedMessageSubtype.orNull
-}
-
-object TestTopic extends App {
-    println(Topic.Practicabilities)
-    println(Topic.Updates)
 }

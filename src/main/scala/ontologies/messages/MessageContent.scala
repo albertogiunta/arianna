@@ -210,6 +210,9 @@ object RoomViewedFromAUser {
 
     def apply(room: Room): RoomViewedFromAUser =
         new RoomViewedFromAUser(room.info, room.cell.info, room.neighbors, room.passages)
+
+    def apply(room: RoomViewedFromACell): RoomViewedFromAUser =
+        new RoomViewedFromAUser(room.info, room.cell, room.neighbors, room.passages)
 }
 
 /**
@@ -221,7 +224,8 @@ object RoomViewedFromAUser {
 final case class AreaViewedFromAUser(id: Int, rooms: List[RoomViewedFromAUser]) extends MessageContent
 
 object AreaViewedFromAUser {
-    def apply(area: Area): AreaViewedFromAUser = new AreaViewedFromAUser(area.id, area.rooms.map(c => RoomViewedFromAUser(c)))
+//    def apply(area: Area): AreaViewedFromAUser = new AreaViewedFromAUser(area.id, area.rooms.map(c => RoomViewedFromAUser(c)))
+    def apply(area: AreaViewedFromACell): AreaViewedFromAUser = new AreaViewedFromAUser(area.id, area.rooms.map(c => RoomViewedFromAUser(c)))
 }
 
 /**
@@ -409,4 +413,4 @@ final case class CellForView(id: Int, name: String, currentPeople: Int, sensors:
   * @param sensorsId : list of Int representing the sensor ID inside the room
   *
   **/
-final case class CellForChart(cell: CellInfo, sensorsId: List[Int]) extends MessageContent
+final case class CellForChart(cell: RoomInfo, sensorsId: List[Int]) extends MessageContent

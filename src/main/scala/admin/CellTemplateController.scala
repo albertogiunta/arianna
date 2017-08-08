@@ -23,7 +23,7 @@ import scalafx.application.Platform
 class CellTemplateController extends Initializable {
 
     var adminActor: ActorRef = _
-    private var cellInfo: CellInfo = _
+    private var cellInfo: Room = _
     private val sensorsController: mutable.Map[Int, SensorTemplateController] = new mutable.HashMap[Int, SensorTemplateController]
     @FXML
     private var roomName: Text = _
@@ -49,16 +49,16 @@ class CellTemplateController extends Initializable {
     /**
       * This method fills the interface with static information about the Cell; it's called only one time when the map is loaded
       *
-      * @param cell : Cell object containing data
+      * @param room : Cell object containing data
       *
       **/
-    def setStaticInformation(cell: Room): Unit = {
-        cellInfo = cell.info
-        roomName setText cell.info.name
-        maxCapacityValue setText cell.capacity.toString
-        sqrMetersValue setText cell.squareMeters.toString
-        if (cell.isEntryPoint) entranceValue setText "1" else entranceValue setText "0"
-        if (cell.isExitPoint) exitValue setText "1" else exitValue setText "0"
+    def setStaticInformation(room: Room): Unit = {
+        cellInfo = room
+        roomName setText room.info.id.name
+        maxCapacityValue setText room.info.capacity.toString
+        sqrMetersValue setText room.info.squareMeters.toString
+        if (room.info.isEntryPoint) entranceValue setText "1" else entranceValue setText "0"
+        if (room.info.isExitPoint) exitValue setText "1" else exitValue setText "0"
     }
 
     /**
@@ -67,13 +67,12 @@ class CellTemplateController extends Initializable {
       *
       * @param cell : CellForView object containing only dynamic data
       * */
-    def setDynamicInformation(cell: CellForView): Unit = {
+    def setDynamicInformation(cell: RoomDataUpdate): Unit = {
         if (chartsButton.isDisabled) {
             chartsButton setDisable false
         }
         currentPeopleValue setText cell.currentPeople.toString
-        cell.sensors.foreach(sensor => {
-            println("Cerco il controller " + sensor.categoryId)
+        cell.cell.sensors.foreach(sensor => {
             sensorsController.get(sensor.categoryId).get updateSensor sensor
         })
     }
@@ -90,7 +89,6 @@ class CellTemplateController extends Initializable {
             var sensorTemplate = loader.load[HBox]
             val sensorController = loader.getController[SensorTemplateController]
             sensorController createSensor sensor
-            println("Aggiungo il controller del sensore " + sensor.categoryId)
             sensorsController += ((sensor.categoryId, sensorController))
             sensorsContainer.getChildren add sensorTemplate
         })
@@ -112,7 +110,7 @@ class CellTemplateController extends Initializable {
       * window with charts.
       **/
     def openCharts(): Unit = {
-        adminActor ! AriadneMessage(Interface, Interface.Subtype.OpenChart, Location.Admin >> Location.Self, CellForChart(cellInfo, sensorsController.keys.toList))
+        adminActor ! AriadneMessage(Interface, Interface.Subtype.OpenChart, Location.Admin >> Location.Self, CellForChart(cellInfo.info, sensorsController.keys.toList))
         chartsButton setDisable true
     }
 

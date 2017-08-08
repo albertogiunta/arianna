@@ -6,7 +6,6 @@ import javafx.fxml.{FXML, Initializable}
 import javafx.scene.canvas.Canvas
 import javafx.scene.paint.Color
 
-import ontologies.messages
 import ontologies.messages.{Coordinates, Point, Room}
 
 import scala.collection.mutable
@@ -20,7 +19,7 @@ import scala.collection.mutable.ListBuffer
   * @param roomVertices : Coordinates object containing Point vertices of the room
   *
   **/
-sealed case class Room(roomVertices: Coordinates) {
+private sealed case class RoomData(roomVertices: Coordinates) {
     val x: Double = roomVertices.northWest.x
     val y: Double = roomVertices.northWest.y
     val width: Double = roomVertices.northEast.x - roomVertices.northWest.x
@@ -47,27 +46,27 @@ class CanvasController extends Initializable {
     @FXML
     private var mapCanvas: Canvas = _
 
-    private val rooms: mutable.Map[Int, (Room, ListBuffer[PassageLine])] = new mutable.HashMap[Int, (Room, ListBuffer[PassageLine])]
+    private val rooms: mutable.Map[String, (RoomData, ListBuffer[PassageLine])] = new mutable.HashMap[String, (RoomData, ListBuffer[PassageLine])]
 
     override def initialize(location: URL, resources: ResourceBundle): Unit = {}
 
     /**
       * This method draws on the Canvas a rectangle representing the Cell passed as parameter
       *
-      * @param cell : cell to be drawn
+      * @param room : cell to be drawn
       *
       * */
-    def drawOnMap(cell: Room): Unit = {
-        val room: Room = messages.Room(cell.info.roomVertices)
+    def drawOnMap(room: Room): Unit = {
+        val roomData: RoomData = RoomData(room.info.roomVertices)
         val passages: ListBuffer[PassageLine] = new ListBuffer[PassageLine]
-        cell.passages.foreach(passage => {
+        room.passages.foreach(passage => {
             passages += PassageLine(passage.startCoordinates, passage.endCoordinates)
         })
 
-        rooms += ((cell.info.id, (room, passages)))
-        drawRoom(room, Color.WHITE)
+        rooms += ((room.cell.info.uri, (roomData, passages)))
+        drawRoom(roomData, Color.WHITE)
         drawPassages(passages)
-        drawAntenna(cell.info.antennaPosition)
+        drawAntenna(room.info.antennaPosition)
     }
 
     /**
@@ -76,13 +75,13 @@ class CanvasController extends Initializable {
       * @param id : id of the cell where the alarm comes from
       *
       * */
-    def handleAlarm(id: Int): Unit = {
+    def handleAlarm(id: String): Unit = {
         val roomData = rooms.get(id).get
         drawRoom(roomData._1, Color.RED)
         drawPassages(roomData._2)
     }
 
-    private def drawRoom(room: Room, color: Color): Unit = {
+    private def drawRoom(room: RoomData, color: Color): Unit = {
         val gc = mapCanvas.getGraphicsContext2D
         gc setStroke Color.BLACK
         gc setFill color

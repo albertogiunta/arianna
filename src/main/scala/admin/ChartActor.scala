@@ -19,19 +19,18 @@ class ChartActor extends CustomActor {
 
     override def receive: Receive = {
         case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
-            cellInfo = cell.info
             Platform.runLater {
                 val view = new ChartView
                 view.start()
                 windowController = view.controller
                 windowController.chartActor = self
-                windowController initializeWindow cell.info
+                windowController initializeWindow cell.cell
                 windowController initializeCharts cell.sensorsId
             }
 
         }
 
-        case msg@AriadneMessage(Interface, Interface.Subtype.UpdateChart, _, update: CellForView) => windowController updateCharts update
+        case msg@AriadneMessage(Interface, Interface.Subtype.UpdateChart, _, update: RoomDataUpdate) => windowController updateCharts update
 
         case msg@AriadneMessage(Interface, Interface.Subtype.CloseChart, _, _) => parent forward msg
 
