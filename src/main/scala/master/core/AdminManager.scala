@@ -36,6 +36,8 @@ class AdminManager extends CustomActor {
 
         case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => parent ! msg.copy(direction = fromAdmin)
 
+        case msg@AriadneMessage(Error, Error.Subtype.MapIdentifierMismatch, _, _) => admin ! msg.copy(direction = toAdmin)
+
     }
 
     override def receive: Receive = {
