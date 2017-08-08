@@ -40,6 +40,7 @@ abstract class ClusterMembersListener extends CustomActor {
             nodes += member.address
             log.info("Member is Up: {}. {} nodes in cluster",
                 member.address, nodes.size)
+            Thread.sleep(5000)
             whenMemberUp(member)
 
 
