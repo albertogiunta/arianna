@@ -1,5 +1,6 @@
-package master.core
+package master.cluster
 
+import akka.cluster.{Member, MemberStatus}
 import com.actors.ClusterMembersListener
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Init
@@ -27,4 +28,8 @@ class MasterClusterSupervisor extends ClusterMembersListener {
                 parent ! AriadneMessage(Init, Init.Subtype.Goodbyes, Location.Master >> Location.Master, Empty())
         }
     }
+
+    override protected def whenMemberUp(member: Member): Unit = {}
+
+    override protected def whenMemeberRemoved(member: Member, previousStatus: MemberStatus): Unit = {}
 }

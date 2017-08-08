@@ -2,10 +2,7 @@ package com.actors
 
 import akka.actor.Address
 import akka.cluster.ClusterEvent.{CurrentClusterState, MemberEvent, MemberRemoved, MemberUp}
-import akka.cluster.{Cluster, MemberStatus}
-import ontologies.messages.Location._
-import ontologies.messages.MessageType.Init
-import ontologies.messages.{AriadneMessage, Greetings, Location}
+import akka.cluster.{Cluster, Member, MemberStatus}
 
 /**
   * This actor implements a listener for members event when nodes interact each other into the cluster
@@ -15,7 +12,7 @@ import ontologies.messages.{AriadneMessage, Greetings, Location}
   * Code based on akka code from official documentation
   * [link: http://doc.akka.io/docs/akka/current/scala/cluster-usage.html]
   */
-class ClusterMembersListener extends CustomActor {
+abstract class ClusterMembersListener extends CustomActor {
 
     protected val greetings: String = "Hello there, it's time to dress-up"
 
@@ -41,12 +38,7 @@ class ClusterMembersListener extends CustomActor {
             log.info("Member is Up: {}. {} nodes in cluster",
                 member.address, nodes.size)
 
-            if (member.address == cluster.selfAddress) {
-                //init actors of current node that must interact in the cluster
-                log.info("Awakening Actors on Cell Actor-System")
-                siblings ! AriadneMessage(Init, Init.Subtype.Greetings,
-                    Location.Cell >> Location.Self, Greetings(List(greetings)))
-            }
+
 
         case MemberRemoved(member, _) =>
             nodes -= member.address
@@ -54,4 +46,9 @@ class ClusterMembersListener extends CustomActor {
                 member.address, nodes.size)
         case msg => log.info("Unhandled... {} ", msg.toString)
     }
+
+
+    protected def whenMemberUp(member: Member): Unit
+
+    protected def whenMemeberRemoved(member: Member, previousStatus: MemberStatus): Unit
 }
