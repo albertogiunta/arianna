@@ -59,7 +59,6 @@ abstract class BasicPublisher extends BasicActor {
     var mediator: ActorRef = _
 
     // Point 2 Point Messaging with other Actors of the cluster
-
     override protected def init(args: List[Any]): Unit = {
         super.init(args)
         mediator = DistributedPubSub(context.system).mediator
