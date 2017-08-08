@@ -5,7 +5,7 @@ import ontologies.messages.{AriadneMessage, Empty, Message, MessageType}
 /**
   * Created by Alessandro on 28/06/2017.
   */
-object TestOntologies extends App {
+object TryMessageOntology extends App {
     val msg = AriadneMessage(
         MessageType.Alarm,
         MessageType.Alarm.Subtype.FromCell,

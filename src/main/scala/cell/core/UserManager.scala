@@ -38,7 +38,8 @@ class UserManager extends BasicActor with ActorLogging {
     var s: WSServer = _
     var c: WSClient = _
     var usrNumber = 0
-    var area: AreaViewedFromACell = _
+    var areaForCell: AreaViewedFromACell = _
+    var areaForUser: AreaViewedFromAUser = _
 
     override protected def init(args: List[Any]): Unit = {
         if (args.size != 2) throw new Exception()
@@ -59,7 +60,8 @@ class UserManager extends BasicActor with ActorLogging {
 
     override protected def receptive: Receive = {
         case msg@AriadneMessage(Topology, ViewedFromACell, _, area: AreaViewedFromACell) =>
-            this.area = area
+            areaForCell = area
+            areaForUser = AreaViewedFromAUser(area)
             context.become(receptiveForMobile)
     }
 
@@ -72,7 +74,7 @@ class UserManager extends BasicActor with ActorLogging {
         case MSGToAkka.FIRST_CONNECTION =>
             println("[ACTOR] GOT NEW FIRST USER")
             println(s"Area received from the Cell Core")
-            s.sendAreaToNewUser(area.toJson.toString())
+            s.sendAreaToNewUser(areaForUser.toJson.toString())
             usrNumber += 1
         // todo tell CellCoreActore
         case MSGToAkka.DISCONNECT =>
@@ -82,9 +84,9 @@ class UserManager extends BasicActor with ActorLogging {
         // todo tell CellCoreActore
         case msg: RouteRequestShort =>
             // use for test
-            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest("", getCellWithId(msg.fromCellUri), getCellWithId(msg.toCellUri), isEscape = false), area.rooms.map(c => c.info.id)))
+            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest("", getCellWithId(msg.fromCellUri), getCellWithId(msg.toCellUri), isEscape = false), areaForCell.rooms.map(c => c.info.id)))
             Thread.sleep(500)
-            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest("", area.rooms.head.info.id, area.rooms.tail.head.info.id, isEscape = true), area.rooms.map(c => c.info.id)))
+            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest("", areaForCell.rooms.head.info.id, areaForCell.rooms.tail.head.info.id, isEscape = true), areaForCell.rooms.map(c => c.info.id)))
         // use in production
         //            parent ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell, RouteRequest(msg.userID, getCellWithId(msg.fromCellId), getCellWithId(msg.toCellId), isEscape = false))
         //            parent ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell, RouteRequest(msg.userID, getCellWithId(msg.fromCellId), getCellWithId(msg.toCellId), isEscape = true))
@@ -97,7 +99,7 @@ class UserManager extends BasicActor with ActorLogging {
     }
 
     def getCellWithId(uri: String): RoomID = {
-        area.rooms.filter(p => p.cell.uri == uri).map(f => f.info.id).head
+        areaForCell.rooms.filter(p => p.cell.uri == uri).map(f => f.info.id).head
     }
 }
 

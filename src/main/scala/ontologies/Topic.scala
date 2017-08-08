@@ -53,8 +53,3 @@ object Topic {
 
     implicit def Topic2MessageSubtype(topic: Topic): MessageSubtype = topic.associatedMessageSubtype.orNull
 }
-
-object TestTopic extends App {
-    println(Topic.Practicabilities)
-    println(Topic.Updates)
-}

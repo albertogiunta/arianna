@@ -111,7 +111,7 @@ object Location {
 
 }
 
-object TestMessageDirection extends App {
+object TryMessageDirection extends App {
     
     println(Location.Master >> Location.Cell)
 

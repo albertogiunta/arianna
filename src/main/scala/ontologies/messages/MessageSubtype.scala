@@ -131,8 +131,3 @@ object MessageSubtype {
     }
     
 }
-
-object TestSubtypes extends App {
-    
-    println(MessageSubtype.Factory(MessageType.Update.Subtype.Sensors.subtypeName))
-}

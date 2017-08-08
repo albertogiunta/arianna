@@ -1,8 +1,7 @@
 package ontologies.messages
 
 import ontologies.messages.AriannaJsonProtocol._
-import ontologies.messages.Location._
-import ontologies.messages.MessageType.{Movement, _}
+import ontologies.messages.MessageType.Movement
 import spray.json._
 
 trait MessageType {
@@ -768,31 +767,5 @@ object MessageType {
             case _ => null
         }
     }
-
-}
-
-object TestMessageType extends App {
-
-    var jsonStr = MessageType.Update.Subtype.Sensors
-        .marshal(
-            SensorsInfoUpdate(
-                CellInfo("uri", 0),
-                List(SensorInfo(1, 2.0), SensorInfo(2, 1.55))
-        ))
-
-    println(jsonStr)
-
-    var jsonObj = MessageType.Update.Subtype.Sensors.unmarshal(jsonStr)
-
-    println(jsonObj)
-
-    val msg = AriadneMessage(
-        Update,
-        Update.Subtype.Sensors,
-        Location.Cell >> Location.Master,
-        jsonObj
-    )
-
-    println(msg.subtype.marshal(msg.content))
 
 }
