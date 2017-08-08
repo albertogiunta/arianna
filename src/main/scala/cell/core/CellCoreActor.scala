@@ -12,6 +12,7 @@ import ontologies.messages.MessageType._
 import ontologies.messages._
 import processor.route.actors.RouteManager
 import spray.json._
+import system.names.NamingSystem
 
 import scala.collection.mutable
 import scala.io.Source
@@ -50,12 +51,12 @@ class CellCoreActor extends BasicActor {
         super.preStart()
         //        clusterListener = context.actorOf(Props[CellClusterSupervisor], "CellClusterSupervisor")
 
-        cellSubscriber = context.actorOf(Props[CellSubscriber], "CellSubscriber")
-        cellPublisher = context.actorOf(Props[CellPublisher], "CellPublisher")
+        cellSubscriber = context.actorOf(Props[CellSubscriber], NamingSystem.Subscriber)
+        cellPublisher = context.actorOf(Props[CellPublisher], NamingSystem.Publisher)
 
-        sensorManager = context.actorOf(Props[SensorManager], "SensorManager")
-        userActor = context.actorOf(Props[UserManager], "UserManager")
-        routeManager = context.actorOf(Props[RouteManager], "RouteManager")
+        sensorManager = context.actorOf(Props[SensorManager], NamingSystem.SensorManager)
+        userActor = context.actorOf(Props[UserManager], NamingSystem.UserManager)
+        routeManager = context.actorOf(Props[RouteManager], NamingSystem.RouteManager)
     }
 
     override protected def init(args: List[Any]): Unit = {
