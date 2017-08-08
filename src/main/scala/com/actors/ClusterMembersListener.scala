@@ -37,18 +37,20 @@ abstract class ClusterMembersListener extends CustomActor {
             nodes += member.address
             log.info("Member is Up: {}. {} nodes in cluster",
                 member.address, nodes.size)
-
+            whenMemberUp(member)
 
 
         case MemberRemoved(member, _) =>
             nodes -= member.address
             log.info("Member is Removed: {}. {} nodes cluster",
                 member.address, nodes.size)
+            whenMemeberRemoved(member)
+
         case msg => log.info("Unhandled... {} ", msg.toString)
     }
 
 
     protected def whenMemberUp(member: Member): Unit
 
-    protected def whenMemeberRemoved(member: Member, previousStatus: MemberStatus): Unit
+    protected def whenMemeberRemoved(member: Member): Unit
 }
