@@ -9,7 +9,7 @@ import com.typesafe.config.ConfigFactory
 import master.cluster.MasterPublisher
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Init.Subtype
-import ontologies.messages.MessageType.{Alarm, Handshake, Init, Update}
+import ontologies.messages.MessageType.{Alarm, Error, Handshake, Init, Update}
 import ontologies.messages._
 
 /**
@@ -44,6 +44,8 @@ class AdminManager extends CustomActor {
             log.info("Map received from Admin")
             context.become(operational)
         }
+        case msg@AriadneMessage(Error, Error.Subtype.LookingForAMap, _, _) => admin ! msg
+
     }
 }
 
