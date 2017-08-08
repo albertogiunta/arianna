@@ -97,7 +97,6 @@ class UserManager extends BasicActor with ActorLogging {
                 case RouteRequest(_, _, _, false) => s.sendRouteToUsers(response, RouteResponseShort(route).toJson.toString())
                 case RouteRequest(_, _, _, true) => s.sendAlarmToUsers(RouteResponseShort(route).toJson.toString())
             }
-        case _ => ""
     }
 
     def getCellWithId(uri: String): RoomID = {
