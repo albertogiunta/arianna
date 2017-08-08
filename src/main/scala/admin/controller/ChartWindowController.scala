@@ -1,7 +1,8 @@
-package admin
+package admin.controller
 
 import java.net.URL
 import java.util.ResourceBundle
+import javafx.application.Platform
 import javafx.fxml.{FXML, FXMLLoader, Initializable}
 import javafx.scene.chart.{LineChart, XYChart}
 import javafx.scene.control.{Label, TitledPane}
@@ -14,7 +15,6 @@ import ontologies.messages._
 import ontologies.sensor.SensorCategories
 
 import scala.collection.mutable
-import scalafx.application.Platform
 
 /**
   * This is the Controller class for the external charts window.
@@ -33,7 +33,7 @@ class ChartWindowController extends Initializable {
     @FXML
     private var cellName: Label = _
 
-    private var cellInfo: RoomInfo = _
+    private var roomInfo: RoomInfo = _
 
     private val sensorChartControllers: mutable.Map[Int, SensorChartController] = new mutable.HashMap[Int, SensorChartController]()
 
@@ -42,9 +42,7 @@ class ChartWindowController extends Initializable {
     private var time = (0 to Int.MaxValue - 1).iterator
 
     override def initialize(location: URL, resources: ResourceBundle): Unit = {
-        Platform.runLater {
-            peopleChart.getData add data
-        }
+        Platform.runLater(() => peopleChart.getData add data)
     }
 
     /**
@@ -54,7 +52,7 @@ class ChartWindowController extends Initializable {
       **/
     def initializeWindow(info: RoomInfo): Unit = {
         cellName setText info.id.name
-        cellInfo = info
+        roomInfo = info
     }
 
     /**
@@ -67,11 +65,11 @@ class ChartWindowController extends Initializable {
     def initializeCharts(sensorsId: List[Int]): Unit = {
         val positions = List((1, 0), (0, 1), (1, 1), (0, 2), (1, 2)).iterator
         sensorsId.foreach(sensorId => {
-            val loader = new FXMLLoader(getClass().getResource("/chartTemplate.fxml"));
+            val loader = new FXMLLoader(getClass.getResource("/chartTemplate.fxml"));
             val template = loader.load[TitledPane]
             template setText SensorCategories.categoryWithId(sensorId).name
             sensorChartControllers += ((sensorId, loader.getController[SensorChartController]))
-            var position: (Int, Int) = positions.next()
+            var position: (Int, Int) = positions.next
             mainPane.add(template, position._1, position._2)
 
         })
@@ -85,17 +83,11 @@ class ChartWindowController extends Initializable {
       *
       * */
     def updateCharts(update: RoomDataUpdate): Unit = {
-
-        Platform.runLater {
-            update.cell.sensors.foreach(sensor => {
-                sensorChartControllers.get(sensor.categoryId).get.addValue(sensor.value)
-            }
-            )
-            if (data.getData.size().equals(20)) {
-                data.getData remove 0
-            }
-            data.getData add new XYChart.Data(time.next, update.currentPeople)
+        update.cell.sensors.foreach(sensor => sensorChartControllers.get(sensor.categoryId).get.addValue(sensor.value))
+        if (data.getData.size.equals(20)) {
+            data.getData remove 0
         }
+        data.getData add new XYChart.Data(time.next, update.currentPeople)
 
     }
 
@@ -103,7 +95,7 @@ class ChartWindowController extends Initializable {
       * This method is called when the secondary window is closed.
       **/
     def closeView(): Unit = {
-        chartActor ! AriadneMessage(Interface, Interface.Subtype.CloseChart, Location.Admin >> Location.Self, cellInfo)
+        chartActor ! AriadneMessage(Interface, Interface.Subtype.CloseChart, Location.Admin >> Location.Self, roomInfo)
     }
 
 }

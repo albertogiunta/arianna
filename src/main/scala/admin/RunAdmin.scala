@@ -4,6 +4,8 @@ import java.io.File
 import java.nio.file.Paths
 import javafx.embed.swing.JFXPanel
 
+import admin.actors.AdminActor
+import admin.view.InterfaceView
 import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
 import ontologies.messages.Location._

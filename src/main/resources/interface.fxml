@@ -9,16 +9,16 @@
 <SplitPane dividerPositions="0.1805111821086262" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
            minWidth="-Infinity" orientation="VERTICAL" prefHeight="850.0" prefWidth="1200.0"
            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="admin.InterfaceController">
+           fx:controller="admin.controller.InterfaceController">
     <items>
         <AnchorPane maxHeight="-Infinity" minHeight="-Infinity" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
             <children>
-                <Button id="loadButton" fx:id="loadButton" layoutX="576.0" layoutY="25.0" mnemonicParsing="false"
+                <Button id="loadButton" fx:id="loadButton" layoutX="469.0" layoutY="27.0" mnemonicParsing="false"
                         onAction="#handleFileLoad" prefHeight="49.0" prefWidth="130.0" text="Load Map"/>
                 <Label layoutX="1004.0" layoutY="41.0" text="File Loaded:"/>
                 <Text id="fileName" fx:id="fileName" layoutX="1079.0" layoutY="55.0" strokeType="OUTSIDE"
                       strokeWidth="0.0" wrappingWidth="113.0"/>
-                <Button fx:id="alarmButton" disable="true" layoutX="756.0" layoutY="25.0" mnemonicParsing="false"
+                <Button fx:id="alarmButton" disable="true" layoutX="783.0" layoutY="27.0" mnemonicParsing="false"
                         onAction="#triggerAlarm" prefHeight="49.0" prefWidth="130.0" text="SEND ALARM"/>
                 <Text layoutX="38.0" layoutY="60.0" strokeType="OUTSIDE" strokeWidth="0.0"
                       text="Arianna Administrator Panel">
@@ -26,6 +26,8 @@
                         <Font name="System Bold" size="27.0"/>
                     </font>
                 </Text>
+                <Button id="loadButton" fx:id="closeButton" layoutX="627.0" layoutY="27.0" mnemonicParsing="false"
+                        onAction="#handleClosing" prefHeight="49.0" prefWidth="130.0" text="Close System"/>
             </children>
         </AnchorPane>
         <AnchorPane maxHeight="-Infinity" minHeight="-Infinity" minWidth="0.0" prefHeight="750.0" prefWidth="160.0">

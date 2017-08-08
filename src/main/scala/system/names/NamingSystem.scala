@@ -12,4 +12,7 @@ object NamingSystem {
     val RouteProcessor = "RouteProcessor"
     val CacheManager = "CacheManager"
     val RouteManager = "RouteManager"
+    val AdminActor = "AdminActor"
+    val InterfaceManager = "InterfaceManager"
+    val ChartManager = "ChartManager"
 }

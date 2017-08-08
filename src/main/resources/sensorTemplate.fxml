@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Text?>
 <HBox alignment="CENTER_LEFT" prefHeight="101.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8"
-      xmlns:fx="http://javafx.com/fxml/1" fx:controller="admin.SensorTemplateController">
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="admin.controller.SensorTemplateController">
     <children>
         <Label fx:id="sensorName" minWidth="120.0"/>
         <Text fx:id="sensorValue" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="62.0"/>
