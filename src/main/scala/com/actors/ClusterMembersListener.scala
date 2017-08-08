@@ -1,8 +1,7 @@
 package com.actors
 
-import akka.actor.{ActorRef, Address}
+import akka.actor.Address
 import akka.cluster.ClusterEvent.{CurrentClusterState, MemberEvent, MemberRemoved, MemberUp}
-import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.{Cluster, Member, MemberStatus}
 
 /**
@@ -18,8 +17,8 @@ abstract class ClusterMembersListener extends CustomActor {
     //    protected val greetings: String = "Hello there, it's time to dress-up"
 
     protected val cluster = Cluster(context.system)
-
-    protected val mediator: ActorRef = DistributedPubSub(context.system).mediator
+    
+    //    protected val mediator: ActorRef = DistributedPubSub(context.system).mediator
 
     protected var nodes = Set.empty[Address]
 
