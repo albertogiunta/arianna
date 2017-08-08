@@ -15,4 +15,5 @@ object NamingSystem {
     val AdminActor = "AdminActor"
     val InterfaceManager = "InterfaceManager"
     val ChartManager = "ChartManager"
+    val CellCore = "CellCore"
 }
