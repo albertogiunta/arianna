@@ -57,12 +57,13 @@ class CellCoreActor extends BasicActor {
         userActor = context.actorOf(Props[UserManager], NamingSystem.UserManager)
         routeManager = context.actorOf(Props[RouteManager], NamingSystem.RouteManager)
 
-        clusterListener = context.actorOf(Props[CellClusterSupervisor], NamingSystem.CellClusterSupervisor)
+
     }
 
     override protected def init(args: List[Any]): Unit = {
         log.info("Hello there! the cell core is being initialized")
 
+        clusterListener = context.actorOf(Props[CellClusterSupervisor], NamingSystem.CellClusterSupervisor)
         val cellConfiguration = Source.fromFile(args.head.asInstanceOf[String]).getLines.mkString
         val loadedConfig = cellConfiguration.parseJson.convertTo[CellConfig]
         localCellInfo = loadedConfig.cellInfo
@@ -98,8 +99,8 @@ class CellCoreActor extends BasicActor {
             }
         }
 
-        //        case msg@AriadneMessage(Error, Error.Subtype.CellMappingMismatch, _, cnt: Empty) =>
-        //            log.error("Mapping Error")
+        case msg@AriadneMessage(Error, Error.Subtype.CellMappingMismatch, _, cnt: Empty) =>
+            log.error("Mapping Error")
 
         case msg@AriadneMessage(Topology, ViewedFromACell, this.server2Cell, cnt: AreaViewedFromACell) => {
             log.info(s"Area arrived from Server $cnt")
