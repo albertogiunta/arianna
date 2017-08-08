@@ -6,7 +6,7 @@
 <SplitPane dividerPositions="0.11353711790393013" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
            minWidth="-Infinity" orientation="VERTICAL" prefHeight="231.0" prefWidth="380.0"
            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="admin.CellTemplateController">
+           fx:controller="admin.controller.CellTemplateController">
     <items>
         <Pane fx:id="header" prefHeight="29.0" prefWidth="380.0">
             <children>

@@ -44,7 +44,6 @@ dependencies {
     compile group: 'com.typesafe.akka', name:'akka-contrib_2.12', version : akkaVersion
     compile group: 'com.typesafe.akka', name:'akka-http-spray-json_2.12', version : '10.0.9'
     compile group: 'com.typesafe.akka', name:'akka-http_2.12', version:'10.0.9'
-    compile group: 'org.scalafx', name: 'scalafx_2.12', version: '8.0.102-R11'
     compile 'io.vertx:vertx-core:3.4.2'
     compile 'io.vertx:vertx-lang-scala_2.12:3.4.2'
 

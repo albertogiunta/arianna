@@ -17,11 +17,11 @@ import ontologies.messages.{AriadneMessage, Greetings, Location}
   */
 class ClusterMembersListener extends CustomActor {
     
-    val greetings: String = "Hello there, it's time to dress-up"
-    
-    val cluster = Cluster(context.system)
-    
-    protected var nodes = Set.empty[Address]
+    private val greetings: String = "Hello there, it's time to dress-up"
+
+    private val cluster = Cluster(context.system)
+
+    private var nodes = Set.empty[Address]
 
     override def preStart = {
         cluster.subscribe(self, classOf[MemberUp], classOf[MemberEvent])

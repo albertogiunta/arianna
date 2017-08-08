@@ -25,12 +25,12 @@ object TestAdminInterface extends App {
     val adminManager = system.actorOf(Props[AdminManager], "AdminManager")
 
     var i = 1
-    Thread.sleep(5000)
-    while (!i.equals(6)) {
+    Thread.sleep(10000)
+    while (!i.equals(5)) {
         Thread.sleep(1000)
         var sensors: ListBuffer[SensorInfo] = new ListBuffer[SensorInfo]
         for (i <- 1 until 5) {
-            sensors += SensorInfo(i, (Math.random() * 10).round.toDouble)
+            sensors += SensorInfo(i, (Math.random * 10).round.toDouble)
         }
         var sensorList: SensorsInfoUpdate = SensorsInfoUpdate(CellInfo("uri" + i.toString, 8080 + i),
             sensors.toList)
@@ -48,19 +48,17 @@ object TestAdminInterface extends App {
     var iter: Iterator[String] = roomNames.iterator
 
     while (true) {
-        println("Invio aggiornamento... ")
         Thread.sleep(1000)
         var update: ListBuffer[RoomDataUpdate] = new ListBuffer[RoomDataUpdate]
         var sensors: ListBuffer[SensorInfo] = new ListBuffer[SensorInfo]
         for (i <- 1 until 5) {
-            sensors += SensorInfo(i, (Math.random() * 10).round.toDouble)
+            sensors += SensorInfo(i, (Math.random * 10).round.toDouble)
         }
 
         for (i <- 1 until 6) {
-            var id = RoomID(i, iter.next())
-            println(id.toString)
+            var id = RoomID(i, iter.next)
             if (iter.hasNext) {
-                update += new RoomDataUpdate(id, ontologies.messages.Cell(CellInfo("uri" + i.toString, 8080 + i), sensors.toList), (Math.random() * 50).toInt)
+                update += new RoomDataUpdate(id, ontologies.messages.Cell(CellInfo("uri" + i.toString, 8080 + i), sensors.toList), (Math.random * 50).toInt)
             } else {
                 iter = roomNames.iterator
             }

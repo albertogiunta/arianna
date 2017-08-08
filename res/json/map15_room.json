@@ -81,7 +81,7 @@
             "y": 200
           },
           "endCoordinates": {
-            "x": 200,
+            "x": 210,
             "y": 200
           }
         }
@@ -101,7 +101,7 @@
             "y": 130
           },
           "northEast": {
-            "x": 300,
+            "x": 330,
             "y": 130
           },
           "southWest": {
@@ -109,12 +109,12 @@
             "y": 170
           },
           "southEast": {
-            "x": 300,
+            "x": 330,
             "y": 170
           }
         },
         "antennaPosition": {
-          "x": 275,
+          "x": 290,
           "y": 150
         },
         "isEntryPoint": false,
@@ -154,11 +154,11 @@
         {
           "neighborId": 3,
           "startCoordinates": {
-            "x": 300,
+            "x": 330,
             "y": 130
           },
           "endCoordinates": {
-            "x": 300,
+            "x": 330,
             "y": 170
           }
         }
@@ -174,7 +174,7 @@
         },
         "roomVertices": {
           "northWest": {
-            "x": 300,
+            "x": 330,
             "y": 100
           },
           "northEast": {
@@ -182,7 +182,7 @@
             "y": 100
           },
           "southWest": {
-            "x": 300,
+            "x": 330,
             "y": 200
           },
           "southEast": {
@@ -220,22 +220,22 @@
         {
           "neighborId": 2,
           "startCoordinates": {
-            "x": 300,
+            "x": 330,
             "y": 130
           },
           "endCoordinates": {
-            "x": 300,
+            "x": 330,
             "y": 170
           }
         },
         {
           "neighborId": 5,
           "startCoordinates": {
-            "x": 400,
+            "x": 380,
             "y": 200
           },
           "endCoordinates": {
-            "x": 450,
+            "x": 440,
             "y": 200
           }
         }
@@ -255,7 +255,7 @@
             "y": 200
           },
           "northEast": {
-            "x": 200,
+            "x": 210,
             "y": 200
           },
           "southWest": {
@@ -263,7 +263,7 @@
             "y": 250
           },
           "southEast": {
-            "x": 200,
+            "x": 210,
             "y": 250
           }
         },
@@ -302,7 +302,7 @@
             "y": 200
           },
           "endCoordinates": {
-            "x": 200,
+            "x": 210,
             "y": 200
           }
         },
@@ -313,7 +313,7 @@
             "y": 250
           },
           "endCoordinates": {
-            "x": 200,
+            "x": 210,
             "y": 250
           }
         }
@@ -329,24 +329,24 @@
         },
         "roomVertices": {
           "northWest": {
-            "x": 400,
+            "x": 380,
             "y": 200
           },
           "northEast": {
-            "x": 450,
+            "x": 440,
             "y": 200
           },
           "southWest": {
-            "x": 400,
+            "x": 380,
             "y": 250
           },
           "southEast": {
-            "x": 450,
+            "x": 440,
             "y": 250
           }
         },
         "antennaPosition": {
-          "x": 425,
+          "x": 410,
           "y": 225
         },
         "isEntryPoint": false,
@@ -377,22 +377,22 @@
         {
           "neighborId": 3,
           "startCoordinates": {
-            "x": 400,
+            "x": 380,
             "y": 200
           },
           "endCoordinates": {
-            "x": 450,
+            "x": 440,
             "y": 200
           }
         },
         {
           "neighborId": 8,
           "startCoordinates": {
-            "x": 400,
+            "x": 380,
             "y": 250
           },
           "endCoordinates": {
-            "x": 450,
+            "x": 440,
             "y": 250
           }
         }
@@ -463,7 +463,7 @@
             "y": 250
           },
           "endCoordinates": {
-            "x": 200,
+            "x": 210,
             "y": 250
           }
         },
@@ -485,7 +485,7 @@
             "y": 400
           },
           "endCoordinates": {
-            "x": 200,
+            "x": 210,
             "y": 400
           }
         }
@@ -505,7 +505,7 @@
             "y": 280
           },
           "northEast": {
-            "x": 300,
+            "x": 330,
             "y": 280
           },
           "southWest": {
@@ -513,12 +513,12 @@
             "y": 370
           },
           "southEast": {
-            "x": 300,
+            "x": 330,
             "y": 370
           }
         },
         "antennaPosition": {
-          "x": 280,
+          "x": 295,
           "y": 325
         },
         "isEntryPoint": false,
@@ -558,11 +558,11 @@
         {
           "neighborId": 8,
           "startCoordinates": {
-            "x": 300,
+            "x": 330,
             "y": 280
           },
           "endCoordinates": {
-            "x": 300,
+            "x": 330,
             "y": 370
           }
         }
@@ -578,7 +578,7 @@
         },
         "roomVertices": {
           "northWest": {
-            "x": 300,
+            "x": 330,
             "y": 250
           },
           "northEast": {
@@ -586,7 +586,7 @@
             "y": 250
           },
           "southWest": {
-            "x": 300,
+            "x": 330,
             "y": 400
           },
           "southEast": {
@@ -595,7 +595,7 @@
           }
         },
         "antennaPosition": {
-          "x": 390,
+          "x": 405,
           "y": 325
         },
         "isEntryPoint": false,
@@ -632,22 +632,22 @@
         {
           "neighborId": 5,
           "startCoordinates": {
-            "x": 400,
+            "x": 380,
             "y": 250
           },
           "endCoordinates": {
-            "x": 450,
+            "x": 440,
             "y": 250
           }
         },
         {
           "neighborId": 7,
           "startCoordinates": {
-            "x": 300,
+            "x": 330,
             "y": 280
           },
           "endCoordinates": {
-            "x": 300,
+            "x": 330,
             "y": 370
           }
         },
@@ -665,11 +665,11 @@
         {
           "neighborId": 12,
           "startCoordinates": {
-            "x": 400,
+            "x": 380,
             "y": 400
           },
           "endCoordinates": {
-            "x": 450,
+            "x": 440,
             "y": 400
           }
         }
@@ -689,7 +689,7 @@
             "y": 280
           },
           "northEast": {
-            "x": 510,
+            "x": 540,
             "y": 280
           },
           "southWest": {
@@ -697,12 +697,12 @@
             "y": 370
           },
           "southEast": {
-            "x": 510,
+            "x": 540,
             "y": 370
           }
         },
         "antennaPosition": {
-          "x": 495,
+          "x": 510,
           "y": 325
         },
         "isEntryPoint": false,
@@ -742,11 +742,11 @@
         {
           "neighborId": 10,
           "startCoordinates": {
-            "x": 510,
+            "x": 540,
             "y": 280
           },
           "endCoordinates": {
-            "x": 510,
+            "x": 540,
             "y": 370
           }
         }
@@ -762,7 +762,7 @@
         },
         "roomVertices": {
           "northWest": {
-            "x": 510,
+            "x": 540,
             "y": 210
           },
           "northEast": {
@@ -770,7 +770,7 @@
             "y": 210
           },
           "southWest": {
-            "x": 510,
+            "x": 540,
             "y": 450
           },
           "southEast": {
@@ -779,7 +779,7 @@
           }
         },
         "antennaPosition": {
-            "x": 580,
+          "x": 590,
           "y": 325
         },
         "isEntryPoint": false,
@@ -804,11 +804,11 @@
         {
           "neighborId": 9,
           "startCoordinates": {
-            "x": 510,
+            "x": 540,
             "y": 280
           },
           "endCoordinates": {
-            "x": 510,
+            "x": 540,
             "y": 370
           }
         }
@@ -828,7 +828,7 @@
             "y": 400
           },
           "northEast": {
-            "x": 200,
+            "x": 210,
             "y": 400
           },
           "southWest": {
@@ -836,7 +836,7 @@
             "y": 450
           },
           "southEast": {
-            "x": 200,
+            "x": 210,
             "y": 450
           }
         },
@@ -874,7 +874,7 @@
             "y": 400
           },
           "endCoordinates": {
-            "x": 200,
+            "x": 210,
             "y": 400
           }
         },
@@ -885,7 +885,7 @@
             "y": 450
           },
           "endCoordinates": {
-            "x": 200,
+            "x": 210,
             "y": 450
           }
         }
@@ -901,24 +901,24 @@
         },
         "roomVertices": {
           "northWest": {
-            "x": 400,
+            "x": 380,
             "y": 400
           },
           "northEast": {
-            "x": 450,
+            "x": 440,
             "y": 400
           },
           "southWest": {
-            "x": 400,
+            "x": 380,
             "y": 450
           },
           "southEast": {
-            "x": 450,
+            "x": 440,
             "y": 450
           }
         },
         "antennaPosition": {
-          "x": 425,
+          "x": 410,
           "y": 425
         },
         "isEntryPoint": false,
@@ -947,22 +947,22 @@
         {
           "neighborId": 8,
           "startCoordinates": {
-            "x": 400,
+            "x": 380,
             "y": 400
           },
           "endCoordinates": {
-            "x": 450,
+            "x": 440,
             "y": 400
           }
         },
         {
           "neighborId": 15,
           "startCoordinates": {
-            "x": 400,
+            "x": 380,
             "y": 450
           },
           "endCoordinates": {
-            "x": 450,
+            "x": 440,
             "y": 450
           }
         }
@@ -1028,7 +1028,7 @@
             "y": 450
           },
           "endCoordinates": {
-            "x": 200,
+            "x": 210,
             "y": 450
           }
         },
@@ -1059,7 +1059,7 @@
             "y": 490
           },
           "northEast": {
-            "x": 300,
+            "x": 330,
             "y": 490
           },
           "southWest": {
@@ -1067,12 +1067,12 @@
             "y": 560
           },
           "southEast": {
-            "x": 300,
+            "x": 330,
             "y": 560
           }
         },
         "antennaPosition": {
-          "x": 285,
+          "x": 300,
           "y": 525
         },
         "isEntryPoint": false,
@@ -1112,11 +1112,11 @@
         {
           "neighborId": 15,
           "startCoordinates": {
-            "x": 300,
+            "x": 330,
             "y": 490
           },
           "endCoordinates": {
-            "x": 300,
+            "x": 330,
             "y": 560
           }
         }
@@ -1132,7 +1132,7 @@
         },
         "roomVertices": {
           "northWest": {
-            "x": 300,
+            "x": 330,
             "y": 450
           },
           "northEast": {
@@ -1140,7 +1140,7 @@
             "y": 450
           },
           "southWest": {
-            "x": 300,
+            "x": 330,
             "y": 600
           },
           "southEast": {
@@ -1178,22 +1178,22 @@
         {
           "neighborId": 12,
           "startCoordinates": {
-            "x": 400,
+            "x": 380,
             "y": 450
           },
           "endCoordinates": {
-            "x": 450,
+            "x": 440,
             "y": 450
           }
         },
         {
           "neighborId": 14,
           "startCoordinates": {
-            "x": 300,
+            "x": 330,
             "y": 490
           },
           "endCoordinates": {
-            "x": 300,
+            "x": 330,
             "y": 560
           }
         }
