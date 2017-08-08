@@ -33,11 +33,11 @@ class TopologySupervisor extends BasicActor {
     private val admin2Master: MessageDirection = Location.Admin >> Location.Master
     private val master2Admin: MessageDirection = admin2Master.reverse
     
-    private val dataStreamer = context.actorOf(Props(
-        new DataStreamer(target = sibling(NamingSystem.AdminManager).get)), "DataStreamer")
-    
     private val publisher: () => ActorSelection = () => sibling(NamingSystem.Publisher).get
     private val subscriber: () => ActorSelection = () => sibling(NamingSystem.Subscriber).get
+    private val admin: () => ActorSelection = () => sibling(NamingSystem.AdminManager).get
+    
+    private val dataStreamer = context.actorOf(Props(new DataStreamer(target = admin())), "DataStreamer")
     
     private val synced: Counter = Counter()
     
@@ -83,7 +83,7 @@ class TopologySupervisor extends BasicActor {
             if (map.id != mapVersionID) {
                 log.error("A topology has already been loaded in the server...")
     
-                dataStreamer ! AriadneMessage(
+                admin() ! AriadneMessage(
                     Error,
                     Error.Subtype.MapIdentifierMismatch,
                     master2Admin,
@@ -105,7 +105,7 @@ class TopologySupervisor extends BasicActor {
         
                 topology.put(roomName.get, newRoom)
     
-                dataStreamer ! msg
+                admin() ! msg
     
                 if ((synced ++) == topology.size) {
                     
@@ -145,7 +145,7 @@ class TopologySupervisor extends BasicActor {
             if (map.id != mapVersionID) {
                 log.error("A topology has already been loaded in the server...")
     
-                dataStreamer ! AriadneMessage(
+                admin() ! AriadneMessage(
                     Error,
                     Error.Subtype.MapIdentifierMismatch,
                     master2Admin,

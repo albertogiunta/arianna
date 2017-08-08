@@ -49,9 +49,6 @@ class DataStreamer(private val target: ActorSelection,
         case msg: Iterable[Room] =>
             streamer offer msg
         
-        case msg: AriadneMessage[_] =>
-            target ! msg
-
         case msg => log.info(msg.toString)
     }
 }
