@@ -31,5 +31,5 @@ class MasterClusterSupervisor extends ClusterMembersListener {
 
     override protected def whenMemberUp(member: Member): Unit = {}
 
-    override protected def whenMemeberRemoved(member: Member, previousStatus: MemberStatus): Unit = {}
+    override protected def whenMemeberRemoved(member: Member): Unit = {}
 }

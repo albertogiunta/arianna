@@ -39,7 +39,6 @@ class UserManager extends BasicActor with ActorLogging {
         if (args.size != 2) throw new Exception()
         vertx = Vertx.vertx()
         s = new WSServer(vertx, self, "/" + args.head.asInstanceOf[String], Port.getPort)
-        //        s = new WSServer(vertx, self, "/" + args.head.asInstanceOf[String], args(1).asInstanceOf[String].toInt)
         vertx.deployVerticle(s)
         log.info("Started User Manager")
         //        initWSClient()

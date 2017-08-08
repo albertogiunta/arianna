@@ -1176,6 +1176,17 @@
       ],
       "passages": [
         {
+          "neighborId": -1,
+          "startCoordinates": {
+            "x": 480,
+            "y": 520
+          },
+          "endCoordinates": {
+            "x": 480,
+            "y": 550
+          }
+        },
+        {
           "neighborId": 12,
           "startCoordinates": {
             "x": 380,
