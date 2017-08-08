@@ -22,7 +22,7 @@ class CellPublisher extends BasicPublisher {
         log.info("Hello there from {}!", name)
 
         //Ask to the core actor the cell information in order to continue the handshake task
-        println("aaa 0")
+        //println("aaa 0")
         parent ! AriadneMessage(
             Info,
             Info.Subtype.Request,
@@ -35,7 +35,7 @@ class CellPublisher extends BasicPublisher {
     override protected def receptive = {
         case msg@AriadneMessage(Info, Info.Subtype.Response, this.self2Self, sensorsInfoUpdate: SensorsInfoUpdate) => {
             println("aaa 3")
-            log.info("Sending Handshake to Master...")
+            //Thread.sleep(5000)
             mediator ! Publish(Topic.HandShakes,
                 AriadneMessage(
                     Handshake,
@@ -44,6 +44,7 @@ class CellPublisher extends BasicPublisher {
                     sensorsInfoUpdate
                 )
             )
+            log.info("Sending Handshake to Master...")
             this.context.become(cultured, discardOld = true)
         }
         case _ => //ignore
