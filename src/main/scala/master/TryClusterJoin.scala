@@ -11,7 +11,7 @@ import com.typesafe.config.ConfigFactory
 import master.cluster.{MasterPublisher, MasterSubscriber}
 import ontologies.Topic
 import ontologies.messages.Location._
-import ontologies.messages.MessageType.Update
+import ontologies.messages.MessageType.Handshake
 import ontologies.messages._
 
 /**
@@ -33,8 +33,8 @@ object TryClusterJoin extends App {
     val publisher = system.actorOf(Props[MasterPublisher], "CellPublisher")
 
     val remotemsg = AriadneMessage(
-        Update,
-        Update.Subtype.Sensors,
+        Handshake,
+        Handshake.Subtype.CellToMaster,
         Location.Cell >> Location.Master,
         SensorsInfoUpdate(
             CellInfo("uri", 0),
@@ -42,9 +42,9 @@ object TryClusterJoin extends App {
         )
     )
     
-    Thread.sleep(3000)
-    
     val mediator: ActorRef = DistributedPubSub(system).mediator
+    
+    Thread.sleep(3000)
     
     system.log.info("Publishing {}", remotemsg)
     
