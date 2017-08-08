@@ -42,7 +42,7 @@ class SensorManagerTest extends TestKit(ActorSystem("SensorManagerTest",
     }
 
     "A Sensor Manager" should {
-        "initialize the same number of sensor of the configuration" in {
+        "initialize the same number of sensors of the configuration" in {
             val sManager = system.actorOf(Props[SensorManager], actorName)
 
             EventFilter.info(message = "[" + actorName + "] " + sensorsNumber + " sensor/s initialized", occurrences = 1) intercept {

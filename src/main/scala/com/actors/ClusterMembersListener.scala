@@ -17,7 +17,7 @@ import ontologies.messages.{AriadneMessage, Greetings, Location}
   */
 class ClusterMembersListener extends CustomActor {
 
-    private val greetings: String = "FROM CLUSTER MEMBERS LISTERNER Hello there, it's time to dress-up"
+    private val greetings: String = "FROM CLUSTER MEMBERS LISTENER Hello there, it's time to dress-up"
 
     private val cluster = Cluster(context.system)
 
