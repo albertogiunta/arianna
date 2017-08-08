@@ -14,12 +14,12 @@ import system.names.NamingSystem
   *
   *
   */
-class AdminActor() extends BasicActor {
+class AdminActor extends BasicActor {
 
     //Se si fa partire solo l'admin manager
     //private val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/AdminManager")
     //Se si fa partire il master
-    val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/Master/AdminManager")
+    val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@192.168.0.6:25520/user/Master/AdminManager")
     private val interfaceManager = context.actorOf(Props[InterfaceManager], NamingSystem.InterfaceManager)
     private var areaLoaded: Area = _
     private val toServer: MessageDirection = Location.Admin >> Location.Master
