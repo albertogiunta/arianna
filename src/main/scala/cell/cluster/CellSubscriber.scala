@@ -21,7 +21,7 @@ class CellSubscriber extends BasicSubscriber {
     private val server2Cell: MessageDirection = Location.Master >> Location.Cell
 
     override protected def init(args: List[Any]) = {
-        if (args(0) != "FROM CLUSTER MEMBERS LISTERNER Hello there, it's time to dress-up") throw new Exception()
+        if (args(0) != "FROM CLUSTER MEMBERS LISTENER Hello there, it's time to dress-up") throw new Exception()
         log.info("Hello there from {}!", name)
     }
 
@@ -51,7 +51,7 @@ class CellSubscriber extends BasicSubscriber {
             this.parent ! msg
         case msg@AriadneMessage(Route, _, _, cnt) =>
             log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
-        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, cnt) =>
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, _, cnt) =>
             log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
         case _ => desist _
     }
