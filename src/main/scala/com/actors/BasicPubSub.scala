@@ -35,6 +35,7 @@ abstract class BasicSubscriber extends BasicActor {
             ackTopicReceived = ackTopicReceived + 1
             if (ackTopicReceived == topics.size) {
                 this.context.become(subscribed, discardOld = true)
+                log.info("I've become Subscribed!")
             }
 
         case msg => super.resistive(msg)

@@ -36,7 +36,7 @@ class MasterPublisher extends BasicPublisher {
     
             log.info("Forwarding Point to Point message {} to {}", cnt.toString, target)
     
-            mediator ! Send("/" + target, cnt, localAffinity = false)
+            mediator ! Send(target, cnt, localAffinity = false)
             
         case _ => desist _
     }
