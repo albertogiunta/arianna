@@ -14,7 +14,7 @@ import system.names.NamingSystem
   *
   *
   */
-class AdminActor() extends BasicActor {
+class AdminActor extends BasicActor {
 
     //Se si fa partire solo l'admin manager
     //private val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/AdminManager")

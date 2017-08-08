@@ -14,8 +14,8 @@ import ontologies.messages.{AriadneMessage, Location, MessageDirection}
   * Created by Matteo Gabellini on 29/06/2017.
   */
 class CellSubscriber extends BasicSubscriber {
-    
-    override val topics = Set(Topic.Alarms, Topic.Topologies, Topic.Practicabilities)
+
+    override val topics = Set(Topic.HandShakes, Topic.Alarms, Topic.Topologies, Topic.Practicabilities)
     
     private val cell2Server: MessageDirection = Location.Master << Location.Cell
     private val server2Cell: MessageDirection = Location.Master >> Location.Cell
@@ -26,7 +26,9 @@ class CellSubscriber extends BasicSubscriber {
         log.info("Hello there from {}!", name)
     }
 
-    override protected def receptive = {
+    override protected def subscribed = {
+        case SubscribeAck(Subscribe(topic, None, this.self)) =>
+            log.info("{} Successfully Subscribed to {}", name, topic)
         case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, _, cnt) =>
             log.info("Got ack {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
         case SubscribeAck(Subscribe(topic, None, `self`)) =>

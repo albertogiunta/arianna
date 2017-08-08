@@ -9,6 +9,7 @@ import com.typesafe.config.ConfigFactory
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Init
 import ontologies.messages.{AriadneMessage, Greetings, Location}
+import system.names.NamingSystem
 
 /**
   * Created by Alessandro on 28/06/2017.
@@ -31,9 +32,8 @@ object RunCells extends App {
     //                Location.Master >> Location.Self, Greetings(List(configPath)))
     //    }
 
-    var core = system.actorOf(Props[CellCoreActor], "CellCore")
+    var core = system.actorOf(Props[CellCoreActor], NamingSystem.CellCore)
     var server2Cell = Location.Master >> Location.Cell
-
     Thread.sleep(500)
     private val configPath: String = "res/json/cell/cell1.json"
     core ! AriadneMessage(Init, Init.Subtype.Greetings,

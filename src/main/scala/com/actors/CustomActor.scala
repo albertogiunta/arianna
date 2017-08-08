@@ -102,7 +102,7 @@ abstract class BasicActor extends CustomActor {
             try {
                 this.init(content.args)
                 this.context.become(receptive, discardOld = true)
-                log.info("[{}] I've become receptive!", name)
+                log.info("I've become receptive!")
             } catch {
                 case ex: Throwable => ex.printStackTrace()
             }

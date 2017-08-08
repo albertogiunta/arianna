@@ -5,6 +5,7 @@ import com.actors.ClusterMembersListener
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Init
 import ontologies.messages.{AriadneMessage, Greetings, Location}
+import system.names.NamingSystem
 
 /**
   * Supervisor of the cluster events
@@ -15,7 +16,7 @@ class CellClusterSupervisor extends ClusterMembersListener {
         if (member.address == cluster.selfAddress) {
             //init actors of current node that must interact in the cluster
             log.info("Awakening Actors on Cell Actor-System")
-            siblings ! AriadneMessage(Init, Init.Subtype.Greetings,
+            sibling(NamingSystem.Subscriber).get ! AriadneMessage(Init, Init.Subtype.Greetings,
                 Location.Cell >> Location.Self, Greetings(List(ClusterMembersListener.greetings)))
         }
     }
