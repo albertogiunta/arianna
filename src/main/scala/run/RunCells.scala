@@ -4,6 +4,7 @@ import java.io.File
 import java.nio.file.Paths
 
 import akka.actor.{ActorSystem, Props}
+import akka.cluster.pubsub.DistributedPubSub
 import cell.core.CellCoreActor
 import com.typesafe.config.ConfigFactory
 import ontologies.messages.Location._
@@ -31,8 +32,9 @@ object RunCells extends App {
     //            core ! AriadneMessage(Init, Init.Subtype.Greetings,
     //                Location.Master >> Location.Self, Greetings(List(configPath)))
     //    }
-
-    var core = system.actorOf(Props[CellCoreActor], NamingSystem.CellCore)
+    val middleware = DistributedPubSub(system).mediator
+    
+    var core = system.actorOf(Props(new CellCoreActor(middleware)), NamingSystem.CellCore)
     var server2Cell = Location.Master >> Location.Cell
     Thread.sleep(500)
     private val configPath: String = "res/json/cell/cell1.json"

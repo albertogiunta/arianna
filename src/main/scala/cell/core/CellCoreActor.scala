@@ -24,7 +24,7 @@ import scala.util.Random
   * the other cell's actors initialization
   * Created by Matteo Gabellini on 14/07/2017.
   */
-class CellCoreActor extends BasicActor {
+class CellCoreActor(mediator: ActorRef) extends BasicActor {
 
     private var actualSelfLoad: Int = 0
     private var localCellInfo: CellInfo = CellInfo.empty
@@ -51,18 +51,20 @@ class CellCoreActor extends BasicActor {
     override def preStart: Unit = {
         super.preStart()
 
-        cellPublisher = context.actorOf(Props[CellPublisher], NamingSystem.Publisher)
-        cellSubscriber = context.actorOf(Props[CellSubscriber], NamingSystem.Subscriber)
+        cellSubscriber = context.actorOf(Props(new CellSubscriber(mediator)), NamingSystem.Subscriber)
+        cellPublisher = context.actorOf(Props(new CellPublisher(mediator)), NamingSystem.Publisher)
+
         sensorManager = context.actorOf(Props[SensorManager], NamingSystem.SensorManager)
         userActor = context.actorOf(Props[UserManager], NamingSystem.UserManager)
         routeManager = context.actorOf(Props[RouteManager], NamingSystem.RouteManager)
 
-        clusterListener = context.actorOf(Props[CellClusterSupervisor], NamingSystem.CellClusterSupervisor)
+
     }
 
     override protected def init(args: List[Any]): Unit = {
         log.info("Hello there! the cell core is being initialized")
 
+        clusterListener = context.actorOf(Props[CellClusterSupervisor], NamingSystem.CellClusterSupervisor)
         val cellConfiguration = Source.fromFile(args.head.asInstanceOf[String]).getLines.mkString
         val loadedConfig = cellConfiguration.parseJson.convertTo[CellConfig]
         if (loadedConfig.cellInfo == CellInfo.empty) throw IncorrectConfigurationException(this.name)

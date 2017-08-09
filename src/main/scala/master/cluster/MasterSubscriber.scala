@@ -1,6 +1,6 @@
 package master.cluster
 
-import akka.actor.ActorSelection
+import akka.actor.{ActorRef, ActorSelection}
 import com.actors.BasicSubscriber
 import ontologies._
 import ontologies.messages.Location._
@@ -15,23 +15,23 @@ import system.names.NamingSystem
   *
   * Created by Alessandro on 28/06/2017.
   */
-class MasterSubscriber extends BasicSubscriber {
+class MasterSubscriber(mediator: ActorRef) extends BasicSubscriber(mediator) {
     
     override val topics: Set[Topic] = Set(Topic.Updates, Topic.HandShakes)
     
-    private val cell2Server: MessageDirection = Location.Master << Location.Cell
-    private val admin2Server: MessageDirection = Location.Admin >> Location.Master
+    private val cell2Master: MessageDirection = Location.Master << Location.Cell
+    private val admin2Master: MessageDirection = Location.Admin >> Location.Master
     
     private val topologySupervisor: () => ActorSelection = () => sibling(NamingSystem.TopologySupervisor).get
     private val publisher: () => ActorSelection = () => sibling(NamingSystem.Publisher).get
     
     override protected def subscribed = {
-        
-        case AriadneMessage(Handshake, CellToMaster, `cell2Server`, _) =>
+    
+        case AriadneMessage(Handshake, CellToMaster, `cell2Master`, _) =>
             log.info("Stashing handshake from {} for later administration...", sender.path)
             stash
-        
-        case AriadneMessage(Topology, Planimetrics, `admin2Server`, _) =>
+    
+        case AriadneMessage(Topology, Planimetrics, `admin2Master`, _) =>
             log.info("A topology has been loaded in the server...")
             
             context.become(behavior = sociable, discardOld = true)
@@ -44,7 +44,7 @@ class MasterSubscriber extends BasicSubscriber {
     
     def sociable: Receive = {
     
-        case msg@AriadneMessage(Handshake, CellToMaster, `cell2Server`, _) =>
+        case msg@AriadneMessage(Handshake, CellToMaster, `cell2Master`, _) =>
             log.info("Resolving Handshake from {}", sender.path)
             publisher() ! (
                 sender.path.elements.mkString("/"),
@@ -58,11 +58,9 @@ class MasterSubscriber extends BasicSubscriber {
             context.become(behavior = proactive, discardOld = true)
             log.info("I've become ProActive...")
         
-            unstashAll
-        
             publisher() forward msg
-    
-        case _ => stash
+
+        case _ => desist _
     }
     
     def proactive: Receive = {
@@ -70,8 +68,8 @@ class MasterSubscriber extends BasicSubscriber {
         case msg@AriadneMessage(Update, _, _, _) =>
             log.info("Forwarding message {} from {} to TopologySupervisor", msg.subtype, sender.path)
             topologySupervisor() forward msg
-    
-        case msg@AriadneMessage(Handshake, CellToMaster, `cell2Server`, _) =>
+
+        case msg@AriadneMessage(Handshake, CellToMaster, `cell2Master`, _) =>
             log.info("Late handshake from {}... Forwarding to Supervisor...", sender.path)
             publisher() ! (
                 sender.path.elements.mkString("/"),

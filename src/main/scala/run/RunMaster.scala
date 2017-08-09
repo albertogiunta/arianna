@@ -4,6 +4,7 @@ import java.io.File
 import java.nio.file.Paths
 
 import akka.actor.{ActorSystem, Props}
+import akka.cluster.pubsub.DistributedPubSub
 import com.typesafe.config.ConfigFactory
 import master.core.Master
 
@@ -20,5 +21,7 @@ object RunMaster extends App {
 
     implicit val system = ActorSystem("Arianna-Cluster", config)
     
-    val master = system.actorOf(Props[Master], "Master")
+    val middleware = DistributedPubSub(system).mediator
+    
+    val master = system.actorOf(Props(new Master(middleware)), "Master")
 }

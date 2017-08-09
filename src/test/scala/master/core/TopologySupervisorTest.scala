@@ -78,7 +78,7 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
         val tester: TestActorRef[Tester] = TestActorRef(Props(new Tester(probe.ref)), "Tester")
     
         "At start time" must {
-            "lack of the map and notify the admin" in {
+            "request the map to the admin" in {
                 probe.expectMsg(
                     AriadneMessage(
                         Error, Error.Subtype.LookingForAMap,
@@ -172,9 +172,6 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
     }
     
     private class Tester(probe: ActorRef) extends CustomActor {
-        
-        val supervisor: TestActorRef[TopologySupervisor] =
-            TestActorRef(Props[TopologySupervisor], self, NamingSystem.TopologySupervisor)
     
         val publisher: TestActorRef[CustomActor] = TestActorRef(Props(new CustomActor {
             override def receive: Receive = {
@@ -193,9 +190,14 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
             override def receive: Receive = {
                 case AriadneMessage(Update, Update.Subtype.Admin, _, cnt: AdminUpdate) =>
                     probe ! cnt
-                case msg => probe ! msg
+                case msg =>
+                    println(msg.toString)
+                    probe ! msg
             }
         }), self, NamingSystem.AdminManager)
+    
+        val supervisor: TestActorRef[TopologySupervisor] =
+            TestActorRef(Props[TopologySupervisor], self, NamingSystem.TopologySupervisor)
         
         override def preStart {
             
