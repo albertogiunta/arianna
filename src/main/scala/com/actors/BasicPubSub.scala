@@ -1,8 +1,7 @@
 package com.actors
 
 import akka.actor.{Actor, ActorRef}
-import akka.cluster.pubsub.DistributedPubSub
-import akka.cluster.pubsub.DistributedPubSubMediator.{Put, Subscribe, SubscribeAck}
+import akka.cluster.pubsub.DistributedPubSubMediator._
 import ontologies.Topic
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Init
@@ -18,26 +17,27 @@ import ontologies.messages.{AriadneMessage, Greetings, Location}
   *
   * Created by Alessandro on 01/07/2017.
   */
-abstract class BasicSubscriber extends BasicActor {
-
+abstract class BasicSubscriber(mediator: ActorRef) extends BasicActor {
+    
+    val cluster = akka.cluster.Cluster(context.system)
+    
     val topics: Set[Topic] // To Override Necessarily
     var ackTopicReceived: Integer = 0
 
-    var mediator: ActorRef = _
-
     override protected def init(args: List[Any]): Unit = {
         super.init(args)
-        mediator = DistributedPubSub(context.system).mediator
         mediator ! Put(self) // Point 2 Point Messaging with other Actors of the cluster
         topics.foreach(topic => mediator ! Subscribe(topic, self))
     }
 
     override protected def receptive = {
-        case SubscribeAck(Subscribe(topic, None, this.self)) =>
+        case SubscribeAck(Subscribe(topic, _, me)) if me == self =>
             log.info("{} Successfully Subscribed to {}", name, topic)
             ackTopicReceived = ackTopicReceived + 1
+        
             if (ackTopicReceived == topics.size) {
                 this.context.become(subscribed, discardOld = true)
+            
                 siblings ! AriadneMessage(Init, Init.Subtype.Greetings,
                     Location.Cell >> Location.Self, Greetings(List(ClusterMembersListener.greetings)))
                 log.info("I've become Subscribed!")
@@ -53,15 +53,13 @@ abstract class BasicSubscriber extends BasicActor {
   * This class gives a common template for a Akka Publisher
   *
   */
-abstract class BasicPublisher extends BasicActor {
-
-    // activate the extension
-    var mediator: ActorRef = _
+abstract class BasicPublisher(mediator: ActorRef) extends BasicActor {
+    
+    val cluster = akka.cluster.Cluster(context.system)
 
     // Point 2 Point Messaging with other Actors of the cluster
     override protected def init(args: List[Any]): Unit = {
         super.init(args)
-        mediator = DistributedPubSub(context.system).mediator
         mediator ! Put(self) // Point 2 Point Messaging with other Actors of the cluster
     }
 

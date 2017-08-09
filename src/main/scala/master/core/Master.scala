@@ -5,12 +5,13 @@ import com.actors.CustomActor
 import master.cluster._
 import ontologies.messages.AriadneMessage
 import ontologies.messages.MessageType.Init
+import system.names.NamingSystem
 
 import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by Alessandro on 29/06/2017.
   */
-class Master extends CustomActor {
+class Master(mediator: ActorRef) extends CustomActor {
     
     var subscriber: ActorRef = _
     var publisher: ActorRef = _
@@ -21,17 +22,19 @@ class Master extends CustomActor {
     
     override def preStart = {
     
-        subscriber = context.actorOf(Props[MasterSubscriber], "Subscriber")
+        super.preStart()
     
-        publisher = context.actorOf(Props[MasterPublisher], "Publisher")
+        subscriber = context.actorOf(Props(new MasterSubscriber(mediator)), NamingSystem.Subscriber)
     
-        adminManager = context.actorOf(Props[AdminManager], "AdminManager")
+        publisher = context.actorOf(Props(new MasterPublisher(mediator)), NamingSystem.Publisher)
     
-        topologySupervisor = context.actorOf(Props[TopologySupervisor], "TopologySupervisor")
+        alarmSupervisor = context.actorOf(Props(new AlarmSupervisor(mediator)), NamingSystem.AlarmSupervisor)
     
-        alarmSupervisor = context.actorOf(Props[AlarmSupervisor], "AlarmSupervisor")
+        adminManager = context.actorOf(Props[AdminManager], NamingSystem.AdminManager)
     
-        listener = context.actorOf(Props[MasterClusterSupervisor], "ClusterListener")
+        topologySupervisor = context.actorOf(Props[TopologySupervisor], NamingSystem.TopologySupervisor)
+    
+        listener = context.actorOf(Props[MasterClusterSupervisor], NamingSystem.ClusterSupervisor)
         
     }
     

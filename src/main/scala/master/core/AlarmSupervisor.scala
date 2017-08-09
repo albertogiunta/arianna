@@ -1,7 +1,6 @@
 package master.core
 
-import akka.actor.ActorSelection
-import akka.cluster.pubsub.DistributedPubSubMediator.{Subscribe, SubscribeAck}
+import akka.actor.{ActorRef, ActorSelection}
 import com.actors.BasicSubscriber
 import ontologies.Topic
 import ontologies.messages.AriadneMessage
@@ -16,16 +15,14 @@ import system.names.NamingSystem
   *
   * Created by Xander_C on 11/07/2017.
   */
-class AlarmSupervisor extends BasicSubscriber {
+class AlarmSupervisor(mediator: ActorRef) extends BasicSubscriber(mediator) {
     override val topics = Set(Topic.Alarms)
     
     private val topologySupervisor: () => ActorSelection = () => sibling(NamingSystem.TopologySupervisor).get
     private val admin: () => ActorSelection = () => sibling(NamingSystem.AdminManager).get
     
-    override protected def receptive = {
-        case SubscribeAck(Subscribe(topic, None, `self`)) =>
-            log.info("{} Successfully Subscribed to {}", name, topic)
-            
+    override protected def subscribed = {
+       
         case msg@AriadneMessage(Alarm, subtype, _, _) =>
             log.info("Got {} from {}", msg.toString, sender.path.name)
         

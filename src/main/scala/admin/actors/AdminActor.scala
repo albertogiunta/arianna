@@ -1,6 +1,7 @@
 package admin.actors
 
 import akka.actor.{ActorSelection, Props}
+import akka.extension.ConfigurationManager
 import com.actors.BasicActor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.{Alarm, Error, Handshake, Init, Topology}
@@ -19,8 +20,11 @@ class AdminActor extends BasicActor {
     //Se si fa partire solo l'admin manager
     //private val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/AdminManager")
     //Se si fa partire il master
+    private val masterSeedNode = ConfigurationManager(context.system)
+        .property(builder.akka.cluster.get("seed-nodes")).stringList.head
+    
     private val adminManager: () => ActorSelection =
-    () => context.actorSelection("akka.tcp://Arianna-Cluster@192.168.0.6:25520/user/Master/AdminManager")
+        () => context.actorSelection(masterSeedNode + "/user/Master/AdminManager")
     
     private val interfaceManager = context.actorOf(Props[InterfaceManager], NamingSystem.InterfaceManager)
     private var areaLoaded: Area = _

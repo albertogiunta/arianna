@@ -3,7 +3,7 @@ package middleware
 import java.io.File
 import java.nio.file.Paths
 
-import _root_.middleware.PublishSubscribeMiddleware.Message.{Publish, SubAck, Subscribe}
+import _root_.middleware.PublishSubscribeMiddleware.Message.{Publish, Subscribe, SubscribeAck}
 import akka.actor.{ActorSystem, Props}
 import akka.cluster.Cluster
 import com.actors.CustomActor
@@ -37,7 +37,7 @@ object TryRemoteSelectionB extends App {
         }
         
         override def receive: Receive = {
-            case SubAck(topic) => log.info("Found: {}", topic)
+            case SubscribeAck(topic) => log.info("Found: {}", topic)
                 if (topic == "Topic/Num1") middleware ! Publish(
                     "Topic/Num1",
                     AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, Location.Master >> Location.Cell, Empty())

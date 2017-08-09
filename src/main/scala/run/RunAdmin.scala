@@ -17,7 +17,7 @@ object RunAdmin extends App {
     override def main(args: Array[String]): Unit = {
         new JFXPanel
         val path2Project = Paths.get("").toFile.getAbsolutePath
-        val path2Config = path2Project + "/res/conf/akka/admin.conf"
+        val path2Config = path2Project + "/res/conf/akka/testAdmin.conf"
         var interfaceView: InterfaceView = new InterfaceView
         val config = ConfigFactory.parseFile(new File(path2Config)).resolve
         val system = ActorSystem.create("adminSystem", config)

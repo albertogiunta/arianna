@@ -1,5 +1,6 @@
 package cell.cluster
 
+import akka.actor.ActorRef
 import akka.cluster.pubsub.DistributedPubSubMediator.{Subscribe, SubscribeAck}
 import com.actors.{BasicSubscriber, ClusterMembersListener}
 import ontologies._
@@ -13,7 +14,7 @@ import ontologies.messages.{AriadneMessage, Location, MessageDirection}
   *
   * Created by Matteo Gabellini on 29/06/2017.
   */
-class CellSubscriber extends BasicSubscriber {
+class CellSubscriber(mediator: ActorRef) extends BasicSubscriber(mediator) {
 
     override val topics = Set(Topic.HandShakes, Topic.Alarms, Topic.Topologies, Topic.Practicabilities)
     

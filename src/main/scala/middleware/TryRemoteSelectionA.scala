@@ -37,7 +37,7 @@ object TryRemoteSelectionA extends App {
         }
         
         override def receive: Receive = {
-            case SubAck(topic) =>
+            case SubscribeAck(topic) =>
                 log.info("Subscribed to {}", topic)
                 if (topic == "Topic/Num1") middleware ! Publish(
                     "Topic/Num1",

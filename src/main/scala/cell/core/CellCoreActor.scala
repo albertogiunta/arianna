@@ -23,7 +23,7 @@ import scala.util.Random
   * the other cell's actors initialization
   * Created by Matteo Gabellini on 14/07/2017.
   */
-class CellCoreActor extends BasicActor {
+class CellCoreActor(mediator: ActorRef) extends BasicActor {
 
     private var actualSelfLoad: Int = 0
     private var localCellInfo: CellInfo = CellInfo.empty
@@ -49,9 +49,9 @@ class CellCoreActor extends BasicActor {
 
     override def preStart: Unit = {
         super.preStart()
-
-        cellSubscriber = context.actorOf(Props[CellSubscriber], NamingSystem.Subscriber)
-        cellPublisher = context.actorOf(Props[CellPublisher], NamingSystem.Publisher)
+    
+        cellSubscriber = context.actorOf(Props(new CellSubscriber(mediator)), NamingSystem.Subscriber)
+        cellPublisher = context.actorOf(Props(new CellPublisher(mediator)), NamingSystem.Publisher)
 
         sensorManager = context.actorOf(Props[SensorManager], NamingSystem.SensorManager)
         userActor = context.actorOf(Props[UserManager], NamingSystem.UserManager)

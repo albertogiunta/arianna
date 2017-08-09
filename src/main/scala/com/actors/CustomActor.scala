@@ -36,14 +36,14 @@ trait CustomActor extends Actor with Stash with ActorLogging {
       * @return Return an Option[ActorSelection] of the found sibling
       */
     def sibling(name: String): Option[ActorSelection] =
-        Option(context.actorSelection("../" + name))
+        Option(context.actorSelection(parent.path / name))
 
     /**
       * A shortcut method that gives all the siblings of this Actor
       *
       * @return Return all the siblings of this node including itself
       */
-    def siblings: ActorSelection = context.actorSelection("../*")
+    def siblings: ActorSelection = context.actorSelection(parent.path / "*")
 
     /**
       * A shortcut method that gives the ActorSelection of the Child with the specified name
@@ -52,14 +52,14 @@ trait CustomActor extends Actor with Stash with ActorLogging {
       * @return An Option[ActorSelection] of the found child
       */
     def child(name: String): Option[ActorSelection] =
-        Option(context.actorSelection("../" + this.name + "/" + name))
+        Option(context.actorSelection(self.path / name))
 
     /**
       * A shortcut method that gives all the children of this Actor
       *
       * @return All the children of this Actor
       */
-    def children: ActorSelection = context.actorSelection("../" + name + "/*")
+    def children: ActorSelection = context.actorSelection(self.path / "*")
     
 }
 

@@ -1,6 +1,6 @@
 package master.cluster
 
-import akka.actor.ActorSelection
+import akka.actor.{ActorRef, ActorSelection}
 import com.actors.BasicSubscriber
 import ontologies._
 import ontologies.messages.Location._
@@ -15,7 +15,7 @@ import system.names.NamingSystem
   *
   * Created by Alessandro on 28/06/2017.
   */
-class MasterSubscriber extends BasicSubscriber {
+class MasterSubscriber(mediator: ActorRef) extends BasicSubscriber(mediator) {
     
     override val topics: Set[Topic] = Set(Topic.Updates, Topic.HandShakes)
     

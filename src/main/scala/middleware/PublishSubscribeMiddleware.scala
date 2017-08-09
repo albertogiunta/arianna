@@ -13,7 +13,9 @@ class PublishSubscribeMiddleware extends CustomActor {
     
     private val subscriptions: mutable.Map[String, mutable.HashSet[String]] = mutable.HashMap.empty
     
-    private val peers: mutable.HashSet[String] = mutable.HashSet(cluster.remotePathOf(self).address.toString)
+    private val seeds: mutable.HashSet[String] = mutable.HashSet(cluster.remotePathOf(self).address.toString)
+    
+    private val peers: mutable.HashSet[String] = mutable.HashSet.empty
     
     override def preStart(): Unit = {
         super.preStart()
@@ -22,51 +24,62 @@ class PublishSubscribeMiddleware extends CustomActor {
     }
     
     override def receive: Receive = {
-        
-        case MemberUp(peer) if peer.address != self.path.address =>
-            log.info("Found {} joining the cluster...", peer.address.toString)
-            log.info("Adding {} to Peers...", peer.address.toString)
-            peers.add(peer.address.toString)
+    
+        case MemberUp(seed) if seed.address != self.path.address =>
+            if (seeds.add(seed.address.toString)) {
             
-            subscriptions.keysIterator.foreach(topic =>
-                subscriptions(topic).foreach(subscriber =>
-                    context.actorSelection(peer.address + "/user/" + name) ! Subscribe(topic, subscriber)
+                subscriptions.keysIterator.foreach(topic =>
+                    subscriptions(topic).foreach(subscriber =>
+                        context.actorSelection(seed.address + "/user/" + name) ! Subscribe(topic, subscriber)
+                    )
                 )
-            )
-        
-        case MemberRemoved(peer, _) =>
-            log.warning("The peer {} has left the group...", peer.address.toString)
-            log.info("Removing {} from Peers...", peer.address.toString)
-            peers.remove(peer.address.toString)
+            
+                peers.foreach(peer =>
+                    context.actorSelection(seed.address + "/user/" + name) ! Put(peer)
+                )
+            }
+    
+        case MemberRemoved(seed, _) =>
+            seeds.remove(seed.address.toString)
         
         case msg@Subscribe(topic, actor) =>
-            
-            log.info("Adding subscription for topic {} from actor {}", topic, actor)
+    
+            var forwardToSeeds = false
             
             if (subscriptions.get(topic).nonEmpty) {
-                subscriptions(topic).add(actor)
+                forwardToSeeds = subscriptions(topic).add(actor)
             } else {
                 subscriptions.put(topic, mutable.HashSet(actor))
+                forwardToSeeds = true
             }
-            
-            //            log.info("Actual subscriptions are {}", subscriptions.toString)
-            
+    
             if (sender.path.address == self.path.address) {
-                log.info("Sending Subscription ACK({}) to {}", topic, actor)
-                
-                context.actorSelection(actor) ! SubAck(topic)
-                
-                peers.filter(p => p != cluster.remotePathOf(self).address.toString)
-                    .foreach(p => context.actorSelection(p + "/user/" + name) forward
-                        msg.copy(subscriber = cluster.remotePathOf(sender).toString))
+        
+                context.actorSelection(actor) ! SubscribeAck(msg)
+        
+                if (forwardToSeeds) {
+                    seeds.filter(p => p != cluster.remotePathOf(self).address.toString)
+                        .foreach(p => context.actorSelection(p + "/user/" + name) forward
+                            msg.copy(subscriber = cluster.remotePathOf(sender).toString))
+                }
             }
-        
+    
         case Publish(topic, msg) if sender != self =>
-            log.info("Publishing {} on topic {}...", msg.toString, topic)
             subscriptions(topic).foreach(a => context.actorSelection(a) forward msg)
+    
+        case msg@Put(actor) =>
         
-        case Send(actor, msg) =>
-            context.actorSelection(actor) forward msg
+            peers.add(actor)
+        
+            seeds.foreach(seed => context.actorSelection(seed + "/user/" + name) ! msg)
+    
+        case send@Send(target, msg) =>
+        
+            if (peers(target)) {
+                context.actorSelection(target) forward msg
+                sender ! SendAck(send)
+            }
+            
         case _ =>
     }
 }
@@ -80,17 +93,18 @@ object PublishSubscribeMiddleware {
         final case class Hello(from: String) extends Serializable
         
         final case class Subscribe(topic: String, subscriber: String) extends Serializable
-        
-        final case class SubAck(topic: String) extends Serializable
+    
+        final case class SubscribeAck(subscrition: Subscribe) extends Serializable
         
         final case class Publish(topic: String, msg: Any) extends Serializable
-        
-        final case class PubAck(topic: String) extends Serializable
+    
+        final case class PublishAck(publishing: Publish) extends Serializable
         
         final case class Send(target: String, msg: Any) extends Serializable
-        
-        final case class SendAck(target: String, msg: Any) extends Serializable
-        
+    
+        final case class SendAck(p2p: Send) extends Serializable
+    
+        final case class Put(self: String) extends Serializable
     }
     
 }

@@ -1,5 +1,6 @@
 package master.cluster
 
+import akka.actor.ActorRef
 import akka.cluster.pubsub.DistributedPubSubMediator._
 import com.actors.BasicPublisher
 import ontologies.Topic
@@ -11,7 +12,7 @@ import system.names.NamingSystem
 /**
   * Created by Alessandro on 28/06/2017.
   */
-class MasterPublisher extends BasicPublisher {
+class MasterPublisher(mediator: ActorRef) extends BasicPublisher(mediator) {
 
     override protected def receptive = {
     

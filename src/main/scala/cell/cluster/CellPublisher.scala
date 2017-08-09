@@ -1,5 +1,6 @@
 package cell.cluster
 
+import akka.actor.ActorRef
 import akka.cluster.pubsub.DistributedPubSubMediator.Publish
 import com.actors.{BasicPublisher, ClusterMembersListener}
 import ontologies._
@@ -11,7 +12,7 @@ import ontologies.messages._
   * Actor that manages the sending of messages to the main server
   * Created by Matteo Gabellini on 29/06/2017.
   */
-class CellPublisher extends BasicPublisher {
+class CellPublisher(mediator: ActorRef) extends BasicPublisher(mediator) {
 
     private val self2Self: MessageDirection = Location.Self >> Location.Self
 
