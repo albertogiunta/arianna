@@ -12,6 +12,7 @@ import ontologies.messages.MessageType._
 import ontologies.messages._
 import processor.route.actors.RouteManager
 import spray.json._
+import system.exceptions.IncorrectConfigurationException
 import system.names.NamingSystem
 
 import scala.collection.mutable
@@ -49,7 +50,7 @@ class CellCoreActor(mediator: ActorRef) extends BasicActor {
 
     override def preStart: Unit = {
         super.preStart()
-    
+
         cellSubscriber = context.actorOf(Props(new CellSubscriber(mediator)), NamingSystem.Subscriber)
         cellPublisher = context.actorOf(Props(new CellPublisher(mediator)), NamingSystem.Publisher)
 
@@ -66,6 +67,7 @@ class CellCoreActor(mediator: ActorRef) extends BasicActor {
         clusterListener = context.actorOf(Props[CellClusterSupervisor], NamingSystem.CellClusterSupervisor)
         val cellConfiguration = Source.fromFile(args.head.asInstanceOf[String]).getLines.mkString
         val loadedConfig = cellConfiguration.parseJson.convertTo[CellConfig]
+        if (loadedConfig.cellInfo == CellInfo.empty) throw IncorrectConfigurationException(this.name)
         localCellInfo = loadedConfig.cellInfo
 
         sensorManager ! AriadneMessage(Init,
@@ -77,16 +79,15 @@ class CellCoreActor(mediator: ActorRef) extends BasicActor {
     override protected def receptive: Receive = {
 
         case msg@AriadneMessage(Info, Info.Subtype.Request, this.self2Self, cnt: SensorsInfoUpdate) => {
-            println("aaa 1")
             //Informations request from the cell publisher in order to complete the handshake task with the master
-            if (localCellInfo == CellInfo.empty || sensorsMounted.isEmpty) {
+            if (sensorsMounted.isEmpty) {
+                println("WARNING!!!!! Sensor Data not yet ready")
                 stash()
             } else {
                 sender() ! msg.copy(
                     subtype = Info.Subtype.Response,
                     content = SensorsInfoUpdate(localCellInfo, sensorsMounted)
                 )
-                println("aaa 2")
             }
         }
 
@@ -113,6 +114,9 @@ class CellCoreActor(mediator: ActorRef) extends BasicActor {
                 self2Self,
                 Greetings(List(localCellInfo.uri, localCellInfo.port.toString)))
             userActor ! msg.copy(direction = cell2User)
+
+            this.context.become(cultured, discardOld = true)
+            log.info("I've become cultured")
         }
 
         case _ => desist _
@@ -170,7 +174,7 @@ class CellCoreActor(mediator: ActorRef) extends BasicActor {
             //Alarm triggered in the current cell
             //Check if the topology is initialized
             if (topology.nonEmpty) {
-                val currentCell: RoomViewedFromACell = topology(localCellInfo.uri)
+                val currentCell: RoomViewedFromACell = topology(indexByUri(localCellInfo.uri))
                 val msgToSend = msg.copy(direction = cell2Cluster,
                     content = AlarmContent(localCellInfo, currentCell.info)
                 )

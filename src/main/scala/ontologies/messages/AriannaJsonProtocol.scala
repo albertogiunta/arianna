@@ -9,7 +9,7 @@ import spray.json.{DefaultJsonProtocol, JsValue, RootJsonFormat}
 object AriannaJsonProtocol extends DefaultJsonProtocol {
     implicit val emptyFormat: RootJsonFormat[Empty] = jsonFormat0(Empty)
     implicit val pointFormat: RootJsonFormat[Point] = jsonFormat2(Point.apply)
-    implicit val coordinatesFormat: RootJsonFormat[Coordinates] = jsonFormat4(Coordinates)
+    implicit val coordinatesFormat: RootJsonFormat[Coordinates] = jsonFormat4(Coordinates.apply)
     implicit val passageFormat: RootJsonFormat[Passage] = jsonFormat3(Passage)
 
     implicit val infoCellFormat: RootJsonFormat[CellInfo] = jsonFormat2(CellInfo.apply)
@@ -18,9 +18,9 @@ object AriannaJsonProtocol extends DefaultJsonProtocol {
     implicit val infoRoomFormat: RootJsonFormat[RoomInfo] = jsonFormat7(RoomInfo.apply)
     
     implicit val sensorFormat: RootJsonFormat[SensorInfo] = jsonFormat2(SensorInfo)
-    
-    implicit val cellFormat: RootJsonFormat[Cell] = jsonFormat2(Cell)
-    implicit val roomFormat: RootJsonFormat[Room] = jsonFormat6(Room)
+
+    implicit val cellFormat: RootJsonFormat[Cell] = jsonFormat2(Cell.apply)
+    implicit val roomFormat: RootJsonFormat[Room] = jsonFormat6(Room.apply)
     implicit val areaFormat: RootJsonFormat[Area] = jsonFormat2(Area)
     
     implicit val thresholdJsonFormat: RootJsonFormat[ThresholdInfo] = new RootJsonFormat[ThresholdInfo] {

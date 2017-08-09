@@ -1,7 +1,5 @@
 package ontologies.messages
 
-import scala.collection.mutable
-
 
 /**
   * A trait that represent a Content for Ariadne Messages
@@ -15,6 +13,11 @@ final case class Coordinates(northWest: Point,
                              northEast: Point,
                              southWest: Point,
                              southEast: Point)
+
+object Coordinates {
+    def empty: Coordinates = new Coordinates(Point(0, 0), Point(0, 0), Point(0, 0), Point(0, 0))
+}
+
 
 final case class Passage(neighborId: Int,
                          startCoordinates: Point,
@@ -51,6 +54,9 @@ final case class Room(info: RoomInfo,
                       currentPeople: Int,
                       practicability: Double) extends MessageContent
 
+object Room {
+    def empty: Room = new Room(RoomInfo.empty, Cell.empty, List.empty, List.empty, 0, Double.PositiveInfinity)
+}
 /**
   * This class is a Static representation of a Room
   *
@@ -71,7 +77,7 @@ final case class RoomInfo(id: RoomID,
                           squareMeters: Double) extends MessageContent
 
 object RoomInfo {
-//    def emtpy: RoomInfo = RoomInfo(RoomID.empty, Coordinates.em)
+    def empty: RoomInfo = RoomInfo(RoomID.empty, Coordinates.empty, Point(0, 0), false, false, 0, 0)
 }
 
 /**
@@ -94,6 +100,9 @@ object RoomID {
   */
 final case class Cell(info: CellInfo, sensors: List[SensorInfo]) extends MessageContent
 
+object Cell {
+    def empty: Cell = new Cell(CellInfo.empty, List.empty)
+}
 /**
   * This Class is a Static representation of a Cell
   *
@@ -305,6 +314,8 @@ final case class SensorsInfoUpdate(cell: CellInfo, sensors: List[SensorInfo]) ex
 
 object SensorsInfoUpdate {
     def apply(room: Room): SensorsInfoUpdate = new SensorsInfoUpdate(room.cell.info, room.cell.sensors)
+
+    def empty: SensorsInfoUpdate = apply(CellInfo.empty, List.empty[SensorInfo])
 }
 
 /**

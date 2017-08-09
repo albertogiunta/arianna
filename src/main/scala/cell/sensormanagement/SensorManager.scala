@@ -8,6 +8,7 @@ import ontologies.messages.Location._
 import ontologies.messages.MessageType.{Alarm, Update}
 import ontologies.messages._
 import spray.json._
+import system.exceptions.IncorrectInitMessageException
 
 import scala.collection.mutable.{ListBuffer, _}
 
@@ -28,7 +29,8 @@ class SensorManager extends BasicActor {
 
 
     override protected def init(args: List[Any]): Unit = {
-        if (args.head == ClusterMembersListener.greetings) throw new Exception()
+        if (args.head == ClusterMembersListener.greetings) throw IncorrectInitMessageException(this.name, args)
+
         var sensorsToLoad = args.head.asInstanceOf[String].parseJson.convertTo[List[SensorInfoFromConfig]]
         sensorsToLoad foreach (X => {
             sensors.put(X.categoryId, SensorInfo(X.categoryId, 0))
