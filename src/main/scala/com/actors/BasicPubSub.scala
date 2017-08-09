@@ -41,9 +41,12 @@ abstract class BasicSubscriber(mediator: ActorRef) extends BasicActor {
                 siblings ! AriadneMessage(Init, Init.Subtype.Greetings,
                     Location.Cell >> Location.Self, Greetings(List(ClusterMembersListener.greetings)))
                 log.info("I've become Subscribed!")
+    
+                unstashAll
             }
 
-        case msg => super.resistive(msg)
+        case _: AriadneMessage[_] => stash
+        case _ => desist _
     }
 
     protected def subscribed: Actor.Receive = ???

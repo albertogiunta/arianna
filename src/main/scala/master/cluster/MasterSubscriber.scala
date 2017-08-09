@@ -58,11 +58,9 @@ class MasterSubscriber(mediator: ActorRef) extends BasicSubscriber(mediator) {
             context.become(behavior = proactive, discardOld = true)
             log.info("I've become ProActive...")
         
-            unstashAll
-        
             publisher() forward msg
-    
-        case _ => stash
+
+        case _ => desist _
     }
     
     def proactive: Receive = {
