@@ -15,8 +15,14 @@ import ontologies.messages.{AriadneMessage, Location, MessageDirection}
   * Created by Matteo Gabellini on 29/06/2017.
   */
 class CellSubscriber(mediator: ActorRef) extends BasicSubscriber(mediator) {
-
-    override val topics = Set(Topic.HandShakes, Topic.Alarms, Topic.Topologies, Topic.Practicabilities)
+    
+    override val topics = Set(
+        //        Topic.HandShakes,
+        Topic.Alarms,
+        Topic.Topologies,
+        Topic.Practicabilities,
+        Topic.ShutDown
+    )
     
     private val cell2Server: MessageDirection = Location.Master << Location.Cell
     private val server2Cell: MessageDirection = Location.Master >> Location.Cell
