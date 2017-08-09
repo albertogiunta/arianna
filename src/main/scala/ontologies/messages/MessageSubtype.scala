@@ -125,7 +125,12 @@ object MessageSubtype {
                 Movement.Subtype.Right
             case st if st == Movement.Subtype.Left.toLowerCase =>
                 Movement.Subtype.Left
-                
+
+            case st if st == Info.Subtype.Request.toLowerCase =>
+                Info.Subtype.Request
+            case st if st == Info.Subtype.Response.toLowerCase =>
+                Info.Subtype.Response
+
             case _ => null
         }
     }

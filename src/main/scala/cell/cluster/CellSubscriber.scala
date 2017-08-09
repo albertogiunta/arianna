@@ -1,11 +1,11 @@
 package cell.cluster
 
-import akka.cluster.pubsub.DistributedPubSubMediator.{Subscribe, SubscribeAck}
 import com.actors.{BasicSubscriber, ClusterMembersListener}
 import ontologies._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType._
 import ontologies.messages.{AriadneMessage, Location, MessageDirection}
+import system.exceptions.IncorrectInitMessageException
 
 /**
   * An actor that models a Cell receiver for the Cells-MasterServer
@@ -22,13 +22,11 @@ class CellSubscriber extends BasicSubscriber {
 
     override protected def init(args: List[Any]) = {
         super.init(args)
-        if (args.head != ClusterMembersListener.greetings) throw new Exception()
+        if (args.head != ClusterMembersListener.greetings) throw IncorrectInitMessageException(this.name, args)
         log.info("Hello there from {}!", name)
     }
 
     override protected def subscribed = {
-        case SubscribeAck(Subscribe(topic, None, this.self)) =>
-            log.info("{} Successfully Subscribed to {}", name, topic)
         case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, _, cnt) =>
             log.info("Got ack {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
         case msg@AriadneMessage(Topology, Topology.Subtype.ViewedFromACell, _, cnt) =>

@@ -10,6 +10,7 @@ import ontologies.messages.MessageType.Topology
 import ontologies.messages.MessageType.Topology.Subtype._
 import ontologies.messages._
 import spray.json._
+import system.exceptions.IncorrectInitMessageException
 
 object MSGToAkka {
     val NORMAL_CONNECTION: String = "connect"
@@ -36,7 +37,8 @@ class UserManager extends BasicActor with ActorLogging {
     var areaForUser: AreaViewedFromAUser = _
 
     override protected def init(args: List[Any]): Unit = {
-        if (args.size != 2) throw new Exception()
+        if (args.size != 2) throw IncorrectInitMessageException(this.name, args)
+
         vertx = Vertx.vertx()
         s = new WSServer(vertx, self, "/" + args.head.asInstanceOf[String], Port.getPort)
         vertx.deployVerticle(s)

@@ -27,25 +27,27 @@ class CellPublisher extends BasicPublisher {
             Info,
             Info.Subtype.Request,
             self2Self,
-            SensorsInfoUpdate(CellInfo.empty, List.empty[SensorInfo])
+            SensorsInfoUpdate.empty
         )
 
     }
 
     override protected def receptive = {
         case msg@AriadneMessage(Info, Info.Subtype.Response, this.self2Self, sensorsInfoUpdate: SensorsInfoUpdate) => {
-            println("aaa 3")
-            //Thread.sleep(5000)
+            println("Sensor Info " + sensorsInfoUpdate)
+            //Thread.sleep(1000)
+            val handshake = AriadneMessage(
+                Handshake,
+                Handshake.Subtype.CellToMaster,
+                Location.Cell >> Location.Master,
+                sensorsInfoUpdate
+            )
             mediator ! Publish(Topic.HandShakes,
-                AriadneMessage(
-                    Handshake,
-                    Handshake.Subtype.CellToMaster,
-                    Location.Cell >> Location.Master,
-                    sensorsInfoUpdate
-                )
+                handshake
             )
             log.info("Sending Handshake to Master...")
             this.context.become(cultured, discardOld = true)
+            log.info("I've become cultured")
         }
         case _ => //ignore
     }
@@ -59,7 +61,6 @@ class CellPublisher extends BasicPublisher {
             mediator ! Publish(Topic.Updates, msg)
 
         case msg@AriadneMessage(Update, Update.Subtype.Practicability, _, _) =>
-
             mediator ! Publish(Topic.Practicabilities, msg)
 
         case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, _, _) =>
