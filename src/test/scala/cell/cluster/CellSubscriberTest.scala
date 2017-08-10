@@ -4,13 +4,15 @@ import java.io.File
 import java.nio.file.Paths
 
 import akka.actor.{ActorRef, ActorSystem, Props}
+import akka.cluster.pubsub.DistributedPubSub
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
-import com.actors.CustomActor
+import com.actors.{ClusterMembersListener, CustomActor}
 import com.typesafe.config.{Config, ConfigFactory}
 import ontologies.messages.Location._
 import ontologies.messages.MessageType._
 import ontologies.messages.{AriadneMessage, _}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
+import system.names.NamingSystem
 
 /**
   * Created by Matteo Gabellini on 08/08/2017.
@@ -18,17 +20,17 @@ import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 class CellSubscriberTest extends TestKit(ActorSystem("CellSubscriberTest", CellSubscriberTest.config))
     with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll {
 
-    private val actorName = "CellSubscriber"
-    private val greetings: String = "FROM CLUSTER MEMBERS LISTENER Hello there, it's time to dress-up"
+    val middleware = DistributedPubSub(system).mediator
+    private val actorName = NamingSystem.Subscriber
 
     val initMsg = AriadneMessage(Init, Init.Subtype.Greetings,
-        Location.Cell >> Location.Self, Greetings(List(greetings)))
+        Location.Cell >> Location.Self, Greetings(List(ClusterMembersListener.greetings)))
 
-    //    val handshakeMsg = AriadneMessage(
-    //        Handshake,
-    //        Handshake.Subtype.Acknowledgement,
-    //        Location.Master >> Location.Cell,
-    //        _)
+    val handshakeMsg = AriadneMessage(
+        Handshake,
+        Handshake.Subtype.Acknowledgement,
+        Location.Master >> Location.Cell,
+        _)
 
     val topologyMsg = AriadneMessage(
         Topology,
@@ -73,9 +75,8 @@ class CellSubscriberTest extends TestKit(ActorSystem("CellSubscriberTest", CellS
     "A Subscriber of a Cell" should {
         "initially ignore all messages that aren't Init messages" in {
             val proxy = TestProbe()
-            val parent = system.actorOf(Props(new TestParent(proxy.ref, actorName)), "TestParent")
+            val parent = system.actorOf(Props(new TestParent(proxy.ref)), "TestParent")
 
-            //proxy.send(parent, handshakeMsg)
             proxy.send(parent, topologyMsg)
             //            proxy.send(parent, routeMsg)
             proxy.send(parent, updateMsg)
@@ -96,9 +97,9 @@ object CellSubscriberTest {
 }
 
 
-class TestParent(proxy: ActorRef, sonName: String) extends CustomActor {
+class TestParent(proxy: ActorRef) extends CustomActor {
 
-    val child = context.actorOf(Props[CellSubscriber], sonName)
+    val child = context.actorOf(Props[CellSubscriber], NamingSystem.Subscriber)
 
     override def receive: Receive = {
         case msg if sender == child => proxy forward msg

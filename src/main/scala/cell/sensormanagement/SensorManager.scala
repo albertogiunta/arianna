@@ -19,7 +19,6 @@ import scala.collection.mutable.{ListBuffer, _}
   * Created by Matteo Gabellini on 05/07/2017.
   */
 class SensorManager extends BasicActor {
-    private val observationRefresh = 1000
 
     private var sensors = new HashMap[Int, SensorInfo]
     private val simulatedSensor: ListBuffer[SimulatedSensor[Double]] = new ListBuffer[SimulatedSensor[Double]]
@@ -44,7 +43,7 @@ class SensorManager extends BasicActor {
 
     private def initializeSensors(): Unit = {
         observableSensors foreach (X => {
-            var flow = X.createObservable(observationRefresh)
+            var flow = X.createObservable(SensorManager.observationRefreshMillis)
             flow.subscribe((Y: Double) => self ! SensorInfo(X.category.id, Y))
             X match {
                 case x: SensorWithThreshold[Double] => {
@@ -75,4 +74,8 @@ class SensorManager extends BasicActor {
         simulatedSensor foreach (X => X.stopGeneration())
         observableSensors foreach (X => X.stopObservation())
     }
+}
+
+object SensorManager {
+    val observationRefreshMillis = 5000
 }
