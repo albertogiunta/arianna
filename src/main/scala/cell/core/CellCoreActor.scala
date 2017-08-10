@@ -208,7 +208,7 @@ class CellCoreActor(mediator: ActorRef) extends BasicActor {
                 Route.Subtype.Info,
                 self2Self,
                 RouteInfo(
-                    RouteRequest(id, topology(localCellInfo.uri).info.id, RoomID.empty, isEscape = true),
+                    RouteRequest(id, topology(indexByUri(localCellInfo.uri)).info.id, RoomID.empty, isEscape = true),
                     AreaViewedFromACell(Random.nextInt(), area)
                 )
             )
