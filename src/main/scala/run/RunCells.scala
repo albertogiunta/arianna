@@ -32,8 +32,8 @@ object RunCells extends App {
             core ! AriadneMessage(Init, Init.Subtype.Greetings,
                 Location.Master >> Location.Self, Greetings(List(configPath)))
     }
-
-
+    
+    
     //    var core = system.actorOf(Props(new CellCoreActor(middleware)), NamingSystem.CellCore)
     //    var server2Cell = Location.Master >> Location.Cell
     //    Thread.sleep(500)

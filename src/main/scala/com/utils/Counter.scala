@@ -27,6 +27,10 @@ case class Counter(private val start: Int) {
         this.get
     }
     
+    def ++==(that: Int): Boolean = (this ++) == that
+    
+    def --==(that: Int): Boolean = (this --) == that
+    
     def get: Int = value
     
     override def equals(obj: scala.Any) = obj match {

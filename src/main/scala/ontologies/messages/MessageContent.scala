@@ -102,6 +102,10 @@ final case class Cell(info: CellInfo, sensors: List[SensorInfo]) extends Message
 
 object Cell {
     def empty: Cell = new Cell(CellInfo.empty, List.empty)
+    
+    implicit def CellToSensorUpdate(c: Cell): SensorsInfoUpdate = SensorsInfoUpdate(c.info, c.sensors)
+    
+    implicit def SensorUpdateToCell(up: SensorsInfoUpdate): Cell = Cell(up.cell, up.sensors)
 }
 /**
   * This Class is a Static representation of a Cell
@@ -316,6 +320,10 @@ object SensorsInfoUpdate {
     def apply(room: Room): SensorsInfoUpdate = new SensorsInfoUpdate(room.cell.info, room.cell.sensors)
 
     def empty: SensorsInfoUpdate = apply(CellInfo.empty, List.empty[SensorInfo])
+    
+    implicit def CellToSensorUpdate(c: Cell): SensorsInfoUpdate = SensorsInfoUpdate(c.info, c.sensors)
+    
+    implicit def SensorUpdateToCell(up: SensorsInfoUpdate): Cell = Cell(up.cell, up.sensors)
 }
 
 /**
