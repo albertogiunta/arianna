@@ -62,9 +62,9 @@ object MessageSerializer extends MessageSerializer[MessageContent] {
         */
         Array.concat(
             Array.fill(1) {
-                message.subtype.subtypeName.length.toByte
+                message.subtype.toString.length.toByte
             },
-            message.subtype.subtypeName.map(char2byte).toArray,
+            message.subtype.toString.map(char2byte).toArray,
             
             Array.fill(1) {
                 message.direction.iter.from.length.toByte
