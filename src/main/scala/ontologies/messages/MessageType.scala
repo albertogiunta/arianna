@@ -231,8 +231,8 @@ object MessageType {
               * Takes a *** object as MessageContent
               */
             object Request extends MessageSubtype {
-        
-                override val subtypeName = "RouteRequest"
+    
+                override val subtypeName = "Request"
     
                 override val superType: MessageType = Route
     
@@ -244,8 +244,8 @@ object MessageType {
             }
     
             object Response extends MessageSubtype {
-        
-                override val subtypeName = "RouteResponse"
+    
+                override val subtypeName = "Response"
     
                 override val superType: MessageType = Route
     
@@ -257,8 +257,8 @@ object MessageType {
             }
     
             object Info extends MessageSubtype {
-        
-                override val subtypeName = "RouteInfo"
+    
+                override val subtypeName = "Info"
     
                 override val superType: MessageType = Route
     

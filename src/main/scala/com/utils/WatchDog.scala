@@ -20,6 +20,7 @@ object WatchDog {
 }
 
 class BasicWatchDog(actorToNotifyTimeOut: ActorRef, waitTime: Long = WatchDog.waitTime) extends Thread with WatchDog {
+    
     var ackReceived: Boolean = false
 
     override def run(): Unit = {
