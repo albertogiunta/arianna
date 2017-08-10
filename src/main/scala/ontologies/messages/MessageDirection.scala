@@ -12,10 +12,10 @@ package ontologies.messages
 trait MessageDirection {
 
     val iter: Direction
-
-    override def toString = "Message is coming " + iter.toString
-
-    override def equals(obj: scala.Any) = obj match {
+    
+    override def toString: String = "Message is coming " + iter.toString
+    
+    override def equals(obj: scala.Any): Boolean = obj match {
         case that: MessageDirection => that.iter == this.iter
         case _ => false
     }
@@ -45,16 +45,16 @@ trait Location {
     def >>(that: Location): Direction = Direction(from = this.loc, to = that.loc)
 
     def <<(that: Location): Direction = Direction(from = that.loc, to = this.loc)
-
-    override def toString = loc
-
-    override def equals(obj: scala.Any) = obj match {
+    
+    override def toString: String = loc
+    
+    override def equals(obj: scala.Any): Boolean = obj match {
         case that: Location => that.loc == this.loc
     }
 }
 
 final case class Direction(from: String, to: String) {
-    override def toString = "from " + from + " to " + to
+    override def toString: String = "from " + from + " to " + to
     
     def reverse: Direction = Direction(from = this.to, to = this.from)
 }
