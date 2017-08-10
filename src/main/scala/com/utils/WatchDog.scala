@@ -20,14 +20,13 @@ object WatchDog {
 }
 
 class BasicWatchDog(actorToNotifyTimeOut: ActorRef, waitTime: Long = WatchDog.waitTime) extends Thread with WatchDog {
-    
-    var ackReceived: Boolean = false
+    var eventHappened: Boolean = false
 
     override def run(): Unit = {
         super.run()
         Thread.sleep(waitTime)
-        actorToNotifyTimeOut ! WatchDogNotification
+        if (!eventHappened) actorToNotifyTimeOut ! WatchDogNotification
     }
 
-    override def notofyEventHappened: Unit = ackReceived = true
+    override def notofyEventHappened: Unit = eventHappened = true
 }
