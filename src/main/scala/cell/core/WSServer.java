@@ -2,10 +2,10 @@ package cell.core;
 
 import com.utils.Pair;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import akka.actor.ActorRef;
 import io.vertx.core.AbstractVerticle;
@@ -34,11 +34,11 @@ public class WSServer extends AbstractVerticle {
         this.baseUrl = baseUrl;
         this.basePort = port;
 
-        this.usersWaitingForDisconnection = new HashMap<>();
-        this.usersWaitingForConnectionOk = new HashMap<>();
-        this.usersWaitingForArea = new HashMap<>();
-        this.usersReadyForAlarm = new HashMap<>();
-        this.usersWaitingForRoute = new HashMap<>();
+        this.usersWaitingForDisconnection = new ConcurrentHashMap<>();
+        this.usersWaitingForConnectionOk = new ConcurrentHashMap<>();
+        this.usersWaitingForArea = new ConcurrentHashMap<>();
+        this.usersReadyForAlarm = new ConcurrentHashMap<>();
+        this.usersWaitingForRoute = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -80,9 +80,9 @@ public class WSServer extends AbstractVerticle {
         }).listen(basePort);
     }
 
-    public void sendOkToNewUser() {
+    public void sendOkToNewUser(String ack) {
         System.out.println("[N USERS OK] " + usersWaitingForConnectionOk.size());
-        usersWaitingForConnectionOk.values().forEach(ws -> ws.writeTextMessage("ack"));
+        usersWaitingForConnectionOk.values().forEach(ws -> ws.writeTextMessage(ack));
         usersWaitingForConnectionOk.clear();
         System.out.println("[N USERS OK] " + usersWaitingForConnectionOk.size());
     }
