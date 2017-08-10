@@ -46,7 +46,9 @@ object Topic {
     val Updates = AriadneTopic(MessageType.Update, Option.empty)
     
     val Practicabilities = AriadneTopic(MessageType.Update, Option(MessageType.Update.Subtype.Practicability))
-
+    
+    val TopologyACK = AriadneTopic(MessageType.Topology, Option(MessageType.Topology.Subtype.Acknowledgement))
+    
     implicit def Topic2String(topic: Topic): String = topic.toString
     
     implicit def Topic2MessageType(topic: Topic): MessageType = topic.associatedMessageType

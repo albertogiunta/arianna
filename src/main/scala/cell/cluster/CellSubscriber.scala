@@ -41,9 +41,9 @@ class CellSubscriber(mediator: ActorRef) extends BasicSubscriber(mediator) {
 
         case msg@AriadneMessage(Topology, Topology.Subtype.ViewedFromACell, _, cnt) =>
             log.info("I received the topology: {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
-
+    
             this.parent ! msg
-
+    
             context.become(behavior = cultured, discardOld = true)
             log.info("I've Become Cultured...")
 

@@ -211,11 +211,11 @@ object MessageType {
     
                 override val superType: MessageType = Handshake
     
-                override def unmarshal(json: String): CellInfo =
-                    json.parseJson.convertTo[CellInfo]
+                override def unmarshal(json: String): Empty =
+                    json.parseJson.convertTo[Empty]
     
                 override def marshal(obj: MessageContent): String =
-                    obj.asInstanceOf[CellInfo].toJson.toString()
+                    obj.asInstanceOf[Empty].toJson.toString()
             }
         }
 
@@ -348,12 +348,12 @@ object MessageType {
                 override val superType: MessageType = Topology
         
                 override val subtypeName: String = "Acknowledgement"
-        
-                override def unmarshal(json: String): Empty =
-                    json.parseJson.convertTo[Empty]
+    
+                override def unmarshal(json: String): CellInfo =
+                    json.parseJson.convertTo[CellInfo]
         
                 override def marshal(obj: MessageContent): String =
-                    obj.asInstanceOf[Empty].toJson.toString()
+                    obj.asInstanceOf[CellInfo].toJson.toString()
             }
 
         }

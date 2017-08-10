@@ -77,16 +77,6 @@ object Location {
 
     val Self: Location = LocationImpl("Self")
 
-    val Switcher: Location = LocationImpl("Switcher")
-
-    val MovGenerator: Location = LocationImpl("MovGenerator")
-    
-    val PowerSupply: Location = LocationImpl("PowerSupplyGenerator")
-
-    val Movement: Location = LocationImpl("Movement")
-
-    val MovementGenerator: Location = LocationImpl("MovementGenerator")
-
     implicit def location2String(d: Location): String = d.toString
     
     implicit def location2Direction(d: Location => Direction, l: Location): Direction = d(l)
@@ -103,10 +93,20 @@ object Location {
             case loc if loc == User.toLowerCase => User
             case loc if loc == Notifier.toLowerCase => Notifier
             case loc if loc == Self.toLowerCase => Self
-            case loc if loc == Switcher.toLowerCase => Switcher
-            case loc if loc == MovementGenerator.toLowerCase => MovementGenerator
             case _ => null
         }
+    }
+    
+    object PreMade {
+        val selfToSelf: MessageDirection = Location.Self >> Location.Self
+        val cellToMaster: MessageDirection = Location.Cell >> Location.Master
+        val masterToCell: MessageDirection = cellToMaster.reverse
+        val adminToMaster: MessageDirection = Location.Admin >> Location.Master
+        val masterToAdmin: MessageDirection = adminToMaster.reverse
+        val masterToCluster: MessageDirection = Location.Master >> Location.Cluster
+        val cellToCluster: MessageDirection = Location.Cell >> Location.Cluster
+        val cellToUser: MessageDirection = Location.Cell >> Location.User
+        val userToCell: MessageDirection = cellToUser.reverse
     }
 
 }
