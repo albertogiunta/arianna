@@ -13,8 +13,9 @@ import spray.json._
 import system.exceptions.IncorrectInitMessageException
 
 object MSGToAkka {
-    val NORMAL_CONNECTION: String = "connect"
-    val FIRST_CONNECTION: String = "firstconnection"
+    val NORMAL_CONNECTION: String = "normalConnection"
+    val FIRST_CONNECTION: String = "firstConnection"
+    val NORMAL_CONNECTION_RESPONSE = "ack"
     val DISCONNECT: String = "disconnect"
 }
 
@@ -63,7 +64,7 @@ class UserManager extends BasicActor with ActorLogging {
     protected def receptiveForMobile: Receive = {
         case MSGToAkka.NORMAL_CONNECTION =>
             println("[ACTOR] GOT NEW USER")
-            s.sendOkToNewUser()
+            s.sendOkToNewUser(MSGToAkka.NORMAL_CONNECTION_RESPONSE)
             usrNumber += 1
         // todo tell CellCoreActore
         case MSGToAkka.FIRST_CONNECTION =>
