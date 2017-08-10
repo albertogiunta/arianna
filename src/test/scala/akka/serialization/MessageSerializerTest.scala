@@ -32,6 +32,13 @@ class MessageSerializerTest extends FunSuite with BeforeAndAfter {
         toJsonObj(Update.Subtype.Sensors, jsonStr)
     )
     
+    //    val messageForTest: Message[MessageContent] = AriadneMessage(
+    //        Handshake,
+    //        Acknowledgement,
+    //        Location.Master >> Location.Cell,
+    //        Empty()
+    //    )
+    
     test("Testing Serialization Utility...") {
         
         val serial: Array[Byte] = MessageSerializer.serialize(messageForTest)

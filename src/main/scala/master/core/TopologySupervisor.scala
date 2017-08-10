@@ -2,9 +2,10 @@ package master.core
 
 import akka.actor.{ActorRef, ActorSelection, Props}
 import com.actors.BasicActor
+import com.utils.WatchDog.WatchDogNotification
 import com.utils.{Counter, Practicability}
 import ontologies.messages
-import ontologies.messages.Location._
+import ontologies.messages.Location.PreMade._
 import ontologies.messages.MessageType.Handshake.Subtype.CellToMaster
 import ontologies.messages.MessageType.Topology.Subtype.{Acknowledgement, Planimetrics, ViewedFromACell}
 import ontologies.messages.MessageType.Update.Subtype.{CurrentPeople, Sensors}
@@ -27,18 +28,15 @@ class TopologySupervisor extends BasicActor {
     
     private var topology: mutable.Map[String, Room] = mutable.HashMap.empty
     private var indexByUri: mutable.Map[String, String] = mutable.HashMap.empty
-    private val actorByUri: mutable.Map[String, ActorRef] = mutable.HashMap.empty
-    private val
-    private val cellToMaster: MessageDirection = Location.Cell >> Location.Master
-    private val masterToCell: MessageDirection = cellToMaster.reverse
-    private val adminToMaster: MessageDirection = Location.Admin >> Location.Master
-    private val masterToAdmin: MessageDirection = adminToMaster.reverse
+    
+    private val alreadyMapped: mutable.Set[String] = mutable.HashSet.empty
     
     private val publisher: () => ActorSelection = () => sibling(NamingSystem.Publisher).get
     private val subscriber: () => ActorSelection = () => sibling(NamingSystem.Subscriber).get
     private val admin: () => ActorSelection = () => sibling(NamingSystem.AdminManager).get
     
-    private val dataStreamer = context.actorOf(Props(new DataStreamer(target = admin())), "DataStreamer")
+    private val dataStreamer = context.actorOf(Props(new DataStreamer(target = admin())), NamingSystem.DataStreamer)
+    private val watchDogSupervisor = context.actorOf(Props[WatchDogSupervisor], NamingSystem.WatchDogSupervisor)
     
     private val synced: Counter = Counter()
     
@@ -79,44 +77,30 @@ class TopologySupervisor extends BasicActor {
     
     private def sociable: Receive = {
     
-        case AriadneMessage(Topology, Planimetrics, _, map: Area) =>
-    
-            log.error("A topology has already been loaded in the server...")
-    
-            if (map.id != mapVersionID) {
-    
-                admin() ! AriadneMessage(
-                    Error,
-                    Error.Subtype.MapIdentifierMismatch,
-                    masterToAdmin,
-                    Empty()
-                )
-            }
-
+        case AriadneMessage(Topology, Planimetrics, _, map: Area) => unexpectedPlanimetry(map)
+        
         case msg@AriadneMessage(Handshake, CellToMaster, `cellToMaster`, SensorsInfoUpdate(cell, sensors)) =>
     
-            val roomName = indexByUri.get(cell.uri)
-            log.info("Received handshake from cell {}", roomName)
+            log.info("Received handshake from cell {}", cell.uri)
     
-            if (roomName.nonEmpty) {
+            if (indexByUri.get(cell.uri).nonEmpty && !alreadyMapped(cell.uri)) {
                 
                 log.info("Found a match into the loaded Topology for {}", cell.uri)
         
                 val newCell = messages.Cell(cell, sensors)
-                val newRoom = topology(roomName.get).copy(cell = newCell)
+                val newRoom = topology(indexByUri(cell.uri)).copy(cell = newCell)
         
-                topology.put(roomName.get, newRoom)
-                actorByUri.put(newCell.info.uri, sender)
+                topology.put(indexByUri(cell.uri), newRoom)
+                alreadyMapped.add(cell.uri)
                 
                 admin() ! msg
-    
-                if ((synced ++) == topology.size) {
-                    
-                    context.become(behavior = proactive, discardOld = true)
-                    log.info("I've become ProActive")
+        
+                watchDogSupervisor forward cell
                 
-                    unstashAll
+                if ((synced ++) == topology.size) {
     
+                    context.become(acknowledging, discardOld = true)
+                    log.info("I've Become Acknowledging!")
                     // Update all the Cells but first notify the subscriber
                     subscriber() ! AriadneMessage(
                         Topology, ViewedFromACell, masterToCell,
@@ -125,8 +109,12 @@ class TopologySupervisor extends BasicActor {
                             topology.map(e => RoomViewedFromACell(e._2)).toList
                         )
                     )
+    
+                    log.info("Notifying the watchdog supervisor to run timers...")
+                    watchDogSupervisor ! true
                 }
-            } else {
+        
+            } else if (!alreadyMapped(cell.uri)) {
                 log.error("Received Handshake as no matching in the current loaded Topology for {}", cell.uri)
                 publisher() ! (
                     sender.path.elements.mkString("/"),
@@ -137,38 +125,44 @@ class TopologySupervisor extends BasicActor {
                     )
                 )
             }
-
-        case AriadneMessage(Topology, Acknowledgement, `cellToMaster`, info: CellInfo) =>
     
-            val cellActor = actorByUri.get(info.uri)
+        case _ => stash
+    }
     
-            if (cellActor.nonEmpty && cellActor.get == sender) {
+    private def acknowledging: Receive = {
         
+        case AriadneMessage(Topology, Planimetrics, _, map: Area) => unexpectedPlanimetry(map)
         
-                if ((synced --) == 0) {
+        case msg@AriadneMessage(Topology, Acknowledgement, `cellToMaster`, _) =>
+            watchDogSupervisor forward msg
+        
+        case WatchDogNotification(true) =>
+            context.become(proactive)
+            log.info("I've become ProActive")
+            unstashAll
+        
+        case WatchDogNotification(hookedActor: ActorRef) =>
             
-                }
-            }
+            log.info("Resending new Topology to {}", hookedActor.path)
             
+            publisher() ! (
+                hookedActor.path.elements.mkString("/"),
+                AriadneMessage(
+                    Topology, ViewedFromACell, masterToCell,
+                    AreaViewedFromACell(
+                        mapVersionID,
+                        topology.map(e => RoomViewedFromACell(e._2)).toList
+                    )
+                )
+            )
+        
         case _ => stash
     }
     
     private def proactive: Receive = {
     
-        case AriadneMessage(Topology, Planimetrics, _, map: Area) =>
-    
-            log.error("A topology has already been loaded in the server...")
-    
-            if (map.id != mapVersionID) {
-    
-                admin() ! AriadneMessage(
-                    Error,
-                    Error.Subtype.MapIdentifierMismatch,
-                    masterToAdmin,
-                    Empty()
-                )
-            }
-
+        case AriadneMessage(Topology, Planimetrics, _, map: Area) => unexpectedPlanimetry(map)
+        
         case AriadneMessage(Update, CurrentPeople, `cellToMaster`, pkg: CurrentPeopleUpdate) =>
     
             if (topology.get(pkg.room.name).nonEmpty) {
@@ -177,16 +171,18 @@ class TopologySupervisor extends BasicActor {
                 topology.put(pkg.room.name,
                     oldRoom.copy(
                         currentPeople = pkg.currentPeople,
-                        practicability = Practicability(oldRoom.info.capacity, pkg.currentPeople, oldRoom.passages.length)
+                        practicability = Practicability(
+                            oldRoom.info.capacity, pkg.currentPeople, oldRoom.passages.length
+                        )
                     )
                 )
                 
                 // Send the updated Map to the Admin
                 dataStreamer ! topology.values
             }
-
-        case AriadneMessage(Update, Sensors, `cellToMaster`, pkg: SensorsInfoUpdate) =>
     
+        case AriadneMessage(Update, Sensors, `cellToMaster`, pkg: SensorsInfoUpdate) =>
+        
             if (topology.get(pkg.cell.uri).nonEmpty) {
                 val newCell = topology(pkg.cell.uri).cell.copy(sensors = pkg.sensors)
                 val newRoom = topology(pkg.cell.uri).copy(cell = newCell)
@@ -195,11 +191,14 @@ class TopologySupervisor extends BasicActor {
                 // Send the updated Map to the Admin
                 dataStreamer ! topology.values
             }
-
-        case AriadneMessage(Handshake, CellToMaster, `cellToMaster`, _) =>
+    
+        case AriadneMessage(Handshake, CellToMaster, `cellToMaster`, SensorsInfoUpdate(cell, _)) =>
             log.info("Late handshake from {}...", sender.path)
-            log.info(sender.path.name)
-
+        
+            context.unbecome()
+        
+            watchDogSupervisor forward cell
+    
             publisher() ! (
                 sender.path.elements.mkString("/"),
                 AriadneMessage(
@@ -209,7 +208,23 @@ class TopologySupervisor extends BasicActor {
                         topology.map(e => RoomViewedFromACell(e._2)).toList)
                 )
             )
-            
+        
+            watchDogSupervisor ! "Start"
+        
         case _ => desist _
+    }
+    
+    
+    private def unexpectedPlanimetry(map: Area): Unit = {
+        log.error("A topology has already been loaded in the server...")
+        if (map.id != mapVersionID) {
+            
+            admin() ! AriadneMessage(
+                Error,
+                Error.Subtype.MapIdentifierMismatch,
+                masterToAdmin,
+                Empty()
+            )
+        }
     }
 }

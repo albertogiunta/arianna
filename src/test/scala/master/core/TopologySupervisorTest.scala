@@ -7,6 +7,7 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit, TestProbe}
 import com.actors.CustomActor
 import com.utils.Practicability
+import ontologies.messages.Location.PreMade.masterToAdmin
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, ViewedFromACell}
 import ontologies.messages.MessageType.{Error, Handshake, Init, Topology, Update}
@@ -36,6 +37,13 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
         Topology.Subtype.Planimetrics,
         Location.Admin >> Location.Master,
         Planimetrics.unmarshal(plan)
+    )
+    
+    val ackTop = AriadneMessage(
+        Topology,
+        Topology.Subtype.Acknowledgement,
+        Location.Cell >> Location.Master,
+        cellInfo
     )
     
     val topologyViewedFromACell = AriadneMessage(
@@ -110,21 +118,31 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
                 probe.expectMsg(handshake)
                 assert(probe.sender == tester.underlyingActor.admin)
             }
-            
-            "once all the expected handshakes have been mapped, should notify the subscriber, sending the Topology and becoming proactive" in {
+    
+            "once all the expected handshakes have been mapped, should notify the subscriber, " +
+                "sending the Topology and becoming acknowledging" in {
                 probe.expectMsg(topologyViewedFromACell)
                 assert(probe.sender == tester.underlyingActor.subscriber)
             }
         }
+    
+        "When Acknowledging " must {
         
+            "Accept Topology Acknowledgement by single Cells" in {
+                tester ! ackTop
+            
+            }
+        
+            "Accept Timeout Messages from it's watchdog Manager" in {
+                // Internal Behaviour
+            }
+        
+            "Accept final Acknowledgement from the WatchDogSupervisor and become proactive " in {
+                //Internal Behaviour
+            }
+        }
         
         "When proactive" must {
-            
-            "accept late handshakes" in {
-                tester ! handshake
-                probe.expectMsg(topologyViewedFromACell)
-                assert(probe.sender == tester.underlyingActor.publisher)
-            }
             
             "accept new sensors values" in {
     
@@ -167,6 +185,27 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
                 tester ! currentPeopleUpdate
     
                 probe.expectMsg(AdminUpdate(0, topology.values.map(c => RoomDataUpdate(c)).toList))
+            }
+    
+            "accept late handshakes, temporary becoming acknoledging" in {
+                tester ! handshake
+                probe.expectMsg(topologyViewedFromACell)
+                assert(probe.sender == tester.underlyingActor.publisher)
+            }
+    
+            "return proactive after a late handshake" in {
+                tester ! Topology.Subtype.Acknowledgement
+        
+                tester ! planimetric
+        
+                probe.expectMsg(AriadneMessage(
+                    Error,
+                    Error.Subtype.MapIdentifierMismatch,
+                    masterToAdmin,
+                    Empty()
+                ))
+        
+                assert(probe.sender == tester.underlyingActor.admin)
             }
         }
     }

@@ -54,7 +54,7 @@ class CellPublisher(mediator: ActorRef) extends BasicPublisher(mediator) {
             log.info("Sending Handshake to Master...")
         }
         case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, _, cnt) =>
-            this.watchDog.notofyEventHappened
+            this.watchDog.notifyEventHappened
             this.context.become(cultured, discardOld = true)
             log.info("I've become cultured")
         case WatchDogNotification => {
@@ -74,16 +74,14 @@ class CellPublisher(mediator: ActorRef) extends BasicPublisher(mediator) {
     private def cultured: Receive = {
         case msg@AriadneMessage(Alarm, _, _, _) =>
             mediator ! Publish(Topic.Alarms, msg)
-
         case msg@AriadneMessage(Update, Update.Subtype.Sensors, _, _) =>
             mediator ! Publish(Topic.Updates, msg)
-
         case msg@AriadneMessage(Update, Update.Subtype.Practicability, _, _) =>
             mediator ! Publish(Topic.Practicabilities, msg)
-
         case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, _, _) =>
             mediator ! Publish(Topic.Updates, msg)
-
+        case msg@AriadneMessage(Topology, Topology.Subtype.Acknowledgement, _, _) =>
+            mediator ! Publish(Topic.TopologyACK, msg)
         case _ => // Ignore
     }
 }
