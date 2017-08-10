@@ -13,7 +13,7 @@ trait WatchDog {
       * Notify to the watch dog that the expected
       * event occurred
       **/
-    def notofyEventOccured: Unit
+    def notifyEventOccurred: Unit
 }
 
 object WatchDog {
@@ -42,7 +42,7 @@ class BasicWatchDog(actorToNotifyTimeOut: ActorRef, waitTime: Long = WatchDog.wa
         if (!eventOccurred) actorToNotifyTimeOut ! WatchDogNotification
     }
     
-    override def notofyEventOccured: Unit = eventOccurred = true
+    override def notifyEventOccurred: Unit = eventOccurred = true
 }
 
 /**
@@ -63,5 +63,5 @@ class CellWatchDog(actorToNotifyTimeOut: ActorRef,
         if (!eventOccurred) actorToNotifyTimeOut ! WatchDogNotification(hookedCell)
     }
     
-    override def notofyEventOccured: Unit = eventOccurred = true
+    override def notifyEventOccurred: Unit = eventOccurred = true
 }
