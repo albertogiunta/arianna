@@ -54,7 +54,7 @@ class CellPublisher(mediator: ActorRef) extends BasicPublisher(mediator) {
             log.info("Sending Handshake to Master...")
         }
         case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, _, cnt) =>
-            this.watchDog.notofyEventHappened
+            this.watchDog.notofyEventOccured
             this.context.become(cultured, discardOld = true)
             log.info("I've become cultured")
         case WatchDogNotification => {
