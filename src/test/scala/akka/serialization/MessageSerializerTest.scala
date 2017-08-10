@@ -23,7 +23,7 @@ class MessageSerializerTest extends FunSuite with BeforeAndAfter {
     
     val toJsonObj: (MessageSubtype, String) => MessageContent = (sub, cnt) => sub.unmarshal(cnt)
     
-    implicit val serializer = new AriadneMessageSerializer
+    implicit val serializer: AriadneMessageSerializer = new AriadneMessageSerializer
     
     val messageForTest = AriadneMessage(
         Update,
@@ -42,7 +42,7 @@ class MessageSerializerTest extends FunSuite with BeforeAndAfter {
     test("Testing Serialization Utility...") {
         
         val serial: Array[Byte] = MessageSerializer.serialize(messageForTest)
-        val deserial: Message[MessageContent] = MessageSerializer.deserialize(serial)
+        val deserial: Message[MessageType, MessageSubtype, MessageContent] = MessageSerializer.deserialize(serial)
         
         assert(deserial == messageForTest)
     }
@@ -59,7 +59,7 @@ class MessageSerializerTest extends FunSuite with BeforeAndAfter {
     test("Testing cross-binaries Serialization...") {
         
         val serial: Array[Byte] = MessageSerializer.serialize(messageForTest)
-        val deserial: Message[MessageContent] = MessageSerializer.deserialize(serial)
+        val deserial: Message[MessageType, MessageSubtype, MessageContent] = MessageSerializer.deserialize(serial)
         
         val serializedMessage: Array[Byte] = serializer.toBinary(messageForTest)
         val deserializedMessage: AnyRef = serializer.fromBinary(serializedMessage, serializer.manifest(messageForTest))

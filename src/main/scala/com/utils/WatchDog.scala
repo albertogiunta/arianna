@@ -55,6 +55,7 @@ class BasicWatchDog(actorToNotifyTimeOut: ActorRef, waitTime: Long = WatchDog.wa
 class CellWatchDog(actorToNotifyTimeOut: ActorRef,
                    hookedCell: String,
                    waitTime: Long = WatchDog.waitTime) extends Thread with WatchDog {
+    
     var eventOccurred: Boolean = false
     
     override def run(): Unit = {
