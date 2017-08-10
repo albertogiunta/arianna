@@ -24,6 +24,7 @@ abstract class ClusterMembersListener extends CustomActor {
 
     override def preStart = {
         cluster.subscribe(self, classOf[MemberUp], classOf[MemberEvent])
+        log.info("I'm born")
     }
     
     override def postStop: Unit = cluster unsubscribe self
