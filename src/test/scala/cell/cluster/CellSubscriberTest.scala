@@ -13,6 +13,7 @@ import ontologies.messages.{AriadneMessage, _}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import system.names.NamingSystem
 
+
 /**
   * Created by Matteo Gabellini on 08/08/2017.
   */
@@ -121,6 +122,11 @@ class TestPublisher(proxy: ActorRef) extends CustomActor {
 class TestMediator(proxy: ActorRef) extends CustomActor {
 
     override def receive: Receive = {
-        case msg => proxy forward "Mediator got " + msg
+        case msg => {
+            proxy forward "Mediator got " + msg
+            println("Mediator got " + msg)
+        }
     }
 }
+
+

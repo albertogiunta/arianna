@@ -13,7 +13,7 @@ object SensorsFactory {
       * The set of the default values of some sensor parameters
       **/
     object DefaultValues {
-        val refreshRate = 2500
+        val simulationRefreshRate = 1000
         val startValue = 0
         val humiditySensorStartValue = 40
 
@@ -123,32 +123,32 @@ object SensorsFactory {
                 sensorInfo.minValue,
                 sensorInfo.maxValue,
                 threshold.lowThreshold,
-                threshold.highThreshold, DefaultValues.refreshRate)
+                threshold.highThreshold, DefaultValues.simulationRefreshRate)
         case Smoke =>
             val threshold = sensorInfo.threshold.asInstanceOf[SingleThresholdInfo]
             Simulated.createSmokeSensor(
                 sensorInfo.minValue,
                 sensorInfo.maxValue,
-                threshold.value, DefaultValues.refreshRate)
+                threshold.value, DefaultValues.simulationRefreshRate)
         case Oxygen =>
             val threshold = sensorInfo.threshold.asInstanceOf[SingleThresholdInfo]
             Simulated.createOxygenSensor(
                 sensorInfo.minValue,
                 sensorInfo.maxValue,
-                threshold.value, DefaultValues.refreshRate)
+                threshold.value, DefaultValues.simulationRefreshRate)
         case CO2 =>
             val threshold = sensorInfo.threshold.asInstanceOf[SingleThresholdInfo]
             Simulated.createCO2Sensor(
                 sensorInfo.minValue,
                 sensorInfo.maxValue,
-                threshold.value, DefaultValues.refreshRate)
+                threshold.value, DefaultValues.simulationRefreshRate)
         case Humidity =>
             val threshold = sensorInfo.threshold.asInstanceOf[DoubleThresholdInfo]
             Simulated.createHumiditySensor(
                 sensorInfo.minValue,
                 sensorInfo.maxValue,
                 threshold.lowThreshold,
-                threshold.highThreshold, DefaultValues.refreshRate)
+                threshold.highThreshold, DefaultValues.simulationRefreshRate)
     }
 
 }

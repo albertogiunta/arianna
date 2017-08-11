@@ -6,6 +6,7 @@ import admin.controller.InterfaceController
 import admin.view.InterfaceView
 import akka.actor.{ActorRef, PoisonPill, Props}
 import com.actors.BasicActor
+import com.utils.Counter
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.{Alarm, Error, Handshake, Init, Interface, Topology}
 import ontologies.messages._
@@ -24,6 +25,8 @@ class InterfaceManager extends BasicActor {
     private var interfaceController: InterfaceController = _
     private val chartActors: mutable.Map[RoomID, ActorRef] = new mutable.HashMap[RoomID, ActorRef]
     private var roomIDs: mutable.Map[CellInfo, RoomID] = new mutable.HashMap[CellInfo, RoomID]
+    val counter: Counter = new Counter(0)
+
 
 
     override def init(args: List[Any]): Unit = {
@@ -47,10 +50,21 @@ class InterfaceManager extends BasicActor {
         case msg@AriadneMessage(_, Topology.Subtype.Planimetrics, _, area: Area) => {
             area.rooms.foreach(r => roomIDs += ((r.cell.info, r.info.id)))
             parent ! msg
-            context.become(operational)
+            context.become(initializer)
         }
 
         case _ => desist _
+
+    }
+
+    def initializer(): Receive = {
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => {
+            counter.++
+            interfaceController.initializeSensors(sensorsInfo, roomIDs.get(sensorsInfo.cell).get)
+            if (counter == roomIDs.size) {
+                context.become(operational)
+            }
+        }
 
     }
 
@@ -67,7 +81,6 @@ class InterfaceManager extends BasicActor {
 
         case msg@AriadneMessage(_, Alarm.Subtype.FromCell, _, content: AlarmContent) => interfaceController triggerAlarm content
 
-        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => interfaceController.initializeSensors(sensorsInfo, roomIDs.get(sensorsInfo.cell).get)
 
         case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
             var chartActor = context.actorOf(Props[ChartManager], NamingSystem.ChartManager + chartActors.size.toString)

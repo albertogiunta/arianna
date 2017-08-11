@@ -26,6 +26,7 @@ class CO2SensorTest extends FlatSpec with Matchers {
         cSensor.category should be(SensorCategories.CO2)
     }
 
+
     "A CO2 Sensor" should "measure the carbon dioxide value" in {
         cSensor.gasMeasured should be(Gas.carbonDioxide)
     }
@@ -45,6 +46,7 @@ class CO2SensorTest extends FlatSpec with Matchers {
     "A CO2 Sensor" should "have the same threshold assigned in the creation" in {
         cSensor.threshold should be(cThreshold)
     }
+
 
     val refreshRate = 1000
     val changeStep = 0.15
