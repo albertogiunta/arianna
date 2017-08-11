@@ -9,19 +9,18 @@ import ontologies.sensor.SensorCategories._
   * Created by Matteo Gabellini on 24/07/2017.
   */
 object SensorsFactory {
-
     /**
       * The set of the default values of some sensor parameters
       **/
     object DefaultValues {
-        val refreshRate = 1000
+        val refreshRate = 2500
         val startValue = 0
         val humiditySensorStartValue = 40
 
         object ChangeStep {
             val temperature = 0.1
             val gas = 0.1
-            val humidity = 1
+            val humidity = 0.5
         }
 
     }

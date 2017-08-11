@@ -14,8 +14,6 @@ import akka.cluster.{Cluster, Member, MemberStatus}
   */
 abstract class ClusterMembersListener extends CustomActor {
 
-    //    protected val greetings: String = "Hello there, it's time to dress-up"
-
     protected val cluster = Cluster(context.system)
     
     //    protected val mediator: ActorRef = DistributedPubSub(context.system).mediator

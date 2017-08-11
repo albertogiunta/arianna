@@ -16,7 +16,10 @@ import ontologies.messages._
   */
 class CellPublisher(mediator: ActorRef) extends BasicPublisher(mediator) {
 
-    private val self2Self: MessageDirection = Location.Self >> Location.Self
+    private val selfToSelf: MessageDirection = Location.Self >> Location.Self
+    private val cellToCluster: MessageDirection = Location.Cell >> Location.Cluster
+    private val cellToCell: MessageDirection = Location.Cell >> Location.Cell
+    private val cellToMaster: MessageDirection = Location.Cell >> Location.Master
 
     private var watchDog: BasicWatchDog = _
 
@@ -30,14 +33,14 @@ class CellPublisher(mediator: ActorRef) extends BasicPublisher(mediator) {
         parent ! AriadneMessage(
             Info,
             Info.Subtype.Request,
-            self2Self,
+            selfToSelf,
             SensorsInfoUpdate.empty
         )
 
     }
 
     override protected def receptive = {
-        case msg@AriadneMessage(Info, Info.Subtype.Response, this.self2Self, sensorsInfoUpdate: SensorsInfoUpdate) => {
+        case msg@AriadneMessage(Info, Info.Subtype.Response, this.selfToSelf, sensorsInfoUpdate: SensorsInfoUpdate) => {
             println("Sensor Info " + sensorsInfoUpdate)
             //Thread.sleep(1000)
             val handshakeMsg = AriadneMessage(
@@ -63,7 +66,7 @@ class CellPublisher(mediator: ActorRef) extends BasicPublisher(mediator) {
             parent ! AriadneMessage(
                 Info,
                 Info.Subtype.Request,
-                self2Self,
+                selfToSelf,
                 SensorsInfoUpdate.empty
             )
         }
@@ -73,15 +76,15 @@ class CellPublisher(mediator: ActorRef) extends BasicPublisher(mediator) {
 
     private def cultured: Receive = {
         case msg@AriadneMessage(Alarm, _, _, _) =>
-            mediator ! Publish(Topic.Alarms, msg)
+            mediator ! Publish(Topic.Alarms, msg.copy(direction = cellToCluster))
         case msg@AriadneMessage(Update, Update.Subtype.Sensors, _, _) =>
-            mediator ! Publish(Topic.Updates, msg)
+            mediator ! Publish(Topic.Updates, msg.copy(direction = cellToMaster))
         case msg@AriadneMessage(Update, Update.Subtype.Practicability, _, _) =>
-            mediator ! Publish(Topic.Practicabilities, msg)
+            mediator ! Publish(Topic.Practicabilities, msg.copy(direction = cellToCell))
         case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, _, _) =>
-            mediator ! Publish(Topic.Updates, msg)
+            mediator ! Publish(Topic.Updates, msg.copy(direction = cellToMaster))
         case msg@AriadneMessage(Topology, Topology.Subtype.Acknowledgement, _, _) =>
-            mediator ! Publish(Topic.TopologyACK, msg)
+            mediator ! Publish(Topic.TopologyACK, msg.copy(direction = cellToMaster))
         case _ => // Ignore
     }
 }

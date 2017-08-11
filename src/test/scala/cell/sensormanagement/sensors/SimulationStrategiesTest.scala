@@ -12,7 +12,7 @@ import org.scalatest.{FlatSpec, Matchers}
 class SimulationStrategiesTest extends FlatSpec with Matchers {
 
 
-    val refreshTime = 1000
+    val refreshTime = 2000
     val doubleChangeStep = 1.0
     val minDoubleValue = 0.0
     val maxDoubleValue = 5.0

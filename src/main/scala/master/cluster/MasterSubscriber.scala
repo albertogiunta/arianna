@@ -63,7 +63,7 @@ class MasterSubscriber(mediator: ActorRef) extends BasicSubscriber(mediator) {
     
     def proactive: Receive = {
     
-        case msg@AriadneMessage(Update, _, _, _) =>
+        case msg@AriadneMessage(Update, _, `cellToMaster`, _) =>
             log.info("Forwarding message {} from {} to TopologySupervisor", msg.subtype, sender.path)
             topologySupervisor() forward msg
 
