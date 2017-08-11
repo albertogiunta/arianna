@@ -31,7 +31,7 @@ class DataStreamer(private val target: ActorSelection,
     private val stream = Flow[Iterable[Room]]
         .map(map => AdminUpdate(0, map.map(c => RoomDataUpdate(c)).toList))
         .map(updates => AriadneMessage(Update, Subtype.Admin, Location.Master >> Location.Admin, updates))
-        .throttle(1, 1000 milliseconds, 1, ThrottleMode.Shaping)
+        .throttle(1, 5000 milliseconds, 1, ThrottleMode.Shaping)
         .to(Sink.foreach(msg => handler(msg, target)))
     
     override def preStart = {

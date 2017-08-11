@@ -5,35 +5,25 @@ package com.utils
   */
 case class Counter(private val start: Int) {
     
-    private var value = start
+    private var value: IncrementalInteger = start
     
-    def ++ : Int = {
-        value += 1
-        this.get
-    }
+    import IncrementalInteger._
     
-    def ++(step: Int): Int = {
-        value += step
-        this.get
-    }
+    def ++ : Int = value ++
     
-    def -- : Int = {
-        value -= 1;
-        this.get
-    }
+    def ++(step: Int): Int = value += step
     
-    def --(step: Int): Int = {
-        value -= step
-        this.get
-    }
+    def -- : Int = value --
     
-    def ++==(that: Int): Boolean = (this ++) == that
+    def --(step: Int): Int = value -= step
     
-    def --==(that: Int): Boolean = (this --) == that
+    def ++==(that: Int): Boolean = (value ++) == that
+    
+    def --==(that: Int): Boolean = (value --) == that
     
     def get: Int = value
     
-    override def equals(obj: scala.Any) = obj match {
+    override def equals(obj: scala.Any): Boolean = obj match {
         case that: Int => that == this.get
         case that: Counter => that.get == this.get
         case _ => false
