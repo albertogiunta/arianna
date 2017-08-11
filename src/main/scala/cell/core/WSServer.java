@@ -13,6 +13,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.http.ServerWebSocket;
 import ontologies.messages.RouteRequestShort;
 import ontologies.messages.RouteResponse;
+import scala.tools.jline_embedded.internal.Log;
 
 /**
  * A Vertx implementation of several websockets needed to communicate with the end user and keep a
@@ -49,10 +50,10 @@ public class WSServer extends AbstractVerticle {
     @Override
     public void start() throws Exception {
         vertx.createHttpServer().websocketHandler(ws -> {
-            System.out.println("[SERVER " + baseUrl + "] PATH " + ws.path() + " " + ws.uri() + " " + ws.query());
+            Log.info("[SERVER " + baseUrl + "] PATH " + ws.path() + " " + ws.uri() + " " + ws.query());
             if (ws.path().equals(baseUrl + "/connect")) {
                 ws.handler(data -> {
-                    System.out.println("[SERVER " + baseUrl + "] GOT NEW USER | " + data.toString());
+                    Log.info("[SERVER " + baseUrl + "] GOT NEW USER | " + data.toString());
                     if (data.toString().equalsIgnoreCase(MSGTAkkaVertx.NORMAL_CONNECTION())) {
                         this.usersWaitingForConnectionOk.put(ws.textHandlerID(), ws);
                     } else if (data.toString().equalsIgnoreCase(MSGTAkkaVertx.FIRST_CONNECTION())) {
@@ -64,7 +65,7 @@ public class WSServer extends AbstractVerticle {
                 });
             } else if (ws.path().equals(baseUrl + "/route")) {
                 ws.handler(data -> {
-                    System.out.println("asked route " + data.toString());
+                    Log.info("asked route " + data.toString());
                     String               uriStart = data.toString().split("-")[0];
                     String               uriEnd   = data.toString().split("-")[1];
                     Pair<String, String> p        = new Pair<>(uriStart, uriEnd);
@@ -91,10 +92,8 @@ public class WSServer extends AbstractVerticle {
      * @param ack the ack message
      */
     public void sendOkToNewUser(String ack) {
-        System.out.println("[N USERS OK] " + usersWaitingForConnectionOk.size());
         usersWaitingForConnectionOk.values().forEach(ws -> ws.writeTextMessage(ack));
         usersWaitingForConnectionOk.clear();
-        System.out.println("[N USERS OK] " + usersWaitingForConnectionOk.size());
     }
 
     /**
@@ -103,10 +102,8 @@ public class WSServer extends AbstractVerticle {
      * @param area the marshaled version of the area
      */
     public void sendAreaToNewUser(String area) {
-        System.out.println("[N USERS AREA] " + usersWaitingForArea.size());
         usersWaitingForArea.values().forEach(ws -> ws.writeTextMessage(area));
         usersWaitingForArea.clear();
-        System.out.println("[N USERS AREA] " + usersWaitingForArea.size());
     }
 
     /**
@@ -117,7 +114,7 @@ public class WSServer extends AbstractVerticle {
             usersWaitingForConnectionOk.remove(id);
             usersWaitingForArea.remove(id);
             usersReadyForAlarm.remove(id);
-            // todo remove from userswaitingforroute
+            // remove from userswaitingforroute
         });
         this.usersWaitingForDisconnection.clear();
     }
@@ -137,7 +134,7 @@ public class WSServer extends AbstractVerticle {
      */
     public void sendRouteToUsers(RouteResponse route, String routeAsJson) {
         Pair<String, String> p = new Pair<>("uri"+route.request().fromCell().serial(), "uri"+route.request().toCell().serial());
-        this.usersWaitingForRoute.get(p).forEach(u -> u.snd.writeTextMessage(routeAsJson));
+        this.usersWaitingForRoute.getOrDefault(p, new LinkedList<>()).forEach(u -> u.snd.writeTextMessage(routeAsJson));
         this.usersWaitingForRoute.remove(p);
     }
 }

@@ -28,6 +28,7 @@ object Port {
     }
 }
 
+
 class UserManager extends BasicActor with ActorLogging {
 
     var uri: String = _
@@ -59,49 +60,53 @@ class UserManager extends BasicActor with ActorLogging {
     }
 
     override protected def receptive: Receive = {
-        case msg@AriadneMessage(Topology, ViewedFromACell, _, area: AreaViewedFromACell) =>
+        case AriadneMessage(Topology, ViewedFromACell, _, area: AreaViewedFromACell) =>
             areaForCell = area
             areaForUser = AreaViewedFromAUser(area)
             context.become(receptiveForMobile)
     }
 
     protected def receptiveForMobile: Receive = {
-        case MSGTAkkaVertx.NORMAL_CONNECTION =>
-            println("[ACTOR] GOT NEW USER")
-            s.sendOkToNewUser(MSGTAkkaVertx.NORMAL_CONNECTION_RESPONSE)
-            usrNumber += 1
-            sendCurrentPeopleUpdate()
         case MSGTAkkaVertx.FIRST_CONNECTION =>
-            println("[ACTOR] GOT NEW FIRST USER")
-            println(s"Area received from the Cell Core")
+            log.info("GOT NEW FIRST USER")
             s.sendAreaToNewUser(areaForUser.toJson.toString())
-            usrNumber += 1
+            incrementUsrNumber()
+            sendCurrentPeopleUpdate()
+        case MSGTAkkaVertx.NORMAL_CONNECTION =>
+            log.info("GOT NEW NORMAL USER")
+            s.sendOkToNewUser(MSGTAkkaVertx.NORMAL_CONNECTION_RESPONSE)
+            incrementUsrNumber()
             sendCurrentPeopleUpdate()
         case MSGTAkkaVertx.DISCONNECT =>
-            println("[ACTOR] USER DISCONNECTING")
+            log.info("USER DISCONNECTING")
             s.disconnectUsers()
-            usrNumber -= 1
+            decrementUsrNumber()
             sendCurrentPeopleUpdate()
         case msg: RouteRequestShort =>
             // use for test
-            Thread.sleep(1500)
-            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest("", areaForCell.rooms.head.info.id, areaForCell.rooms.tail.head.info.id, isEscape = true), areaForCell.rooms.map(c => c.info.id)))
-            Thread.sleep(1500)
-            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest("", getCellWithId(msg.fromCellUri), getCellWithId(msg.toCellUri), isEscape = false), areaForCell.rooms.map(c => c.info.id)))
-        // use in production
-        //            parent ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell, RouteRequest(msg.userID, getCellWithId(msg.fromCellId), getCellWithId(msg.toCellId), isEscape = false))
-        case msg@AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, _, response@RouteResponse(request, route)) =>
+            //            Thread.sleep(1500)
+            //            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest("", areaForCell.rooms.head.info.id, areaForCell.rooms.tail.head.info.id, isEscape = true), areaForCell.rooms.map(c => c.info.id)))
+            //            Thread.sleep(1500)
+            //            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest("", getCellWithUri(msg.fromCellUri), getCellWithUri(msg.toCellUri), isEscape = false), areaForCell.rooms.map(c => c.info.id)))
+            // use in production
+            parent ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell, RouteRequest(msg.userID, getCellWithUri(msg.fromCellUri), getCellWithUri(msg.toCellUri), isEscape = false))
+        case AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, _, response@RouteResponse(request, route)) =>
             request match {
                 case RouteRequest(_, _, _, false) => s.sendRouteToUsers(response, RouteResponseShort(route).toJson.toString())
                 case RouteRequest(_, _, _, true) => s.sendAlarmToUsers(RouteResponseShort(route).toJson.toString())
             }
     }
 
+    private def incrementUsrNumber() = usrNumber += 1
+
+    private def decrementUsrNumber() = usrNumber -= 1
+
     private def sendCurrentPeopleUpdate(): Unit = {
-        AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, CurrentPeopleUpdate(RoomID(serial, uri), usrNumber))
+        parent ! AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, CurrentPeopleUpdate(RoomID(serial, uri), usrNumber))
     }
 
-    private def getCellWithId(uri: String): RoomID = {
+    def getCellWithUri(uri: String): RoomID = {
         areaForCell.rooms.filter(p => p.cell.uri == uri).map(f => f.info.id).head
     }
+
 }

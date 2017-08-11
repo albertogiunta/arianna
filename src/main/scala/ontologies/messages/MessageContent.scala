@@ -318,7 +318,7 @@ final case class SensorsInfoUpdate(cell: CellInfo, sensors: List[SensorInfo]) ex
 
 object SensorsInfoUpdate {
     def apply(room: Room): SensorsInfoUpdate = new SensorsInfoUpdate(room.cell.info, room.cell.sensors)
-
+    
     def empty: SensorsInfoUpdate = apply(CellInfo.empty, List.empty[SensorInfo])
     
     implicit def CellToSensorUpdate(c: Cell): SensorsInfoUpdate = SensorsInfoUpdate(c.info, c.sensors)
