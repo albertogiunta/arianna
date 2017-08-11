@@ -43,12 +43,12 @@ class TopologySupervisor extends BasicActor {
     override def init(args: List[Any]): Unit = {
     
         super.init(args)
-    
+        log.info("Requesting map to the Admin Application...")
+        
         admin() ! AriadneMessage(
             Error, Error.Subtype.LookingForAMap,
             masterToAdmin, Empty()
         )
-        
     }
     
     override protected def receptive: Receive = {
@@ -117,8 +117,8 @@ class TopologySupervisor extends BasicActor {
                     AriadneMessage(Error, Error.Subtype.CellMappingMismatch, masterToCell, Empty())
                 )
             }
-    
-        case _ => stash
+
+        case _ => desist _
     }
     
     private def acknowledging: Receive = {
@@ -129,7 +129,7 @@ class TopologySupervisor extends BasicActor {
             watchDogSupervisor forward msg
         
         case WatchDogNotification(true) =>
-            context.become(proactive)
+            context.become(proactive, discardOld = true)
             log.info("I've become ProActive")
             unstashAll
         
@@ -143,6 +143,8 @@ class TopologySupervisor extends BasicActor {
                     AreaViewedFromACell(mapVersionID, topology.map(e => RoomViewedFromACell(e._2)).toList)
                 )
             )
+
+        case AriadneMessage(Handshake, CellToMaster, _, _) => // Ignore
         
         case _ => stash
     }
@@ -173,7 +175,8 @@ class TopologySupervisor extends BasicActor {
     
         case AriadneMessage(Handshake, CellToMaster, `cellToMaster`, SensorsInfoUpdate(cell, _)) =>
             log.info("Late handshake from {}...", sender.path)
-            context.unbecome()
+            context.become(acknowledging, discardOld = true)
+            
             watchDogSupervisor forward cell
     
             publisher() ! (

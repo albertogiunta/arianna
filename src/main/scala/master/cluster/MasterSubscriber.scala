@@ -27,6 +27,10 @@ class MasterSubscriber(mediator: ActorRef) extends BasicSubscriber(mediator) {
         
         case AriadneMessage(Handshake, CellToMaster, `cellToMaster`, _) =>
             log.info("Stashing handshake from {} for later administration...", sender.path)
+            publisher() ! (
+                sender.path.elements.mkString("/"),
+                AriadneMessage(Handshake, Acknowledgement, Location.Master >> Location.Cell, Empty())
+            )
             stash
         
         case AriadneMessage(Topology, Planimetrics, `adminToMaster`, _) =>
