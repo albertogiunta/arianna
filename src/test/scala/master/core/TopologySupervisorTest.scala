@@ -32,6 +32,8 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
     
     val plan: String = Source.fromFile(new File(path2map)).getLines.mkString
     
+    val cellInfo = CellInfo(uri = "PancoPillo", port = 8080)
+    
     val planimetric = AriadneMessage(
         Topology,
         Topology.Subtype.Planimetrics,
@@ -52,8 +54,6 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
         Location.Master >> Location.Cell,
         AreaViewedFromACell(planimetric.content)
     )
-    
-    val cellInfo = CellInfo(uri = "PancoPillo", port = 8080)
     
     val handshake = AriadneMessage(
         Handshake,
@@ -187,15 +187,15 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
                 probe.expectMsg(AdminUpdate(0, topology.values.map(c => RoomDataUpdate(c)).toList))
             }
     
-            "accept late handshakes, temporary becoming acknoledging" in {
+            "accept late handshakes, temporary becoming acknowledging" in {
                 tester ! handshake
                 probe.expectMsg(topologyViewedFromACell)
                 assert(probe.sender == tester.underlyingActor.publisher)
+                tester ! ackTop
             }
     
             "return proactive after a late handshake" in {
-                tester ! Topology.Subtype.Acknowledgement
-        
+    
                 tester ! planimetric
         
                 probe.expectMsg(AriadneMessage(

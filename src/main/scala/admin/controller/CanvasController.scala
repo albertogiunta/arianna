@@ -95,6 +95,11 @@ class CanvasController extends Initializable {
         })
     }
 
+    def cleanCanvas(): Unit = {
+        val gc = mapCanvas.getGraphicsContext2D
+        gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight())
+    }
+
     private def drawRoom(room: RoomData, color: Color): Unit = {
         val gc = mapCanvas.getGraphicsContext2D
         gc setStroke Color.BLACK

@@ -79,5 +79,5 @@ class SensorManager extends BasicActor {
 }
 
 object SensorManager {
-    val observationRefreshMillis = 5000
+    val observationRefreshMillis = 2000
 }

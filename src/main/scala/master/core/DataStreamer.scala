@@ -1,6 +1,6 @@
 package master.core
 
-import akka.actor.ActorSelection
+import akka.actor.{ActorSelection, ActorSystem}
 import akka.stream._
 import akka.stream.scaladsl.{Flow, Sink, Source, SourceQueueWithComplete}
 import com.actors.CustomActor
@@ -9,6 +9,7 @@ import ontologies.messages.MessageType.Update
 import ontologies.messages.MessageType.Update.Subtype
 import ontologies.messages._
 
+import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration._
 
 /**
@@ -20,8 +21,8 @@ class DataStreamer(private val target: ActorSelection,
                    private val handler: (AriadneMessage[_], ActorSelection) => Unit = (msg, dest) => dest ! msg)
     extends CustomActor {
     
-    implicit private val system = context.system
-    implicit private val executionContext = system.dispatcher
+    implicit private val system: ActorSystem = context.system
+    implicit private val executionContext: ExecutionContextExecutor = system.dispatcher
     implicit private val materializer: ActorMaterializer = ActorMaterializer.create(system)
     
     private var streamer: SourceQueueWithComplete[Iterable[Room]] = _
@@ -31,15 +32,15 @@ class DataStreamer(private val target: ActorSelection,
     private val stream = Flow[Iterable[Room]]
         .map(map => AdminUpdate(0, map.map(c => RoomDataUpdate(c)).toList))
         .map(updates => AriadneMessage(Update, Subtype.Admin, Location.Master >> Location.Admin, updates))
-        .throttle(1, 1000 milliseconds, 1, ThrottleMode.Shaping)
+        .throttle(1, 5000 milliseconds, 1, ThrottleMode.Shaping)
         .to(Sink.foreach(msg => handler(msg, target)))
     
-    override def preStart = {
+    override def preStart: Unit = {
         streamer = stream.async.runWith(source)
         super.preStart
     }
     
-    override def postStop = {
+    override def postStop: Unit = {
         streamer.complete()
         super.postStop
     }

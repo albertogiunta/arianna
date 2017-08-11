@@ -2,17 +2,18 @@ package cell.sensormanagement
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{EventFilter, ImplicitSender, TestKit, TestProbe}
+import cell.sensormanagement.sensors.SensorsFactory
 import com.actors.CustomActor
 import com.typesafe.config.ConfigFactory
 import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType._
 import ontologies.messages._
+import ontologies.sensor.SensorCategories
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import spray.json._
 
 import scala.concurrent.duration._
-import scala.io.Source
 
 /**
   * Created by Matteo Gabellini on 05/08/2017.
@@ -25,9 +26,19 @@ class SensorManagerTest extends TestKit(ActorSystem("SensorManagerTest",
     with BeforeAndAfterAll {
 
     val actorName = "SensorManager"
-    val configPath: String = "res/json/cell/cell4Test.json"
-    val config = Source.fromFile(configPath).getLines.mkString
-    var loadedConfig: CellConfig = config.parseJson.convertTo[CellConfig]
+    val tempSensConfig = SensorInfoFromConfig(
+        SensorCategories.Temperature.id,
+        -10,
+        10,
+        DoubleThresholdInfo(-1, 1))
+    val smokeSensConfig = SensorInfoFromConfig(
+        SensorCategories.Smoke.id,
+        0,
+        50,
+        SingleThresholdInfo(30))
+    var loadedConfig: CellConfig = CellConfig(
+        CellInfo("uriTest", 8080),
+        List(tempSensConfig, smokeSensConfig))
     val sensorsNumber = loadedConfig.sensors.size
 
     val testSensorInfoMsg: SensorInfo = new SensorInfo(1, 0.5)
@@ -72,11 +83,17 @@ class SensorManagerTest extends TestKit(ActorSystem("SensorManagerTest",
             proxy.ignoreMsg {
                 case msg: String => msg != "Alarm Received"
             }
-            proxy.expectMsg(15 seconds, "Alarm Received")
+            val valuesBeforeAlarm = tempSensConfig.threshold.asInstanceOf[DoubleThresholdInfo].highThreshold /
+                SensorsFactory.DefaultValues.ChangeStep.temperature
+
+            val timeForAlarm = SensorsFactory.DefaultValues.simulationRefreshRate * valuesBeforeAlarm
+            proxy.expectMsg((timeForAlarm + 1) seconds, "Alarm Received")
 
             system.stop(proxy.ref)
             system.stop(parent)
         }
+
+
     }
 }
 
