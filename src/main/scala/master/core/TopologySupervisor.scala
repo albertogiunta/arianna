@@ -201,6 +201,10 @@ class TopologySupervisor extends BasicActor {
                 masterToAdmin,
                 Empty()
             )
+        } else {
+            topology.valuesIterator.foreach(room =>
+                admin() ! AriadneMessage(Handshake, CellToMaster, cellToMaster, SensorsInfoUpdate(room))
+            )
         }
     }
 }
