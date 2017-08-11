@@ -29,9 +29,11 @@ class ChartManager extends CustomActor {
                 windowController initializeWindow cell.cell
                 windowController initializeCharts cell.sensorsId
             })
-
+            context.become(operational)
         }
+    }
 
+    def operational: Receive = {
         case msg@AriadneMessage(Interface, Interface.Subtype.UpdateChart, _, update: RoomDataUpdate) => {
             Platform.runLater(() => {
                 windowController updateCharts update

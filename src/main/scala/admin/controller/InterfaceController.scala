@@ -148,10 +148,12 @@ class InterfaceController extends Initializable {
     private def parseFile(file: File): Unit = {
         val source = Source.fromFile(file).getLines.mkString
         val area = Topology.Subtype.Planimetrics.unmarshal(source)
-        interfaceActor ! AriadneMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, Location.Admin >> Location.Self, area)
-        loadCanvas
-        createCells(area.rooms)
-        fileName setText file.getName
+        Platform.runLater(() => {
+            loadCanvas
+            createCells(area.rooms)
+            fileName setText file.getName
+            interfaceActor ! AriadneMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, Location.Admin >> Location.Self, area)
+        })
     }
 
     private def loadCanvas(): Unit = {
@@ -163,12 +165,10 @@ class InterfaceController extends Initializable {
 
     private def createCells(initialConfiguration: List[Room]): Unit = {
         initialConfiguration.foreach(cell => {
-            Platform.runLater(() => {
                 var node = createCellTemplate(cell)
                 vBoxPane.getChildren add node
                 canvasController drawOnMap cell
             })
-        })
     }
 
     private def createCellTemplate(cell: Room): SplitPane = {
