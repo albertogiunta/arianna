@@ -1,13 +1,13 @@
 package cell.cluster
 
 import akka.actor.ActorRef
-import akka.cluster.pubsub.DistributedPubSubMediator.{Subscribe, SubscribeAck}
 import com.actors.{BasicSubscriber, ClusterMembersListener}
 import ontologies._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType._
 import ontologies.messages.{AriadneMessage, Location, MessageDirection}
 import system.exceptions.IncorrectInitMessageException
+import system.names.NamingSystem
 
 /**
   * An actor that models a Cell receiver for the Cells-MasterServer
@@ -37,11 +37,13 @@ class CellSubscriber(mediator: ActorRef) extends BasicSubscriber(mediator) {
     override protected def subscribed = {
         case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, _, cnt) =>
             log.info("Got ack {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
+            sibling(NamingSystem.Publisher).get ! msg
+
         case msg@AriadneMessage(Topology, Topology.Subtype.ViewedFromACell, _, cnt) =>
             log.info("I received the topology: {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
-
+    
             this.parent ! msg
-
+    
             context.become(behavior = cultured, discardOld = true)
             log.info("I've Become Cultured...")
 

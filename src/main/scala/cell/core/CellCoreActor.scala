@@ -105,6 +105,14 @@ class CellCoreActor(mediator: ActorRef) extends BasicActor {
 
         case msg@AriadneMessage(Topology, ViewedFromACell, this.server2Cell, cnt: AreaViewedFromACell) => {
             log.info(s"Area arrived from Server $cnt")
+            log.info("Sending ACK to Master for Topology...")
+    
+            cellPublisher ! AriadneMessage(
+                Topology,
+                Topology.Subtype.Acknowledgement,
+                Location.Cell >> Location.Master,
+                localCellInfo
+            )
             
             cnt.rooms.foreach(room => topology.put(room.info.id.name, room))
             cnt.rooms.foreach(room => indexByUri.put(room.cell.uri, room.info.id.name))
@@ -113,6 +121,7 @@ class CellCoreActor(mediator: ActorRef) extends BasicActor {
                 Init.Subtype.Greetings,
                 self2Self,
                 Greetings(List(localCellInfo.uri, localCellInfo.port.toString)))
+    
             userActor ! msg.copy(direction = cell2User)
 
             this.context.become(cultured, discardOld = true)
@@ -199,7 +208,7 @@ class CellCoreActor(mediator: ActorRef) extends BasicActor {
                 Route.Subtype.Info,
                 self2Self,
                 RouteInfo(
-                    RouteRequest(id, topology(localCellInfo.uri).info.id, RoomID.empty, isEscape = true),
+                    RouteRequest(id, topology(indexByUri(localCellInfo.uri)).info.id, RoomID.empty, isEscape = true),
                     AreaViewedFromACell(Random.nextInt(), area)
                 )
             )

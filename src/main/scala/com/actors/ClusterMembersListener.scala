@@ -24,15 +24,25 @@ abstract class ClusterMembersListener extends CustomActor {
 
     override def preStart = {
         cluster.subscribe(self, classOf[MemberUp], classOf[MemberEvent])
+        log.info("I'm born")
     }
     
     override def postStop: Unit = cluster unsubscribe self
 
     def receive = {
-        case state: CurrentClusterState =>
+        case state: CurrentClusterState => {
             nodes = state.members.toStream
                 .filter(m => m.status == MemberStatus.Up)
                 .map(m => m.address).toSet
+            //Check if the current node is already up
+            //in order to complete the cell initialization
+            val currentMember = state.members.toStream
+                .filter(m => m.status == MemberStatus.Up)
+                .map(m => (m.address, m))
+                .toMap.get(cluster.selfAddress)
+            if (!currentMember.isEmpty) whenMemberUp(currentMember.get)
+        }
+
 
         case MemberUp(member) =>
             //Node connected to the cluster

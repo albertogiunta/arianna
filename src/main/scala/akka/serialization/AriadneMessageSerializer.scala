@@ -13,13 +13,13 @@ class AriadneMessageSerializer extends SerializerWithStringManifest {
     
     override def manifest(obj: AnyRef): String = obj match {
         case _: AriadneMessage[MessageContent] => AriadneMessage.getClass.getName
-        case _: Message[MessageContent] => "ontologies.messages.Message$"
+        case _: Message[MessageType, MessageSubtype, MessageContent] => "ontologies.messages.Message$"
         case _ => null
     }
     
     override def toBinary(obj: AnyRef): Array[Byte] = obj match {
         case msg: AriadneMessage[MessageContent] => MessageSerializer.serialize(msg)
-        case msg: Message[MessageContent] => MessageSerializer.serialize(msg)
+        case msg: Message[MessageType, MessageSubtype, MessageContent] => MessageSerializer.serialize(msg)
         case _ => null
     }
     
@@ -37,18 +37,18 @@ class AriadneMessageSerializer extends SerializerWithStringManifest {
   * The actual implementation is statically provided by the Object companion MessageSerializer
   *
   */
-trait MessageSerializer[T] {
-    def serialize(message: Message[T]): Array[Byte]
+trait MessageSerializer[G, L, C] {
+    def serialize(message: Message[G, L, C]): Array[Byte]
     
-    def deserialize(array: Array[Byte]): Message[T]
+    def deserialize(array: Array[Byte]): Message[G, L, C]
 }
 
 /**
   * An Utility Companion Object that provides the logic to Serialize any object that implements the trait Message
   */
-object MessageSerializer extends MessageSerializer[MessageContent] {
+object MessageSerializer extends MessageSerializer[MessageType, MessageSubtype, MessageContent] {
     
-    override def serialize(message: Message[MessageContent]): Array[Byte] = {
+    override def serialize(message: Message[MessageType, MessageSubtype, MessageContent]): Array[Byte] = {
         
         val char2byte: Char => Byte = { c =>
             //println(c.toString + "=>" + c.toByte)
@@ -62,9 +62,9 @@ object MessageSerializer extends MessageSerializer[MessageContent] {
         */
         Array.concat(
             Array.fill(1) {
-                message.subtype.subtypeName.length.toByte
+                message.subtype.toString.length.toByte
             },
-            message.subtype.subtypeName.map(char2byte).toArray,
+            message.subtype.toString.map(char2byte).toArray,
             
             Array.fill(1) {
                 message.direction.iter.from.length.toByte
@@ -80,7 +80,7 @@ object MessageSerializer extends MessageSerializer[MessageContent] {
         )
     }
     
-    override def deserialize(array: Array[Byte]): Message[MessageContent] = {
+    override def deserialize(array: Array[Byte]): Message[MessageType, MessageSubtype, MessageContent] = {
         
         val retrieveBlock: (Int, Int) => Seq[Char] =
             (from, to) => {

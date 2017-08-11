@@ -43,6 +43,15 @@ class MasterSubscriberTest extends TestKit(ActorSystem("SubscriberTest", MasterS
         SensorsInfoUpdate(cellInfo, List(SensorInfo(1, 10.0)))
     )
     
+    val ackTop = AriadneMessage(
+        Topology,
+        Topology.Subtype.Acknowledgement,
+        Location.Cell >> Location.Master,
+        cellInfo
+    )
+    
+    val ackHand = AriadneMessage(Handshake, Acknowledgement, Location.Master >> Location.Cell, Empty())
+    
     val planimetric = AriadneMessage(
         Topology,
         Topology.Subtype.Planimetrics,
@@ -104,9 +113,7 @@ class MasterSubscriberTest extends TestKit(ActorSystem("SubscriberTest", MasterS
             
             tester ! planimetric
     
-            probe.expectMsg(
-                AriadneMessage(Handshake, Acknowledgement, Location.Master >> Location.Cell, Empty())
-            )
+            probe.expectMsg(ackHand)
             
             probe.expectMsg(handshake)
             
@@ -133,12 +140,29 @@ class MasterSubscriberTest extends TestKit(ActorSystem("SubscriberTest", MasterS
             
             assert(probe.sender == tester.underlyingActor.publisher)
         }
-        
-        "Forward Updates and late handshakes to the TopologySupervisor" in {
+    
+        "Forward Updates,  and ACK to the TopologySupervisor" in {
             tester ! updates
-            
+        
             probe.expectMsg(updates)
-            
+        
+            assert(probe.sender == tester.underlyingActor.supervisor)
+        }
+    
+        "Forward ACK to the TopologySupervisor" in {
+            tester ! ackTop
+        
+            probe.expectMsg(ackTop)
+        
+            assert(probe.sender == tester.underlyingActor.supervisor)
+        }
+    
+        "Forward late handshakes to the TopologySupervisor" in {
+            tester ! handshake
+        
+            probe.expectMsg(ackHand)
+            probe.expectMsg(handshake)
+    
             assert(probe.sender == tester.underlyingActor.supervisor)
         }
     }

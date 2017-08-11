@@ -13,8 +13,8 @@ import system.names.NamingSystem
   * Created by Alessandro on 28/06/2017.
   */
 class MasterPublisher(mediator: ActorRef) extends BasicPublisher(mediator) {
-
-    override protected def receptive = {
+    
+    override protected def receptive: Receive = {
     
         case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) =>
             log.info("Forwarding system shut-down... ")
@@ -35,7 +35,7 @@ class MasterPublisher(mediator: ActorRef) extends BasicPublisher(mediator) {
     
             val target = "/" + dest.replace(NamingSystem.Publisher, NamingSystem.Subscriber)
     
-            log.info("Forwarding Point to Point message {} to {}", cnt.toString, target)
+            log.info("Forwarding Point to Point message {} to {}", cnt.subtype.toString, target)
     
             mediator ! Send(target, cnt, localAffinity = false)
             

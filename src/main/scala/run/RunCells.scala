@@ -10,7 +10,6 @@ import com.typesafe.config.ConfigFactory
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Init
 import ontologies.messages.{AriadneMessage, Greetings, Location}
-import system.names.NamingSystem
 
 /**
   * Created by Alessandro on 28/06/2017.
@@ -25,19 +24,20 @@ object RunCells extends App {
 
     val system = ActorSystem("Arianna-Cluster", config)
 
-    //    (1 to 15) map {
-    //        i =>
-    //            val core = system.actorOf(Props[CellCoreActor], "CellCore" + i)
-    //            val configPath: String = "res/json/cell/cell" + i + ".json"
-    //            core ! AriadneMessage(Init, Init.Subtype.Greetings,
-    //                Location.Master >> Location.Self, Greetings(List(configPath)))
-    //    }
     val middleware = DistributedPubSub(system).mediator
+    (1 to 15) map {
+        i =>
+            val core = system.actorOf(Props(new CellCoreActor(middleware)), "CellCore" + i)
+            val configPath: String = "res/json/cell/cell" + i + ".json"
+            core ! AriadneMessage(Init, Init.Subtype.Greetings,
+                Location.Master >> Location.Self, Greetings(List(configPath)))
+    }
     
-    var core = system.actorOf(Props(new CellCoreActor(middleware)), NamingSystem.CellCore)
-    var server2Cell = Location.Master >> Location.Cell
-    Thread.sleep(500)
-    private val configPath: String = "res/json/cell/cell1.json"
-    core ! AriadneMessage(Init, Init.Subtype.Greetings,
-        Location.Master >> Location.Self, Greetings(List(configPath)))
+    
+    //    var core = system.actorOf(Props(new CellCoreActor(middleware)), NamingSystem.CellCore)
+    //    var server2Cell = Location.Master >> Location.Cell
+    //    Thread.sleep(500)
+    //    private val configPath: String = "res/json/cell/cell1.json"
+    //    core ! AriadneMessage(Init, Init.Subtype.Greetings,
+    //        Location.Master >> Location.Self, Greetings(List(configPath)))
 }
