@@ -58,7 +58,6 @@ class InterfaceController extends Initializable {
                 alarmButton setDisable false
             }
             update.foreach(update => {
-                println(update.room.toString)
                 var cellController = cellControllers.get(update.room).get
                 cellController setDynamicInformation update
             })
@@ -133,13 +132,17 @@ class InterfaceController extends Initializable {
       *
       **/
     def showErrorDialog(): Unit = {
-        val alert = new Alert(AlertType.ERROR)
-        alert setTitle "Fatal Error"
-        alert setHeaderText "Wrong Map loaded!"
-        alert setContentText "The System already has a Map, try again loading the correct map"
+        Platform.runLater(() => {
+            cleanInterface
+            val alert = new Alert(AlertType.ERROR)
+            alert setTitle "Fatal Error"
+            alert setHeaderText "Wrong Map loaded!"
+            alert setContentText "The map loaded is different from the one already loaded in the System. Close and restart the System or load the correct map"
 
-        alert.showAndWait
-        loadButton setDisable false
+            alert.showAndWait
+            loadButton setDisable false
+
+        })
     }
 
     private def parseFile(file: File): Unit = {
@@ -174,9 +177,15 @@ class InterfaceController extends Initializable {
         var controller = loader.getController[CellTemplateController]
         controller.adminActor = interfaceActor
         cellControllers += ((cell.info.id, controller))
-        Platform.runLater(() => controller setStaticInformation cell)
+        controller setStaticInformation cell
         node
     }
 
+    private def cleanInterface(): Unit = {
+        cellControllers.clear
+        vBoxPane.getChildren.clear
+        canvasController.cleanCanvas
+        fileName setText ""
+    }
 
 }

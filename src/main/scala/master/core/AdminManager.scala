@@ -1,16 +1,12 @@
 package master.core
 
-import java.io.File
-import java.nio.file.Paths
-
-import akka.actor.{ActorSelection, ActorSystem, Props}
+import akka.actor.ActorSelection
 import com.actors.CustomActor
-import com.typesafe.config.ConfigFactory
-import master.cluster.MasterPublisher
 import ontologies.messages.Location._
-import ontologies.messages.MessageType.Init.Subtype
 import ontologies.messages.MessageType.{Alarm, Error, Handshake, Init, Update}
 import ontologies.messages._
+
+import scala.collection.mutable.ListBuffer
 
 /**
   * This is the Actor inside the cluster that forwards messages to the Administrator system.
@@ -26,7 +22,8 @@ class AdminManager extends CustomActor {
 
     def operational: Receive = {
         //Ricezione di un update dal server
-        case msg@AriadneMessage(Update, Update.Subtype.Admin, _, _) => admin ! msg.copy(direction = toAdmin)
+        case msg@AriadneMessage(Update, Update.Subtype.Admin, _, content: AdminUpdate) => admin ! roundData(content)
+
         //Ricezione di un allarme dall'admin
         case msg@AriadneMessage(Alarm, Alarm.Subtype.FromInterface, fromAdmin, _) => publisher ! msg.copy(direction = fromAdmin)
         //Ricezione di un allarme da parte del sistema
@@ -37,6 +34,8 @@ class AdminManager extends CustomActor {
         case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => parent ! msg.copy(direction = fromAdmin)
 
         case msg@AriadneMessage(Error, Error.Subtype.MapIdentifierMismatch, _, _) => admin ! msg.copy(direction = toAdmin)
+
+        case msg@AriadneMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, _, area: Area) => topologySupervisor ! msg
 
     }
 
@@ -49,25 +48,20 @@ class AdminManager extends CustomActor {
         case msg@AriadneMessage(Error, Error.Subtype.LookingForAMap, _, _) => admin ! msg
 
     }
-}
 
-object ServerRun {
-    def main(args: Array[String]): Unit = {
-        val path2Project = Paths.get("").toFile.getAbsolutePath
-        val path2Config = path2Project + "/res/conf/akka/testMaster.conf"
-        //val path2Config2 = path2Project + "/res/conf/akka/application.conf"
-        val config = ConfigFactory.parseFile(new File(path2Config))
-            .withFallback(ConfigFactory.load()).resolve()
-        
-        val system = ActorSystem.create("Arianna-Cluster", config)
-    
-        val server = system.actorOf(Props[AdminManager], "AdminManager")
-        val publisher = system.actorOf(Props[MasterPublisher], "Publisher")
+    private def roundData(adminUpdate: AdminUpdate): AriadneMessage[AdminUpdate] = {
+        val roundedRoomDataUpdate: ListBuffer[RoomDataUpdate] = new ListBuffer[RoomDataUpdate]
+        adminUpdate.list.foreach(roomDataUpdate => {
+            val roundedSensorData: ListBuffer[SensorInfo] = new ListBuffer[SensorInfo]
+            roomDataUpdate.cell.sensors.foreach(sensor => roundedSensorData += SensorInfo(sensor.categoryId, round(sensor.value)))
+            roundedRoomDataUpdate += roomDataUpdate.copy(cell = ontologies.messages.Cell(roomDataUpdate.cell.info, roundedSensorData.toList))
+        })
 
-        val alarmSup = system.actorOf(Props[AlarmSupervisor], "AlarmSupervisor")
-
-        publisher ! AriadneMessage(MessageType.Init, Subtype.Greetings, Location.Self >> Location.Self, Greetings(List.empty));
+        AriadneMessage(Update, Update.Subtype.Admin, Location.Master >> Location.Admin, adminUpdate.copy(list = roundedRoomDataUpdate.toList))
 
     }
 
+    private def round(data: Double): Double = {
+        BigDecimal(data).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
+    }
 }
