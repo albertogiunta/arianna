@@ -62,9 +62,11 @@ class SensorManager extends BasicActor {
     override protected def receptive: Receive = {
         case msg: SensorInfo =>
             this.sensors.put(msg.categoryId, msg)
-            this.parent ! AriadneMessage(Update,
+            this.parent ! AriadneMessage(
+                Update,
                 Update.Subtype.Sensors,
-                internalMessage, new SensorsInfoUpdate(CellInfo.empty, this.sensors.values.toList))
+                internalMessage,
+                new SensorsInfoUpdate(CellInfo.empty, this.sensors.values.toList))
         case msg@AriadneMessage(Alarm, _, _, cnt: SensorInfo) =>
             this.parent ! msg
     }

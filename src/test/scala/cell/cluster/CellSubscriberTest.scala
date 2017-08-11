@@ -4,7 +4,6 @@ import java.io.File
 import java.nio.file.Paths
 
 import akka.actor.{ActorRef, ActorSystem, Props}
-import akka.cluster.pubsub.DistributedPubSub
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
 import com.actors.{ClusterMembersListener, CustomActor}
 import com.typesafe.config.{Config, ConfigFactory}
@@ -20,17 +19,19 @@ import system.names.NamingSystem
 class CellSubscriberTest extends TestKit(ActorSystem("CellSubscriberTest", CellSubscriberTest.config))
     with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll {
 
-    val middleware = DistributedPubSub(system).mediator
     private val actorName = NamingSystem.Subscriber
 
-    val initMsg = AriadneMessage(Init, Init.Subtype.Greetings,
-        Location.Cell >> Location.Self, Greetings(List(ClusterMembersListener.greetings)))
+    val initMsg = AriadneMessage(
+        Init,
+        Init.Subtype.Greetings,
+        Location.Cell >> Location.Self,
+        Greetings(List(ClusterMembersListener.greetings)))
 
     val handshakeMsg = AriadneMessage(
         Handshake,
         Handshake.Subtype.Acknowledgement,
         Location.Master >> Location.Cell,
-        _)
+        Empty())
 
     val topologyMsg = AriadneMessage(
         Topology,
@@ -87,6 +88,8 @@ class CellSubscriberTest extends TestKit(ActorSystem("CellSubscriberTest", CellS
             system.stop(parent)
         }
     }
+
+
 }
 
 object CellSubscriberTest {
@@ -99,11 +102,25 @@ object CellSubscriberTest {
 
 class TestParent(proxy: ActorRef) extends CustomActor {
 
-    val child = context.actorOf(Props[CellSubscriber], NamingSystem.Subscriber)
-
+    val fakeMediator = context.actorOf(Props[TestMediator], "Mediator")
+    val child = context.actorOf(Props(new CellSubscriber(fakeMediator)), NamingSystem.Subscriber)
+    val fakePublisher = context.actorOf(Props(new TestPublisher(fakeMediator)), NamingSystem.Publisher)
     override def receive: Receive = {
         case msg if sender == child => proxy forward msg
         case x => child forward x
     }
 }
 
+class TestPublisher(proxy: ActorRef) extends CustomActor {
+
+    override def receive: Receive = {
+        case msg => proxy forward NamingSystem.Publisher + " got " + msg
+    }
+}
+
+class TestMediator(proxy: ActorRef) extends CustomActor {
+
+    override def receive: Receive = {
+        case msg => proxy forward "Mediator got " + msg
+    }
+}

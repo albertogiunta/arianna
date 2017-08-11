@@ -81,7 +81,7 @@ class CellCoreActor(mediator: ActorRef) extends BasicActor {
         case msg@AriadneMessage(Info, Info.Subtype.Request, this.self2Self, cnt: SensorsInfoUpdate) => {
             //Informations request from the cell publisher in order to complete the handshake task with the master
             if (sensorsMounted.isEmpty) {
-                println("WARNING!!!!! Sensor Data not yet ready")
+                log.debug("Sensor Data not yet ready, stash the info request")
                 stash()
             } else {
                 sender() ! msg.copy(
@@ -110,14 +110,15 @@ class CellCoreActor(mediator: ActorRef) extends BasicActor {
             cellPublisher ! AriadneMessage(
                 Topology,
                 Topology.Subtype.Acknowledgement,
-                Location.Cell >> Location.Master,
+                this.self2Self,
                 localCellInfo
             )
             
             cnt.rooms.foreach(room => topology.put(room.info.id.name, room))
             cnt.rooms.foreach(room => indexByUri.put(room.cell.uri, room.info.id.name))
-            
-            userActor ! AriadneMessage(Init,
+
+            userActor ! AriadneMessage(
+                Init,
                 Init.Subtype.Greetings,
                 self2Self,
                 Greetings(List(localCellInfo.uri, localCellInfo.port.toString)))
@@ -150,11 +151,11 @@ class CellCoreActor(mediator: ActorRef) extends BasicActor {
                     cnt.currentPeople,
                     topology(localCellInfo.uri).passages.length)))
 
-            cellPublisher ! msg.copy(direction = cell2Server)
+            cellPublisher ! msg
             cellPublisher ! AriadneMessage(
                 Update,
                 Update.Subtype.Practicability,
-                cell2Cell,
+                self2Self,
                 PracticabilityUpdate(
                     topology(indexByUri(localCellInfo.uri)).info.id,
                     topology(localCellInfo.uri).practicability
@@ -184,7 +185,7 @@ class CellCoreActor(mediator: ActorRef) extends BasicActor {
             //Check if the topology is initialized
             if (topology.nonEmpty) {
                 val currentCell: RoomViewedFromACell = topology(indexByUri(localCellInfo.uri))
-                val msgToSend = msg.copy(direction = cell2Cluster,
+                val msgToSend = msg.copy(
                     content = AlarmContent(localCellInfo, currentCell.info)
                 )
                 cellPublisher ! msgToSend
