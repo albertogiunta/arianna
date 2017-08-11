@@ -6,13 +6,13 @@ import cell.WSClient
 import com.actors.BasicActor
 import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.Location._
-import ontologies.messages.MessageType.Topology
 import ontologies.messages.MessageType.Topology.Subtype._
+import ontologies.messages.MessageType.{Topology, Update}
 import ontologies.messages._
 import spray.json._
 import system.exceptions.IncorrectInitMessageException
 
-object MSGToAkka {
+object MSGTAkkaVertx {
     val NORMAL_CONNECTION: String = "normalConnection"
     val FIRST_CONNECTION: String = "firstConnection"
     val NORMAL_CONNECTION_RESPONSE = "ack"
@@ -62,22 +62,23 @@ class UserManager extends BasicActor with ActorLogging {
     }
 
     protected def receptiveForMobile: Receive = {
-        case MSGToAkka.NORMAL_CONNECTION =>
+        case MSGTAkkaVertx.NORMAL_CONNECTION =>
             println("[ACTOR] GOT NEW USER")
-            s.sendOkToNewUser(MSGToAkka.NORMAL_CONNECTION_RESPONSE)
+            s.sendOkToNewUser(MSGTAkkaVertx.NORMAL_CONNECTION_RESPONSE)
             usrNumber += 1
+            AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, usrNumber)
         // todo tell CellCoreActore
-        case MSGToAkka.FIRST_CONNECTION =>
+        case MSGTAkkaVertx.FIRST_CONNECTION =>
             println("[ACTOR] GOT NEW FIRST USER")
             println(s"Area received from the Cell Core")
             s.sendAreaToNewUser(areaForUser.toJson.toString())
             usrNumber += 1
-        // todo tell CellCoreActore
-        case MSGToAkka.DISCONNECT =>
+            AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, usrNumber)
+        case MSGTAkkaVertx.DISCONNECT =>
             println("[ACTOR] USER DISCONNECTING")
             s.disconnectUsers()
             usrNumber -= 1
-        // todo tell CellCoreActore
+            AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, usrNumber)
         case msg: RouteRequestShort =>
             // use for test
             Thread.sleep(1500)
@@ -86,7 +87,6 @@ class UserManager extends BasicActor with ActorLogging {
             self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest("", getCellWithId(msg.fromCellUri), getCellWithId(msg.toCellUri), isEscape = false), areaForCell.rooms.map(c => c.info.id)))
         // use in production
         //            parent ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell, RouteRequest(msg.userID, getCellWithId(msg.fromCellId), getCellWithId(msg.toCellId), isEscape = false))
-        //            parent ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell, RouteRequest(msg.userID, getCellWithId(msg.fromCellId), getCellWithId(msg.toCellId), isEscape = true))
         case msg@AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, _, response@RouteResponse(request, route)) =>
             request match {
                 case RouteRequest(_, _, _, false) => s.sendRouteToUsers(response, RouteResponseShort(route).toJson.toString())
@@ -94,7 +94,7 @@ class UserManager extends BasicActor with ActorLogging {
             }
     }
 
-    def getCellWithId(uri: String): RoomID = {
+    private def getCellWithId(uri: String): RoomID = {
         areaForCell.rooms.filter(p => p.cell.uri == uri).map(f => f.info.id).head
     }
 }

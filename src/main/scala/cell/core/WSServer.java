@@ -14,6 +14,11 @@ import io.vertx.core.http.ServerWebSocket;
 import ontologies.messages.RouteRequestShort;
 import ontologies.messages.RouteResponse;
 
+/**
+ * A Vertx implementation of several websockets needed to communicate with the end user and keep a
+ * reliable and
+ * stable connection active.
+ */
 public class WSServer extends AbstractVerticle {
 
     private final Vertx    vertx;
@@ -48,11 +53,11 @@ public class WSServer extends AbstractVerticle {
             if (ws.path().equals(baseUrl + "/connect")) {
                 ws.handler(data -> {
                     System.out.println("[SERVER " + baseUrl + "] GOT NEW USER | " + data.toString());
-                    if (data.toString().equalsIgnoreCase(MSGToAkka.NORMAL_CONNECTION())) {
+                    if (data.toString().equalsIgnoreCase(MSGTAkkaVertx.NORMAL_CONNECTION())) {
                         this.usersWaitingForConnectionOk.put(ws.textHandlerID(), ws);
-                    } else if (data.toString().equalsIgnoreCase(MSGToAkka.FIRST_CONNECTION())) {
+                    } else if (data.toString().equalsIgnoreCase(MSGTAkkaVertx.FIRST_CONNECTION())) {
                         this.usersWaitingForArea.put(ws.textHandlerID(), ws);
-                    } else if (data.toString().equalsIgnoreCase(MSGToAkka.DISCONNECT())) {
+                    } else if (data.toString().equalsIgnoreCase(MSGTAkkaVertx.DISCONNECT())) {
                         this.usersWaitingForDisconnection.put(ws.textHandlerID(), ws);
                     }
                     userActor.tell(data.toString(), ActorRef.noSender());
@@ -80,6 +85,11 @@ public class WSServer extends AbstractVerticle {
         }).listen(basePort);
     }
 
+    /**
+     * Called after a user asks to connect to a specific cell but was already present in the system, hence he
+     * doesn't need no further information about it
+     * @param ack the ack message
+     */
     public void sendOkToNewUser(String ack) {
         System.out.println("[N USERS OK] " + usersWaitingForConnectionOk.size());
         usersWaitingForConnectionOk.values().forEach(ws -> ws.writeTextMessage(ack));
@@ -87,6 +97,11 @@ public class WSServer extends AbstractVerticle {
         System.out.println("[N USERS OK] " + usersWaitingForConnectionOk.size());
     }
 
+    /**
+     * Called when the user first connects to a cell, he should receive the area, so that he can complete his work
+     * on his end
+     * @param area the marshaled version of the area
+     */
     public void sendAreaToNewUser(String area) {
         System.out.println("[N USERS AREA] " + usersWaitingForArea.size());
         usersWaitingForArea.values().forEach(ws -> ws.writeTextMessage(area));
@@ -94,6 +109,9 @@ public class WSServer extends AbstractVerticle {
         System.out.println("[N USERS AREA] " + usersWaitingForArea.size());
     }
 
+    /**
+     * Called when a user disconnects from a cell because he wants to connect to the next one
+     */
     public void disconnectUsers() {
         this.usersWaitingForDisconnection.keySet().forEach(id -> {
             usersWaitingForConnectionOk.remove(id);
@@ -104,10 +122,19 @@ public class WSServer extends AbstractVerticle {
         this.usersWaitingForDisconnection.clear();
     }
 
+    /**
+     * Called when an alarm is the detected in the system and should be propagated to all the end users
+     * @param routeAsJson the mashaled version of the route from this cell to the exit
+     */
     public void sendAlarmToUsers(String routeAsJson) {
         usersReadyForAlarm.forEach((s, ws) -> ws.writeTextMessage(routeAsJson));
     }
 
+    /**
+     * Called when a route is requested from one or more users and it's finally calculated and sent
+     * @param route the RouteResponse object
+     * @param routeAsJson the marshaled version of the route
+     */
     public void sendRouteToUsers(RouteResponse route, String routeAsJson) {
         Pair<String, String> p = new Pair<>("uri"+route.request().fromCell().serial(), "uri"+route.request().toCell().serial());
         this.usersWaitingForRoute.get(p).forEach(u -> u.snd.writeTextMessage(routeAsJson));
