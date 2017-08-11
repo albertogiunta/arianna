@@ -12,8 +12,6 @@ import system.names.NamingSystem
   * This actor intermediates between the interface and the System. It sends the loaded map, handles the messages coming
   * from the System and communicates them to the InterfaceManager in order to update the interface. It keeps a copy of the loaded map
   * if the System goes down and asks it again.
-  *
-  *
   */
 class AdminActor extends BasicActor {
 
@@ -81,7 +79,6 @@ class AdminActor extends BasicActor {
             log.info("Map sent again to Master")
             context.become(operational)
         }
-        case msg => println(msg.toString)
     }
 
 }
