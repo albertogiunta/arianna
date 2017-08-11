@@ -20,9 +20,9 @@ import ontologies.messages.{AriadneMessage, Greetings, Location}
 abstract class BasicSubscriber(mediator: ActorRef) extends BasicActor {
     
     val cluster = akka.cluster.Cluster(context.system)
-    
-    val topics: Set[Topic] // To Override Necessarily
-    var ackTopicReceived: Integer = 0
+
+    protected val topics: Set[Topic] // To Override Necessarily
+    private var ackTopicReceived: Integer = 0
 
     override protected def init(args: List[Any]): Unit = {
         super.init(args)

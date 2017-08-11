@@ -16,8 +16,8 @@ import system.names.NamingSystem
   * Created by Matteo Gabellini on 29/06/2017.
   */
 class CellSubscriber(mediator: ActorRef) extends BasicSubscriber(mediator) {
-    
-    override val topics = Set(
+
+    override protected val topics = Set(
         //        Topic.HandShakes,
         Topic.Alarms,
         Topic.Topologies,
