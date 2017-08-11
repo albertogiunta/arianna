@@ -6,7 +6,6 @@ import java.nio.file.Paths
 import akka.actor.{ActorRef, ActorSystem, Props}
 import cell.core.UserManager
 import com.typesafe.config.ConfigFactory
-import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology
 import ontologies.messages.MessageType.Topology.Subtype.ViewedFromACell
@@ -24,15 +23,14 @@ object RunUser {
     }
 
     def loadArea(): Area = {
-        val culo = readJson(s"res/json/map15_room.json").convertTo[Area]
-        culo
+        area
     }
 
     def areaForCell: AreaViewedFromACell = {
-        AreaViewedFromACell(culo2)
+        AreaViewedFromACell(area)
     }
 
-    var culo2: Area = loadArea()
+    var area: Area = loadArea()
 
     def main(args: Array[String]): Unit = {
 

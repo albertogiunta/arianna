@@ -30,6 +30,8 @@ object Port {
 
 class UserManager extends BasicActor with ActorLogging {
 
+    var uri: String = _
+    var serial: Int = _
     var vertx: Vertx = _
     var s: WSServer = _
     var c: WSClient = _
@@ -40,6 +42,8 @@ class UserManager extends BasicActor with ActorLogging {
     override protected def init(args: List[Any]): Unit = {
         if (args.size != 2) throw IncorrectInitMessageException(this.name, args)
 
+        uri = args.head.asInstanceOf[String]
+        serial = uri.split("uri")(1).toInt
         vertx = Vertx.vertx()
         s = new WSServer(vertx, self, "/" + args.head.asInstanceOf[String], Port.getPort)
         vertx.deployVerticle(s)
@@ -66,19 +70,18 @@ class UserManager extends BasicActor with ActorLogging {
             println("[ACTOR] GOT NEW USER")
             s.sendOkToNewUser(MSGTAkkaVertx.NORMAL_CONNECTION_RESPONSE)
             usrNumber += 1
-            AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, usrNumber)
-        // todo tell CellCoreActore
+            sendCurrentPeopleUpdate()
         case MSGTAkkaVertx.FIRST_CONNECTION =>
             println("[ACTOR] GOT NEW FIRST USER")
             println(s"Area received from the Cell Core")
             s.sendAreaToNewUser(areaForUser.toJson.toString())
             usrNumber += 1
-            AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, usrNumber)
+            sendCurrentPeopleUpdate()
         case MSGTAkkaVertx.DISCONNECT =>
             println("[ACTOR] USER DISCONNECTING")
             s.disconnectUsers()
             usrNumber -= 1
-            AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, usrNumber)
+            sendCurrentPeopleUpdate()
         case msg: RouteRequestShort =>
             // use for test
             Thread.sleep(1500)
@@ -92,6 +95,10 @@ class UserManager extends BasicActor with ActorLogging {
                 case RouteRequest(_, _, _, false) => s.sendRouteToUsers(response, RouteResponseShort(route).toJson.toString())
                 case RouteRequest(_, _, _, true) => s.sendAlarmToUsers(RouteResponseShort(route).toJson.toString())
             }
+    }
+
+    private def sendCurrentPeopleUpdate(): Unit = {
+        AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, CurrentPeopleUpdate(RoomID(serial, uri), usrNumber))
     }
 
     private def getCellWithId(uri: String): RoomID = {
