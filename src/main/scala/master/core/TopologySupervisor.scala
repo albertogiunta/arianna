@@ -134,7 +134,7 @@ class TopologySupervisor extends BasicActor {
             unstashAll
         
         case WatchDogNotification(hookedActor: ActorRef) =>
-            log.info("Resending new Topology to {}", hookedActor.path)
+            log.info("Resending new Topology to {}", hookedActor.path.address)
             
             publisher() ! (
                 hookedActor.path.elements.mkString("/"),
@@ -154,6 +154,7 @@ class TopologySupervisor extends BasicActor {
         case AriadneMessage(Update, CurrentPeople, `cellToMaster`, pkg: CurrentPeopleUpdate) =>
     
             if (topology.get(pkg.room.name).nonEmpty) {
+                log.info("Updating sensors for {} from {}", pkg.room.name, sender.path)
                 val newRoom = topology(pkg.room.name).copy(currentPeople = pkg.currentPeople)
                 topology.put(pkg.room.name, newRoom)
                 
@@ -162,10 +163,11 @@ class TopologySupervisor extends BasicActor {
 
         case AriadneMessage(Update, Sensors, `cellToMaster`, SensorsInfoUpdate(cell, sensors)) =>
     
-            if (topology.get(cell.uri).nonEmpty) {
-                val newCell = topology(cell.uri).cell.copy(sensors = sensors)
-                val newRoom = topology(cell.uri).copy(cell = newCell)
-                topology.put(cell.uri, newRoom)
+            if (topology.get(indexByUri(cell.uri)).nonEmpty) {
+                log.info("Updating sensors for {} from {}", cell.uri, sender.path)
+                val newCell = topology(indexByUri(cell.uri)).cell.copy(sensors = sensors)
+                val newRoom = topology(indexByUri(cell.uri)).copy(cell = newCell)
+                topology.put(indexByUri(cell.uri), newRoom)
                 dataStreamer ! topology.values
             }
     

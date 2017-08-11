@@ -93,6 +93,7 @@ object Location {
             case loc if loc == User.toLowerCase => User
             case loc if loc == Notifier.toLowerCase => Notifier
             case loc if loc == Self.toLowerCase => Self
+            case loc if loc == Cluster.toLowerCase => Cluster
             case _ => null
         }
     }

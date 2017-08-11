@@ -27,6 +27,7 @@ class WatchDogSupervisor extends CustomActor {
         case AriadneMessage(Topology, Acknowledgement, _, info: CellInfo) =>
             log.info("Found Topology Acknowledgement from {}", sender.path)
             if (actorByUri.get(info.uri).nonEmpty) {
+    
                 actorByUri.remove(info.uri)
                 if ((synced --) == 0) {
                     log.info("All the Topology ACK have been received, unlocking {}", parent.path.name)

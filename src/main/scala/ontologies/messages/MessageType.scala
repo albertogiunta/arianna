@@ -123,8 +123,8 @@ object MessageType {
               * Takes a *** object as MessageContent
               */
             object FromCell extends MessageSubtype {
-
-                override val subtypeName = "Alarm"
+    
+                override val subtypeName = "FromCell"
     
                 override val superType: MessageType = Alarm
 

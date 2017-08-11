@@ -12,7 +12,7 @@ object TryMessageOntology extends App {
         messages.Location.Self >> messages.Location.Self,
         Empty())
     
-    val checker: Message[_] => Unit = {
+    val checker: Message[_, _, _] => Unit = {
         case msg@AriadneMessage(MessageType.Alarm, _, _, _) => println(msg.supertype.toString)
         case AriadneMessage(_, _, _, _) => println("Fuck-off")
         case _ => println("Ciao.")
