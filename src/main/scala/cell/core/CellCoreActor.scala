@@ -145,11 +145,11 @@ class CellCoreActor(mediator: ActorRef) extends BasicActor {
 
             actualSelfLoad = cnt.currentPeople
 
-            topology.put(cnt.room.name, topology(localCellInfo.uri).copy(practicability =
+            topology.put(cnt.room.name, topology(indexByUri(localCellInfo.uri)).copy(practicability =
                 Practicability(
-                    topology(localCellInfo.uri).info.capacity,
+                    topology(indexByUri(localCellInfo.uri)).info.capacity,
                     cnt.currentPeople,
-                    topology(localCellInfo.uri).passages.length)))
+                    topology(indexByUri(localCellInfo.uri)).passages.length)))
 
             cellPublisher ! msg
             cellPublisher ! AriadneMessage(
@@ -158,7 +158,7 @@ class CellCoreActor(mediator: ActorRef) extends BasicActor {
                 self2Self,
                 PracticabilityUpdate(
                     topology(indexByUri(localCellInfo.uri)).info.id,
-                    topology(localCellInfo.uri).practicability
+                    topology(indexByUri(localCellInfo.uri)).practicability
                 )
             )
         }

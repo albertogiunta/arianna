@@ -174,7 +174,7 @@ abstract class SimulatedSensor[E](val sensor: GenericSensor[E],
                                   val millisRefreshRate: Long,
                                   var changeStrategy: SimulationStrategy[E, GenericSensor[E]])
     extends GenericSensor[E] {
-    var value: E = sensor.currentValue
+    @volatile var value: E = sensor.currentValue
 
     //thread safe read-access to the current value
     override def currentValue = sensor.synchronized {
