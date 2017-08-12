@@ -59,10 +59,12 @@ class InterfaceManager extends BasicActor {
 
     def initializer(): Receive = {
         case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => {
+            log.info("Received an handshake with sensor data")
             counter.++
             interfaceController.initializeSensors(sensorsInfo, roomIDs.get(sensorsInfo.cell).get)
             if (counter == roomIDs.size) {
                 context.become(operational)
+                log.info("Finish initialize sensors, now become operational")
             }
         }
 

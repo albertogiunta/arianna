@@ -10,7 +10,7 @@ import akka.testkit.{TestActorRef, TestKit, TestProbe}
 import com.actors.CustomActor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology.Subtype.Planimetrics
-import ontologies.messages.MessageType.{Alarm, Init, Topology, Update}
+import ontologies.messages.MessageType.{Alarm, Handshake, Init, Topology, Update}
 import ontologies.messages._
 import org.junit.runner.RunWith
 import org.scalatest.WordSpecLike
@@ -31,7 +31,7 @@ class InterfaceManagerTest extends TestKit(ActorSystem("InterfaceManagerTest")) 
         Topology,
         Topology.Subtype.Planimetrics,
         Location.Admin >> Location.Master,
-        Planimetrics.unmarshal(plan)
+        Planimetrics unmarshal plan
     )
 
     val roomDataUpdate: RoomDataUpdate = RoomDataUpdate(RoomID(0, "room1"), ontologies.messages.Cell(CellInfo("uri", 8080), List.empty[SensorInfo]), 50)
@@ -52,22 +52,34 @@ class InterfaceManagerTest extends TestKit(ActorSystem("InterfaceManagerTest")) 
         Location.Admin >> Location.Self, Empty()
     )
 
+    val handshake = AriadneMessage(
+        Handshake,
+        Handshake.Subtype.CellToMaster,
+        Location.Cell >> Location.Master,
+        SensorsInfoUpdate(CellInfo(uri = "PancoPillo", port = 8080)
+            , List(SensorInfo(1, 10.0)))
+    )
+
+
     "A InterfaceManager" must {
         val probe = TestProbe()
-        val tester: TestActorRef[Tester] = TestActorRef(Props(new Tester(probe.ref)), "Tester")
+        val tester: ActorRef = system.actorOf(Props(new Tester(probe.ref)), "Tester")
 
-        "In the beginning receives the map and send it to the parent" in {
-            probe.expectMsg(planimetric)
-        }
-
-        "When receiving a Goodbye, forward to parent" in {
-            tester ! goodbye
-            probe.expectMsg(goodbye)
+        "In the beginning receive the map and send it to the parent" in {
+            // Giving time to load the map from GUI once started
+            Thread.sleep(5000)
+            probe expectMsg planimetric
+            tester ! handshake
         }
 
         "When receiving an Alarm, forward to parent" in {
             tester ! alarm
             probe.expectMsg(alarm)
+        }
+
+        "When receiving an Goodbye message, forward to parent" in {
+            tester ! goodbye
+            probe.expectMsg(goodbye)
         }
     }
 
@@ -77,25 +89,23 @@ class InterfaceManagerTest extends TestKit(ActorSystem("InterfaceManagerTest")) 
             TestActorRef(Props(new CustomActor {
                 new JFXPanel
                 val interfaceManager = context.actorOf(Props[InterfaceManager], NamingSystem.InterfaceManager)
-                interfaceManager ! AriadneMessage(Init, Init.Subtype.Greetings, Location.Admin >> Location.Self, Greetings(List.empty))
 
                 override def receive: Receive = {
                     case "Start" => {
-                        interfaceManager ! planimetric
+                        interfaceManager ! AriadneMessage(Init, Init.Subtype.Greetings, Location.Admin >> Location.Self, Greetings(List.empty))
                     }
                     case msg if sender == interfaceManager => {
                         probe ! msg
                     }
                     case msg => interfaceManager forward msg
                 }
-            }), self, "adminActor")
+            }), self, NamingSystem.AdminActor)
 
         override def preStart {
             adminActor ! "Start"
         }
 
         override def receive: Receive = {
-            //case msg if sender == adminActor => probe forward msg
             case msg => adminActor forward msg
         }
     }
