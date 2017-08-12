@@ -6,7 +6,7 @@ import javafx.scene.Scene
 import javafx.scene.control.SplitPane
 import javafx.stage.Stage
 
-import admin.controller.InterfaceController
+import admin.controller.{GraphicResources, InterfaceController, InterfaceText}
 
 
 /**
@@ -19,11 +19,11 @@ class InterfaceView {
 
     def start(): Unit = {
         val mainStage = new Stage
-        mainStage setTitle "Arianna admin Interface"
+        mainStage setTitle InterfaceText.mainTitle
         mainStage setHeight 850
         mainStage setWidth 1200
         mainStage setResizable false
-        var loader: FXMLLoader = new FXMLLoader(getClass.getResource("/interface.fxml"))
+        var loader: FXMLLoader = new FXMLLoader(getClass.getResource(GraphicResources.interface))
         val root: SplitPane = loader.load[SplitPane]
         controller = loader.getController[InterfaceController]
         val scene: Scene = new Scene(root)

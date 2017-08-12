@@ -50,6 +50,12 @@ class CanvasController extends Initializable {
 
     private val rooms: mutable.Map[String, RoomData] = new mutable.HashMap[String, RoomData]
 
+    private val ANTENNA_RADIUS: Double = 2.0
+
+    private val STARTING_POINT: Point = Point(4, 15)
+
+    private val LINE_WIDTH: Double = 2.0
+
     override def initialize(location: URL, resources: ResourceBundle): Unit = {}
 
     /**
@@ -104,7 +110,7 @@ class CanvasController extends Initializable {
         val gc = mapCanvas.getGraphicsContext2D
         gc setStroke Color.BLACK
         gc setFill color
-        gc setLineWidth 2.0
+        gc setLineWidth LINE_WIDTH
         gc strokeRect(room.x, room.y, room.width, room.height)
         gc fillRect(room.x, room.y, room.width, room.height)
     }
@@ -118,13 +124,13 @@ class CanvasController extends Initializable {
     private def drawAntenna(point: Point): Unit = {
         val gc = mapCanvas.getGraphicsContext2D
         gc setStroke Color.GREEN
-        gc strokeOval(point.x, point.y, 2.0, 2.0)
+        gc strokeOval(point.x, point.y, ANTENNA_RADIUS, ANTENNA_RADIUS)
     }
 
     private def drawName(name: String, initialPoint: Point, color: Color): Unit = {
         val gc = mapCanvas.getGraphicsContext2D
         gc setFill color
-        gc.fillText(name, initialPoint.x + 4, initialPoint.y + 15)
+        gc.fillText(name, initialPoint.x + STARTING_POINT.x, initialPoint.y + STARTING_POINT.y)
     }
 
 }

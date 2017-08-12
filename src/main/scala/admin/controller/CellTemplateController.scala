@@ -22,6 +22,8 @@ import scala.collection.mutable
 class CellTemplateController extends Initializable {
 
     var adminActor: ActorRef = _
+    private val ONE: String = "1"
+    private val ZERO: String = "0"
     private var roomInfo: RoomInfo = _
     private val sensorsController: mutable.Map[Int, SensorTemplateController] = new mutable.HashMap[Int, SensorTemplateController]
     @FXML
@@ -56,8 +58,8 @@ class CellTemplateController extends Initializable {
         roomName setText room.info.id.name
         maxCapacityValue setText room.info.capacity.toString
         sqrMetersValue setText room.info.squareMeters.toString
-        if (room.info.isEntryPoint) entranceValue setText "1" else entranceValue setText "0"
-        if (room.info.isExitPoint) exitValue setText "1" else exitValue setText "0"
+        if (room.info.isEntryPoint) entranceValue setText ONE else entranceValue setText ZERO
+        if (room.info.isExitPoint) exitValue setText ONE else exitValue setText ZERO
     }
 
     /**
@@ -82,7 +84,7 @@ class CellTemplateController extends Initializable {
     def addSensors(sensorsInfo: SensorsInfoUpdate): Unit = {
         chartsButton setDisable false
         sensorsInfo.sensors.foreach(sensor => {
-            var loader = new FXMLLoader(getClass.getResource("/sensorTemplate.fxml"))
+            var loader = new FXMLLoader(getClass.getResource(GraphicResources.sensor))
             var sensorTemplate = loader.load[HBox]
             val sensorController = loader.getController[SensorTemplateController]
             sensorController createSensor sensor
