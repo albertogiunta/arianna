@@ -132,7 +132,27 @@ class CellCoreActor(mediator: ActorRef) extends BasicActor {
         case _ => desist _
     }
 
-    protected def cultured: Receive = {
+    protected def cultured: Receive = ({
+
+        case msg@AriadneMessage(Alarm, _, this.self2Self, _) => {
+            //Alarm triggered in the current cell
+            //Check if the topology is initialized
+            if (topology.nonEmpty) {
+                val currentCell: RoomViewedFromACell = topology(indexByUri(localCellInfo.uri))
+                val msgToSend = msg.copy(
+                    content = AlarmContent(localCellInfo, currentCell.info)
+                )
+                cellPublisher ! msgToSend
+            }
+            context.become(localEmergency)
+        }
+    }: Receive) orElse this.proactive
+
+
+    protected def localEmergency: Receive = this.proactive
+
+
+    private def proactive: Receive = {
         case msg@AriadneMessage(Update, Update.Subtype.Sensors, this.self2Self, cnt: SensorsInfoUpdate) => {
             cellPublisher ! msg.copy(content = cnt.copy(cell = this.localCellInfo))
         }
@@ -179,18 +199,6 @@ class CellCoreActor(mediator: ActorRef) extends BasicActor {
         case msg@AriadneMessage(Route, Route.Subtype.Response, this.cell2User, _) =>
             //route response from route manager for the user
             userActor ! msg
-
-        case msg@AriadneMessage(Alarm, _, this.self2Self, _) => {
-            //Alarm triggered in the current cell
-            //Check if the topology is initialized
-            if (topology.nonEmpty) {
-                val currentCell: RoomViewedFromACell = topology(indexByUri(localCellInfo.uri))
-                val msgToSend = msg.copy(
-                    content = AlarmContent(localCellInfo, currentCell.info)
-                )
-                cellPublisher ! msgToSend
-            }
-        }
 
         case AriadneMessage(Alarm, _, this.cell2Cluster, alarm) => {
             val (id, area) = alarm match {
