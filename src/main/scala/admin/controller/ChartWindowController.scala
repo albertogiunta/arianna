@@ -23,7 +23,8 @@ import scala.collection.mutable
 class ChartWindowController extends Initializable {
 
     var chartActor: ActorRef = _
-
+    private val HEAD = 0
+    private val MAX_DATA_ON_GRAPH = 20
     @FXML
     private var mainPane: GridPane = _
 
@@ -65,7 +66,7 @@ class ChartWindowController extends Initializable {
     def initializeCharts(sensorsId: List[Int]): Unit = {
         val positions = List((1, 0), (0, 1), (1, 1), (0, 2), (1, 2)).iterator
         sensorsId.foreach(sensorId => {
-            val loader = new FXMLLoader(getClass.getResource("/chartTemplate.fxml"));
+            val loader = new FXMLLoader(getClass.getResource(GraphicResources.chart));
             val template = loader.load[TitledPane]
             template setText SensorCategories.categoryWithId(sensorId).name
             sensorChartControllers += ((sensorId, loader.getController[SensorChartController]))
@@ -84,8 +85,8 @@ class ChartWindowController extends Initializable {
       * */
     def updateCharts(update: RoomDataUpdate): Unit = {
         update.cell.sensors.foreach(sensor => sensorChartControllers.get(sensor.categoryId).get.addValue(sensor.value))
-        if (data.getData.size.equals(20)) {
-            data.getData remove 0
+        if (data.getData.size.equals(MAX_DATA_ON_GRAPH)) {
+            data.getData remove HEAD
         }
         data.getData add new XYChart.Data(time.next, update.currentPeople)
 

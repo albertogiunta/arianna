@@ -72,8 +72,8 @@ class InterfaceController extends Initializable {
     def handleFileLoad(): Unit = {
         loadButton setDisable true
         val fc = new FileChooser
-        fc setTitle "Get JSON Map"
-        fc setSelectedExtensionFilter new ExtensionFilter("JSON Files", "*.json")
+        fc setTitle InterfaceText.fileSelectionText
+        fc setSelectedExtensionFilter new ExtensionFilter(InterfaceText.extension, "*.json")
         val json: File = fc.showOpenDialog(null)
         parseFile(json)
     }
@@ -135,9 +135,9 @@ class InterfaceController extends Initializable {
         Platform.runLater(() => {
             cleanInterface
             val alert = new Alert(AlertType.ERROR)
-            alert setTitle "Fatal Error"
-            alert setHeaderText "Wrong Map loaded!"
-            alert setContentText "The map loaded is different from the one already loaded in the System. Close and restart the System or load the correct map"
+            alert setTitle InterfaceText.errorTitle
+            alert setHeaderText InterfaceText.errorHeader
+            alert setContentText InterfaceText.errorText
 
             alert.showAndWait
             loadButton setDisable false
@@ -157,7 +157,7 @@ class InterfaceController extends Initializable {
     }
 
     private def loadCanvas(): Unit = {
-        var loader = new FXMLLoader(getClass.getResource("/canvasTemplate.fxml"))
+        var loader = new FXMLLoader(getClass.getResource(GraphicResources.canvas))
         var canvas = loader.load[Canvas]
         canvasController = loader.getController[CanvasController]
         mapContainer.getChildren add canvas
@@ -172,7 +172,7 @@ class InterfaceController extends Initializable {
     }
 
     private def createCellTemplate(cell: Room): SplitPane = {
-        var loader = new FXMLLoader(getClass.getResource("/cellTemplate2.fxml"))
+        var loader = new FXMLLoader(getClass.getResource(GraphicResources.cell))
         var node = loader.load[SplitPane]
         var controller = loader.getController[CellTemplateController]
         controller.adminActor = interfaceActor
@@ -185,7 +185,7 @@ class InterfaceController extends Initializable {
         cellControllers.clear
         vBoxPane.getChildren.clear
         canvasController.cleanCanvas
-        fileName setText ""
+        fileName setText InterfaceText.none
     }
 
 }
