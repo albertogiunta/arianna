@@ -102,6 +102,10 @@ class CellTemplateController extends Initializable {
         header setBackground new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY))
     }
 
+    def endAlarm(): Unit = {
+        header setBackground new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY))
+    }
+
     /**
       * This method is called when the administrator clicks on the Chart button, in order to open the secondary
       * window with charts.

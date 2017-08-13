@@ -19,13 +19,15 @@ import scala.collection.mutable.ListBuffer
   * @param roomVertices : Coordinates object containing Point vertices of the room
   *
   **/
-private sealed case class RoomData(roomVertices: Coordinates, name: String) {
+private sealed case class RoomData(roomVertices: Coordinates, name: String, antennaPoint: Point) {
     val roomName: String = name
     val x: Int = roomVertices.northWest.x
     val y: Int = roomVertices.northWest.y
     val width: Int = roomVertices.northEast.x - roomVertices.northWest.x
     val height: Int = roomVertices.southWest.y - roomVertices.northWest.y
+    val antenna: Point = antennaPoint
     var passages: ListBuffer[PassageLine] = new ListBuffer[PassageLine]
+
 }
 
 /**
@@ -65,15 +67,12 @@ class CanvasController extends Initializable {
       *
       * */
     def drawOnMap(room: Room): Unit = {
-        val roomData: RoomData = RoomData(room.info.roomVertices, room.info.id.name)
+        val roomData: RoomData = RoomData(room.info.roomVertices, room.info.id.name, room.info.antennaPosition)
         val passages: ListBuffer[PassageLine] = new ListBuffer[PassageLine]
         room.passages.foreach(passage => passages += PassageLine(passage.startCoordinates, passage.endCoordinates))
         roomData.passages = passages
         rooms += ((room.cell.info.uri, roomData))
-        drawRoom(roomData, Color.WHITE)
-        drawPassages(passages)
-        drawAntenna(room.info.antennaPosition)
-        drawName(roomData.name, new Point(roomData.x, roomData.y), Color.BLACK)
+        drawRoom(roomData, Color.WHITE, Color.BLACK)
     }
 
     /**
@@ -84,9 +83,8 @@ class CanvasController extends Initializable {
       * */
     def handleAlarm(id: String): Unit = {
         val roomData = rooms.get(id).get
-        drawRoom(roomData, Color.RED)
-        drawPassages(roomData.passages)
-        drawName(roomData.name, new Point(roomData.x, roomData.y), Color.WHITE)
+        drawRoom(roomData, Color.RED, Color.WHITE)
+
     }
 
     /**
@@ -96,8 +94,7 @@ class CanvasController extends Initializable {
       **/
     def handleAlarm(): Unit = {
         rooms.values.foreach(roomData => {
-            drawRoom(roomData, Color.RED)
-            drawPassages(roomData.passages)
+            drawRoom(roomData, Color.RED, Color.WHITE)
         })
     }
 
@@ -106,7 +103,20 @@ class CanvasController extends Initializable {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight())
     }
 
-    private def drawRoom(room: RoomData, color: Color): Unit = {
+    def redrawMap(): Unit = {
+        rooms.values.foreach(roomData => {
+            drawRoom(roomData, Color.WHITE, Color.BLACK)
+        })
+    }
+
+    private def drawRoom(roomData: RoomData, backgroundColor: Color, textColor: Color): Unit = {
+        drawRoomPerimeter(roomData, backgroundColor)
+        drawPassages(roomData.passages)
+        drawAntenna(roomData.antenna)
+        drawName(roomData.name, new Point(roomData.x, roomData.y), textColor)
+    }
+
+    private def drawRoomPerimeter(room: RoomData, color: Color): Unit = {
         val gc = mapCanvas.getGraphicsContext2D
         gc setStroke Color.BLACK
         gc setFill color

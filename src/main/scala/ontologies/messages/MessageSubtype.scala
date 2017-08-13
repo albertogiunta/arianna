@@ -50,6 +50,8 @@ object MessageSubtype {
                 Alarm.Subtype.FromCell
             case st if st == Alarm.Subtype.FromInterface.toLowerCase =>
                 Alarm.Subtype.FromInterface
+            case st if st == Alarm.Subtype.End.toLowerCase =>
+                Alarm.Subtype.End
 
             /* Handshake Messages */
             case st if st == Handshake.Subtype.CellToMaster.toLowerCase =>
