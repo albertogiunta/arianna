@@ -98,11 +98,19 @@ class CanvasController extends Initializable {
         })
     }
 
+    /**
+      * This method clean the canvas; it is called when a wrong map is loaded
+      *
+      **/
     def cleanCanvas(): Unit = {
         val gc = mapCanvas.getGraphicsContext2D
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight())
     }
 
+    /**
+      * This method draws again all the map in a normal condition; it is called when a
+      * emergency situation is over
+      **/
     def redrawMap(): Unit = {
         rooms.values.foreach(roomData => {
             drawRoom(roomData, Color.WHITE, Color.BLACK)

@@ -102,6 +102,10 @@ class CellTemplateController extends Initializable {
         header setBackground new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY))
     }
 
+    /**
+      * This method modifies the interface in order to show to the administrator that an Alarm ended.
+      *
+      **/
     def endAlarm(): Unit = {
         header setBackground new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY))
     }

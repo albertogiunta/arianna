@@ -109,16 +109,6 @@ class InterfaceController extends Initializable {
 
     }
 
-    private def endAlarm: Unit = {
-        Platform.runLater(() => {
-            alarmButton setText InterfaceText.sendAlarm
-            interfaceActor ! AriadneMessage(Alarm, Alarm.Subtype.End, Location.Admin >> Location.Self, Empty())
-            alarmButton setOnAction ((e) => triggerAlarm)
-            canvasController.redrawMap
-            cellControllers.values.foreach(cellController => cellController.endAlarm)
-        })
-    }
-
     /**
       * This method is called when the administrator press the Alarm button on the interface.
       *
@@ -203,5 +193,16 @@ class InterfaceController extends Initializable {
         canvasController.cleanCanvas
         fileName setText InterfaceText.none
     }
+
+    private def endAlarm: Unit = {
+        Platform.runLater(() => {
+            interfaceActor ! AriadneMessage(Alarm, Alarm.Subtype.End, Location.Admin >> Location.Self, Empty())
+            alarmButton setText InterfaceText.sendAlarm
+            alarmButton setOnAction ((e) => triggerAlarm)
+            canvasController.redrawMap
+            cellControllers.values.foreach(cellController => cellController.endAlarm)
+        })
+    }
+
 
 }

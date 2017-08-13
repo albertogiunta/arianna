@@ -52,17 +52,13 @@ class AdminActor extends BasicActor {
 
         case msg@AriadneMessage(_, MessageType.Update.Subtype.Admin, _, adminUpdate: AdminUpdate) => interfaceManager ! msg.copy(direction = toSelf)
 
-        case msg@AriadneMessage(_, Alarm.Subtype.FromInterface, _, _) => {
-            log.info("Alarm triggered from interface")
-            adminManager() ! msg.copy(direction = toMaster)
-        }
+        case msg@AriadneMessage(_, Alarm.Subtype.FromInterface, _, _) => adminManager() ! msg.copy(direction = toMaster)
+
 
         case msg@AriadneMessage(_, Alarm.Subtype.FromCell, _, content: AlarmContent) => interfaceManager ! msg.copy(direction = toSelf)
 
-        case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) => {
-            log.info("Alarm ended from interface")
-            adminManager() ! msg.copy(direction = toMaster)
-        }
+        case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) => adminManager() ! msg.copy(direction = toMaster)
+
 
         case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => interfaceManager ! msg.copy(direction = toSelf)
 
