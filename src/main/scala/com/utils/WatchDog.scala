@@ -44,24 +44,3 @@ class BasicWatchDog(actorToNotifyTimeOut: ActorRef, waitTime: Long = WatchDog.wa
     
     override def notifyEventOccurred: Unit = eventOccurred = true
 }
-
-/**
-  *
-  * @param actorToNotifyTimeOut the actor that will be notified when the time exceed
-  * @param hookedCell           the cell to which this WatchDog is associated
-  * @param waitTime             the time value after which the actor will be notified,
-  *                             the default value is the waitTime value specified in the WatchDog companion object
-  */
-class CellWatchDog(actorToNotifyTimeOut: ActorRef,
-                   hookedCell: String,
-                   waitTime: Long = WatchDog.waitTime) extends Thread with WatchDog {
-    @volatile var eventOccurred: Boolean = false
-    
-    override def run(): Unit = {
-        super.run()
-        Thread.sleep(waitTime)
-        if (!eventOccurred) actorToNotifyTimeOut ! WatchDogNotification(hookedCell)
-    }
-    
-    override def notifyEventOccurred: Unit = eventOccurred = true
-}

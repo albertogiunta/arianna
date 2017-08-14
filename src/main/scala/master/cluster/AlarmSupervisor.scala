@@ -1,4 +1,4 @@
-package master.core
+package master.cluster
 
 import akka.actor.{ActorRef, ActorSelection}
 import com.actors.BasicSubscriber
