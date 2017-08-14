@@ -19,16 +19,6 @@ object MSGTAkkaVertx {
     val DISCONNECT: String = "disconnect"
 }
 
-object Port {
-    private var port = 8080
-
-    def getPort: Int = {
-        port += 1
-        port
-    }
-}
-
-
 class UserManager extends BasicActor with ActorLogging {
 
     var uri: String = _
@@ -46,7 +36,7 @@ class UserManager extends BasicActor with ActorLogging {
         uri = args.head.asInstanceOf[String]
         serial = uri.split("uri")(1).toInt
         vertx = Vertx.vertx()
-        s = new WSServer(vertx, self, "/" + args.head.asInstanceOf[String], Port.getPort)
+        s = new WSServer(vertx, self, "/" + args.head.asInstanceOf[String], args(1).asInstanceOf[String].toInt)
         vertx.deployVerticle(s)
         log.info("Started User Manager")
         //        initWSClient()
@@ -68,17 +58,17 @@ class UserManager extends BasicActor with ActorLogging {
 
     protected def receptiveForMobile: Receive = {
         case MSGTAkkaVertx.FIRST_CONNECTION =>
-            log.info("GOT NEW FIRST USER")
+            println("GOT NEW FIRST USER")
             s.sendAreaToNewUser(areaForUser.toJson.toString())
             incrementUsrNumber()
             sendCurrentPeopleUpdate()
         case MSGTAkkaVertx.NORMAL_CONNECTION =>
-            log.info("GOT NEW NORMAL USER")
+            println("GOT NEW NORMAL USER")
             s.sendOkToNewUser(MSGTAkkaVertx.NORMAL_CONNECTION_RESPONSE)
             incrementUsrNumber()
             sendCurrentPeopleUpdate()
         case MSGTAkkaVertx.DISCONNECT =>
-            log.info("USER DISCONNECTING")
+            println("USER DISCONNECTING")
             s.disconnectUsers()
             decrementUsrNumber()
             sendCurrentPeopleUpdate()
@@ -102,6 +92,7 @@ class UserManager extends BasicActor with ActorLogging {
     private def decrementUsrNumber() = usrNumber -= 1
 
     private def sendCurrentPeopleUpdate(): Unit = {
+        println("sending people update " + usrNumber)
         parent ! AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, CurrentPeopleUpdate(RoomID(serial, uri), usrNumber))
     }
 
