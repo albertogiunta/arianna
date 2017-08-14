@@ -62,7 +62,6 @@ class CellPublisher(mediator: ActorRef) extends BasicPublisher(mediator) {
             log.info("I've become cultured")
         case WatchDogNotification => {
             //Ask to the core actor the cell information in order to continue the handshake task
-            //println("aaa 0")
             parent ! AriadneMessage(
                 Info,
                 Info.Subtype.Request,
