@@ -3,16 +3,17 @@ package cell.sensormanagement.sensors
 import ontologies.sensor.{SensorCategories, SensorCategory}
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers}
 
 /**
   * Created by Matteo Gabellini on 31/07/2017.
   */
 @RunWith(classOf[JUnitRunner])
-class SimulationStrategiesTest extends FlatSpec with Matchers {
+class SimulationStrategiesTest extends FlatSpec with Matchers with BeforeAndAfterEach {
 
 
     val refreshTime = 2000
+    val sleepTime = refreshTime + 1000
     val doubleChangeStep = 1.0
     val minDoubleValue = 0.0
     val maxDoubleValue = 5.0
@@ -48,20 +49,29 @@ class SimulationStrategiesTest extends FlatSpec with Matchers {
         override def maxValue: Double = maxDoubleValue
     }
 
-    var simulatedDoubleSensor: SimulatedNumericSensor[Double] = new SimulatedNumericSensor[Double](doubleSensor,
-        refreshTime,
-        SimulationStrategies.MonotonicDoubleSimulation(doubleChangeStep))
+    var simulatedDoubleSensor: SimulatedNumericSensor[Double] = _
+    var simulatedIntSensor: SimulatedNumericSensor[Int] = _
+
+    override def beforeEach(): Unit = {
+        simulatedDoubleSensor = new SimulatedNumericSensor[Double](doubleSensor,
+            refreshTime,
+            SimulationStrategies.MonotonicDoubleSimulation(doubleChangeStep))
+        simulatedIntSensor = new SimulatedNumericSensor[Int](intSensor,
+            refreshTime,
+            SimulationStrategies.MonotonicIntSimulation(intChangeStep))
+
+    }
 
     "A monotonic double strategies" should "change the sensor value after the defined refresh time" in {
         @volatile var oldValue = simulatedDoubleSensor.currentValue
-        Thread.sleep(refreshTime)
+        Thread.sleep(sleepTime)
         oldValue should not be (simulatedDoubleSensor.currentValue)
     }
 
     "A monotonic double strategies" should "increase the sensor value after the defined refresh time " +
         "if the current value hasn't reached the max value" in {
         @volatile var oldValue = simulatedDoubleSensor.currentValue
-        Thread.sleep(refreshTime)
+        Thread.sleep(sleepTime)
         oldValue should be < (simulatedDoubleSensor.currentValue)
     }
 
@@ -71,7 +81,7 @@ class SimulationStrategiesTest extends FlatSpec with Matchers {
         var waitTime: Long = (simulatedDoubleSensor.maxValue - oldValue).toLong
         Thread.sleep(refreshTime * waitTime)
         oldValue = simulatedDoubleSensor.currentValue
-        Thread.sleep(refreshTime)
+        Thread.sleep(sleepTime)
         oldValue should be > (simulatedDoubleSensor.currentValue)
     }
 
@@ -81,7 +91,7 @@ class SimulationStrategiesTest extends FlatSpec with Matchers {
         var waitTime: Long = (simulatedDoubleSensor.minValue + oldValue).toLong
         Thread.sleep(refreshTime * waitTime)
         oldValue = simulatedDoubleSensor.currentValue
-        Thread.sleep(refreshTime)
+        Thread.sleep(sleepTime)
         oldValue should be < (simulatedDoubleSensor.currentValue)
     }
 
@@ -121,40 +131,37 @@ class SimulationStrategiesTest extends FlatSpec with Matchers {
         override def maxValue: Int = maxIntValue
     }
 
-    var simulatedIntSensor: SimulatedNumericSensor[Int] = new SimulatedNumericSensor[Int](intSensor,
-        refreshTime,
-        SimulationStrategies.MonotonicIntSimulation(intChangeStep))
 
     "A monotonic integer strategies" should "change the sensor value after the defined refresh time" in {
         @volatile var oldValue = simulatedIntSensor.currentValue
-        Thread.sleep(refreshTime)
+        Thread.sleep(sleepTime)
         oldValue should not be (simulatedIntSensor.currentValue)
     }
 
-    "A monotonic integer strategies" should "increase the sensor value after the defined refresh time " +
+    "A monotonic integer strategies" should "increase the sensor value after the defined refresh time, " +
         "if the current value hasn't reached the max value" in {
         @volatile var oldValue = simulatedIntSensor.currentValue
-        Thread.sleep(refreshTime)
+        Thread.sleep(sleepTime)
         oldValue should be < (simulatedIntSensor.currentValue)
     }
 
-    "A monotonic integer strategies" should "decrease the sensor value after the defined refresh time " +
+    "A monotonic integer strategies" should "decrease the sensor value after the defined refresh time, " +
         "if the current value has reached the max value" in {
         @volatile var oldValue = simulatedIntSensor.currentValue
         var waitTime: Long = (simulatedIntSensor.maxValue - oldValue).toLong
         Thread.sleep(refreshTime * waitTime)
         oldValue = simulatedIntSensor.currentValue
-        Thread.sleep(refreshTime)
+        Thread.sleep(sleepTime)
         oldValue should be > (simulatedIntSensor.currentValue)
     }
 
-    "A monotonic integer strategies" should "increase the sensor value after the defined refresh time " +
+    "A monotonic integer strategies" should "increase the sensor value after the defined refresh time, " +
         "if the current value has reached the min value during the decreasing phase" in {
         @volatile var oldValue = simulatedIntSensor.currentValue
         var waitTime: Long = (simulatedIntSensor.minValue + oldValue).toLong
         Thread.sleep(refreshTime * waitTime)
         oldValue = simulatedIntSensor.currentValue
-        Thread.sleep(refreshTime)
+        Thread.sleep(sleepTime)
         oldValue should be < (simulatedIntSensor.currentValue)
     }
 

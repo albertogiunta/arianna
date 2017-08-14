@@ -28,6 +28,8 @@ class AdminManager extends CustomActor {
         case msg@AriadneMessage(Alarm, Alarm.Subtype.FromInterface, fromAdmin, _) => publisher ! msg.copy(direction = fromAdmin)
         //Ricezione di un allarme da parte del sistema
         case msg@AriadneMessage(Alarm, Alarm.Subtype.FromCell, _, _) => admin ! msg.copy(direction = toAdmin)
+
+        case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) => publisher ! msg.copy(direction = toAdmin)
         //Ricezione di aggiornamento sensori
         case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, _) => admin ! msg
 

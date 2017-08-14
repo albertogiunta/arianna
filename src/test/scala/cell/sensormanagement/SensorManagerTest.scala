@@ -77,17 +77,16 @@ class SensorManagerTest extends TestKit(ActorSystem("SensorManagerTest",
         "sends an alarm when a sensor exceeds the threshold" in {
             val proxy = TestProbe()
             val parent = system.actorOf(Props(new TestParent(proxy.ref, actorName)), "TestParent")
-            //Time related to the threshold specified in the configuration file for the test
-            //The monotonic humidity sensor must exceed the threshold after 10 seconds
+
             proxy.send(parent, sensorManagerInitMsg)
-            proxy.ignoreMsg {
-                case msg: String => msg != "Alarm Received"
-            }
             val valuesBeforeAlarm = tempSensConfig.threshold.asInstanceOf[DoubleThresholdInfo].highThreshold /
                 SensorsFactory.DefaultValues.ChangeStep.temperature
-
             val timeForAlarm = SensorsFactory.DefaultValues.simulationRefreshRate * valuesBeforeAlarm
-            proxy.expectMsg((timeForAlarm + 1) seconds, "Alarm Received")
+
+            proxy.fishForMessage((timeForAlarm + 1) seconds, "") {
+                case "Alarm Received" => true
+                case "Update Received" => false
+            }
 
             system.stop(proxy.ref)
             system.stop(parent)

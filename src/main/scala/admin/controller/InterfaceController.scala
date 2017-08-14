@@ -16,7 +16,7 @@ import javafx.stage.FileChooser.ExtensionFilter
 import admin.view.InterfaceView
 import akka.actor.ActorRef
 import ontologies.messages.Location._
-import ontologies.messages.MessageType.{Init, Topology}
+import ontologies.messages.MessageType.{Alarm, Init, Topology}
 import ontologies.messages._
 
 import scala.collection.mutable
@@ -72,8 +72,8 @@ class InterfaceController extends Initializable {
     def handleFileLoad(): Unit = {
         loadButton setDisable true
         val fc = new FileChooser
-        fc setTitle "Get JSON Map"
-        fc setSelectedExtensionFilter new ExtensionFilter("JSON Files", "*.json")
+        fc setTitle InterfaceText.fileSelectionText
+        fc setSelectedExtensionFilter new ExtensionFilter(InterfaceText.extension, "*.json")
         val json: File = fc.showOpenDialog(null)
         parseFile(json)
     }
@@ -100,22 +100,28 @@ class InterfaceController extends Initializable {
       * @param alarmContent : AlarmContent object that contains information about the Cell from which the alarm comes
       **/
     def triggerAlarm(alarmContent: AlarmContent): Unit = {
-        interfaceActor ! new AriadneMessage(MessageType.Alarm, MessageType.Alarm.Subtype.FromInterface, Location.Admin >> Location.Self, Empty())
         Platform.runLater(() => {
             cellControllers.get(alarmContent.room.id).get.handleAlarm
             canvasController handleAlarm alarmContent.info.uri
+            alarmButton setText InterfaceText.endAlarm
+            alarmButton setOnAction ((e) => endAlarm)
         })
+
     }
 
     /**
       * This method is called when the administrator press the Alarm button on the interface.
       *
       **/
+    @FXML
     def triggerAlarm(): Unit = {
+        interfaceActor ! new AriadneMessage(MessageType.Alarm, MessageType.Alarm.Subtype.FromInterface, Location.Admin >> Location.Self, Empty())
         Platform.runLater(() => {
             cellControllers.values.foreach(cellController => cellController.handleAlarm)
             canvasController.handleAlarm
         })
+        alarmButton setText InterfaceText.endAlarm
+        alarmButton setOnAction ((e) => endAlarm)
     }
 
     /**
@@ -135,9 +141,9 @@ class InterfaceController extends Initializable {
         Platform.runLater(() => {
             cleanInterface
             val alert = new Alert(AlertType.ERROR)
-            alert setTitle "Fatal Error"
-            alert setHeaderText "Wrong Map loaded!"
-            alert setContentText "The map loaded is different from the one already loaded in the System. Close and restart the System or load the correct map"
+            alert setTitle InterfaceText.errorTitle
+            alert setHeaderText InterfaceText.errorHeader
+            alert setContentText InterfaceText.errorText
 
             alert.showAndWait
             loadButton setDisable false
@@ -157,7 +163,7 @@ class InterfaceController extends Initializable {
     }
 
     private def loadCanvas(): Unit = {
-        var loader = new FXMLLoader(getClass.getResource("/canvasTemplate.fxml"))
+        var loader = new FXMLLoader(getClass.getResource(GraphicResources.canvas))
         var canvas = loader.load[Canvas]
         canvasController = loader.getController[CanvasController]
         mapContainer.getChildren add canvas
@@ -172,7 +178,7 @@ class InterfaceController extends Initializable {
     }
 
     private def createCellTemplate(cell: Room): SplitPane = {
-        var loader = new FXMLLoader(getClass.getResource("/cellTemplate2.fxml"))
+        var loader = new FXMLLoader(getClass.getResource(GraphicResources.cell))
         var node = loader.load[SplitPane]
         var controller = loader.getController[CellTemplateController]
         controller.adminActor = interfaceActor
@@ -185,7 +191,18 @@ class InterfaceController extends Initializable {
         cellControllers.clear
         vBoxPane.getChildren.clear
         canvasController.cleanCanvas
-        fileName setText ""
+        fileName setText InterfaceText.none
     }
+
+    private def endAlarm: Unit = {
+        Platform.runLater(() => {
+            interfaceActor ! AriadneMessage(Alarm, Alarm.Subtype.End, Location.Admin >> Location.Self, Empty())
+            alarmButton setText InterfaceText.sendAlarm
+            alarmButton setOnAction ((e) => triggerAlarm)
+            canvasController.redrawMap
+            cellControllers.values.foreach(cellController => cellController.endAlarm)
+        })
+    }
+
 
 }

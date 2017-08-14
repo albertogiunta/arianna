@@ -1,31 +1,110 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Text?>
-<VBox prefHeight="200.0" prefWidth="325.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-    <children>
-        <Pane fx:id="namePane" prefHeight="200.0" prefWidth="200.0">
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<SplitPane dividerPositions="0.11353711790393013" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+           minWidth="-Infinity" orientation="VERTICAL" prefHeight="231.0" prefWidth="380.0"
+           xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="admin.controller.CellTemplateController">
+    <items>
+        <Pane fx:id="header" prefHeight="29.0" prefWidth="380.0" style="-fx-background-color: WHITE;">
             <children>
-                <Label fx:id="roomLabel" layoutX="46.0" layoutY="20.0" text="Room Name"/>
-                <Text fx:id="roomName" layoutX="192.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0"
-                      text="Padiglione A"/>
+                <Text fx:id="roomName" layoutX="88.0" layoutY="17.0" strokeType="OUTSIDE" strokeWidth="0.0"
+                      textAlignment="CENTER" wrappingWidth="221.0">
+                    <font>
+                        <Font size="18.0"/>
+                    </font>
+                </Text>
             </children>
         </Pane>
-        <Pane fx:id="occupationPane" prefHeight="200.0" prefWidth="200.0">
-            <children>
-                <Label fx:id="occupationLabel" layoutX="45.0" layoutY="20.0" text="Current occupation"/>
-                <Text fx:id="roomOccupation" layoutX="194.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0"
-                      text="34"/>
-            </children>
-        </Pane>
-        <Pane fx:id="temperaturePane" prefHeight="200.0" prefWidth="200.0">
-            <children>
-                <Text fx:id="roomTemperature" layoutX="194.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0"
-                      text="25°"/>
-                <Label fx:id="temperatureLabel" layoutX="46.0" layoutY="20.0" text="Temperature"/>
-            </children>
-        </Pane>
-    </children>
-</VBox>
+        <TabPane fx:id="tabPane" prefHeight="169.0" prefWidth="380.0" tabClosingPolicy="UNAVAILABLE">
+            <tabs>
+                <Tab fx:id="tabDynamic" text="Dinamic">
+                    <content>
+                        <HBox fx:id="mainStaticBox" prefHeight="136.0" prefWidth="398.0" style="-fx-padding: 10;">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" prefHeight="22.0" prefWidth="371.0"
+                                      style="-fx-padding: 10;">
+                                    <children>
+                                        <Pane prefHeight="200.0" prefWidth="200.0">
+                                            <children>
+                                                <Button fx:id="chartsButton" disable="true" layoutX="8.0" layoutY="34.0"
+                                                        mnemonicParsing="false" onAction="#openCharts" prefHeight="46.0"
+                                                        prefWidth="130.0" text="Charts"/>
+                                            </children>
+                                        </Pane>
+                                    </children>
+                                </HBox>
+                                <Pane prefHeight="107.0" prefWidth="190.0">
+                                    <children>
+                                        <VBox fx:id="sensorsContainer" layoutX="-103.0" layoutY="-4.0"
+                                              prefHeight="159.0" prefWidth="199.0">
+                                            <children>
+                                                <HBox minHeight="30.0" prefHeight="30.0" prefWidth="199.0">
+                                                    <children>
+                                                        <Label fx:id="currentPeopleLabel" text="Current people:"
+                                                               underline="true"/>
+                                                        <Text fx:id="currentPeopleValue" strokeType="OUTSIDE"
+                                                              strokeWidth="0.0" textAlignment="RIGHT"
+                                                              wrappingWidth="42.0"/>
+                                                    </children>
+                                                </HBox>
+                                                <Label text="Sensor data" underline="true"/>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </Pane>
+                            </children>
+                        </HBox>
+                    </content>
+                </Tab>
+                <Tab fx:id="tabStatic" text="Static">
+                    <content>
+                        <Pane prefHeight="166.0" prefWidth="323.0">
+                            <children>
+                                <VBox layoutX="21.0" prefHeight="166.0" prefWidth="355.0">
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Label fx:id="maxCapacityLabel" contentDisplay="CENTER"
+                                                       text="Max capacity"/>
+                                                <Pane prefHeight="41.0" prefWidth="52.0"/>
+                                                <Text fx:id="maxCapacityValue" strokeType="OUTSIDE" strokeWidth="0.0"
+                                                      wrappingWidth="30.0"/>
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Label fx:id="sqrMetersLabel" text="M^2"/>
+                                                <Pane prefHeight="41.0" prefWidth="107.0"/>
+                                                <Text fx:id="sqrMetersValue" strokeType="OUTSIDE" strokeWidth="0.0"
+                                                      wrappingWidth="32.0"/>
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Label fx:id="entranceLabel" text="Entry"/>
+                                                <Pane prefHeight="42.0" prefWidth="100.0"/>
+                                                <Text fx:id="entranceValue" strokeType="OUTSIDE" strokeWidth="0.0"
+                                                      wrappingWidth="33.0"/>
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Label fx:id="exitLabel1" text="Exit"/>
+                                                <Pane prefHeight="42.0" prefWidth="110.0"/>
+                                                <Text fx:id="exitValue" strokeType="OUTSIDE" strokeWidth="0.0"
+                                                      wrappingWidth="26.0"/>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </Pane>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </items>
+</SplitPane>

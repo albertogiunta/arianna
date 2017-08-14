@@ -99,6 +99,8 @@ class InterfaceManager extends BasicActor {
 
         case msg@AriadneMessage(Error, Error.Subtype.MapIdentifierMismatch, _, _) => interfaceController.showErrorDialog
 
+        case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) => parent ! msg
+
         case _ => desist _
 
     }

@@ -18,7 +18,7 @@ object SensorsFactory {
         val humiditySensorStartValue = 40
 
         object ChangeStep {
-            val temperature = 0.1
+            val temperature = 0.2
             val gas = 0.1
             val humidity = 0.5
         }

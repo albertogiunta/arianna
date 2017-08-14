@@ -15,8 +15,8 @@
             <children>
                 <Button id="loadButton" fx:id="loadButton" layoutX="469.0" layoutY="27.0" mnemonicParsing="false"
                         onAction="#handleFileLoad" prefHeight="49.0" prefWidth="130.0" text="Load Map"/>
-                <Label layoutX="1004.0" layoutY="41.0" text="File Loaded:"/>
-                <Text id="fileName" fx:id="fileName" layoutX="1079.0" layoutY="55.0" strokeType="OUTSIDE"
+                <Label layoutX="939.0" layoutY="43.0" text="File Loaded:"/>
+                <Text id="fileName" fx:id="fileName" layoutX="1021.0" layoutY="56.0" strokeType="OUTSIDE"
                       strokeWidth="0.0" wrappingWidth="113.0"/>
                 <Button fx:id="alarmButton" disable="true" layoutX="783.0" layoutY="27.0" mnemonicParsing="false"
                         onAction="#triggerAlarm" prefHeight="49.0" prefWidth="130.0" text="SEND ALARM"/>
