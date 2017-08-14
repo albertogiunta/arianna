@@ -1,7 +1,7 @@
 package processor.route.actors
 
 import akka.actor.{ActorRef, ActorSystem, Props}
-import akka.testkit.{ImplicitSender, TestKit, TestProbe}
+import akka.testkit.{ImplicitSender, TestActorRef, TestKit, TestProbe}
 import com.actors.CustomActor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.{Init, Route}
@@ -249,7 +249,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
     
         val probe = TestProbe()
     
-        val core = system.actorOf(Props(new Tester(probe)), "Tester")
+        val core: TestActorRef[Tester] = TestActorRef(Props(new Tester(probe.ref)), "Tester")
     
         "Answer with a RouteResponse holding the SHP from the specified source to the specified target" in {
             core ! AriadneMessage(
@@ -312,7 +312,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
         }
     }
     
-    private class Tester(probe: TestProbe) extends CustomActor {
+    private class Tester(probe: ActorRef) extends CustomActor {
     
         val routeManager: ActorRef = context.actorOf(Props[RouteManager], NamingSystem.RouteManager)
         
@@ -330,7 +330,7 @@ class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
             case msg@AriadneMessage(Route, Route.Subtype.Info, _, _) => routeManager ! msg
             case msg@AriadneMessage(Route, Route.Subtype.Response, _, cnt: RouteResponse) =>
                 log.info(cnt.route.map(i => i.name).mkString(" -> "))
-                probe.ref forward msg
+                probe forward msg
         }
     }
 }

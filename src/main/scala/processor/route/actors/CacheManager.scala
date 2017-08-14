@@ -18,6 +18,7 @@ class CacheManager(val cacheKeepAlive: Long) extends CustomActor {
     override def receive: Receive = {
         case msg@RouteInfo(req@RouteRequest(_, from, to, _), _) =>
             log.info("Evaluating cache...")
+    
             sender ! (
                 // Maybe we can check also the if there is a path saved going from "to" to "from"
                 // that is a reverse path

@@ -16,7 +16,7 @@ import javafx.stage.FileChooser.ExtensionFilter
 import admin.view.InterfaceView
 import akka.actor.ActorRef
 import ontologies.messages.Location._
-import ontologies.messages.MessageType.{Init, Topology}
+import ontologies.messages.MessageType.{Alarm, Init, Topology}
 import ontologies.messages._
 
 import scala.collection.mutable
@@ -100,22 +100,28 @@ class InterfaceController extends Initializable {
       * @param alarmContent : AlarmContent object that contains information about the Cell from which the alarm comes
       **/
     def triggerAlarm(alarmContent: AlarmContent): Unit = {
-        interfaceActor ! new AriadneMessage(MessageType.Alarm, MessageType.Alarm.Subtype.FromInterface, Location.Admin >> Location.Self, Empty())
         Platform.runLater(() => {
             cellControllers.get(alarmContent.room.id).get.handleAlarm
             canvasController handleAlarm alarmContent.info.uri
+            alarmButton setText InterfaceText.endAlarm
+            alarmButton setOnAction ((e) => endAlarm)
         })
+
     }
 
     /**
       * This method is called when the administrator press the Alarm button on the interface.
       *
       **/
+    @FXML
     def triggerAlarm(): Unit = {
+        interfaceActor ! new AriadneMessage(MessageType.Alarm, MessageType.Alarm.Subtype.FromInterface, Location.Admin >> Location.Self, Empty())
         Platform.runLater(() => {
             cellControllers.values.foreach(cellController => cellController.handleAlarm)
             canvasController.handleAlarm
         })
+        alarmButton setText InterfaceText.endAlarm
+        alarmButton setOnAction ((e) => endAlarm)
     }
 
     /**
@@ -187,5 +193,16 @@ class InterfaceController extends Initializable {
         canvasController.cleanCanvas
         fileName setText InterfaceText.none
     }
+
+    private def endAlarm: Unit = {
+        Platform.runLater(() => {
+            interfaceActor ! AriadneMessage(Alarm, Alarm.Subtype.End, Location.Admin >> Location.Self, Empty())
+            alarmButton setText InterfaceText.sendAlarm
+            alarmButton setOnAction ((e) => triggerAlarm)
+            canvasController.redrawMap
+            cellControllers.values.foreach(cellController => cellController.endAlarm)
+        })
+    }
+
 
 }

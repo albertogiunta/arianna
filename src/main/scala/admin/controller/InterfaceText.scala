@@ -16,6 +16,10 @@ object InterfaceText {
 
     val errorText: String = "The map loaded is different from the one already loaded in the System. Close and restart the System or load the correct map"
 
+    val sendAlarm: String = "SEND ALARM"
+
+    val endAlarm: String = "END ALARM"
+
 }
 
 object GraphicResources {

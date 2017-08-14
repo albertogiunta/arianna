@@ -103,6 +103,14 @@ class CellTemplateController extends Initializable {
     }
 
     /**
+      * This method modifies the interface in order to show to the administrator that an Alarm ended.
+      *
+      **/
+    def endAlarm(): Unit = {
+        header setBackground new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY))
+    }
+
+    /**
       * This method is called when the administrator clicks on the Chart button, in order to open the secondary
       * window with charts.
       **/

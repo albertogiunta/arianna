@@ -147,6 +147,20 @@ object MessageType {
                     obj.asInstanceOf[Empty].toJson.toString()
             }
 
+
+            object End extends MessageSubtype {
+                override val subtypeName: String = "End"
+
+                override val superType: MessageType = Alarm
+
+                override def unmarshal(json: String): Empty =
+                    json.parseJson.convertTo[Empty]
+
+                override def marshal(obj: MessageContent): String =
+                    obj.asInstanceOf[Empty].toJson.toString()
+
+            }
+
         }
 
     }
