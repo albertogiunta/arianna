@@ -1,5 +1,8 @@
 package com.utils
 
+/**
+  * Created by Alessandro on 11/08/2017.
+  */
 final case class IncrementalInteger(private var base: Int) {
     
     
@@ -33,17 +36,4 @@ object IncrementalInteger {
     implicit def fromIntToIncremental(from: Int): IncrementalInteger = IncrementalInteger(from: Int)
     
     implicit def fromIncrementalToInt(incrementalInteger: IncrementalInteger): Int = incrementalInteger.value
-}
-
-object TryIt extends App {
-    
-    import IncrementalInteger._
-    
-    val i = IncrementalInteger(0)
-    
-    val x: IncrementalInteger = i ++
-    
-    val y: Int = x
-    
-    println(i, x, y ++)
 }
