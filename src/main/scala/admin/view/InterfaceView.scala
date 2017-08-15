@@ -13,7 +13,7 @@ import admin.controller.{GraphicResources, InterfaceController, InterfaceText}
   * This class represent the interface of the Application
   *
   **/
-class InterfaceView {
+class InterfaceView extends View {
 
     var controller: InterfaceController = _
 
