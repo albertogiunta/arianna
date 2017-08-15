@@ -48,10 +48,12 @@ class MasterSubscriber(mediator: ActorRef) extends BasicSubscriber(mediator) {
     
         case msg@AriadneMessage(Handshake, CellToMaster, `cellToMaster`, _) =>
             log.info("Resolving Handshake from {}", sender.path)
+    
             publisher() ! (
                 sender.path.elements.mkString("/"),
                 AriadneMessage(Handshake, Acknowledgement, Location.Master >> Location.Cell, Empty())
             )
+    
             topologySupervisor() forward msg
     
         case msg@AriadneMessage(Topology, ViewedFromACell, _, _) =>
