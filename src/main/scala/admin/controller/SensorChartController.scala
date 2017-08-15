@@ -3,13 +3,13 @@ package admin.controller
 import java.net.URL
 import java.util.ResourceBundle
 import javafx.application.Platform
-import javafx.fxml.{FXML, Initializable}
+import javafx.fxml.FXML
 import javafx.scene.chart.{LineChart, XYChart}
 
 /**
   * This is the Controller for the sensor chart, that initialized it and keep it updated.
   **/
-class SensorChartController extends Initializable {
+class SensorChartController extends ViewController {
 
     @FXML
     private var chart: LineChart[Int, Double] = _
