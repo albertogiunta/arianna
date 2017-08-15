@@ -13,14 +13,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
   */
 class Master(mediator: ActorRef) extends CustomActor {
     
-    var subscriber: ActorRef = _
-    var publisher: ActorRef = _
-    var adminManager: ActorRef = _
-    var topologySupervisor: ActorRef = _
-    var alarmSupervisor: ActorRef = _
-    var listener: ActorRef = _
+    private var subscriber: ActorRef = _
+    private var publisher: ActorRef = _
+    private var adminManager: ActorRef = _
+    private var topologySupervisor: ActorRef = _
+    private var alarmSupervisor: ActorRef = _
+    private var listener: ActorRef = _
     
-    override def preStart = {
+    override def preStart: Unit = {
     
         super.preStart()
     

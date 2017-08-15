@@ -77,7 +77,7 @@ trait CustomActor extends Actor with Stash with ActorLogging {
   */
 abstract class TemplateActor extends CustomActor {
     
-    override def preStart = {
+    override def preStart: Unit = {
         log.info("Hello there, I need to be initialized!")
     }
     
@@ -97,7 +97,7 @@ abstract class TemplateActor extends CustomActor {
       *
       * @return An Actor Receive Behaviour
       */
-    protected def resistive: Actor.Receive = {
+    protected def resistive: Receive = {
         case AriadneMessage(MessageType.Init, _, _, content: Greetings) =>
             try {
                 this.init(content.args)
@@ -126,7 +126,7 @@ abstract class TemplateActor extends CustomActor {
       *
       * @return An Actor Receive Behaviour
       */
-    protected def receptive: Actor.Receive
+    protected def receptive: Receive
 
     /**
       * This method is the default action to be used for unhandled messages
