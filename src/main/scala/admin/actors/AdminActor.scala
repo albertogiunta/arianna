@@ -2,7 +2,7 @@ package admin.actors
 
 import akka.actor.{ActorSelection, Props}
 import akka.extension.ConfigurationManager
-import com.actors.BasicActor
+import com.actors.TemplateActor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.{Alarm, Error, Handshake, Init, Topology}
 import ontologies.messages._
@@ -13,7 +13,7 @@ import system.names.NamingSystem
   * from the System and communicates them to the InterfaceManager in order to update the interface. It keeps a copy of the loaded map
   * if the System goes down and asks it again.
   */
-class AdminActor extends BasicActor {
+class AdminActor extends TemplateActor {
 
     //Se si fa partire solo l'admin manager
     //private val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/AdminManager")

@@ -75,7 +75,7 @@ trait CustomActor extends Actor with Stash with ActorLogging {
   *
   * Created by Alessandro on 01/07/2017.
   */
-abstract class BasicActor extends CustomActor {
+abstract class TemplateActor extends CustomActor {
     
     override def preStart = {
         log.info("Hello there, I need to be initialized!")
