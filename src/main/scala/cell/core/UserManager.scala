@@ -4,6 +4,8 @@ import _root_.io.vertx.core.Vertx
 import akka.actor.ActorLogging
 import cell.WSClient
 import com.actors.BasicActor
+import com.utils.Counter
+import io.vertx.scala.core.http.ServerWebSocket
 import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology.Subtype._
@@ -26,7 +28,7 @@ class UserManager extends BasicActor with ActorLogging {
     var vertx: Vertx = _
     var s: WSServer = _
     var c: WSClient = _
-    var usrNumber = 0
+    var usrNumber: Counter = Counter(0)
     var areaForCell: AreaViewedFromACell = _
     var areaForUser: AreaViewedFromAUser = _
 
@@ -46,7 +48,7 @@ class UserManager extends BasicActor with ActorLogging {
         c = new WSClient(vertx)
         vertx.deployVerticle(c)
         Thread.sleep(1000)
-        c.sendMessageConnect()
+        c.sendMessageFirstConnection()
     }
 
     override protected def receptive: Receive = {
@@ -60,25 +62,19 @@ class UserManager extends BasicActor with ActorLogging {
         case MSGTAkkaVertx.FIRST_CONNECTION =>
             println("GOT NEW FIRST USER")
             s.sendAreaToNewUser(areaForUser.toJson.toString())
-            incrementUsrNumber()
+            usrNumber.++
             sendCurrentPeopleUpdate()
         case MSGTAkkaVertx.NORMAL_CONNECTION =>
             println("GOT NEW NORMAL USER")
-            s.sendOkToNewUser(MSGTAkkaVertx.NORMAL_CONNECTION_RESPONSE)
-            incrementUsrNumber()
+            s.sendAckToNewUser(MSGTAkkaVertx.NORMAL_CONNECTION_RESPONSE)
+            usrNumber.++
             sendCurrentPeopleUpdate()
         case MSGTAkkaVertx.DISCONNECT =>
             println("USER DISCONNECTING")
             s.disconnectUsers()
-            decrementUsrNumber()
+            usrNumber.--
             sendCurrentPeopleUpdate()
         case msg: RouteRequestShort =>
-            // use for test
-            //            Thread.sleep(1500)
-            //            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest("", areaForCell.rooms.head.info.id, areaForCell.rooms.tail.head.info.id, isEscape = true), areaForCell.rooms.map(c => c.info.id)))
-            //            Thread.sleep(1500)
-            //            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest("", getCellWithUri(msg.fromCellUri), getCellWithUri(msg.toCellUri), isEscape = false), areaForCell.rooms.map(c => c.info.id)))
-            // use in production
             parent ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell, RouteRequest(msg.userID, getCellWithUri(msg.fromCellUri), getCellWithUri(msg.toCellUri), isEscape = false))
         case AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, _, response@RouteResponse(request, route)) =>
             request match {
@@ -87,13 +83,9 @@ class UserManager extends BasicActor with ActorLogging {
             }
     }
 
-    private def incrementUsrNumber() = usrNumber += 1
-
-    private def decrementUsrNumber() = usrNumber -= 1
-
     private def sendCurrentPeopleUpdate(): Unit = {
         println("sending people update " + usrNumber)
-        parent ! AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, CurrentPeopleUpdate(RoomID(serial, uri), usrNumber))
+        parent ! AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, CurrentPeopleUpdate(RoomID(serial, uri), usrNumber.get))
     }
 
     def getCellWithUri(uri: String): RoomID = {
@@ -101,3 +93,5 @@ class UserManager extends BasicActor with ActorLogging {
     }
 
 }
+
+case class WSRouteInfo(connectWSId: String, routeWSId: String, serverWebSocket: ServerWebSocket)

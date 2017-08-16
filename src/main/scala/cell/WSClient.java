@@ -1,13 +1,15 @@
 package cell;
 
+import cell.core.MSGTAkkaVertx;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.WebSocket;
 
 public class WSClient extends AbstractVerticle {
 
-    private final Vertx     vertx;
-    private       WebSocket webSocket;
+    private final Vertx vertx;
+    private WebSocket webSocketConnect;
+    private WebSocket webSocketRoute;
 
     public WSClient(Vertx vertx) {
         this.vertx = vertx;
@@ -16,19 +18,44 @@ public class WSClient extends AbstractVerticle {
     @Override
     public void start() throws Exception {
         // Setting host as localhost is not strictly necessary as it's the default
-        vertx.createHttpClient().websocket(8080, "localhost", "/connect", websocket -> {
-            if (this.webSocket == null) {
-                this.webSocket = websocket;
+        vertx.createHttpClient().websocket(8081, "localhost", "/uri1/connect", websocket -> {
+            if (this.webSocketConnect == null) {
+                this.webSocketConnect = websocket;
             }
 
             websocket.handler(data -> {
-                System.out.println("[CLIENT] Received " + data);
+                System.out.println("[CLIENT CONNECT] Received " + data);
+            });
+        });
+
+        vertx.createHttpClient().websocket(8081, "localhost", "/uri1/route", websocket -> {
+            if (this.webSocketRoute == null) {
+                this.webSocketRoute = websocket;
+            }
+
+            websocket.handler(data -> {
+                System.out.println("[CLIENT ROUTE] Received " + data);
             });
         });
     }
 
-    public void sendMessageConnect() {
-        System.out.println("[CLIENT] I want to connect");
-        webSocket.writeTextMessage("I want to connect");
+    public void sendMessageFirstConnection() {
+        System.out.println("[CLIENT CLIENT CONNECT] " + MSGTAkkaVertx.FIRST_CONNECTION());
+        webSocketConnect.writeTextMessage(MSGTAkkaVertx.FIRST_CONNECTION());
+    }
+
+    public void sendMessageNormalConnection() {
+        System.out.println("[CLIENT CONNECT] " + MSGTAkkaVertx.NORMAL_CONNECTION());
+        webSocketConnect.writeTextMessage(MSGTAkkaVertx.NORMAL_CONNECTION());
+    }
+
+    public void sendMessageDisconnect() {
+        System.out.println("[CLIENT CONNECT] " + MSGTAkkaVertx.DISCONNECT());
+        webSocketConnect.writeTextMessage(MSGTAkkaVertx.DISCONNECT());
+    }
+
+    public void sendMessageAskRoute() {
+        System.out.println("[CLIENT ROUTE] " + "uri1-uri2");
+        webSocketRoute.writeTextMessage("uri1-uri2");
     }
 }
