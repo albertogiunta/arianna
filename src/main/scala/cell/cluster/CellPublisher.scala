@@ -2,7 +2,7 @@ package cell.cluster
 
 import akka.actor.ActorRef
 import akka.cluster.pubsub.DistributedPubSubMediator.Publish
-import com.actors.{BasicPublisher, ClusterMembersListener}
+import com.actors.{ClusterMembersListener, TemplatePublisher}
 import com.utils.BasicWatchDog
 import com.utils.WatchDog.WatchDogNotification
 import ontologies._
@@ -14,7 +14,7 @@ import ontologies.messages._
   * Actor that manages the sending of messages to the main server
   * Created by Matteo Gabellini on 29/06/2017.
   */
-class CellPublisher(mediator: ActorRef) extends BasicPublisher(mediator) {
+class CellPublisher(mediator: ActorRef) extends TemplatePublisher(mediator) {
 
     private val selfToSelf: MessageDirection = Location.Self >> Location.Self
     private val cellToCluster: MessageDirection = Location.Cell >> Location.Cluster
@@ -29,7 +29,6 @@ class CellPublisher(mediator: ActorRef) extends BasicPublisher(mediator) {
         log.info("Hello there from {}!", name)
 
         //Ask to the core actor the cell information in order to continue the handshake task
-        //println("aaa 0")
         parent ! AriadneMessage(
             Info,
             Info.Subtype.Request,
@@ -42,7 +41,6 @@ class CellPublisher(mediator: ActorRef) extends BasicPublisher(mediator) {
     override protected def receptive = {
         case msg@AriadneMessage(Info, Info.Subtype.Response, this.selfToSelf, sensorsInfoUpdate: SensorsInfoUpdate) => {
             println("Sensor Info " + sensorsInfoUpdate)
-            //Thread.sleep(1000)
             val handshakeMsg = AriadneMessage(
                 Handshake,
                 Handshake.Subtype.CellToMaster,
@@ -62,7 +60,6 @@ class CellPublisher(mediator: ActorRef) extends BasicPublisher(mediator) {
             log.info("I've become cultured")
         case WatchDogNotification => {
             //Ask to the core actor the cell information in order to continue the handshake task
-            //println("aaa 0")
             parent ! AriadneMessage(
                 Info,
                 Info.Subtype.Request,

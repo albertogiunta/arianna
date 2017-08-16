@@ -10,7 +10,7 @@ import admin.controller.{ChartWindowController, GraphicResources}
 /**
   * This class represent the View for the secondary window containing charts.
   **/
-class ChartView() {
+class ChartView() extends View {
 
     var controller: ChartWindowController = _
 

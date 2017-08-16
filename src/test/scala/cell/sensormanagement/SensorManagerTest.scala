@@ -26,19 +26,23 @@ class SensorManagerTest extends TestKit(ActorSystem("SensorManagerTest",
     with BeforeAndAfterAll {
 
     val actorName = "SensorManager"
+
     val tempSensConfig = SensorInfoFromConfig(
         SensorCategories.Temperature.id,
         -10,
         10,
         DoubleThresholdInfo(-1, 1))
+
     val smokeSensConfig = SensorInfoFromConfig(
         SensorCategories.Smoke.id,
         0,
         50,
         SingleThresholdInfo(30))
+
     var loadedConfig: CellConfig = CellConfig(
         CellInfo("uriTest", 8080),
         List(tempSensConfig, smokeSensConfig))
+
     val sensorsNumber = loadedConfig.sensors.size
 
     val testSensorInfoMsg: SensorInfo = new SensorInfo(1, 0.5)

@@ -7,7 +7,6 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit, TestProbe}
 import com.actors.CustomActor
 import com.utils.Practicability
-import ontologies.messages.Location.PreMade.masterToAdmin
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, ViewedFromACell}
 import ontologies.messages.MessageType.{Error, Handshake, Init, Topology, Update}
@@ -87,6 +86,14 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
     
         "At start time" must {
             "request the map to the admin" in {
+    
+                tester ! AriadneMessage(
+                    Init,
+                    Init.Subtype.Greetings,
+                    Location.Cell >> Location.Self,
+                    Greetings(List.empty)
+                )
+                
                 probe.expectMsg(
                     AriadneMessage(
                         Error, Error.Subtype.LookingForAMap,
@@ -187,23 +194,18 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
                 probe.expectMsg(AdminUpdate(0, topology.values.map(c => RoomDataUpdate(c)).toList))
             }
     
-            "accept late handshakes, temporary becoming acknowledging" in {
+            "accept late handshakes, temporary becoming acknowledging and then returning ProActive" in {
                 tester ! handshake
                 probe.expectMsg(topologyViewedFromACell)
                 assert(probe.sender == tester.underlyingActor.publisher)
                 tester ! ackTop
             }
     
-            "return proactive after a late handshake" in {
+            "resend mock handshakes to the admin when an unexpected planimetry is loaded" in {
     
                 tester ! planimetric
         
-                probe.expectMsg(AriadneMessage(
-                    Error,
-                    Error.Subtype.MapIdentifierMismatch,
-                    masterToAdmin,
-                    Empty()
-                ))
+                probe.expectMsg(handshake)
         
                 assert(probe.sender == tester.underlyingActor.admin)
             }
@@ -237,16 +239,6 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
     
         val supervisor: TestActorRef[TopologySupervisor] =
             TestActorRef(Props[TopologySupervisor], self, NamingSystem.TopologySupervisor)
-        
-        override def preStart {
-            
-            supervisor ! AriadneMessage(
-                Init,
-                Init.Subtype.Greetings,
-                Location.Cell >> Location.Self,
-                Greetings(List.empty)
-            )
-        }
         
         override def receive: Receive = {
             case msg if sender == supervisor => probe forward msg

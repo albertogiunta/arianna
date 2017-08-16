@@ -3,7 +3,7 @@ package cell.core
 import akka.actor.{ActorRef, Props}
 import cell.cluster.{CellClusterSupervisor, CellPublisher, CellSubscriber}
 import cell.sensormanagement.SensorManager
-import com.actors.BasicActor
+import com.actors.TemplateActor
 import com.utils.Practicability
 import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.Location._
@@ -24,7 +24,7 @@ import scala.util.Random
   * the other cell's actors initialization
   * Created by Matteo Gabellini on 14/07/2017.
   */
-class CellCoreActor(mediator: ActorRef) extends BasicActor {
+class CellCoreActor(mediator: ActorRef) extends TemplateActor {
 
     private var actualSelfLoad: Int = 0
     private var localCellInfo: CellInfo = CellInfo.empty

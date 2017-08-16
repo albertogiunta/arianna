@@ -79,7 +79,7 @@ class CellSubscriberTest extends TestKit(ActorSystem("CellSubscriberTest", CellS
     "A Subscriber of a Cell" should {
 
         val proxy = TestProbe()
-        val parent = system.actorOf(Props(new TestParent(proxy.ref)), "TestParent")
+        val parent = system.actorOf(Props(new TestParentForSubscriber(proxy.ref)), "TestParent")
 
         "initially ignore all messages that aren't Init messages" in {
 
@@ -99,7 +99,7 @@ class CellSubscriberTest extends TestKit(ActorSystem("CellSubscriberTest", CellS
                 Topic.Practicabilities,
                 Topic.ShutDown
             )
-            topicsSubscribedByACell foreach (X => proxy.expectMsg("Subscribed to a topic"))
+            topicsSubscribedByACell foreach (X => proxy.expectMsg(CellSubscriberTest.subscriptionResponse))
         }
 
         "after topic subscription change its behaviour to \"subscribed\" " +
@@ -117,7 +117,7 @@ class CellSubscriberTest extends TestKit(ActorSystem("CellSubscriberTest", CellS
 
         "in the \"subscribed\" behaviour, if receives Handshake Acknowledge, sends a message to the Publisher" in {
             proxy.send(parent, handshakeAckMsg)
-            proxy.expectMsg("handshake received")
+            proxy.expectMsg(CellSubscriberTest.hadshakeAckResponse)
         }
 
         "in the \"subscribed\" behaviour, if receives a topology forwards it to the parent" +
@@ -138,15 +138,19 @@ class CellSubscriberTest extends TestKit(ActorSystem("CellSubscriberTest", CellS
 
 object CellSubscriberTest {
     val path2Project: String = Paths.get("").toFile.getAbsolutePath
-    val configPath: String = path2Project + "/res/conf/akka/testCell.conf"
+    val configPath: String = path2Project + "/res/conf/akka/testCellSubscriber.conf"
 
     val config: Config = ConfigFactory.parseFile(new File(configPath)).withFallback(ConfigFactory.load()).resolve()
+
+    val subscriptionResponse = "Subscribed to a topic"
+
+    val hadshakeAckResponse = "handshake ack received"
 }
 
 
-class TestParent(proxy: ActorRef) extends CustomActor {
+class TestParentForSubscriber(proxy: ActorRef) extends CustomActor {
 
-    val fakeMediator = context.actorOf(Props(new TestMediator(proxy)), "Mediator")
+    val fakeMediator = context.actorOf(Props(new TestMediatorForSubscriber(proxy)), "Mediator")
     val child = context.actorOf(Props(new CellSubscriber(fakeMediator)), NamingSystem.Subscriber)
     val fakePublisher = context.actorOf(Props(new TestPublisher(proxy)), NamingSystem.Publisher)
     override def receive: Receive = {
@@ -158,16 +162,17 @@ class TestParent(proxy: ActorRef) extends CustomActor {
 class TestPublisher(proxy: ActorRef) extends CustomActor {
 
     override def receive: Receive = {
-        case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, _, cnt) => proxy forward "handshake received"
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, _, cnt) =>
+            proxy forward CellSubscriberTest.hadshakeAckResponse
     }
 }
 
-class TestMediator(proxy: ActorRef) extends CustomActor {
+class TestMediatorForSubscriber(proxy: ActorRef) extends CustomActor {
 
     override def receive: Receive = {
         case msg: Subscribe => {
             sender ! SubscribeAck(Subscribe(msg.topic, Option.empty, sender()))
-            proxy forward "Subscribed to a topic"
+            proxy forward CellSubscriberTest.subscriptionResponse
         }
     }
 }

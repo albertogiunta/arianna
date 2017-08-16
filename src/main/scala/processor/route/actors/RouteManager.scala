@@ -1,7 +1,7 @@
 package processor.route.actors
 
 import akka.actor.{ActorRef, Props}
-import com.actors.BasicActor
+import com.actors.TemplateActor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Route
 import ontologies.messages.MessageType.Route.Subtype.{Info, Response}
@@ -15,14 +15,14 @@ import system.names.NamingSystem
   *
   * Created by Alessandro on 11/07/2017.
   */
-class RouteManager extends BasicActor {
+class RouteManager extends TemplateActor {
     
     private var cacher: ActorRef = _
     
     private var processor: ActorRef = _
     
     
-    override def preStart = {
+    override def preStart: Unit = {
         super.preStart()
         cacher = context.actorOf(Props(new CacheManager(cacheKeepAlive = 2500L)), NamingSystem.CacheManager)
         processor = context.actorOf(Props(new RouteProcessor(parent)), NamingSystem.RouteProcessor)

@@ -1,7 +1,7 @@
 package cell.sensormanagement
 
 import cell.sensormanagement.sensors._
-import com.actors.{BasicActor, ClusterMembersListener}
+import com.actors.{ClusterMembersListener, TemplateActor}
 import ontologies.messages
 import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.Location._
@@ -18,7 +18,7 @@ import scala.collection.mutable.{ListBuffer, _}
   * the threshold (set in the configuration file of the cell) in an reactive way
   * Created by Matteo Gabellini on 05/07/2017.
   */
-class SensorManager extends BasicActor {
+class SensorManager extends TemplateActor {
 
     private var sensors = new HashMap[Int, SensorInfo]
     private val simulatedSensor: ListBuffer[SimulatedSensor[Double]] = new ListBuffer[SimulatedSensor[Double]]

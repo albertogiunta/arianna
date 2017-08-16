@@ -1,8 +1,6 @@
 package admin.controller
 
-import java.net.URL
-import java.util.ResourceBundle
-import javafx.fxml.{FXML, Initializable}
+import javafx.fxml.FXML
 import javafx.scene.control.Label
 import javafx.scene.text.Text
 
@@ -13,7 +11,7 @@ import ontologies.sensor.SensorCategories
   * This class represents the controller for the Sensor element inside the interface
   *
   **/
-class SensorTemplateController extends Initializable {
+class SensorTemplateController extends ViewController {
 
     @FXML
     private var sensorName: Label = _
@@ -23,7 +21,6 @@ class SensorTemplateController extends Initializable {
 
     private var sensorCategory: Int = _
 
-    override def initialize(location: URL, resources: ResourceBundle): Unit = {}
 
     /**
       * This method initializes the sensor template

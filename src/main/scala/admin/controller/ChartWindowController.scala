@@ -3,7 +3,7 @@ package admin.controller
 import java.net.URL
 import java.util.ResourceBundle
 import javafx.application.Platform
-import javafx.fxml.{FXML, FXMLLoader, Initializable}
+import javafx.fxml.{FXML, FXMLLoader}
 import javafx.scene.chart.{LineChart, XYChart}
 import javafx.scene.control.{Label, TitledPane}
 import javafx.scene.layout.GridPane
@@ -20,7 +20,7 @@ import scala.collection.mutable
   * This is the Controller class for the external charts window.
   *
   **/
-class ChartWindowController extends Initializable {
+class ChartWindowController extends ViewController {
 
     var chartActor: ActorRef = _
     private val HEAD = 0

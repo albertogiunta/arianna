@@ -1,7 +1,7 @@
-package master.core
+package master.cluster
 
 import akka.actor.{ActorRef, ActorSelection}
-import com.actors.BasicSubscriber
+import com.actors.TemplateSubscriber
 import ontologies.Topic
 import ontologies.messages.AriadneMessage
 import ontologies.messages.MessageType.Alarm
@@ -15,7 +15,7 @@ import system.names.NamingSystem
   *
   * Created by Xander_C on 11/07/2017.
   */
-class AlarmSupervisor(mediator: ActorRef) extends BasicSubscriber(mediator) {
+class AlarmSupervisor(mediator: ActorRef) extends TemplateSubscriber(mediator) {
     override val topics = Set(Topic.Alarms)
     
     private val topologySupervisor: () => ActorSelection = () => sibling(NamingSystem.TopologySupervisor).get

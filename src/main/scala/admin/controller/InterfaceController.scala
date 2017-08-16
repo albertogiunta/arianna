@@ -1,10 +1,8 @@
 package admin.controller
 
 import java.io.File
-import java.net.URL
-import java.util.ResourceBundle
 import javafx.application.Platform
-import javafx.fxml.{FXML, FXMLLoader, Initializable}
+import javafx.fxml.{FXML, FXMLLoader}
 import javafx.scene.canvas.Canvas
 import javafx.scene.control.Alert.AlertType
 import javafx.scene.control.{Alert, Button, SplitPane}
@@ -26,7 +24,7 @@ import scala.io.Source
   * This is the main controller for the interface of the Application
   *
   **/
-class InterfaceController extends Initializable {
+class InterfaceController extends ViewController {
     var interfaceActor: ActorRef = _
     var interfaceView: InterfaceView = _
     private val cellControllers: mutable.Map[RoomID, CellTemplateController] = new mutable.HashMap[RoomID, CellTemplateController]
@@ -44,8 +42,6 @@ class InterfaceController extends Initializable {
     private var vBoxPane: VBox = _
     @FXML
     private var mapContainer: Pane = _
-
-    override def initialize(location: URL, resources: ResourceBundle): Unit = {}
 
     /**
       * This method updates the interface with the information about all the cells

@@ -1,7 +1,7 @@
 package master.cluster
 
 import akka.actor.{ActorRef, ActorSelection}
-import com.actors.BasicSubscriber
+import com.actors.TemplateSubscriber
 import ontologies._
 import ontologies.messages.Location.PreMade.{adminToMaster, cellToMaster}
 import ontologies.messages.Location._
@@ -16,7 +16,7 @@ import system.names.NamingSystem
   *
   * Created by Alessandro on 28/06/2017.
   */
-class MasterSubscriber(mediator: ActorRef) extends BasicSubscriber(mediator) {
+class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) {
     
     override val topics: Set[Topic] = Set(Topic.TopologyACK, Topic.Updates, Topic.HandShakes)
     
@@ -48,10 +48,12 @@ class MasterSubscriber(mediator: ActorRef) extends BasicSubscriber(mediator) {
     
         case msg@AriadneMessage(Handshake, CellToMaster, `cellToMaster`, _) =>
             log.info("Resolving Handshake from {}", sender.path)
+    
             publisher() ! (
                 sender.path.elements.mkString("/"),
                 AriadneMessage(Handshake, Acknowledgement, Location.Master >> Location.Cell, Empty())
             )
+    
             topologySupervisor() forward msg
     
         case msg@AriadneMessage(Topology, ViewedFromACell, _, _) =>

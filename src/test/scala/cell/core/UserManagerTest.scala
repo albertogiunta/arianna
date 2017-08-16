@@ -11,14 +11,11 @@ import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, ViewedFromACell}
 import ontologies.messages.MessageType.{Init, Topology, Update}
 import ontologies.messages._
-import org.junit.runner.RunWith
 import org.scalatest.WordSpecLike
-import org.scalatest.junit.JUnitRunner
 import system.names.NamingSystem
 
 import scala.io.Source
 
-@RunWith(classOf[JUnitRunner])
 class UserManagerTest extends TestKit(ActorSystem("UserManagerTest")) with WordSpecLike {
 
     val path2Project: String = Paths.get("").toFile.getAbsolutePath

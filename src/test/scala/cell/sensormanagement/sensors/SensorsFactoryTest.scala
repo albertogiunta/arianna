@@ -2,14 +2,11 @@ package cell.sensormanagement.sensors
 
 import ontologies.messages.{DoubleThresholdInfo, SensorInfoFromConfig, SingleThresholdInfo}
 import ontologies.sensor.SensorCategories
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import org.scalatest.{FlatSpec, Matchers}
 
 /**
   * Created by Matteo Gabellini on 01/08/2017.
   */
-@RunWith(classOf[JUnitRunner])
 class SensorsFactoryTest extends FlatSpec with Matchers {
 
     //Temperature sensor 
