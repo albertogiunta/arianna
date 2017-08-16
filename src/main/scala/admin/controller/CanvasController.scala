@@ -1,8 +1,6 @@
 package admin.controller
 
-import java.net.URL
-import java.util.ResourceBundle
-import javafx.fxml.{FXML, Initializable}
+import javafx.fxml.FXML
 import javafx.scene.canvas.Canvas
 import javafx.scene.paint.Color
 
@@ -45,7 +43,7 @@ sealed case class PassageLine(startPoint: Point, endPoint: Point)
   * This class is the Controller for the Canvas node inside the interface.
   *
   * */
-class CanvasController extends Initializable {
+class CanvasController extends ViewController {
 
     @FXML
     private var mapCanvas: Canvas = _
@@ -57,8 +55,6 @@ class CanvasController extends Initializable {
     private val STARTING_POINT: Point = Point(4, 15)
 
     private val LINE_WIDTH: Double = 2.0
-
-    override def initialize(location: URL, resources: ResourceBundle): Unit = {}
 
     /**
       * This method draws on the Canvas a rectangle representing the Cell passed as parameter

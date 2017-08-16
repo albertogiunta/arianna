@@ -3,7 +3,7 @@ package cell.core
 import _root_.io.vertx.core.Vertx
 import akka.actor.ActorLogging
 import cell.WSClient
-import com.actors.BasicActor
+import com.actors.TemplateActor
 import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology.Subtype._
@@ -19,7 +19,7 @@ object MSGTAkkaVertx {
     val DISCONNECT: String = "disconnect"
 }
 
-class UserManager extends BasicActor with ActorLogging {
+class UserManager extends TemplateActor with ActorLogging {
 
     var uri: String = _
     var serial: Int = _

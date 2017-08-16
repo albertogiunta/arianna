@@ -1,8 +1,6 @@
 package admin.controller
 
-import java.net.URL
-import java.util.ResourceBundle
-import javafx.fxml.{FXML, FXMLLoader, Initializable}
+import javafx.fxml.{FXML, FXMLLoader}
 import javafx.geometry.Insets
 import javafx.scene.control.Button
 import javafx.scene.layout._
@@ -19,7 +17,7 @@ import scala.collection.mutable
 /**
   * This class represent the controller for each Cell template inside the interface
   */
-class CellTemplateController extends Initializable {
+class CellTemplateController extends ViewController {
 
     var adminActor: ActorRef = _
     private val ONE: String = "1"
@@ -44,8 +42,6 @@ class CellTemplateController extends Initializable {
     private var header: Pane = _
     @FXML
     private var chartsButton: Button = _
-
-    override def initialize(location: URL, resources: ResourceBundle): Unit = {}
 
     /**
       * This method fills the interface with static information about the Cell; it's called only one time when the map is loaded

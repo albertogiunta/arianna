@@ -1,7 +1,7 @@
 package cell.cluster
 
 import akka.actor.ActorRef
-import com.actors.{BasicSubscriber, ClusterMembersListener}
+import com.actors.{ClusterMembersListener, TemplateSubscriber}
 import ontologies._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType._
@@ -15,7 +15,7 @@ import system.names.NamingSystem
   *
   * Created by Matteo Gabellini on 29/06/2017.
   */
-class CellSubscriber(mediator: ActorRef) extends BasicSubscriber(mediator) {
+class CellSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) {
 
     override protected val topics = Set(
         //        Topic.HandShakes,

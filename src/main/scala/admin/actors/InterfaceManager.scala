@@ -5,7 +5,7 @@ import javafx.application.Platform
 import admin.controller.InterfaceController
 import admin.view.InterfaceView
 import akka.actor.{ActorRef, PoisonPill, Props}
-import com.actors.BasicActor
+import com.actors.TemplateActor
 import com.utils.Counter
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.{Alarm, Error, Handshake, Init, Interface, Topology}
@@ -20,7 +20,7 @@ import scala.collection.mutable
   * the updates about the correct cell.
   *
   **/
-class InterfaceManager extends BasicActor {
+class InterfaceManager extends TemplateActor {
 
     private var interfaceController: InterfaceController = _
     private val chartActors: mutable.Map[RoomID, ActorRef] = new mutable.HashMap[RoomID, ActorRef]

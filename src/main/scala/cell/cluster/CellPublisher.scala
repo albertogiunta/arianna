@@ -2,7 +2,7 @@ package cell.cluster
 
 import akka.actor.ActorRef
 import akka.cluster.pubsub.DistributedPubSubMediator.Publish
-import com.actors.{BasicPublisher, ClusterMembersListener}
+import com.actors.{ClusterMembersListener, TemplatePublisher}
 import com.utils.BasicWatchDog
 import com.utils.WatchDog.WatchDogNotification
 import ontologies._
@@ -14,7 +14,7 @@ import ontologies.messages._
   * Actor that manages the sending of messages to the main server
   * Created by Matteo Gabellini on 29/06/2017.
   */
-class CellPublisher(mediator: ActorRef) extends BasicPublisher(mediator) {
+class CellPublisher(mediator: ActorRef) extends TemplatePublisher(mediator) {
 
     private val selfToSelf: MessageDirection = Location.Self >> Location.Self
     private val cellToCluster: MessageDirection = Location.Cell >> Location.Cluster

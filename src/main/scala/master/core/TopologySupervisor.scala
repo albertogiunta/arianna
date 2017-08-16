@@ -1,7 +1,7 @@
 package master.core
 
 import akka.actor.{ActorRef, ActorSelection, Props}
-import com.actors.BasicActor
+import com.actors.TemplateActor
 import com.utils.Counter
 import com.utils.WatchDog.WatchDogNotification
 import ontologies.messages.Location.PreMade._
@@ -22,7 +22,7 @@ import scala.collection.mutable
   *
   * Created by Alessandro on 05/07/2017.
   */
-class TopologySupervisor extends BasicActor {
+class TopologySupervisor extends TemplateActor {
     
     private var mapVersionID: Int = 0
     

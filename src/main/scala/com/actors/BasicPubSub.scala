@@ -17,7 +17,7 @@ import ontologies.messages.{AriadneMessage, Greetings, Location}
   *
   * Created by Alessandro on 01/07/2017.
   */
-abstract class BasicSubscriber(mediator: ActorRef) extends BasicActor {
+abstract class TemplateSubscriber(mediator: ActorRef) extends TemplateActor {
     
     val cluster = akka.cluster.Cluster(context.system)
 
@@ -29,8 +29,8 @@ abstract class BasicSubscriber(mediator: ActorRef) extends BasicActor {
         mediator ! Put(self) // Point 2 Point Messaging with other Actors of the cluster
         topics.foreach(topic => mediator ! Subscribe(topic, self))
     }
-
-    override protected def receptive = {
+    
+    override protected def receptive: Receive = {
         case SubscribeAck(Subscribe(topic, _, me)) if me == self =>
             log.info("{} Successfully Subscribed to {}", name, topic)
             ackTopicReceived = ackTopicReceived + 1
@@ -56,7 +56,7 @@ abstract class BasicSubscriber(mediator: ActorRef) extends BasicActor {
   * This class gives a common template for a Akka Publisher
   *
   */
-abstract class BasicPublisher(mediator: ActorRef) extends BasicActor {
+abstract class TemplatePublisher(mediator: ActorRef) extends TemplateActor {
     
     val cluster = akka.cluster.Cluster(context.system)
 

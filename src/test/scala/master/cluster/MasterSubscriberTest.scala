@@ -103,9 +103,10 @@ class MasterSubscriberTest extends TestKit(ActorSystem("SubscriberTest", MasterS
         "When Subscribed stash all the Handshakes" in {
             
             tester ! handshake
-            
-            probe.expectNoMsg()
-            
+    
+            probe.expectMsg(ackHand)
+    
+            assert(probe.sender == tester.underlyingActor.publisher)
         }
         
         "Change its behaviour when a Planimetry is loaded, unstash all the handshakes" +
@@ -114,6 +115,8 @@ class MasterSubscriberTest extends TestKit(ActorSystem("SubscriberTest", MasterS
             tester ! planimetric
     
             probe.expectMsg(ackHand)
+    
+            assert(probe.sender == tester.underlyingActor.publisher)
             
             probe.expectMsg(handshake)
             
