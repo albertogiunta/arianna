@@ -34,11 +34,7 @@ class CellSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) {
         log.info("Hello there from {}!", name)
     }
 
-    override protected def subscribed = {
-        case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, _, cnt) =>
-            log.info("Got ack {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
-            sibling(NamingSystem.Publisher).get ! msg
-
+    override protected def subscribed = this.proactive orElse {
         case msg@AriadneMessage(Topology, Topology.Subtype.ViewedFromACell, _, cnt) =>
             log.info("I received the topology: {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
     
@@ -53,18 +49,28 @@ class CellSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) {
         case _ => stash
     }
 
-    private def cultured: Receive = {
+    private def cultured: Receive = this.proactive orElse {
+        case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) =>
+            this.parent ! msg
+            log.info("Got {} from {} of Type {}", msg.subtype, sender.path.name, msg.supertype)
+
         case msg@AriadneMessage(Alarm, _, _, cnt) =>
             log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
             this.parent ! msg
+
         case msg@AriadneMessage(Update, Update.Subtype.Practicability, _, cnt) =>
             log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
             this.parent ! msg
-        case msg@AriadneMessage(Route, _, _, cnt) =>
-            log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
-        case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, _, cnt) =>
-            log.info("Got ack {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
         case _ => desist _
     }
+
+
+    private def proactive: Receive = ({
+        case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) =>
+            this.parent ! msg
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, _, cnt) =>
+            log.info("Got ack {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
+            sibling(NamingSystem.Publisher).get ! msg
+    }: Receive)
 }
 
