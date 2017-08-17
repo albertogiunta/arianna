@@ -1,4 +1,4 @@
-package processor.route.actors
+package cell.processor.route.actors
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit, TestProbe}
@@ -15,6 +15,10 @@ class RouteCachingTest extends TestKit(ActorSystem("RouteProcessorTest"))
     val rInfo = RouteInfo(req, AreaViewedFromACell(0, List.empty))
     
     val res = RouteResponse(req, List(RoomID(0, "A"), RoomID(1, "B"), RoomID(2, "C"), RoomID(3, "D")))
+    
+    override def afterAll {
+        TestKit.shutdownActorSystem(system)
+    }
     
     "A route cacher" should {
         val probe = TestProbe()

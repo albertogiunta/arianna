@@ -1,9 +1,9 @@
-package processor.route.algorithms
+package cell.processor.route.algorithms
 
+import cell.processor.route.algorithms.AStarSearch.Graph
 import org.junit.runner.RunWith
 import org.scalatest._
 import org.scalatest.junit.JUnitRunner
-import processor.route.algorithms.AStarSearch.Graph
 
 /**
   * Created by Alessandro on 12/07/2017.

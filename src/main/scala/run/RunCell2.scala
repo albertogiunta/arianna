@@ -27,7 +27,7 @@ object RunCell2 extends App {
     
     val middleware = DistributedPubSub(system).mediator
     
-    var core = system.actorOf(Props(new CellCoreActor(middleware)), NamingSystem.CellCore)
+    var core = system.actorOf(Props(new CellCoreActor(middleware)), NamingSystem.CellCore + 2)
     
     core ! AriadneMessage(Init, Init.Subtype.Greetings,
         Location.Master >> Location.Self, Greetings(List("res/json/cell/cell2.json")))

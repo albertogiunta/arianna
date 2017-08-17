@@ -18,6 +18,10 @@ import system.names.NamingSystem
 class DataStreamerTest extends TestKit(ActorSystem("DataStreamerTest"))
     with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll {
     
+    override def afterAll {
+        TestKit.shutdownActorSystem(system)
+    }
+    
     "A DataStreamer " should {
         
         val probe = TestProbe()

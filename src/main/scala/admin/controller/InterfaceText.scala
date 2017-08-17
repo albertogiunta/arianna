@@ -24,7 +24,7 @@ object InterfaceText {
 
 object GraphicResources {
 
-    val interface: String = "/interface.fxml"
+    val interface: String = "/interfaceTemplate.fxml"
 
     val canvas: String = "/canvasTemplate.fxml"
 
@@ -32,7 +32,7 @@ object GraphicResources {
 
     val chartWindow: String = "/chartWindowTemplate.fxml"
 
-    val chart: String = "/chart.fxml"
+    val chart: String = "/chartTemplate.fxml"
 
     val sensor: String = "/sensorTemplate.fxml"
 

@@ -51,11 +51,7 @@ class CellTemplateController extends ViewController {
       **/
     def setStaticInformation(room: Room): Unit = {
         roomInfo = room.info
-        roomName setText room.info.id.name
-        maxCapacityValue setText room.info.capacity.toString
-        sqrMetersValue setText room.info.squareMeters.toString
-        if (room.info.isEntryPoint) entranceValue setText ONE else entranceValue setText ZERO
-        if (room.info.isExitPoint) exitValue setText ONE else exitValue setText ZERO
+        setRoomInfo(roomInfo)
     }
 
     /**
@@ -65,9 +61,11 @@ class CellTemplateController extends ViewController {
       * @param update : CellForView object containing only dynamic data
       * */
     def setDynamicInformation(update: RoomDataUpdate): Unit = {
-        currentPeopleValue setText update.currentPeople.toString
+        currentPeopleValue setText update.currentPeople.toString + "/" + maxCapacityValue.getText
         update.cell.sensors.foreach(sensor => {
-            sensorsController.get(sensor.categoryId).get updateSensor sensor
+            if (sensorsController.contains(sensor.categoryId)) {
+                sensorsController.get(sensor.categoryId).get updateSensor sensor
+            }
         })
     }
 
@@ -79,14 +77,7 @@ class CellTemplateController extends ViewController {
       * */
     def addSensors(sensorsInfo: SensorsInfoUpdate): Unit = {
         chartsButton setDisable false
-        sensorsInfo.sensors.foreach(sensor => {
-            var loader = new FXMLLoader(getClass.getResource(GraphicResources.sensor))
-            var sensorTemplate = loader.load[HBox]
-            val sensorController = loader.getController[SensorTemplateController]
-            sensorController createSensor sensor
-            sensorsController += ((sensor.categoryId, sensorController))
-            sensorsContainer.getChildren add sensorTemplate
-        })
+        sensorsInfo.sensors.foreach(sensor => loadSensor(sensor))
 
     }
 
@@ -120,5 +111,22 @@ class CellTemplateController extends ViewController {
       **/
     def enableChartButton(): Unit = {
         chartsButton setDisable false
+    }
+
+    private def loadSensor(sensor: SensorInfo): Unit = {
+        var loader = new FXMLLoader(getClass.getResource(GraphicResources.sensor))
+        var sensorTemplate = loader.load[HBox]
+        val sensorController = loader.getController[SensorTemplateController]
+        sensorController createSensor sensor
+        sensorsController += ((sensor.categoryId, sensorController))
+        sensorsContainer.getChildren add sensorTemplate
+    }
+
+    private def setRoomInfo(roomInfo: RoomInfo): Unit = {
+        roomName setText roomInfo.id.name
+        maxCapacityValue setText roomInfo.capacity.toString
+        sqrMetersValue setText roomInfo.squareMeters.toString
+        if (roomInfo.isEntryPoint) entranceValue setText ONE else entranceValue setText ZERO
+        if (roomInfo.isExitPoint) exitValue setText ONE else exitValue setText ZERO
     }
 }

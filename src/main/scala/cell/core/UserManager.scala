@@ -4,10 +4,11 @@ import _root_.io.vertx.core.Vertx
 import akka.actor.ActorLogging
 import cell.WSClient
 import com.actors.TemplateActor
+import io.vertx.scala.core.http.ServerWebSocket
 import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology.Subtype._
-import ontologies.messages.MessageType.{Topology, Update}
+import ontologies.messages.MessageType.{Alarm, Topology, Update}
 import ontologies.messages._
 import spray.json._
 import system.exceptions.IncorrectInitMessageException
@@ -17,6 +18,8 @@ object MSGTAkkaVertx {
     val FIRST_CONNECTION: String = "firstConnection"
     val NORMAL_CONNECTION_RESPONSE = "ack"
     val DISCONNECT: String = "disconnect"
+    val END_ALARM: String = "endAlarm"
+    val SYS_SHUTDOWN: String = "sysShutdown"
 }
 
 class UserManager extends TemplateActor with ActorLogging {
@@ -46,7 +49,7 @@ class UserManager extends TemplateActor with ActorLogging {
         c = new WSClient(vertx)
         vertx.deployVerticle(c)
         Thread.sleep(1000)
-        c.sendMessageConnect()
+        c.sendMessageFirstConnection()
     }
 
     override protected def receptive: Receive = {
@@ -60,36 +63,36 @@ class UserManager extends TemplateActor with ActorLogging {
         case MSGTAkkaVertx.FIRST_CONNECTION =>
             println("GOT NEW FIRST USER")
             s.sendAreaToNewUser(areaForUser.toJson.toString())
-            incrementUsrNumber()
+            usrNumber = usrNumber + 1
+            println(usrNumber)
             sendCurrentPeopleUpdate()
         case MSGTAkkaVertx.NORMAL_CONNECTION =>
             println("GOT NEW NORMAL USER")
-            s.sendOkToNewUser(MSGTAkkaVertx.NORMAL_CONNECTION_RESPONSE)
-            incrementUsrNumber()
+            s.sendAckToNewUser(MSGTAkkaVertx.NORMAL_CONNECTION_RESPONSE)
+            usrNumber = usrNumber + 1
             sendCurrentPeopleUpdate()
         case MSGTAkkaVertx.DISCONNECT =>
             println("USER DISCONNECTING")
             s.disconnectUsers()
-            decrementUsrNumber()
+            usrNumber = usrNumber - 1
             sendCurrentPeopleUpdate()
         case msg: RouteRequestShort =>
-            // use for test
-            //            Thread.sleep(1500)
-            //            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest("", areaForCell.rooms.head.info.id, areaForCell.rooms.tail.head.info.id, isEscape = true), areaForCell.rooms.map(c => c.info.id)))
-            //            Thread.sleep(1500)
-            //            self ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, Location.User >> Location.Cell, RouteResponse(RouteRequest("", getCellWithUri(msg.fromCellUri), getCellWithUri(msg.toCellUri), isEscape = false), areaForCell.rooms.map(c => c.info.id)))
-            // use in production
             parent ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell, RouteRequest(msg.userID, getCellWithUri(msg.fromCellUri), getCellWithUri(msg.toCellUri), isEscape = false))
         case AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, _, response@RouteResponse(request, route)) =>
             request match {
                 case RouteRequest(_, _, _, false) => s.sendRouteToUsers(response, RouteResponseShort(route).toJson.toString())
                 case RouteRequest(_, _, _, true) => s.sendAlarmToUsers(RouteResponseShort(route).toJson.toString())
             }
+        case AriadneMessage(Alarm, Alarm.Subtype.End, _, _) =>
+            s.sendAlarmEndToUsers()
+
     }
 
-    private def incrementUsrNumber() = usrNumber += 1
 
-    private def decrementUsrNumber() = usrNumber -= 1
+    override def postStop(): Unit = {
+        s.sendSystemShutDownToUsers()
+        super.postStop()
+    }
 
     private def sendCurrentPeopleUpdate(): Unit = {
         println("sending people update " + usrNumber)
@@ -101,3 +104,5 @@ class UserManager extends TemplateActor with ActorLogging {
     }
 
 }
+
+case class WSRouteInfo(connectWSId: String, routeWSId: String, serverWebSocket: ServerWebSocket)

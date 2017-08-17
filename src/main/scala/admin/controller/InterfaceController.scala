@@ -136,12 +136,7 @@ class InterfaceController extends ViewController {
     def showErrorDialog(): Unit = {
         Platform.runLater(() => {
             cleanInterface
-            val alert = new Alert(AlertType.ERROR)
-            alert setTitle InterfaceText.errorTitle
-            alert setHeaderText InterfaceText.errorHeader
-            alert setContentText InterfaceText.errorText
-
-            alert.showAndWait
+            openAlert
             loadButton setDisable false
 
         })
@@ -198,6 +193,15 @@ class InterfaceController extends ViewController {
             canvasController.redrawMap
             cellControllers.values.foreach(cellController => cellController.endAlarm)
         })
+    }
+
+    private def openAlert(): Unit = {
+        val alert = new Alert(AlertType.ERROR)
+        alert setTitle InterfaceText.errorTitle
+        alert setHeaderText InterfaceText.errorHeader
+        alert setContentText InterfaceText.errorText
+
+        alert.showAndWait
     }
 
 

@@ -97,6 +97,10 @@ trait SimulationStrategy[D, S <: GenericSensor[D]] {
   **/
 object SimulationStrategies {
 
+    trait MonotonicSimulation[D, S <: GenericSensor[D]] extends SimulationStrategy[D, S] {
+        def changeStep: D
+    }
+
     /**
       * A simulation strategy implementation for sensors that manage value Double.
       * This strategy models a behaviour for a sensor that change its value according to its scale
@@ -109,7 +113,7 @@ object SimulationStrategies {
       *
       **/
     case class MonotonicDoubleSimulation(val changeStep: Double)
-        extends SimulationStrategy[Double, NumericSensor[Double]] {
+        extends MonotonicSimulation[Double, NumericSensor[Double]] {
         private var increasePhase: Boolean = true
 
         private def shouldIncrease(sensor: NumericSensor[Double]): Boolean =
@@ -141,7 +145,7 @@ object SimulationStrategies {
       *
       **/
     case class MonotonicIntSimulation(val changeStep: Int)
-        extends SimulationStrategy[Int, NumericSensor[Int]] {
+        extends MonotonicSimulation[Int, NumericSensor[Int]] {
         private var increasePhase: Boolean = true
 
         private def shouldIncrease(sensor: NumericSensor[Int]): Boolean =

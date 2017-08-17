@@ -12,9 +12,9 @@ import javafx.scene.chart.{LineChart, XYChart}
 class SensorChartController extends ViewController {
 
     @FXML
-    private var chart: LineChart[Int, Double] = _
+    private var chart: LineChart[Double, Double] = _
 
-    private val data: XYChart.Series[Int, Double] = new XYChart.Series[Int, Double]
+    private var data: XYChart.Series[Double, Double] = new XYChart.Series[Double, Double]
 
     private var time = (0 to Int.MaxValue - 1).iterator
 
@@ -29,9 +29,7 @@ class SensorChartController extends ViewController {
       * @param value : new Double to add in the chart
       **/
     def addValue(value: Double): Unit = {
-        if (data.getData.size.equals(20)) {
-            data.getData.remove(0)
-        }
+        data = ChartUtils.resizeIfNeeded(data)
         data.getData add new XYChart.Data(time.next, value)
     }
 }
