@@ -4,9 +4,12 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit, TestProbe}
 import com.actors.CustomActor
 import ontologies.messages._
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import system.names.NamingSystem
 
+@RunWith(classOf[JUnitRunner])
 class RouteCachingTest extends TestKit(ActorSystem("RouteProcessorTest"))
     with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll {
     
