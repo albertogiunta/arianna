@@ -6,7 +6,6 @@ object Practicability {
     
     def apply(capacity: Double, load: Double, flows: Double): Double = {
         if (flows == 0) Double.PositiveInfinity
-        else if (load == 0) 0.0
         else load / capacity * (
             if (flows == 1) log_b(3.0, 4.5)
             else if (flows == 2) log_b(3.0, 3.0)

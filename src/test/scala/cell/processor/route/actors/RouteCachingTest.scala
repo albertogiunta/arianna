@@ -16,6 +16,10 @@ class RouteCachingTest extends TestKit(ActorSystem("RouteProcessorTest"))
     
     val res = RouteResponse(req, List(RoomID(0, "A"), RoomID(1, "B"), RoomID(2, "C"), RoomID(3, "D")))
     
+    override def afterAll {
+        TestKit.shutdownActorSystem(system)
+    }
+    
     "A route cacher" should {
         val probe = TestProbe()
         val routeManager: TestActorRef[Tester] = TestActorRef(Props(new Tester(probe.ref)), "Tester")
