@@ -20,7 +20,7 @@ class ChartView() extends View {
         controller = loader.getController[ChartWindowController]
         val stage = new Stage
         stage.setOnCloseRequest((e) => {
-            controller.closeView
+            controller.closeWindow
         })
         stage setTitle "Arianna Charts"
         stage setScene new Scene(template)

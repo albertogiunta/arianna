@@ -20,16 +20,28 @@ import scala.collection.mutable
   * This is the Controller class for the external charts window.
   *
   **/
+
+object ChartUtils {
+    private val HEAD = 0
+    private val MAX_DATA_ON_GRAPH = 20
+
+    def resizeIfNeeded(data: XYChart.Series[Double, Double]): XYChart.Series[Double, Double] = {
+        if (data.getData.size.equals(MAX_DATA_ON_GRAPH)) {
+            data.getData remove HEAD
+        }
+        data
+    }
+
+}
+
 class ChartWindowController extends ViewController {
 
     var chartActor: ActorRef = _
-    private val HEAD = 0
-    private val MAX_DATA_ON_GRAPH = 20
     @FXML
     private var mainPane: GridPane = _
 
     @FXML
-    private var peopleChart: LineChart[Int, Int] = _
+    private var peopleChart: LineChart[Double, Double] = _
 
     @FXML
     private var cellName: Label = _
@@ -38,7 +50,7 @@ class ChartWindowController extends ViewController {
 
     private val sensorChartControllers: mutable.Map[Int, SensorChartController] = new mutable.HashMap[Int, SensorChartController]()
 
-    private val data: XYChart.Series[Int, Int] = new XYChart.Series[Int, Int]
+    private var data: XYChart.Series[Double, Double] = new XYChart.Series[Double, Double]
 
     private var time = (0 to Int.MaxValue - 1).iterator
 
@@ -85,17 +97,15 @@ class ChartWindowController extends ViewController {
       * */
     def updateCharts(update: RoomDataUpdate): Unit = {
         update.cell.sensors.foreach(sensor => sensorChartControllers.get(sensor.categoryId).get.addValue(sensor.value))
-        if (data.getData.size.equals(MAX_DATA_ON_GRAPH)) {
-            data.getData remove HEAD
-        }
-        data.getData add new XYChart.Data(time.next, update.currentPeople)
+        data = ChartUtils.resizeIfNeeded(data)
+        data.getData add new XYChart.Data(time.next.toDouble, update.currentPeople.toDouble)
 
     }
 
     /**
       * This method is called when the secondary window is closed.
       **/
-    def closeView(): Unit = {
+    def closeWindow(): Unit = {
         chartActor ! AriadneMessage(Interface, Interface.Subtype.CloseChart, Location.Admin >> Location.Self, roomInfo)
     }
 

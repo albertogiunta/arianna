@@ -5,13 +5,13 @@ import com.utils.Pair;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.ServerWebSocket;
+import io.vertx.core.impl.ConcurrentHashSet;
 import ontologies.messages.RouteRequestShort;
 import ontologies.messages.RouteResponse;
 import scala.tools.jline_embedded.internal.Log;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -24,11 +24,11 @@ public class WSServer extends AbstractVerticle {
     private final Vertx vertx;
     private final ActorRef userActor;
 
-    private Map<String, ServerWebSocket> usersWaitingForDisconnection;
-    private Map<String, ServerWebSocket> usersWaitingForConnectionAck;
-    private Map<String, ServerWebSocket> usersWaitingForArea;
-    private Map<String, ServerWebSocket> usersReadyForAlarm;
-    private Map<Pair<String, String>, List<Pair<String, ServerWebSocket>>> usersWaitingForRoute;
+    Map<String, ServerWebSocket> usersWaitingForDisconnection;
+    Map<String, ServerWebSocket> usersWaitingForConnectionAck;
+    Map<String, ServerWebSocket> usersWaitingForArea;
+    Map<String, ServerWebSocket> usersReadyForAlarm;
+    Map<String, Set<Pair<String, ServerWebSocket>>> usersWaitingForRoute;
 
     private String baseUrl = "";
     private Integer basePort = 0;
@@ -53,26 +53,26 @@ public class WSServer extends AbstractVerticle {
             if (ws.path().equals(baseUrl + "/connect")) {
                 ws.handler(data -> {
                     Log.info("[SERVER " + baseUrl + "] GOT NEW USER | " + data.toString());
-                    if (data.toString().equalsIgnoreCase(MSGTAkkaVertx.NORMAL_CONNECTION())) {
+                    if (data.toString().equalsIgnoreCase(MSGTAkkaVertx.FIRST_CONNECTION())) {
+                        this.usersWaitingForArea.put(ws.textHandlerID(), ws);
+                        System.out.println("sending first to actor" + usersWaitingForArea.size());
+                    } else if (data.toString().equalsIgnoreCase(MSGTAkkaVertx.NORMAL_CONNECTION())) {
                         System.out.println("sending normal to actor");
                         this.usersWaitingForConnectionAck.put(ws.textHandlerID(), ws);
-                    } else if (data.toString().equalsIgnoreCase(MSGTAkkaVertx.FIRST_CONNECTION())) {
-                        System.out.println("sending first to actor");
-                        this.usersWaitingForArea.put(ws.textHandlerID(), ws);
                     } else if (data.toString().equalsIgnoreCase(MSGTAkkaVertx.DISCONNECT())) {
                         System.out.println("sending disconnect to actor");
                         this.usersWaitingForDisconnection.put(ws.textHandlerID(), ws);
                     }
-                    userActor.tell(data.toString(), ActorRef.noSender());
+                    if (userActor != null) userActor.tell(data.toString(), ActorRef.noSender());
                 });
             } else if (ws.path().equals(baseUrl + "/route")) {
                 ws.handler(data -> {
-                    Log.info("asked route " + data.toString());
                     String uriStart = data.toString().split("-")[0];
                     String uriEnd = data.toString().split("-")[1];
-                    Pair<String, String> p = new Pair<>(uriStart, uriEnd);
-                    usersWaitingForRoute.computeIfAbsent(p, k -> new LinkedList<>()).add(new Pair<>(ws.textHandlerID(), ws));
-                    userActor.tell(new RouteRequestShort(ws.textHandlerID(), uriStart, uriEnd, false), ActorRef.noSender());
+                    usersWaitingForRoute.computeIfAbsent(data.toString(), k -> new ConcurrentHashSet<>()).add(new Pair<>(ws.textHandlerID(), ws));
+                    Log.info("asked route " + data.toString() + " " + usersWaitingForRoute.size());
+                    if (userActor != null)
+                        userActor.tell(new RouteRequestShort(ws.textHandlerID(), uriStart, uriEnd, false), ActorRef.noSender());
                 });
             } else if (ws.path().equals(baseUrl + "/alarm")) {
                 this.usersReadyForAlarm.put(ws.textHandlerID(), ws);
@@ -95,7 +95,7 @@ public class WSServer extends AbstractVerticle {
      *
      * @param ack the ack message
      */
-    public void sendOkToNewUser(String ack) {
+    public void sendAckToNewUser(String ack) {
         System.out.println("Waiting for ACK " + usersWaitingForConnectionAck.size());
         usersWaitingForConnectionAck.values().forEach(ws -> ws.writeTextMessage(ack));
         usersWaitingForConnectionAck.clear();
@@ -123,7 +123,6 @@ public class WSServer extends AbstractVerticle {
             usersWaitingForConnectionAck.remove(id);
             usersWaitingForArea.remove(id);
             usersReadyForAlarm.remove(id);
-            // remove from usersWaitingForRoute
         });
         this.usersWaitingForDisconnection.clear();
     }
@@ -145,8 +144,20 @@ public class WSServer extends AbstractVerticle {
      * @param routeAsJson the marshaled version of the route
      */
     public void sendRouteToUsers(RouteResponse route, String routeAsJson) {
-        Pair<String, String> p = new Pair<>("uri" + route.request().fromCell().serial(), "uri" + route.request().toCell().serial());
-        this.usersWaitingForRoute.getOrDefault(p, new LinkedList<>()).forEach(u -> u.snd().writeTextMessage(routeAsJson));
-        this.usersWaitingForRoute.remove(p);
+        int departureCellId = route.request().fromCell().serial();
+        int arrivalCellId = route.request().toCell().serial();
+        sendRouteToUsers(departureCellId, arrivalCellId, routeAsJson);
+    }
+
+    public void sendRouteToUsers(int initialRouteId, int finalRouteId, String routeAsJson) {
+        System.out.println(usersWaitingForRoute.toString());
+        String routeId = buildRouteId(initialRouteId, finalRouteId);
+        this.usersWaitingForRoute.getOrDefault(routeId, new ConcurrentHashSet<>()).forEach(u -> u.snd().writeTextMessage(routeAsJson));
+        this.usersWaitingForRoute.remove(routeId);
+    }
+
+    private String buildRouteId(int departureCell, int arrivalCell) {
+        String uri = "uri";
+        return uri + departureCell + "-" + uri + arrivalCell;
     }
 }

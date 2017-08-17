@@ -1,11 +1,11 @@
-package processor
+package cell.processor
 
 import java.io.File
 import java.nio.file.Paths
 
+import cell.processor.route.actors.RouteProcessor
 import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.{Area, AreaViewedFromACell}
-import processor.route.actors.RouteProcessor
 import spray.json._
 
 import scala.concurrent.Await
