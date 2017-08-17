@@ -18,8 +18,8 @@ trait Topic {
     override def toString: String = {
         topic + "/" + subTopic.getOrElse("All")
     }
-
-    override def equals(obj: scala.Any) = obj match {
+    
+    override def equals(obj: scala.Any): Boolean = obj match {
         case that: Topic => that.toString == this.toString
         case _ => false
     }
