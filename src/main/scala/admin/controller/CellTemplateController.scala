@@ -63,7 +63,9 @@ class CellTemplateController extends ViewController {
     def setDynamicInformation(update: RoomDataUpdate): Unit = {
         currentPeopleValue setText update.currentPeople.toString + "/" + maxCapacityValue.getText
         update.cell.sensors.foreach(sensor => {
-            sensorsController.get(sensor.categoryId).get updateSensor sensor
+            if (sensorsController.contains(sensor.categoryId)) {
+                sensorsController.get(sensor.categoryId).get updateSensor sensor
+            }
         })
     }
 

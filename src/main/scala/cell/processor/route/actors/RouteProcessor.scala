@@ -1,13 +1,13 @@
-package processor.route.actors
+package cell.processor.route.actors
 
 import akka.actor.{ActorRef, ActorSelection}
+import cell.processor.route.algorithms.AStarSearch
+import cell.processor.route.algorithms.AStarSearch.Graph
 import com.actors.CustomActor
 import com.utils.Practicability
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Route
 import ontologies.messages._
-import processor.route.algorithms.AStarSearch
-import processor.route.algorithms.AStarSearch.Graph
 import system.names.NamingSystem
 
 import scala.collection.immutable.HashMap

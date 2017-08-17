@@ -1,6 +1,6 @@
-package processor.route.algorithms
+package cell.processor.route.algorithms
 
-import processor.route.algorithms.Dijkstra.Graph
+import cell.processor.route.algorithms.Dijkstra.Graph
 
 import scala.annotation.tailrec
 import scala.collection.immutable.HashMap

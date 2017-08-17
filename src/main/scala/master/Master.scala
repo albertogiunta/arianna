@@ -1,8 +1,9 @@
-package master.core
+package master
 
 import akka.actor.{ActorRef, Props}
 import com.actors.CustomActor
 import master.cluster._
+import master.core.{AdminManager, TopologySupervisor}
 import ontologies.messages.AriadneMessage
 import ontologies.messages.MessageType.Init
 import system.names.NamingSystem
@@ -20,7 +21,7 @@ class Master(mediator: ActorRef) extends CustomActor {
     var alarmSupervisor: ActorRef = _
     var listener: ActorRef = _
     
-    override def preStart = {
+    override def preStart: Unit = {
     
         super.preStart()
     
@@ -42,7 +43,9 @@ class Master(mediator: ActorRef) extends CustomActor {
     
         case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) =>
             publisher ! msg
-            context.system.terminate().onComplete(_ => println("Ariadne has shat down..."))
+            context.system.terminate().onComplete(_ => {
+                println("Ariadne has shat down..."); System.exit(1)
+            })
     
         case msg => log.info("Ignoring {}", msg)
     }

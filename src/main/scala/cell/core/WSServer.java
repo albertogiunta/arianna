@@ -4,6 +4,7 @@ import akka.actor.ActorRef;
 import com.utils.Pair;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.impl.ConcurrentHashSet;
 import ontologies.messages.RouteRequestShort;
@@ -48,7 +49,8 @@ public class WSServer extends AbstractVerticle {
 
     @Override
     public void start() throws Exception {
-        vertx.createHttpServer().websocketHandler(ws -> {
+        HttpServerOptions options = new HttpServerOptions().setTcpKeepAlive(true);
+        vertx.createHttpServer(options).websocketHandler(ws -> {
             System.out.println("[SERVER " + baseUrl + "] PATH " + ws.path() + " " + ws.uri() + " " + ws.query());
             if (ws.path().equals(baseUrl + "/connect")) {
                 ws.handler(data -> {
@@ -128,6 +130,13 @@ public class WSServer extends AbstractVerticle {
     }
 
     /**
+     * Called when an alarm is shut down because the emergency's done
+     */
+    public void sendSystemShutDownToUsers() {
+        usersReadyForAlarm.forEach((s, ws) -> ws.writeTextMessage(MSGTAkkaVertx.SYS_SHUTDOWN()));
+    }
+
+    /**
      * Called when an alarm is the detected in the system and should be propagated to all the end
      * users
      *
@@ -135,6 +144,13 @@ public class WSServer extends AbstractVerticle {
      */
     public void sendAlarmToUsers(String routeAsJson) {
         usersReadyForAlarm.forEach((s, ws) -> ws.writeTextMessage(routeAsJson));
+    }
+
+    /**
+     * Called when an alarm is shut down because the emergency's done
+     */
+    public void sendAlarmEndToUsers() {
+        usersReadyForAlarm.forEach((s, ws) -> ws.writeTextMessage(MSGTAkkaVertx.END_ALARM()));
     }
 
     /**

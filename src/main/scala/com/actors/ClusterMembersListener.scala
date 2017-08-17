@@ -13,22 +13,20 @@ import akka.cluster.{Cluster, Member, MemberStatus}
   * [link: http://doc.akka.io/docs/akka/current/scala/cluster-usage.html]
   */
 abstract class ClusterMembersListener extends CustomActor {
-
-    protected val cluster = Cluster(context.system)
     
-    //    protected val mediator: ActorRef = DistributedPubSub(context.system).mediator
-
-    protected var nodes = Set.empty[Address]
-
-    override def preStart = {
+    protected val cluster: Cluster = Cluster(context.system)
+    
+    protected var nodes: Set[Address] = Set.empty
+    
+    override def preStart: Unit = {
         cluster.subscribe(self, classOf[MemberUp], classOf[MemberEvent])
-        log.info("I'm born")
+        log.info("Started...")
     }
     
     override def postStop: Unit = cluster unsubscribe self
-
-    def receive = {
-        case state: CurrentClusterState => {
+    
+    def receive: Receive = {
+        case state: CurrentClusterState =>
             nodes = state.members.toStream
                 .filter(m => m.status == MemberStatus.Up)
                 .map(m => m.address).toSet
@@ -38,8 +36,7 @@ abstract class ClusterMembersListener extends CustomActor {
                 .filter(m => m.status == MemberStatus.Up)
                 .map(m => (m.address, m))
                 .toMap.get(cluster.selfAddress)
-            if (!currentMember.isEmpty) whenMemberUp(currentMember.get)
-        }
+            if (currentMember.isDefined) whenMemberUp(currentMember.get)
 
 
         case MemberUp(member) =>
@@ -56,8 +53,8 @@ abstract class ClusterMembersListener extends CustomActor {
             log.info("Member is Removed: {}. {} nodes cluster",
                 member.address, nodes.size)
             whenMemberRemoved(member)
-
-        case msg => // log.info("Unhandled... {} ", msg.toString)
+        
+        case msg => log.info("Unhandled... {} ", msg.toString)
     }
 
 

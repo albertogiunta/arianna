@@ -42,8 +42,6 @@ class CellSubscriberTest extends TestKit(ActorSystem("CellSubscriberTest", CellS
         Location.Master >> Location.Cell,
         AreaViewedFromACell(0, List.empty[RoomViewedFromACell]))
 
-    //    val routeMsg = AriadneMessage(Route, _, _, _)
-
     val updateMsg = AriadneMessage(
         Update,
         Update.Subtype.Practicability,
@@ -72,6 +70,20 @@ class CellSubscriberTest extends TestKit(ActorSystem("CellSubscriberTest", CellS
         )
     )
 
+    val alarmEndMsg = AriadneMessage(
+        Alarm,
+        Alarm.Subtype.End,
+        Location.Master >> Location.Cell,
+        Empty()
+    )
+
+    val shutdownMsg = AriadneMessage(
+        Init,
+        Init.Subtype.Goodbyes,
+        Location.Master >> Location.Cell,
+        Empty()
+    )
+
     override def afterAll {
         TestKit.shutdownActorSystem(system)
     }
@@ -84,9 +96,10 @@ class CellSubscriberTest extends TestKit(ActorSystem("CellSubscriberTest", CellS
         "initially ignore all messages that aren't Init messages" in {
 
             proxy.send(parent, topologyMsg)
-            //            proxy.send(parent, routeMsg)
             proxy.send(parent, updateMsg)
             proxy.send(parent, alarmMsg)
+            proxy.send(parent, alarmEndMsg)
+            proxy.send(parent, shutdownMsg)
             proxy.expectNoMsg()
         }
 
@@ -114,10 +127,20 @@ class CellSubscriberTest extends TestKit(ActorSystem("CellSubscriberTest", CellS
             proxy.expectNoMsg()
         }
 
+        "after topic subscription change its behaviour to \"subscribed\" " +
+            "and stashes messages that notify alarm end" in {
+            proxy.send(parent, alarmEndMsg)
+            proxy.expectNoMsg()
+        }
+
+        "in the \"subscribed\" behaviour, if receives Shutdown Message, forward the message to the parent" in {
+            proxy.send(parent, shutdownMsg)
+            proxy.expectMsg(shutdownMsg)
+        }
 
         "in the \"subscribed\" behaviour, if receives Handshake Acknowledge, sends a message to the Publisher" in {
             proxy.send(parent, handshakeAckMsg)
-            proxy.expectMsg(CellSubscriberTest.hadshakeAckResponse)
+            proxy.expectMsg(CellSubscriberTest.handshakeAckResponse)
         }
 
         "in the \"subscribed\" behaviour, if receives a topology forwards it to the parent" +
@@ -126,10 +149,16 @@ class CellSubscriberTest extends TestKit(ActorSystem("CellSubscriberTest", CellS
             proxy.expectMsg(topologyMsg)
         }
 
-        "in the \"cultured\" state, process the previous stashed messages (Alarm and Update) " +
+        "in the \"cultured\" state, process the previous stashed messages (Alarm, Update and Alarm End) " +
             "and forward them to the parent actor" in {
             proxy.expectMsg(alarmMsg)
             proxy.expectMsg(updateMsg)
+            proxy.expectMsg(alarmEndMsg)
+        }
+
+        "in the \"cultured\" state, if receives a shutdown message, forward it to the parent" in {
+            proxy.send(parent, shutdownMsg)
+            proxy.expectMsg(shutdownMsg)
         }
     }
 
@@ -144,7 +173,7 @@ object CellSubscriberTest {
 
     val subscriptionResponse = "Subscribed to a topic"
 
-    val hadshakeAckResponse = "handshake ack received"
+    val handshakeAckResponse = "Handshake ack received"
 }
 
 
@@ -163,7 +192,7 @@ class TestPublisher(proxy: ActorRef) extends CustomActor {
 
     override def receive: Receive = {
         case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, _, cnt) =>
-            proxy forward CellSubscriberTest.hadshakeAckResponse
+            proxy forward CellSubscriberTest.handshakeAckResponse
     }
 }
 
