@@ -24,10 +24,10 @@
         {
             "categoryId": 3,
             "minValue": 0,
-            "maxValue": 60,
+          "maxValue": 100,
             "threshold": {
                 "lowThreshold": 20,
-                "highThreshold": 50
+              "highThreshold": 101
             }
         }
     ]

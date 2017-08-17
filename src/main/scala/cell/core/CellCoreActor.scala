@@ -163,7 +163,8 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
                     cnt.currentPeople,
                     topology(indexByUri(localCellInfo.uri)).passages.length)))
 
-            cellPublisher ! msg
+
+            cellPublisher ! msg.copy(content = cnt.copy(room = topology(indexByUri(cnt.room.name)).info.id))
             cellPublisher ! AriadneMessage(
                 Update,
                 Update.Subtype.Practicability,
@@ -187,7 +188,7 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
         case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, this.user2Cell, cnt: CurrentPeopleUpdate) => {
 
             actualSelfLoad = cnt.currentPeople
-            cellPublisher ! msg
+            cellPublisher ! msg.copy(content = cnt.copy(room = topology(indexByUri(cnt.room.name)).info.id))
         }
     }: Receive) orElse this.proactive
 
