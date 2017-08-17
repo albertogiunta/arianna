@@ -13,7 +13,7 @@ class SensorChartController extends ViewController {
 
     @FXML
     private var chart: LineChart[Double, Double] = _
-
+    
     private var data: XYChart.Series[Double, Double] = new XYChart.Series[Double, Double]
 
     private var time = (0 to Int.MaxValue - 1).iterator

@@ -112,7 +112,7 @@ class CellTemplateController extends ViewController {
     def enableChartButton(): Unit = {
         chartsButton setDisable false
     }
-
+    
     private def loadSensor(sensor: SensorInfo): Unit = {
         var loader = new FXMLLoader(getClass.getResource(GraphicResources.sensor))
         var sensorTemplate = loader.load[HBox]
@@ -121,7 +121,7 @@ class CellTemplateController extends ViewController {
         sensorsController += ((sensor.categoryId, sensorController))
         sensorsContainer.getChildren add sensorTemplate
     }
-
+    
     private def setRoomInfo(roomInfo: RoomInfo): Unit = {
         roomName setText roomInfo.id.name
         maxCapacityValue setText roomInfo.capacity.toString

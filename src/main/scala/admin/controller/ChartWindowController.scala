@@ -24,18 +24,18 @@ import scala.collection.mutable
 object ChartUtils {
     private val HEAD = 0
     private val MAX_DATA_ON_GRAPH = 20
-
+    
     def resizeIfNeeded(data: XYChart.Series[Double, Double]): XYChart.Series[Double, Double] = {
         if (data.getData.size.equals(MAX_DATA_ON_GRAPH)) {
             data.getData remove HEAD
         }
         data
     }
-
+    
 }
 
 class ChartWindowController extends ViewController {
-
+    
     var chartActor: ActorRef = _
     @FXML
     private var mainPane: GridPane = _
@@ -49,7 +49,7 @@ class ChartWindowController extends ViewController {
     private var roomInfo: RoomInfo = _
 
     private val sensorChartControllers: mutable.Map[Int, SensorChartController] = new mutable.HashMap[Int, SensorChartController]()
-
+    
     private var data: XYChart.Series[Double, Double] = new XYChart.Series[Double, Double]
 
     private var time = (0 to Int.MaxValue - 1).iterator

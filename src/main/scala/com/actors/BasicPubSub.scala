@@ -21,7 +21,7 @@ import ontologies.messages.{AriadneMessage, Greetings, Location}
 abstract class TemplateSubscriber(mediator: ActorRef) extends TemplateActor {
     
     val cluster: Cluster = akka.cluster.Cluster(context.system)
-
+    
     protected val topics: Set[Topic] // To Override Necessarily
     private var ackTopicReceived: Int = 0
 
@@ -49,8 +49,8 @@ abstract class TemplateSubscriber(mediator: ActorRef) extends TemplateActor {
         case _: AriadneMessage[_] => stash
         case _ => desist _
     }
-
-    protected def subscribed: Actor.Receive = ???
+    
+    protected def subscribed: Actor.Receive
 }
 
 /**

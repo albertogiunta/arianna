@@ -1,7 +1,6 @@
 package run
 
 import java.io.File
-import java.nio.file.Paths
 
 import akka.actor.{ActorSystem, Props}
 import akka.cluster.pubsub.DistributedPubSub
@@ -21,17 +20,10 @@ object RunCellN extends App {
     val REQUIRED_ARGS = 2
     
     if (args.length == REQUIRED_ARGS) {
-        
-        val path2Project: String = Paths.get("").toFile.getAbsolutePath + "/"
-        
-        if (args(0).startsWith("/")) args(0).replaceFirst("/", "")
-        if (args(1).startsWith("/")) args(1).replaceFirst("/", "")
-        
-        val path2AkkaConfig = if (!args(0).contains(path2Project)) path2Project + args(0) else args(0)
-        
-        val pathToCellConfig = if (!args(1).contains(path2Project)) path2Project + args(1) else args(1)
-        
-        // "/res/conf/test/testCell1.conf" "/res/json/cell/cell1.json"
+    
+        // "*root*/res/conf/test/testCell1.conf" "*root*/res/json/cell/cell1.json"
+        val path2AkkaConfig = args(0)
+        val pathToCellConfig = args(1)
         
         implicit val config: Config = ConfigFactory.parseFile(new File(path2AkkaConfig))
             .withFallback(ConfigFactory.load()).resolve()

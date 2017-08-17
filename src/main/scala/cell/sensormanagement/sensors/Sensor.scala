@@ -96,7 +96,7 @@ trait SimulationStrategy[D, S <: GenericSensor[D]] {
   *
   **/
 object SimulationStrategies {
-
+    
     trait MonotonicSimulation[D, S <: GenericSensor[D]] extends SimulationStrategy[D, S] {
         def changeStep: D
     }

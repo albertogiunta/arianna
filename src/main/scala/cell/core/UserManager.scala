@@ -87,8 +87,8 @@ class UserManager extends TemplateActor with ActorLogging {
             s.sendAlarmEndToUsers()
 
     }
-
-
+    
+    
     override def postStop(): Unit = {
         s.sendSystemShutDownToUsers()
         super.postStop()

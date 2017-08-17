@@ -24,30 +24,30 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.1'
 
     compile group: 'com.typesafe.akka', name:'akka-actor_2.12', version : akkaVersion
-    compile group: 'com.typesafe.akka', name:'akka-agent_2.12', version : akkaVersion
-    compile group: 'com.typesafe.akka', name:'akka-camel_2.12', version : akkaVersion
+//    compile group: 'com.typesafe.akka', name:'akka-agent_2.12', version : akkaVersion
+//    compile group: 'com.typesafe.akka', name:'akka-camel_2.12', version : akkaVersion
     compile group: 'com.typesafe.akka', name:'akka-cluster_2.12', version : akkaVersion
     compile group: 'com.typesafe.akka', name:'akka-cluster-metrics_2.12', version : akkaVersion
-    compile group: 'com.typesafe.akka', name:'akka-cluster-sharding_2.12', version : akkaVersion
+//    compile group: 'com.typesafe.akka', name:'akka-cluster-sharding_2.12', version : akkaVersion
     compile group: 'com.typesafe.akka', name:'akka-cluster-tools_2.12', version : akkaVersion
-    compile group: 'com.typesafe.akka', name:'akka-distributed-data_2.12', version : akkaVersion
-    compile group: 'com.typesafe.akka', name:'akka-multi-node-testkit_2.12', version : akkaVersion
-    compile group: 'com.typesafe.akka', name:'akka-osgi_2.12', version : akkaVersion
-    compile group: 'com.typesafe.akka', name:'akka-persistence_2.12', version : akkaVersion
-    compile group: 'com.typesafe.akka', name:'akka-persistence-query_2.12', version : akkaVersion
+//    compile group: 'com.typesafe.akka', name:'akka-distributed-data_2.12', version : akkaVersion
+//    compile group: 'com.typesafe.akka', name:'akka-multi-node-testkit_2.12', version : akkaVersion
+//    compile group: 'com.typesafe.akka', name:'akka-osgi_2.12', version : akkaVersion
+//    compile group: 'com.typesafe.akka', name:'akka-persistence_2.12', version : akkaVersion
+//    compile group: 'com.typesafe.akka', name:'akka-persistence-query_2.12', version : akkaVersion
     compile group: 'com.typesafe.akka', name:'akka-remote_2.12', version : akkaVersion
     compile group: 'com.typesafe.akka', name:'akka-slf4j_2.12', version : akkaVersion
     compile group: 'com.typesafe.akka', name:'akka-stream_2.12', version : akkaVersion
     compile group: 'com.typesafe.akka', name:'akka-stream-testkit_2.12', version : akkaVersion
     compile group: 'com.typesafe.akka', name:'akka-testkit_2.12', version : akkaVersion
-    compile group: 'com.typesafe.akka', name:'akka-typed_2.12', version : akkaVersion
-    compile group: 'com.typesafe.akka', name:'akka-contrib_2.12', version : akkaVersion
+//    compile group: 'com.typesafe.akka', name:'akka-typed_2.12', version : akkaVersion
+//    compile group: 'com.typesafe.akka', name:'akka-contrib_2.12', version : akkaVersion
     compile group: 'com.typesafe.akka', name:'akka-http-spray-json_2.12', version : '10.0.9'
-    compile group: 'com.typesafe.akka', name:'akka-http_2.12', version:'10.0.9'
+//    compile group: 'com.typesafe.akka', name:'akka-http_2.12', version:'10.0.9'
     compile 'io.vertx:vertx-core:3.4.2'
     compile 'io.vertx:vertx-lang-scala_2.12:3.4.2'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile 'org.scalatest:scalatest_2.12:3.0.1'
-    testCompile 'org.scalamock:scalamock_2.12:3.0.1'
+//    testCompile 'org.scalamock:scalamock_2.12:3.0.1'
 }
