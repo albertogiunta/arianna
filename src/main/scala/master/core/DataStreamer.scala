@@ -46,10 +46,7 @@ class DataStreamer(private val target: ActorSelection,
     }
     
     override def receive: Receive = {
-        
-        case msg: Iterable[Room] =>
-            streamer offer msg
-        
+        case msg: Iterable[Room] => streamer offer msg
         case msg => log.info(msg.toString)
     }
 }

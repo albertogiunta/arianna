@@ -90,8 +90,9 @@ object AStarSearch {
       */
     object Extractors {
         
-        
         /**
+          * Extract the SHP as a Map, like "A" -> "B", "B" -> "C", etc..., 'till the target node,
+          * where the the SHP is give by chaining all the Pairs
           *
           * @param parents The Map containing the evaluated Nodes from the Algorithm,
           *                each of them associated with the respective predecessor
@@ -114,6 +115,8 @@ object AStarSearch {
         }
         
         /**
+          * Extract the SHP as a List, like "A", "B", "C", etc..., 'till the target node,
+          * where the order of the members is the order in which the SHP is to be followed
           *
           * @param parents The Map containing the evaluated Nodes from the Algorithm,
           *                each of them associated with the respective predecessor
