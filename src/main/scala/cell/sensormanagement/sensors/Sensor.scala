@@ -97,8 +97,8 @@ trait SimulationStrategy[D, S <: GenericSensor[D]] {
   **/
 object SimulationStrategies {
 
-    trait MonotonicSimulation[I] {
-        def changeStep: I
+    trait MonotonicSimulation[D, S <: GenericSensor[D]] extends SimulationStrategy[D, S] {
+        def changeStep: D
     }
 
     /**
@@ -113,8 +113,7 @@ object SimulationStrategies {
       *
       **/
     case class MonotonicDoubleSimulation(val changeStep: Double)
-        extends SimulationStrategy[Double, NumericSensor[Double]]
-            with MonotonicSimulation[Double] {
+        extends MonotonicSimulation[Double, NumericSensor[Double]] {
         private var increasePhase: Boolean = true
 
         private def shouldIncrease(sensor: NumericSensor[Double]): Boolean =
@@ -146,8 +145,7 @@ object SimulationStrategies {
       *
       **/
     case class MonotonicIntSimulation(val changeStep: Int)
-        extends SimulationStrategy[Int, NumericSensor[Int]]
-            with MonotonicSimulation[Int] {
+        extends MonotonicSimulation[Int, NumericSensor[Int]] {
         private var increasePhase: Boolean = true
 
         private def shouldIncrease(sensor: NumericSensor[Int]): Boolean =

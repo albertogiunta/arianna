@@ -183,6 +183,12 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
             context.become(cultured, discardOld = true)
             log.info("Alarm deactiveted")
         }
+
+        case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, this.user2Cell, cnt: CurrentPeopleUpdate) => {
+
+            actualSelfLoad = cnt.currentPeople
+            cellPublisher ! msg
+        }
     }: Receive) orElse this.proactive
 
 
