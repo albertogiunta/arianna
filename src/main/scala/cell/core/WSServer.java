@@ -4,6 +4,7 @@ import akka.actor.ActorRef;
 import com.utils.Pair;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.impl.ConcurrentHashSet;
 import ontologies.messages.RouteRequestShort;
@@ -48,7 +49,8 @@ public class WSServer extends AbstractVerticle {
 
     @Override
     public void start() throws Exception {
-        vertx.createHttpServer().websocketHandler(ws -> {
+        HttpServerOptions options = new HttpServerOptions().setTcpKeepAlive(true);
+        vertx.createHttpServer(options).websocketHandler(ws -> {
             System.out.println("[SERVER " + baseUrl + "] PATH " + ws.path() + " " + ws.uri() + " " + ws.query());
             if (ws.path().equals(baseUrl + "/connect")) {
                 ws.handler(data -> {
