@@ -152,6 +152,28 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
         case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) =>
             userActor ! msg
             log.info("Alarm deactiveted")
+
+        case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, this.user2Cell, cnt: CurrentPeopleUpdate) => {
+
+            actualSelfLoad = cnt.currentPeople
+
+            topology.put(cnt.room.name, topology(indexByUri(localCellInfo.uri)).copy(practicability =
+                Practicability(
+                    topology(indexByUri(localCellInfo.uri)).info.capacity,
+                    cnt.currentPeople,
+                    topology(indexByUri(localCellInfo.uri)).passages.length)))
+
+            cellPublisher ! msg
+            cellPublisher ! AriadneMessage(
+                Update,
+                Update.Subtype.Practicability,
+                self2Self,
+                PracticabilityUpdate(
+                    topology(indexByUri(localCellInfo.uri)).info.id,
+                    topology(indexByUri(localCellInfo.uri)).practicability
+                )
+            )
+        }
     }: Receive) orElse this.proactive
 
 
@@ -178,28 +200,6 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
         case AriadneMessage(Update, Update.Subtype.Practicability, this.cell2Cell, cnt: PracticabilityUpdate) =>
             topology.put(cnt.room.name, topology(cnt.room.name)
                 .copy(practicability = cnt.practicability))
-
-        case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, this.user2Cell, cnt: CurrentPeopleUpdate) => {
-
-            actualSelfLoad = cnt.currentPeople
-
-            topology.put(cnt.room.name, topology(indexByUri(localCellInfo.uri)).copy(practicability =
-                Practicability(
-                    topology(indexByUri(localCellInfo.uri)).info.capacity,
-                    cnt.currentPeople,
-                    topology(indexByUri(localCellInfo.uri)).passages.length)))
-
-            cellPublisher ! msg
-            cellPublisher ! AriadneMessage(
-                Update,
-                Update.Subtype.Practicability,
-                self2Self,
-                PracticabilityUpdate(
-                    topology(indexByUri(localCellInfo.uri)).info.id,
-                    topology(indexByUri(localCellInfo.uri)).practicability
-                )
-            )
-        }
 
         case AriadneMessage(Route, Route.Subtype.Request, this.user2Cell, cnt: RouteRequest) => {
             //route request from user management
