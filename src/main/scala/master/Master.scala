@@ -43,7 +43,9 @@ class Master(mediator: ActorRef) extends CustomActor {
     
         case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) =>
             publisher ! msg
-            context.system.terminate().onComplete(_ => println("Ariadne has shat down..."))
+            context.system.terminate().onComplete(_ => {
+                println("Ariadne has shat down..."); System.exit(1)
+            })
     
         case msg => log.info("Ignoring {}", msg)
     }

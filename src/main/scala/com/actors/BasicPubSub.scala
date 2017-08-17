@@ -1,6 +1,7 @@
 package com.actors
 
 import akka.actor.{Actor, ActorRef}
+import akka.cluster.Cluster
 import akka.cluster.pubsub.DistributedPubSubMediator._
 import ontologies.Topic
 import ontologies.messages.Location._
@@ -19,10 +20,10 @@ import ontologies.messages.{AriadneMessage, Greetings, Location}
   */
 abstract class TemplateSubscriber(mediator: ActorRef) extends TemplateActor {
     
-    val cluster = akka.cluster.Cluster(context.system)
+    val cluster: Cluster = akka.cluster.Cluster(context.system)
 
     protected val topics: Set[Topic] // To Override Necessarily
-    private var ackTopicReceived: Integer = 0
+    private var ackTopicReceived: Int = 0
 
     override protected def init(args: List[Any]): Unit = {
         super.init(args)
@@ -58,7 +59,7 @@ abstract class TemplateSubscriber(mediator: ActorRef) extends TemplateActor {
   */
 abstract class TemplatePublisher(mediator: ActorRef) extends TemplateActor {
     
-    val cluster = akka.cluster.Cluster(context.system)
+    val cluster: Cluster = akka.cluster.Cluster(context.system)
 
     // Point 2 Point Messaging with other Actors of the cluster
     override protected def init(args: List[Any]): Unit = {

@@ -81,8 +81,8 @@ case class ConfigPathBuilder() {
 }
 
 object ConfigurationManager extends ExtensionId[ConfigurationManagerImpl] with ExtensionIdProvider {
-
-    override def lookup = ConfigurationManager
+    
+    override def lookup: ConfigurationManager.type = ConfigurationManager
 
     override def createExtension(system: ExtendedActorSystem) =
         new ConfigurationManagerImpl(system)
@@ -96,11 +96,11 @@ object ConfigurationManager extends ExtensionId[ConfigurationManagerImpl] with E
 object TestConfigManager extends App {
     val path2Project = Paths.get("").toFile.getAbsolutePath
     val path2Config = path2Project + "/res/conf/akka/master.conf"
-
-    implicit val config = ConfigFactory.parseFile(new File(path2Config))
+    
+    implicit val config: Config = ConfigFactory.parseFile(new File(path2Config))
         .withFallback(ConfigFactory.load()).resolve()
-
-    implicit val system = ActorSystem("Arianna-Cluster", config)
+    
+    implicit val system: ActorSystem = ActorSystem("Arianna-Cluster", config)
 
     println(ConfigurationManager(system) property ConfigPathBuilder().akka.remote.netty.tcp.get("port") number)
 

@@ -21,7 +21,7 @@ class AlarmSupervisor(mediator: ActorRef) extends TemplateSubscriber(mediator) {
     private val topologySupervisor: () => ActorSelection = () => sibling(NamingSystem.TopologySupervisor).get
     private val admin: () => ActorSelection = () => sibling(NamingSystem.AdminManager).get
     
-    override protected def subscribed = {
+    override protected def subscribed: Receive = {
        
         case msg@AriadneMessage(Alarm, subtype, _, _) =>
             log.info("Got {} from {}", msg.toString, sender.path.name)

@@ -79,7 +79,7 @@ class TopologySupervisor extends TemplateActor {
     
         case AriadneMessage(Topology, Planimetrics, _, map: Area) => unexpectedPlanimetry(map)
 
-        case msg@AriadneMessage(Handshake, CellToMaster, `cellToMaster`, cnt@SensorsInfoUpdate(cell, sensors)) =>
+        case msg@AriadneMessage(Handshake, CellToMaster, `cellToMaster`, cnt@SensorsInfoUpdate(cell, _)) =>
     
             log.info("Received handshake from cell {}", cell.uri)
     

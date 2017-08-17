@@ -38,8 +38,21 @@ class AriadneMessageSerializer extends SerializerWithStringManifest {
   *
   */
 trait MessageSerializer[G, L, C] {
+    
+    /**
+      * Performs a transformation of the given message from its object view to an array of Byte
+      *
+      * @param message The Message object to be serialized
+      * @return The Array of  Byte representing the object
+      */
     def serialize(message: Message[G, L, C]): Array[Byte]
     
+    /**
+      * Performs a transformation of the given message from a Byte Array to its Object view
+      *
+      * @param array The Array of Byte representing the Message
+      * @return The object view of the Message
+      */
     def deserialize(array: Array[Byte]): Message[G, L, C]
 }
 
@@ -49,11 +62,9 @@ trait MessageSerializer[G, L, C] {
 object MessageSerializer extends MessageSerializer[MessageType, MessageSubtype, MessageContent] {
     
     override def serialize(message: Message[MessageType, MessageSubtype, MessageContent]): Array[Byte] = {
+    
+        val char2byte: Char => Byte = c => c.toByte
         
-        val char2byte: Char => Byte = { c =>
-            //println(c.toString + "=>" + c.toByte)
-            c.toByte
-        }
         
         /*
             Create an Array[Byte] of the same length of the sum of the length in Byte of the fields
@@ -103,14 +114,9 @@ object MessageSerializer extends MessageSerializer[MessageType, MessageSubtype, 
         /** ************************************************************/
         
         val subtypeBytes = retrieveBlock(subtypeOffset, fromOffset - 1)
-        //println(subtype)
         val fromBytes = retrieveBlock(fromOffset, toOffset - 1)
-        //println(from)
         val toBytes = retrieveBlock(toOffset, contentOffset)
-        //println(to)
         val contentBytes = retrieveBlock(contentOffset, array.length)
-        //println(content)
-        
         val subtype = MessageSubtype.Factory(subtypeBytes.mkString)
         
         AriadneMessage(
