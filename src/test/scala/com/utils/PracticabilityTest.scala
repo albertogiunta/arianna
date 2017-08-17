@@ -16,6 +16,10 @@ class PracticabilityTest extends FunSuite with BeforeAndAfter {
     }
     
     test("Testing function progression...") {
+    
         (1 to 20).foreach(i => assert(Practicability(capacity = 20, load = i, flows = 1) > Practicability(capacity = 20, load = i, flows = 2)))
+        (1 to 20).foreach(i => assert(Practicability(capacity = 20, load = i, flows = 2) > Practicability(capacity = 20, load = i, flows = 3)))
+        (1 to 20).foreach(i => assert(Practicability(capacity = 20, load = i, flows = 3) > Practicability(capacity = 20, load = i, flows = 4)))
+        (1 to 20).foreach(i => assert(Practicability(capacity = 20, load = i, flows = 4) < Practicability(capacity = 20, load = i, flows = 1)))
     }
 }
