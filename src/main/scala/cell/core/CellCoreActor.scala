@@ -16,6 +16,7 @@ import system.exceptions.IncorrectConfigurationException
 import system.names.NamingSystem
 
 import scala.collection.mutable
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 import scala.util.Random
 
@@ -144,22 +145,13 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
                 )
                 cellPublisher ! msgToSend
             }
-            context.become(localEmergency)
-        }
-    }: Receive) orElse this.proactive
-
-
-    protected def localEmergency: Receive = this.proactive
-
-
-    private def proactive: Receive = {
-        case msg@AriadneMessage(Update, Update.Subtype.Sensors, this.self2Self, cnt: SensorsInfoUpdate) => {
-            cellPublisher ! msg.copy(content = cnt.copy(cell = this.localCellInfo))
+            context.become(localEmergency, discardOld = true)
+            log.info("Alarm triggered locally")
         }
 
-        case AriadneMessage(Update, Update.Subtype.Practicability, this.cell2Cell, cnt: PracticabilityUpdate) =>
-            topology.put(cnt.room.name, topology(cnt.room.name)
-                .copy(practicability = cnt.practicability))
+        case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) =>
+            userActor ! msg
+            log.info("Alarm deactiveted")
 
         case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, this.user2Cell, cnt: CurrentPeopleUpdate) => {
 
@@ -182,6 +174,38 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
                 )
             )
         }
+    }: Receive) orElse this.proactive
+
+
+    protected def localEmergency: Receive = ({
+        case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) => {
+            userActor ! msg
+            context.become(cultured, discardOld = true)
+            log.info("Alarm deactiveted")
+        }
+
+        case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, this.user2Cell, cnt: CurrentPeopleUpdate) => {
+
+            actualSelfLoad = cnt.currentPeople
+            cellPublisher ! msg
+        }
+    }: Receive) orElse this.proactive
+
+
+    private def proactive: Receive = {
+        case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => {
+            log.info("Ariadne system is shutting down...")
+            context.system.terminate().onComplete(_ => println("Ariadne system has shutdown!"))
+            System.exit(0)
+        }
+
+        case msg@AriadneMessage(Update, Update.Subtype.Sensors, this.self2Self, cnt: SensorsInfoUpdate) => {
+            cellPublisher ! msg.copy(content = cnt.copy(cell = this.localCellInfo))
+        }
+
+        case AriadneMessage(Update, Update.Subtype.Practicability, this.cell2Cell, cnt: PracticabilityUpdate) =>
+            topology.put(cnt.room.name, topology(cnt.room.name)
+                .copy(practicability = cnt.practicability))
 
         case AriadneMessage(Route, Route.Subtype.Request, this.user2Cell, cnt: RouteRequest) => {
             //route request from user management
