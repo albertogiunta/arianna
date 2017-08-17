@@ -3,8 +3,16 @@ package ontologies.messages
 import ontologies.messages.AriannaJsonProtocol._
 import spray.json._
 
+/**
+  * A simple Message Type
+  *
+  * Created by Xander_C on 03/07/2017.
+  */
 trait MessageType {
-
+    
+    /**
+      * The name of this message type
+      */
     val typeName: String
 
     override def toString: String = typeName
@@ -588,6 +596,10 @@ object MessageType {
     
     implicit def String2MessageType(str: String): MessageType = MessageType.StaticFactory(str)
     
+    /**
+      * A Static Factory of MessageType
+      *
+      */
     object StaticFactory {
 
         def apply(typeName: String): MessageType = typeName.toLowerCase match {

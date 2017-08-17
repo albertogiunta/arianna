@@ -4,17 +4,37 @@ import ontologies.messages.MessageType._
 
 
 /**
+  * A Message Subtype for a Generic Content of Type C
+  *
   * Created by Xander_C on 03/07/2017.
   */
 trait MessageSubtype[C] {
     
+    /**
+      * The Message type of which this is a subtype
+      */
     val superType: MessageType
     
+    /**
+      * The name of this subtype
+      */
     val subtypeName: String
     
+    /**
+      * An un-marshaling method to perform a deserialization of the Content C
+      *
+      * @param json The String Representation of the content
+      * @return The Object representation of the content
+      */
     def unmarshal(json: String): C
     
-    def marshal(jso: C): String
+    /**
+      * A marshaling method to perform a serialization of the Content C
+      *
+      * @param content The Object representation of the Content
+      * @return The string representation of the Content
+      */
+    def marshal(content: C): String
     
     override def toString: String = superType.typeName + "/" + subtypeName
     
@@ -27,6 +47,10 @@ object MessageSubtype {
     
     implicit def subtype2String(st: MessageSubtype[_]): String = st.toString
     
+    /**
+      * A Static Factory of MessageSubtype with Content of type MessageContent
+      *
+      */
     object StaticFactory {
         def apply(subTypeAsString: String): MessageSubtype[MessageContent] = subTypeAsString.toLowerCase match {
         
