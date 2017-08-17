@@ -2,6 +2,7 @@ package cell.core
 
 import akka.actor.{ActorRef, Props}
 import cell.cluster.{CellClusterSupervisor, CellPublisher, CellSubscriber}
+import cell.processor.route.actors.RouteManager
 import cell.sensormanagement.SensorManager
 import com.actors.TemplateActor
 import com.utils.Practicability
@@ -10,7 +11,6 @@ import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology.Subtype.ViewedFromACell
 import ontologies.messages.MessageType._
 import ontologies.messages._
-import processor.route.actors.RouteManager
 import spray.json._
 import system.exceptions.IncorrectConfigurationException
 import system.names.NamingSystem

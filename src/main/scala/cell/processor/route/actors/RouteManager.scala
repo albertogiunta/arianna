@@ -1,4 +1,4 @@
-package processor.route.actors
+package cell.processor.route.actors
 
 import akka.actor.{ActorRef, Props}
 import com.actors.TemplateActor
