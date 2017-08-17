@@ -29,7 +29,6 @@ class CellPublisher(mediator: ActorRef) extends TemplatePublisher(mediator) {
         log.info("Hello there from {}!", name)
 
         //Ask to the core actor the cell information in order to continue the handshake task
-        //println("aaa 0")
         parent ! AriadneMessage(
             Info,
             Info.Subtype.Request,
@@ -42,7 +41,6 @@ class CellPublisher(mediator: ActorRef) extends TemplatePublisher(mediator) {
     override protected def receptive = {
         case msg@AriadneMessage(Info, Info.Subtype.Response, this.selfToSelf, sensorsInfoUpdate: SensorsInfoUpdate) => {
             println("Sensor Info " + sensorsInfoUpdate)
-            //Thread.sleep(1000)
             val handshakeMsg = AriadneMessage(
                 Handshake,
                 Handshake.Subtype.CellToMaster,
