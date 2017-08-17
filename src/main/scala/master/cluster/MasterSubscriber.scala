@@ -18,7 +18,7 @@ import system.names.NamingSystem
   */
 class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) {
     
-    override val topics: Set[Topic] = Set(Topic.TopologyACK, Topic.Updates, Topic.HandShakes)
+    override val topics: Set[Topic[MessageContent]] = Set(Topic.TopologyACK, Topic.Updates, Topic.HandShakes)
     
     private val topologySupervisor: () => ActorSelection = () => sibling(NamingSystem.TopologySupervisor).get
     private val publisher: () => ActorSelection = () => sibling(NamingSystem.Publisher).get

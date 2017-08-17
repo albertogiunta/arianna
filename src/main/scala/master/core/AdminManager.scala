@@ -50,8 +50,8 @@ class AdminManager extends CustomActor {
         case msg@AriadneMessage(Error, Error.Subtype.LookingForAMap, _, _) => admin ! msg
 
     }
-
-    private def roundData(adminUpdate: AdminUpdate): AriadneMessage[AdminUpdate] = {
+    
+    private def roundData(adminUpdate: AdminUpdate): AriadneMessage[MessageContent] = {
         val roundedRoomDataUpdate: ListBuffer[RoomDataUpdate] = new ListBuffer[RoomDataUpdate]
         adminUpdate.list.foreach(roomDataUpdate => {
             val roundedSensorData: ListBuffer[SensorInfo] = new ListBuffer[SensorInfo]

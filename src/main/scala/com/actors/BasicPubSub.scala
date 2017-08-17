@@ -6,7 +6,7 @@ import akka.cluster.pubsub.DistributedPubSubMediator._
 import ontologies.Topic
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Init
-import ontologies.messages.{AriadneMessage, Greetings, Location}
+import ontologies.messages.{AriadneMessage, Greetings, Location, MessageContent}
 
 /**
   * This class gives a common template for a Akka Subscriber.
@@ -22,7 +22,7 @@ abstract class TemplateSubscriber(mediator: ActorRef) extends TemplateActor {
     
     val cluster: Cluster = akka.cluster.Cluster(context.system)
     
-    protected val topics: Set[Topic] // To Override Necessarily
+    protected val topics: Set[Topic[MessageContent]] // To Override Necessarily
     private var ackTopicReceived: Int = 0
 
     override protected def init(args: List[Any]): Unit = {

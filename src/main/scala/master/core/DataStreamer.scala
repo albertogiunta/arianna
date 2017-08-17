@@ -3,6 +3,7 @@ package master.core
 import akka.actor.{ActorSelection, ActorSystem}
 import akka.stream._
 import akka.stream.scaladsl.{Flow, Sink, Source, SourceQueueWithComplete}
+import cell.sensormanagement.sensors.SensorsFactory.DefaultValues.simulationRefreshRate
 import com.actors.CustomActor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Update
@@ -32,7 +33,7 @@ class DataStreamer(private val target: ActorSelection,
     private val stream = Flow[Iterable[Room]]
         .map(map => AdminUpdate(0, map.map(c => RoomDataUpdate(c)).toList))
         .map(updates => AriadneMessage(Update, Subtype.Admin, Location.Master >> Location.Admin, updates))
-        .throttle(1, 5000 milliseconds, 1, ThrottleMode.Shaping)
+        .throttle(1, simulationRefreshRate milliseconds, 1, ThrottleMode.Shaping)
         .to(Sink.foreach(msg => handler(msg, target)))
     
     override def preStart: Unit = {
@@ -46,7 +47,9 @@ class DataStreamer(private val target: ActorSelection,
     }
     
     override def receive: Receive = {
-        case msg: Iterable[Room] => streamer offer msg
+        case msg: Iterable[Room] =>
+            log.info("Pushing in the stream...")
+            streamer offer msg
         case msg => log.info(msg.toString)
     }
 }

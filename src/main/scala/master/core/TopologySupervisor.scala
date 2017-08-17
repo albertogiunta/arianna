@@ -154,9 +154,9 @@ class TopologySupervisor extends TemplateActor {
         case AriadneMessage(Topology, Planimetrics, _, map: Area) => unexpectedPlanimetry(map)
         
         case AriadneMessage(Update, CurrentPeople, `cellToMaster`, pkg: CurrentPeopleUpdate) =>
-            log.info("CAZZI Updating sensors for {} from {} with current people {}", pkg.room.name, sender.path, pkg.currentPeople)
+    
             if (topology.get(pkg.room.name).nonEmpty) {
-                log.info("Updating sensors for {} from {} with current people {}", pkg.room.name, sender.path, pkg.currentPeople)
+                log.info("Updating sensors for {} from {}", pkg.room.name, sender.path)
                 val newRoom = topology(pkg.room.name).copy(currentPeople = pkg.currentPeople)
                 topology.put(pkg.room.name, newRoom)
                 

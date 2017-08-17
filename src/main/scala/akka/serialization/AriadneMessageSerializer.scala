@@ -13,13 +13,13 @@ class AriadneMessageSerializer extends SerializerWithStringManifest {
     
     override def manifest(obj: AnyRef): String = obj match {
         case _: AriadneMessage[MessageContent] => AriadneMessage.getClass.getName
-        case _: Message[MessageType, MessageSubtype, MessageContent] => "ontologies.messages.Message$"
+        case _: Message[MessageContent] => "ontologies.messages.Message$"
         case _ => null
     }
     
     override def toBinary(obj: AnyRef): Array[Byte] = obj match {
         case msg: AriadneMessage[MessageContent] => MessageSerializer.serialize(msg)
-        case msg: Message[MessageType, MessageSubtype, MessageContent] => MessageSerializer.serialize(msg)
+        case msg: Message[MessageContent] => MessageSerializer.serialize(msg)
         case _ => null
     }
     
@@ -37,7 +37,7 @@ class AriadneMessageSerializer extends SerializerWithStringManifest {
   * The actual implementation is statically provided by the Object companion MessageSerializer
   *
   */
-trait MessageSerializer[G, L, C] {
+trait MessageSerializer[C] {
     
     /**
       * Performs a transformation of the given message from its object view to an array of Byte
@@ -45,7 +45,7 @@ trait MessageSerializer[G, L, C] {
       * @param message The Message object to be serialized
       * @return The Array of  Byte representing the object
       */
-    def serialize(message: Message[G, L, C]): Array[Byte]
+    def serialize(message: Message[C]): Array[Byte]
     
     /**
       * Performs a transformation of the given message from a Byte Array to its Object view
@@ -53,15 +53,15 @@ trait MessageSerializer[G, L, C] {
       * @param array The Array of Byte representing the Message
       * @return The object view of the Message
       */
-    def deserialize(array: Array[Byte]): Message[G, L, C]
+    def deserialize(array: Array[Byte]): Message[C]
 }
 
 /**
   * An Utility Companion Object that provides the logic to Serialize any object that implements the trait Message
   */
-object MessageSerializer extends MessageSerializer[MessageType, MessageSubtype, MessageContent] {
+object MessageSerializer extends MessageSerializer[MessageContent] {
     
-    override def serialize(message: Message[MessageType, MessageSubtype, MessageContent]): Array[Byte] = {
+    override def serialize(message: Message[MessageContent]): Array[Byte] = {
     
         val char2byte: Char => Byte = c => c.toByte
         
@@ -91,7 +91,7 @@ object MessageSerializer extends MessageSerializer[MessageType, MessageSubtype, 
         )
     }
     
-    override def deserialize(array: Array[Byte]): Message[MessageType, MessageSubtype, MessageContent] = {
+    override def deserialize(array: Array[Byte]): Message[MessageContent] = {
         
         val retrieveBlock: (Int, Int) => Seq[Char] =
             (from, to) => {
@@ -117,7 +117,7 @@ object MessageSerializer extends MessageSerializer[MessageType, MessageSubtype, 
         val fromBytes = retrieveBlock(fromOffset, toOffset - 1)
         val toBytes = retrieveBlock(toOffset, contentOffset)
         val contentBytes = retrieveBlock(contentOffset, array.length)
-        val subtype = MessageSubtype.Factory(subtypeBytes.mkString)
+        val subtype = MessageSubtype.StaticFactory(subtypeBytes.mkString)
         
         AriadneMessage(
             subtype.superType,

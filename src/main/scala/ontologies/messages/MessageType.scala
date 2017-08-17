@@ -26,7 +26,7 @@ object MessageType {
             /**
               * Takes a Greetings object as MessageContent
               */
-            object Greetings extends MessageSubtype { // To be renamed Greetings
+            object Greetings extends MessageSubtype[MessageContent] { // To be renamed Greetings
 
                 override val subtypeName = "Greetings" // Greetings
     
@@ -42,7 +42,7 @@ object MessageType {
             /**
               *
               */
-            object Goodbyes extends MessageSubtype {
+            object Goodbyes extends MessageSubtype[MessageContent] {
                 override val superType: MessageType = Init
                 override val subtypeName: String = "Goodbyes"
         
@@ -61,7 +61,7 @@ object MessageType {
         
         object Subtype {
     
-            object Generic extends MessageSubtype {
+            object Generic extends MessageSubtype[MessageContent] {
     
                 override val superType: MessageType = Error
                 override val subtypeName = "Generic"
@@ -72,8 +72,8 @@ object MessageType {
                 override def marshal(obj: MessageContent): String =
                     obj.asInstanceOf[Empty].toJson.toString()
             }
-            
-            object LookingForAMap extends MessageSubtype {
+    
+            object LookingForAMap extends MessageSubtype[MessageContent] {
     
                 override val superType: MessageType = Error
                 override val subtypeName = "LookingForAMap"
@@ -84,8 +84,8 @@ object MessageType {
                 override def marshal(obj: MessageContent): String =
                     obj.asInstanceOf[Empty].toJson.toString()
             }
-            
-            object MapIdentifierMismatch extends MessageSubtype {
+    
+            object MapIdentifierMismatch extends MessageSubtype[MessageContent] {
     
                 override val superType: MessageType = Error
                 override val subtypeName = "MapIdentifierMismatch"
@@ -97,7 +97,7 @@ object MessageType {
                     obj.asInstanceOf[Empty].toJson.toString()
             }
     
-            object CellMappingMismatch extends MessageSubtype {
+            object CellMappingMismatch extends MessageSubtype[MessageContent] {
     
                 override val superType: MessageType = Error
                 override val subtypeName = "CellMappingMismatch"
@@ -122,7 +122,7 @@ object MessageType {
             /**
               * Takes a *** object as MessageContent
               */
-            object FromCell extends MessageSubtype {
+            object FromCell extends MessageSubtype[MessageContent] {
     
                 override val subtypeName = "FromCell"
     
@@ -134,8 +134,8 @@ object MessageType {
                 override def marshal(obj: MessageContent): String =
                     obj.asInstanceOf[AlarmContent].toJson.toString()
             }
-
-            object FromInterface extends MessageSubtype {
+    
+            object FromInterface extends MessageSubtype[MessageContent] {
                 override val subtypeName: String = "FromInterface"
 
                 override val superType: MessageType = Alarm
@@ -146,9 +146,9 @@ object MessageType {
                 override def marshal(obj: MessageContent): String =
                     obj.asInstanceOf[Empty].toJson.toString()
             }
-
-
-            object End extends MessageSubtype {
+    
+    
+            object End extends MessageSubtype[MessageContent] {
                 override val subtypeName: String = "End"
 
                 override val superType: MessageType = Alarm
@@ -174,7 +174,7 @@ object MessageType {
             /**
               * Takes a Empty object as MessageContent
               */
-            object UserToCell extends MessageSubtype {
+            object UserToCell extends MessageSubtype[MessageContent] {
     
                 override val subtypeName = "UserToCell"
     
@@ -190,7 +190,7 @@ object MessageType {
             /**
               * Takes a *** object as MessageContent
               */
-            object CellToUser extends MessageSubtype {
+            object CellToUser extends MessageSubtype[MessageContent] {
     
                 override val subtypeName = "UserToCell"
     
@@ -206,7 +206,7 @@ object MessageType {
             /**
               * Takes a *** object as MessageContent
               */
-            object CellToMaster extends MessageSubtype {
+            object CellToMaster extends MessageSubtype[MessageContent] {
     
                 override val subtypeName = "CellToMaster"
     
@@ -219,7 +219,7 @@ object MessageType {
                     obj.asInstanceOf[SensorsInfoUpdate].toJson.toString()
             }
     
-            object Acknowledgement extends MessageSubtype {
+            object Acknowledgement extends MessageSubtype[MessageContent] {
         
                 override val subtypeName = "Acknowledgement"
     
@@ -244,7 +244,7 @@ object MessageType {
             /**
               * Takes a *** object as MessageContent
               */
-            object Request extends MessageSubtype {
+            object Request extends MessageSubtype[MessageContent] {
     
                 override val subtypeName = "Request"
     
@@ -257,7 +257,7 @@ object MessageType {
                     obj.asInstanceOf[RouteRequest].toJson.toString()
             }
     
-            object Response extends MessageSubtype {
+            object Response extends MessageSubtype[MessageContent] {
     
                 override val subtypeName = "Response"
     
@@ -270,7 +270,7 @@ object MessageType {
                     obj.asInstanceOf[RouteResponse].toJson.toString()
             }
     
-            object Info extends MessageSubtype {
+            object Info extends MessageSubtype[MessageContent] {
     
                 override val subtypeName = "Info"
     
@@ -296,7 +296,7 @@ object MessageType {
             /**
               * Takes a Area object as MessageContent
               */
-            object Planimetrics extends MessageSubtype {
+            object Planimetrics extends MessageSubtype[MessageContent] {
 
                 override val subtypeName = "Planimetrics"
     
@@ -312,7 +312,7 @@ object MessageType {
             /**
               * Takes a LightArea object as MessageContent
               */
-            object Practicabilities extends MessageSubtype {
+            object Practicabilities extends MessageSubtype[MessageContent] {
     
                 override val subtypeName = "Practicabilities"
     
@@ -328,7 +328,7 @@ object MessageType {
             /**
               * Takes a AreaForCell object as MessageContent
               */
-            object ViewedFromACell extends MessageSubtype {
+            object ViewedFromACell extends MessageSubtype[MessageContent] {
     
                 override val superType: MessageType = Topology
                 
@@ -344,7 +344,7 @@ object MessageType {
             /**
               * Takes a CellForUser object as MessageContent
               */
-            object Topology4User extends MessageSubtype {
+            object Topology4User extends MessageSubtype[MessageContent] {
     
                 override val superType: MessageType = Topology
                 
@@ -357,7 +357,7 @@ object MessageType {
                     obj.asInstanceOf[RoomViewedFromAUser].toJson.toString()
             }
     
-            object Acknowledgement extends MessageSubtype {
+            object Acknowledgement extends MessageSubtype[MessageContent] {
         
                 override val superType: MessageType = Topology
         
@@ -383,7 +383,7 @@ object MessageType {
             /**
               * Takes a SensorList object as MessageContent
               */
-            object Sensors extends MessageSubtype {
+            object Sensors extends MessageSubtype[MessageContent] {
 
                 override val subtypeName = "Sensors"
     
@@ -399,7 +399,7 @@ object MessageType {
             /**
               * Takes a LightCell object as MessageContent
               */
-            object Practicability extends MessageSubtype {
+            object Practicability extends MessageSubtype[MessageContent] {
 
                 override val subtypeName = "Practicability"
     
@@ -415,7 +415,7 @@ object MessageType {
             /**
               * Takes a ActualLoadUpdate object as MessageContent
               */
-            object CurrentPeople extends MessageSubtype {
+            object CurrentPeople extends MessageSubtype[MessageContent] {
     
                 override val subtypeName = "CurrentPeople"
     
@@ -431,7 +431,7 @@ object MessageType {
             /**
               * Takes a UpdateForAdmin object as MessageContent
               */
-            object Admin extends MessageSubtype {
+            object Admin extends MessageSubtype[MessageContent] {
 
                 override val superType: MessageType = Update
                 override val subtypeName = "Admin"
@@ -448,7 +448,7 @@ object MessageType {
                 /**
                   * Takes a Point object as MessageContent
                   */
-                object UserPosition extends MessageSubtype {
+                object UserPosition extends MessageSubtype[MessageContent] {
 
                     override val subtypeName = "Position"
     
@@ -464,7 +464,7 @@ object MessageType {
                 /**
                   * Takes a Point object as MessageContent
                   */
-                object AntennaPosition extends MessageSubtype {
+                object AntennaPosition extends MessageSubtype[MessageContent] {
 
                     override val superType: MessageType = Update
                     override val subtypeName = "AntennaPosition"
@@ -491,7 +491,7 @@ object MessageType {
             /**
               * Takes a CellForChart object as MessageContent
               */
-            object OpenChart extends MessageSubtype {
+            object OpenChart extends MessageSubtype[MessageContent] {
 
                 override val superType: MessageType = Interface
 
@@ -507,7 +507,7 @@ object MessageType {
             /**
               * Takes a CellForView object as MessageContent
               */
-            object UpdateChart extends MessageSubtype {
+            object UpdateChart extends MessageSubtype[MessageContent] {
 
                 override val superType: MessageType = Interface
 
@@ -524,7 +524,7 @@ object MessageType {
             /**
               * Takes a InfoCell object as MessageContent
               */
-            object CloseChart extends MessageSubtype {
+            object CloseChart extends MessageSubtype[MessageContent] {
 
                 override val superType: MessageType = Interface
 
@@ -551,7 +551,7 @@ object MessageType {
               * A generic info request that an actor 'A' do to another actor 'B' to ask the information that it needs
               * in order to complete a specific job
               **/
-            object Request extends MessageSubtype {
+            object Request extends MessageSubtype[MessageContent] {
 
                 override val subtypeName = "InfoRequest"
     
@@ -567,7 +567,7 @@ object MessageType {
             /**
               * A generic info response of actor 'B' after a request from the actor 'A'
               **/
-            object Response extends MessageSubtype {
+            object Response extends MessageSubtype[MessageContent] {
 
                 override val subtypeName = "InfoResponse"
     
@@ -585,10 +585,10 @@ object MessageType {
     }
 
     implicit def MessageType2String(msg: MessageType): String = msg.typeName
-
-    implicit def String2MessageType(str: String): MessageType = MessageType.Factory(str)
-
-    object Factory {
+    
+    implicit def String2MessageType(str: String): MessageType = MessageType.StaticFactory(str)
+    
+    object StaticFactory {
 
         def apply(typeName: String): MessageType = typeName.toLowerCase match {
             case t if t == Init.toLowerCase => Init
