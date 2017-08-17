@@ -4,12 +4,11 @@ import _root_.io.vertx.core.Vertx
 import akka.actor.ActorLogging
 import cell.WSClient
 import com.actors.TemplateActor
-import com.utils.Counter
 import io.vertx.scala.core.http.ServerWebSocket
 import ontologies.messages.AriannaJsonProtocol._
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology.Subtype._
-import ontologies.messages.MessageType.{Topology, Update}
+import ontologies.messages.MessageType.{Alarm, Topology, Update}
 import ontologies.messages._
 import spray.json._
 import system.exceptions.IncorrectInitMessageException
@@ -19,6 +18,8 @@ object MSGTAkkaVertx {
     val FIRST_CONNECTION: String = "firstConnection"
     val NORMAL_CONNECTION_RESPONSE = "ack"
     val DISCONNECT: String = "disconnect"
+    val END_ALARM: String = "endAlarm"
+    val SYS_SHUTDOWN: String = "sysShutdown"
 }
 
 class UserManager extends TemplateActor with ActorLogging {
@@ -28,7 +29,7 @@ class UserManager extends TemplateActor with ActorLogging {
     var vertx: Vertx = _
     var s: WSServer = _
     var c: WSClient = _
-    var usrNumber: Counter = Counter(0)
+    var usrNumber = 0
     var areaForCell: AreaViewedFromACell = _
     var areaForUser: AreaViewedFromAUser = _
 
@@ -62,17 +63,18 @@ class UserManager extends TemplateActor with ActorLogging {
         case MSGTAkkaVertx.FIRST_CONNECTION =>
             println("GOT NEW FIRST USER")
             s.sendAreaToNewUser(areaForUser.toJson.toString())
-            usrNumber.++
+            usrNumber = usrNumber + 1
+            println(usrNumber)
             sendCurrentPeopleUpdate()
         case MSGTAkkaVertx.NORMAL_CONNECTION =>
             println("GOT NEW NORMAL USER")
             s.sendAckToNewUser(MSGTAkkaVertx.NORMAL_CONNECTION_RESPONSE)
-            usrNumber.++
+            usrNumber = usrNumber + 1
             sendCurrentPeopleUpdate()
         case MSGTAkkaVertx.DISCONNECT =>
             println("USER DISCONNECTING")
             s.disconnectUsers()
-            usrNumber.--
+            usrNumber = usrNumber - 1
             sendCurrentPeopleUpdate()
         case msg: RouteRequestShort =>
             parent ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell, RouteRequest(msg.userID, getCellWithUri(msg.fromCellUri), getCellWithUri(msg.toCellUri), isEscape = false))
@@ -81,11 +83,20 @@ class UserManager extends TemplateActor with ActorLogging {
                 case RouteRequest(_, _, _, false) => s.sendRouteToUsers(response, RouteResponseShort(route).toJson.toString())
                 case RouteRequest(_, _, _, true) => s.sendAlarmToUsers(RouteResponseShort(route).toJson.toString())
             }
+        case AriadneMessage(Alarm, Alarm.Subtype.End, _, _) =>
+            s.sendAlarmEndToUsers()
+
+    }
+
+
+    override def postStop(): Unit = {
+        s.sendSystemShutDownToUsers()
+        super.postStop()
     }
 
     private def sendCurrentPeopleUpdate(): Unit = {
         println("sending people update " + usrNumber)
-        parent ! AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, CurrentPeopleUpdate(RoomID(serial, uri), usrNumber.get))
+        parent ! AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, CurrentPeopleUpdate(RoomID(serial, uri), usrNumber))
     }
 
     def getCellWithUri(uri: String): RoomID = {

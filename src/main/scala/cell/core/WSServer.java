@@ -128,6 +128,13 @@ public class WSServer extends AbstractVerticle {
     }
 
     /**
+     * Called when an alarm is shut down because the emergency's done
+     */
+    public void sendSystemShutDownToUsers() {
+        usersReadyForAlarm.forEach((s, ws) -> ws.writeTextMessage(MSGTAkkaVertx.SYS_SHUTDOWN()));
+    }
+
+    /**
      * Called when an alarm is the detected in the system and should be propagated to all the end
      * users
      *
@@ -135,6 +142,13 @@ public class WSServer extends AbstractVerticle {
      */
     public void sendAlarmToUsers(String routeAsJson) {
         usersReadyForAlarm.forEach((s, ws) -> ws.writeTextMessage(routeAsJson));
+    }
+
+    /**
+     * Called when an alarm is shut down because the emergency's done
+     */
+    public void sendAlarmEndToUsers() {
+        usersReadyForAlarm.forEach((s, ws) -> ws.writeTextMessage(MSGTAkkaVertx.END_ALARM()));
     }
 
     /**
