@@ -26,10 +26,9 @@ class InterfaceManager extends TemplateActor {
     private val chartActors: mutable.Map[RoomID, ActorRef] = new mutable.HashMap[RoomID, ActorRef]
     private var roomIDs: mutable.Map[CellInfo, RoomID] = new mutable.HashMap[CellInfo, RoomID]
     val counter: Counter = new Counter(0)
-
-
-
-    override def init(args: List[Any]): Unit = {
+    
+    
+    protected override def init(args: List[String]): Unit = {
         Platform.runLater(() => {
             val view: InterfaceView = new InterfaceView
             view.start

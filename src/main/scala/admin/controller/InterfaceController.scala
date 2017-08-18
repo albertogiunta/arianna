@@ -13,6 +13,7 @@ import javafx.stage.FileChooser.ExtensionFilter
 
 import admin.view.InterfaceView
 import akka.actor.ActorRef
+import com.utils.{GraphicResources, InterfaceText}
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.{Alarm, Init, Topology}
 import ontologies.messages._

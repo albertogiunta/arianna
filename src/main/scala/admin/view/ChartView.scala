@@ -5,7 +5,8 @@ import javafx.scene.Scene
 import javafx.scene.layout.Pane
 import javafx.stage.Stage
 
-import admin.controller.{ChartWindowController, GraphicResources}
+import admin.controller.ChartWindowController
+import com.utils.GraphicResources
 
 /**
   * This class represent the View for the secondary window containing charts.

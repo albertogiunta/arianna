@@ -17,7 +17,7 @@ import scala.collection.mutable.ListBuffer
   * @param roomVertices : Coordinates object containing Point vertices of the room
   *
   **/
-private sealed case class RoomData(roomVertices: Coordinates, name: String, antennaPoint: Point) {
+case class RoomData(roomVertices: Coordinates, name: String, antennaPoint: Point) {
     val roomName: String = name
     val x: Int = roomVertices.northWest.x
     val y: Int = roomVertices.northWest.y
@@ -37,7 +37,7 @@ private sealed case class RoomData(roomVertices: Coordinates, name: String, ante
   *
   **/
 
-sealed case class PassageLine(startPoint: Point, endPoint: Point)
+case class PassageLine(startPoint: Point, endPoint: Point)
 
 /**
   * This class is the Controller for the Canvas node inside the interface.

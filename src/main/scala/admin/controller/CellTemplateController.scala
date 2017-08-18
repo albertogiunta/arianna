@@ -8,6 +8,7 @@ import javafx.scene.paint.Color
 import javafx.scene.text.Text
 
 import akka.actor.ActorRef
+import com.utils.GraphicResources
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Interface
 import ontologies.messages._

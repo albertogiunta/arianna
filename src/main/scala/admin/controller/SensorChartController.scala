@@ -6,6 +6,8 @@ import javafx.application.Platform
 import javafx.fxml.FXML
 import javafx.scene.chart.{LineChart, XYChart}
 
+import com.utils.ChartUtils
+
 /**
   * This is the Controller for the sensor chart, that initialized it and keep it updated.
   **/

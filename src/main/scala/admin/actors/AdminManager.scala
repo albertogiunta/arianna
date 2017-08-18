@@ -19,7 +19,7 @@ class AdminManager extends TemplateActor {
     //private val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/AdminManager")
     //Se si fa partire il master
     private val masterSeedNode = ConfigurationManager(context.system)
-        .property(builder.akka.cluster.get("seed-nodes")).stringList.head
+        .property(builder.akka.cluster.get("seed-nodes")).asStringList.head
     
     private val adminManager: () => ActorSelection =
         () => context.actorSelection(masterSeedNode + "/user/" + NamingSystem.Master + "/" + NamingSystem.AdminSupervisor)
@@ -28,8 +28,8 @@ class AdminManager extends TemplateActor {
     private var areaLoaded: Area = _
     private val toMaster: MessageDirection = Location.Admin >> Location.Master
     private val toSelf: MessageDirection = Location.Admin >> Location.Self
-
-    override def init(args: List[Any]): Unit = {
+    
+    protected override def init(args: List[String]): Unit = {
         interfaceManager ! AriadneMessage(Init, Init.Subtype.Greetings, toSelf, Greetings(List.empty))
     }
 

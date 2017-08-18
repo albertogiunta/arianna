@@ -27,8 +27,8 @@ class CellSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) {
     
     private val cell2Server: MessageDirection = Location.Master << Location.Cell
     private val server2Cell: MessageDirection = Location.Master >> Location.Cell
-
-    override protected def init(args: List[Any]) = {
+    
+    override protected def init(args: List[String]): Unit = {
         super.init(args)
         if (args.head != ClusterMembersListener.greetings) throw IncorrectInitMessageException(this.name, args)
         log.info("Hello there from {}!", name)
