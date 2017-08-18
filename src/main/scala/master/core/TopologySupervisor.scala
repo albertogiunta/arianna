@@ -33,7 +33,7 @@ class TopologySupervisor extends TemplateActor {
     
     private val publisher: () => ActorSelection = () => sibling(NamingSystem.Publisher).get
     private val subscriber: () => ActorSelection = () => sibling(NamingSystem.Subscriber).get
-    private val admin: () => ActorSelection = () => sibling(NamingSystem.AdminManager).get
+    private val admin: () => ActorSelection = () => sibling(NamingSystem.AdminSupervisor).get
     
     private val dataStreamer = context.actorOf(Props(new DataStreamer(target = admin())), NamingSystem.DataStreamer)
     private val watchDogSupervisor = context.actorOf(Props[WatchDogSupervisor], NamingSystem.WatchDogSupervisor)

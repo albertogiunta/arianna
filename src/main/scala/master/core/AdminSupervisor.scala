@@ -12,7 +12,7 @@ import scala.collection.mutable.ListBuffer
   * This is the Actor inside the cluster that forwards messages to the Administrator system.
   *
   **/
-class AdminManager extends CustomActor {
+class AdminSupervisor extends CustomActor {
     
     val toAdmin: MessageDirection = Location.Master >> Location.Admin
     val fromAdmin: MessageDirection = Location.Admin >> Location.Master

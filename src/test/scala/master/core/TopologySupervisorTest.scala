@@ -242,7 +242,7 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
             override def receive: Receive = {
                 case msg => probe ! msg
             }
-        }), self, NamingSystem.AdminManager)
+        }), self, NamingSystem.AdminSupervisor)
     
         val supervisor: TestActorRef[TopologySupervisor] =
             TestActorRef(Props[TopologySupervisor], self, NamingSystem.TopologySupervisor)

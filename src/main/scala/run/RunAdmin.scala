@@ -4,7 +4,7 @@ import java.io.File
 import java.nio.file.Paths
 import javafx.embed.swing.JFXPanel
 
-import admin.actors.AdminActor
+import admin.actors.AdminManager
 import admin.view.InterfaceView
 import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
@@ -21,7 +21,7 @@ object RunAdmin extends App {
         var interfaceView: InterfaceView = new InterfaceView
         val config = ConfigFactory.parseFile(new File(path2Config)).resolve
         val system = ActorSystem.create("adminSystem", config)
-        var admin = system.actorOf(Props[AdminActor], "admin")
+        var admin = system.actorOf(Props[AdminManager], "admin")
         admin ! AriadneMessage(Init, Init.Subtype.Greetings, Location.Admin >> Location.Self, Greetings(List.empty))
     }
 

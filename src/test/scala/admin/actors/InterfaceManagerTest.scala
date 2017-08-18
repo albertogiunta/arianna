@@ -85,7 +85,7 @@ class InterfaceManagerTest extends TestKit(ActorSystem("InterfaceManagerTest")) 
 
     private class Tester(probe: ActorRef) extends CustomActor {
 
-        val adminActor: TestActorRef[CustomActor] =
+        val adminManager: TestActorRef[CustomActor] =
             TestActorRef(Props(new CustomActor {
                 new JFXPanel
                 val interfaceManager = context.actorOf(Props[InterfaceManager], NamingSystem.InterfaceManager)
@@ -99,14 +99,14 @@ class InterfaceManagerTest extends TestKit(ActorSystem("InterfaceManagerTest")) 
                     }
                     case msg => interfaceManager forward msg
                 }
-            }), self, NamingSystem.AdminActor)
+            }), self, NamingSystem.AdminManager)
 
         override def preStart {
-            adminActor ! "Start"
+            adminManager ! "Start"
         }
 
         override def receive: Receive = {
-            case msg => adminActor forward msg
+            case msg => adminManager forward msg
         }
     }
 
