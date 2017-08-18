@@ -9,6 +9,7 @@ import javafx.scene.control.{Label, TitledPane}
 import javafx.scene.layout.GridPane
 
 import akka.actor.ActorRef
+import com.utils.{ChartUtils, GraphicResources}
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Interface
 import ontologies.messages._
@@ -21,18 +22,6 @@ import scala.collection.mutable
   *
   **/
 
-object ChartUtils {
-    private val HEAD = 0
-    private val MAX_DATA_ON_GRAPH = 20
-    
-    def resizeIfNeeded(data: XYChart.Series[Double, Double]): XYChart.Series[Double, Double] = {
-        if (data.getData.size.equals(MAX_DATA_ON_GRAPH)) {
-            data.getData remove HEAD
-        }
-        data
-    }
-    
-}
 
 class ChartWindowController extends ViewController {
     

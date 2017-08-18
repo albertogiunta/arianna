@@ -6,7 +6,8 @@ import javafx.scene.Scene
 import javafx.scene.control.SplitPane
 import javafx.stage.Stage
 
-import admin.controller.{GraphicResources, InterfaceController, InterfaceText}
+import admin.controller.InterfaceController
+import com.utils.{GraphicResources, InterfaceText}
 
 
 /**
