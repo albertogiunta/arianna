@@ -4,6 +4,7 @@ import akka.actor.{ActorRef, ActorSelection, Props}
 import com.actors.TemplateActor
 import com.utils.Counter
 import com.utils.WatchDog.WatchDogNotification
+import master.cluster.MasterSubscriber
 import ontologies.messages.Location.PreMade._
 import ontologies.messages.MessageType.Handshake.Subtype.CellToMaster
 import ontologies.messages.MessageType.Topology.Subtype.{Acknowledgement, Planimetrics, ViewedFromACell}
@@ -69,7 +70,7 @@ class TopologySupervisor extends TemplateActor {
                 unstashAll
         
                 log.info("Notifying the Subscriber...")
-                subscriber() ! msg
+                subscriber() ! MasterSubscriber.TopologyLoadedACK
             }
 
         case _ => stash
@@ -100,8 +101,10 @@ class TopologySupervisor extends TemplateActor {
     
                     context.become(acknowledging, discardOld = true)
                     log.info("I've Become Acknowledging!")
-        
-                    subscriber() ! AriadneMessage(
+    
+                    subscriber() ! MasterSubscriber.TopologyMappedACK
+    
+                    publisher() ! AriadneMessage(
                         Topology, ViewedFromACell, masterToCell,
                         AreaViewedFromACell(mapVersionID, topology.map(e => RoomViewedFromACell(e._2)).toList)
                     )
