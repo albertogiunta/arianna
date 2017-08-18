@@ -13,7 +13,7 @@ import system.names.NamingSystem
   * from the System and communicates them to the InterfaceManager in order to update the interface. It keeps a copy of the loaded map
   * if the System goes down and asks it again.
   */
-class AdminActor extends TemplateActor {
+class AdminManager extends TemplateActor {
 
     //Se si fa partire solo l'admin manager
     //private val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/AdminManager")
@@ -22,7 +22,7 @@ class AdminActor extends TemplateActor {
         .property(builder.akka.cluster.get("seed-nodes")).stringList.head
     
     private val adminManager: () => ActorSelection =
-        () => context.actorSelection(masterSeedNode + "/user/Master/AdminManager")
+        () => context.actorSelection(masterSeedNode + "/user/" + NamingSystem.Master + "/" + NamingSystem.AdminSupervisor)
     
     private val interfaceManager = context.actorOf(Props[InterfaceManager], NamingSystem.InterfaceManager)
     private var areaLoaded: Area = _

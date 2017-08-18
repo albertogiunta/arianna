@@ -3,7 +3,7 @@ package master
 import akka.actor.{ActorRef, Props}
 import com.actors.CustomActor
 import master.cluster._
-import master.core.{AdminManager, TopologySupervisor}
+import master.core.{AdminSupervisor, TopologySupervisor}
 import ontologies.messages.AriadneMessage
 import ontologies.messages.MessageType.Init
 import system.names.NamingSystem
@@ -30,8 +30,8 @@ class Master(mediator: ActorRef) extends CustomActor {
         publisher = context.actorOf(Props(new MasterPublisher(mediator)), NamingSystem.Publisher)
     
         alarmSupervisor = context.actorOf(Props(new AlarmSupervisor(mediator)), NamingSystem.AlarmSupervisor)
-    
-        adminManager = context.actorOf(Props[AdminManager], NamingSystem.AdminManager)
+
+        adminManager = context.actorOf(Props[AdminSupervisor], NamingSystem.AdminSupervisor)
     
         topologySupervisor = context.actorOf(Props[TopologySupervisor], NamingSystem.TopologySupervisor)
     

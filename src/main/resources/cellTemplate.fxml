@@ -47,7 +47,7 @@
                                                                underline="true"/>
                                                         <Text fx:id="currentPeopleValue" strokeType="OUTSIDE"
                                                               strokeWidth="0.0" textAlignment="RIGHT"
-                                                              wrappingWidth="42.0"/>
+                                                              wrappingWidth="71.0"/>
                                                     </children>
                                                 </HBox>
                                                 <Label text="Sensor data" underline="true"/>

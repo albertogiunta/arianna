@@ -54,8 +54,10 @@ class InterfaceController extends ViewController {
                 alarmButton setDisable false
             }
             update.foreach(update => {
-                var cellController = cellControllers.get(update.room).get
-                cellController setDynamicInformation update
+                if (cellControllers.contains(update.room)) {
+                    var cellController = cellControllers.get(update.room).get
+                    cellController setDynamicInformation update
+                }
             })
         })
     }
@@ -172,7 +174,7 @@ class InterfaceController extends ViewController {
         var loader = new FXMLLoader(getClass.getResource(GraphicResources.cell))
         var node = loader.load[SplitPane]
         var controller = loader.getController[CellTemplateController]
-        controller.adminActor = interfaceActor
+        controller.adminManager = interfaceActor
         cellControllers += ((cell.info.id, controller))
         controller setStaticInformation cell
         node

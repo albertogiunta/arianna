@@ -5,7 +5,7 @@ import java.nio.file.Paths
 
 import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
-import master.core.{AdminManager, DataStreamer}
+import master.core.{AdminSupervisor, DataStreamer}
 import ontologies.messages._
 
 import scala.collection.immutable.HashMap
@@ -20,8 +20,8 @@ object TryDataStreamer extends App {
     val path2Config = path2Project + "/res/conf/akka/application.conf"
     val config = ConfigFactory.parseFile(new File(path2Config))
     val system = ActorSystem.create("serverSystem", config.getConfig("adminManager"))
-    
-    val adminManager = system.actorOf(Props[AdminManager], "AdminManager")
+
+    val adminManager = system.actorOf(Props[AdminSupervisor], "AdminManager")
     
     Thread.sleep(5000)
     

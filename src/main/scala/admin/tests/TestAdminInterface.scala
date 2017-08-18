@@ -5,7 +5,7 @@ import java.nio.file.Paths
 
 import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
-import master.core.AdminManager
+import master.core.AdminSupervisor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Handshake
 import ontologies.messages._
@@ -22,7 +22,7 @@ object TestAdminInterface extends App {
 
     val system = ActorSystem.create("Arianna-Cluster", config)
 
-    val adminManager = system.actorOf(Props[AdminManager], "AdminManager")
+    val adminManager = system.actorOf(Props[AdminSupervisor], "AdminManager")
 
     var i = 1
     Thread.sleep(10000)

@@ -19,7 +19,7 @@ import scala.collection.mutable
   */
 class CellTemplateController extends ViewController {
 
-    var adminActor: ActorRef = _
+    var adminManager: ActorRef = _
     private val ONE: String = "1"
     private val ZERO: String = "0"
     private var roomInfo: RoomInfo = _
@@ -102,7 +102,7 @@ class CellTemplateController extends ViewController {
       * window with charts.
       **/
     def openCharts(): Unit = {
-        adminActor ! AriadneMessage(Interface, Interface.Subtype.OpenChart, Location.Admin >> Location.Self, CellForChart(roomInfo, sensorsController.keys.toList))
+        adminManager ! AriadneMessage(Interface, Interface.Subtype.OpenChart, Location.Admin >> Location.Self, CellForChart(roomInfo, sensorsController.keys.toList))
         chartsButton setDisable true
     }
 
