@@ -40,7 +40,7 @@ class TopologySupervisor extends TemplateActor {
     
     private val synced: Counter = Counter()
     
-    override def init(args: List[Any]): Unit = {
+    protected override def init(args: List[String]): Unit = {
     
         super.init(args)
         log.info("Requesting map to the Admin Application...")

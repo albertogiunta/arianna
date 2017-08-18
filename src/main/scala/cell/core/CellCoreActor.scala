@@ -61,8 +61,8 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
 
 
     }
-
-    override protected def init(args: List[Any]): Unit = {
+    
+    override protected def init(args: List[String]): Unit = {
         log.info("Hello there! the cell core is being initialized")
 
         clusterListener = context.actorOf(Props[CellClusterSupervisor], NamingSystem.CellClusterSupervisor)

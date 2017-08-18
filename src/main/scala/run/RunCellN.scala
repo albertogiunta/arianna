@@ -34,8 +34,8 @@ object RunCellN extends App {
         
         val loadedConf = ConfigurationManager(system)
         val builder = ConfigPathBuilder()
-        
-        val serialNumber = loadedConf.property(builder.akka.actor.get("serial-number")).string
+    
+        val serialNumber = loadedConf.property(builder.akka.actor.get("serial-number")).asString
         
         val core = system.actorOf(Props(new CellCoreActor(middleware)), NamingSystem.CellCore + serialNumber)
         

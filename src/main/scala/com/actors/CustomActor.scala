@@ -10,10 +10,10 @@ import ontologies.messages.{AriadneMessage, Greetings, MessageType}
   * Created by Alessandro on 01/07/2017.
   */
 trait CustomActor extends Actor with Stash with ActorLogging {
-
-    protected val config = ConfigurationManager(context.system)
+    
+    protected val configManager = ConfigurationManager(context.system)
     protected val builder = ConfigPathBuilder()
-
+    
     /**
       * A shortcut method that gives the name of this actor
       *
@@ -116,7 +116,7 @@ abstract class TemplateActor extends CustomActor {
       *
       * @param args A List of Arguments need to initialize post creation this Actor.
       */
-    protected def init(args: List[Any]): Unit = {
+    protected def init(args: List[String]): Unit = {
         log.info("Hello there from {}!", name)
     }
 

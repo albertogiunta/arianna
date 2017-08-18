@@ -32,8 +32,8 @@ class UserManager extends TemplateActor with ActorLogging {
     var usrNumber = 0
     var areaForCell: AreaViewedFromACell = _
     var areaForUser: AreaViewedFromAUser = _
-
-    override protected def init(args: List[Any]): Unit = {
+    
+    override protected def init(args: List[String]): Unit = {
         if (args.size != 2) throw IncorrectInitMessageException(this.name, args)
 
         uri = args.head.asInstanceOf[String]
