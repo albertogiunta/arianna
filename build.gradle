@@ -5,6 +5,39 @@ apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'scala'
 
+apply plugin: 'gradle-one-jar'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.github.rholder:gradle-one-jar:1.0.4'
+    }
+}
+
+task generateMasterJar(type: OneJar) {
+    mainClass = 'run.RunMaster'
+    archiveName = 'Master.jar'
+}
+
+task generateAdminJar(type: OneJar) {
+    mainClass = 'run.RunAdmin'
+    archiveName = 'Admin.jar'
+}
+
+task generateCellJar(type: OneJar) {
+    mainClass = 'run.RunCellN'
+    archiveName = 'Cell.jar'
+}
+
+task generateAriadneJars{
+    println "Starting Ariadne Jars Creation..."
+    dependsOn 'generateMasterJar'
+    dependsOn 'generateAdminJar'
+    dependsOn 'generateCellJar'
+}
+
 sourceCompatibility = 1.8
 
 def akkaVersion = '2.5.3'

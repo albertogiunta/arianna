@@ -24,8 +24,8 @@ abstract class TemplateSubscriber(mediator: ActorRef) extends TemplateActor {
     
     protected val topics: Set[Topic[MessageContent]] // To Override Necessarily
     private var ackTopicReceived: Int = 0
-
-    override protected def init(args: List[Any]): Unit = {
+    
+    override protected def init(args: List[String]): Unit = {
         super.init(args)
         mediator ! Put(self) // Point 2 Point Messaging with other Actors of the cluster
         topics.foreach(topic => mediator ! Subscribe(topic, self))
@@ -62,7 +62,7 @@ abstract class TemplatePublisher(mediator: ActorRef) extends TemplateActor {
     val cluster: Cluster = akka.cluster.Cluster(context.system)
 
     // Point 2 Point Messaging with other Actors of the cluster
-    override protected def init(args: List[Any]): Unit = {
+    override protected def init(args: List[String]): Unit = {
         super.init(args)
         mediator ! Put(self) // Point 2 Point Messaging with other Actors of the cluster
     }

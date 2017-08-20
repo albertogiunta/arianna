@@ -84,8 +84,8 @@ object Location {
     implicit def direction2String(d: Direction): String = d.toString
     
     implicit def direction2Message(d: Direction): MessageDirection = MessageDirectionImpl(d)
-
-    object Factory {
+    
+    object StaticFactory {
         def apply(s: String): Location = s.toLowerCase match {
             case loc if loc == Admin.toLowerCase => Admin
             case loc if loc == Master.toLowerCase => Master
@@ -119,6 +119,6 @@ object TryMessageDirection extends App {
     //val msgDir: MessageDirection = Location.Master << Location.Admin
     
     //println(msgDir)
-
-    println(Location.Factory("ADMIN"))
+    
+    println(Location.StaticFactory("ADMIN"))
 }

@@ -25,9 +25,9 @@ class SensorManager extends TemplateActor {
     private val observableSensors: ListBuffer[ObservableSensor[_ <: Any]] = new ListBuffer[ObservableSensor[_ <: Any]]
 
     private val internalMessage: MessageDirection = Location.Self >> Location.Self
-
-
-    override protected def init(args: List[Any]): Unit = {
+    
+    
+    override protected def init(args: List[String]): Unit = {
         if (args.head == ClusterMembersListener.greetings) throw IncorrectInitMessageException(this.name, args)
 
         var sensorsToLoad = args.head.asInstanceOf[String].parseJson.convertTo[List[SensorInfoFromConfig]]

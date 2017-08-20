@@ -122,7 +122,7 @@ object MessageSerializer extends MessageSerializer[MessageContent] {
         AriadneMessage(
             subtype.superType,
             subtype,
-            Location.Factory(fromBytes.mkString) >> Location.Factory(toBytes.mkString),
+            Location.StaticFactory(fromBytes.mkString) >> Location.StaticFactory(toBytes.mkString),
             subtype.unmarshal(contentBytes.mkString)
         )
     }

@@ -22,8 +22,8 @@ class CellPublisher(mediator: ActorRef) extends TemplatePublisher(mediator) {
     private val cellToMaster: MessageDirection = Location.Cell >> Location.Master
 
     private var watchDog: BasicWatchDog = _
-
-    override protected def init(args: List[Any]) = {
+    
+    override protected def init(args: List[String]): Unit = {
         super.init(args)
         if (args.head != ClusterMembersListener.greetings) throw new Exception()
         log.info("Hello there from {}!", name)
