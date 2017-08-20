@@ -54,7 +54,6 @@ class ChartManagerTest extends TestKit(ActorSystem("InterfaceManagerTest")) with
         }
 
         override def receive: Receive = {
-            //case msg if sender == adminActor => probe forward msg
             case msg => interfaceManager forward msg
         }
     }

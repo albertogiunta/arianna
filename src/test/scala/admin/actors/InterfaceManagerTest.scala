@@ -88,36 +88,25 @@ class InterfaceManagerTest extends TestKit(ActorSystem("InterfaceManagerTest")) 
         }
 
         "When receiving a CloseChart message, kills the sender" in {
-            val target = tester.underlyingActor.adminManager
-            probe watch target
-            target ! closeChart
-            probe.expectTerminated(target)
+            probe watch tester
+            tester ! closeChart
+            probe.expectTerminated(tester)
         }
     }
 
     private class Tester(probe: ActorRef) extends CustomActor {
 
-        val adminManager: TestActorRef[CustomActor] =
-            TestActorRef(Props(new CustomActor {
-                new JFXPanel
-                val interfaceManager = context.actorOf(Props[InterfaceManager], NamingSystem.InterfaceManager)
-
-                override def receive: Receive = {
-                    case "Start" => {
-                        interfaceManager ! AriadneMessage(Init, Init.Subtype.Greetings, Location.Admin >> Location.Self, Greetings(List.empty))
-                    }
-                    case msg if sender == interfaceManager => probe ! msg
-
-                    case msg => interfaceManager ! msg
-                }
-            }), self, NamingSystem.AdminManager)
+        private var interfaceManager: ActorRef = _
 
         override def preStart {
-            adminManager ! "Start"
+            new JFXPanel
+            interfaceManager = context.actorOf(Props[InterfaceManager], NamingSystem.InterfaceManager)
+            interfaceManager ! AriadneMessage(Init, Init.Subtype.Greetings, Location.Admin >> Location.Self, Greetings(List.empty))
         }
 
         override def receive: Receive = {
-            case msg => adminManager ! msg
+            case msg if sender == interfaceManager => probe ! msg
+            case msg => interfaceManager ! msg
         }
     }
 
