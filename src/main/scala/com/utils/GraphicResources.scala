@@ -14,4 +14,6 @@ object GraphicResources {
 
     val sensor: String = "/sensorTemplate.fxml"
 
+    val loader: String = "/loaderTemplate.fxml"
+
 }
