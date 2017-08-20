@@ -5,6 +5,7 @@ import com.actors.CustomActor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.{Alarm, Error, Handshake, Init, Update}
 import ontologies.messages._
+import system.names.NamingSystem
 
 import scala.collection.mutable.ListBuffer
 
@@ -13,12 +14,14 @@ import scala.collection.mutable.ListBuffer
   *
   **/
 class AdminSupervisor extends CustomActor {
-    
-    val toAdmin: MessageDirection = Location.Master >> Location.Admin
-    val fromAdmin: MessageDirection = Location.Admin >> Location.Master
-    val admin = context.actorSelection("akka.tcp://adminSystem@127.0.0.1:4550/user/admin")
-    val topologySupervisor: ActorSelection = sibling("TopologySupervisor").get
-    val publisher: ActorSelection = sibling("Publisher").get
+
+    private val IPAddress: String = "127.0.0.1"
+    private val port: String = "4550"
+    private val toAdmin: MessageDirection = Location.Master >> Location.Admin
+    private val fromAdmin: MessageDirection = Location.Admin >> Location.Master
+    private val admin = context.actorSelection("akka.tcp://" + NamingSystem.AdminActorSystem + " @" + IPAddress + ":" + port + "/user/" + NamingSystem.AdminManager)
+    private val topologySupervisor: ActorSelection = sibling(NamingSystem.TopologySupervisor).get
+    private val publisher: ActorSelection = sibling(NamingSystem.Publisher).get
 
     def operational: Receive = {
         //Ricezione di un update dal server

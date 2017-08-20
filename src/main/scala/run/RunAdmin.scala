@@ -11,6 +11,7 @@ import com.typesafe.config.ConfigFactory
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Init
 import ontologies.messages.{AriadneMessage, Greetings, Location}
+import system.names.NamingSystem
 
 object RunAdmin extends App {
 
@@ -20,8 +21,8 @@ object RunAdmin extends App {
         val path2Config = path2Project + "/res/conf/akka/testAdmin.conf"
         var interfaceView: InterfaceView = new InterfaceView
         val config = ConfigFactory.parseFile(new File(path2Config)).resolve
-        val system = ActorSystem.create("adminSystem", config)
-        var admin = system.actorOf(Props[AdminManager], "admin")
+        val system = ActorSystem.create(NamingSystem.AdminActorSystem, config)
+        var admin = system.actorOf(Props[AdminManager], NamingSystem.AdminManager)
         admin ! AriadneMessage(Init, Init.Subtype.Greetings, Location.Admin >> Location.Self, Greetings(List.empty))
     }
 

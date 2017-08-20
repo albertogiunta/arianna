@@ -3,6 +3,7 @@ package system.names
 object NamingSystem {
     
     val ActorSystem = "Arianna-Cluster"
+    val AdminActorSystem = "adminSystem"
     val AdminSupervisor = "AdminSupervisor"
     val TopologySupervisor = "TopologySupervisor"
     val DataStreamer = "DataStreamer"
