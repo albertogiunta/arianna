@@ -530,7 +530,7 @@ object MessageType {
             }
 
             /**
-              * Takes a InfoCell object as MessageContent
+              * Takes a RoomInfo object as MessageContent
               */
             object CloseChart extends MessageSubtype[MessageContent] {
 
@@ -539,10 +539,10 @@ object MessageType {
                 override val subtypeName: String = "CloseChart"
     
                 override def unmarshal(json: String): MessageContent =
-                    json.parseJson.convertTo[CellInfo]
+                    json.parseJson.convertTo[RoomInfo]
     
                 override def marshal(obj: MessageContent): String =
-                    obj.asInstanceOf[CellInfo].toJson.toString()
+                    obj.asInstanceOf[RoomInfo].toJson.toString()
             }
 
         }

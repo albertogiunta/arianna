@@ -8,7 +8,7 @@
 <?import javafx.scene.text.Text?>
 <SplitPane dividerPositions="0.1805111821086262" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
            minWidth="-Infinity" orientation="VERTICAL" prefHeight="850.0" prefWidth="1200.0"
-           xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+           style="-fx-background-color: F0F0F0;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="admin.controller.InterfaceController">
     <items>
         <AnchorPane maxHeight="-Infinity" minHeight="-Infinity" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
@@ -32,9 +32,11 @@
         </AnchorPane>
         <AnchorPane maxHeight="-Infinity" minHeight="-Infinity" minWidth="0.0" prefHeight="750.0" prefWidth="160.0">
             <children>
-                <ScrollPane layoutX="14.0" layoutY="34.0" prefHeight="681.0" prefWidth="400.0">
+                <ScrollPane layoutX="14.0" layoutY="34.0" prefHeight="681.0" prefWidth="400.0"
+                            style="-fx-border-color: F0F0F0;">
                     <content>
-                        <VBox fx:id="vBoxPane" prefHeight="663.0" prefWidth="380.0"/>
+                        <VBox fx:id="vBoxPane" prefHeight="663.0" prefWidth="380.0"
+                              style="-fx-background-color: F0F0F0;"/>
                     </content>
                 </ScrollPane>
                 <Pane fx:id="mapContainer" layoutX="425.0" layoutY="17.0" prefHeight="715.0" prefWidth="767.0"/>

@@ -6,6 +6,10 @@ object InterfaceText {
 
     val mainTitle: String = "Arianna admin Interface"
 
+    val chartTitle: String = "Arianna Charts"
+
+    val loadTitle: String = "Load configuration file"
+
     val fileSelectionText: String = "Get JSON Map"
 
     val extension: String = "JSON Files"
