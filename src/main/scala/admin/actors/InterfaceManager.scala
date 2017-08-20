@@ -45,7 +45,6 @@ class InterfaceManager extends TemplateActor {
       */
 
     override def receptive: Receive = {
-        //Ricezione del messaggio iniziale dall'interfaccia con aggiornamento iniziale
         case msg@AriadneMessage(_, Topology.Subtype.Planimetrics, _, area: Area) => {
             area.rooms.foreach(r => roomIDs += ((r.cell.info, r.info.id)))
             parent ! msg
@@ -81,7 +80,6 @@ class InterfaceManager extends TemplateActor {
         case msg@AriadneMessage(_, Alarm.Subtype.FromInterface, _, _) => parent ! msg
 
         case msg@AriadneMessage(_, Alarm.Subtype.FromCell, _, content: AlarmContent) => interfaceController triggerAlarm content
-
 
         case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
             var chartActor = context.actorOf(Props[ChartManager], NamingSystem.ChartManager + chartActors.size.toString)

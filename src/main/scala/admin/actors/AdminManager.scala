@@ -15,9 +15,6 @@ import system.names.NamingSystem
   */
 class AdminManager extends TemplateActor {
 
-    //Se si fa partire solo l'admin manager
-    //private val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/AdminManager")
-    //Se si fa partire il master
     private val masterSeedNode = ConfigurationManager(context.system)
         .property(builder.akka.cluster.get("seed-nodes")).asStringList.head
     
@@ -36,7 +33,6 @@ class AdminManager extends TemplateActor {
     context.system.eventStream.subscribe(self, classOf[akka.remote.DisassociatedEvent])
 
     override def receptive: Receive = {
-        //Ricezione del messaggio iniziale dall'interfaccia con aggiornamento iniziale
         case msg@AriadneMessage(_, Topology.Subtype.Planimetrics, _, area: Area) => {
             areaLoaded = area
             adminManager() ! msg.copy(direction = toMaster)
@@ -54,11 +50,9 @@ class AdminManager extends TemplateActor {
 
         case msg@AriadneMessage(_, Alarm.Subtype.FromInterface, _, _) => adminManager() ! msg.copy(direction = toMaster)
 
-
         case msg@AriadneMessage(_, Alarm.Subtype.FromCell, _, content: AlarmContent) => interfaceManager ! msg.copy(direction = toSelf)
 
         case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) => adminManager() ! msg.copy(direction = toMaster)
-
 
         case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => interfaceManager ! msg.copy(direction = toSelf)
 

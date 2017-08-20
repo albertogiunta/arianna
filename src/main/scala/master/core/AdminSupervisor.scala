@@ -24,16 +24,14 @@ class AdminSupervisor extends CustomActor {
     private val publisher: ActorSelection = sibling(NamingSystem.Publisher).get
 
     def operational: Receive = {
-        //Ricezione di un update dal server
         case msg@AriadneMessage(Update, Update.Subtype.Admin, _, content: AdminUpdate) => admin ! roundData(content)
 
-        //Ricezione di un allarme dall'admin
         case msg@AriadneMessage(Alarm, Alarm.Subtype.FromInterface, fromAdmin, _) => publisher ! msg.copy(direction = fromAdmin)
-        //Ricezione di un allarme da parte del sistema
+
         case msg@AriadneMessage(Alarm, Alarm.Subtype.FromCell, _, _) => admin ! msg.copy(direction = toAdmin)
 
         case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) => publisher ! msg.copy(direction = toAdmin)
-        //Ricezione di aggiornamento sensori
+
         case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, _) => admin ! msg
 
         case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => parent ! msg.copy(direction = fromAdmin)
