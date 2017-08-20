@@ -48,7 +48,7 @@ class HumiditySensorTest extends FlatSpec with Matchers {
 
     val refreshRate = 1000
     val changeStep = 0.15
-    var simulatedHumiditySensor = new SimulatedMonotonicHumiditySensor(hSensor, refreshRate, changeStep)
+    var simulatedHumiditySensor = new SimulatedLinearHumiditySensor(hSensor, refreshRate, changeStep)
     var oHSensor: ObservableHumiditySensor = new ObservableHumiditySensor(simulatedHumiditySensor)
 
 

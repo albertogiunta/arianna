@@ -96,15 +96,18 @@ trait SimulationStrategy[D, S <: GenericSensor[D]] {
   *
   **/
 object SimulationStrategies {
-    
-    trait MonotonicSimulation[D, S <: GenericSensor[D]] extends SimulationStrategy[D, S] {
+
+    /**
+      * A trait that define the basic method that a linear simulations must have
+      */
+    trait LinearSimulation[D, S <: GenericSensor[D]] extends SimulationStrategy[D, S] {
         def changeStep: D
     }
 
     /**
       * A simulation strategy implementation for sensors that manage value Double.
       * This strategy models a behaviour for a sensor that change its value according to its scale
-      * in a monotonic way. The sensor increase its value by the specified "changeStep" parameter value until
+      * in a linear way. The sensor increase its value by the specified "changeStep" parameter value until
       * it reaches the max value. When the sensor reaches the max value, starts to decrease its value
       * (always by the "changeStep") until it reaches the min value. After this, its restart to increase
       * and repeats the previous operations
@@ -112,8 +115,8 @@ object SimulationStrategies {
       * @param changeStep the value added/subtracted to/from the sensor value at each step
       *
       **/
-    case class MonotonicDoubleSimulation(val changeStep: Double)
-        extends MonotonicSimulation[Double, NumericSensor[Double]] {
+    case class LinearDoubleSimulation(val changeStep: Double)
+        extends LinearSimulation[Double, NumericSensor[Double]] {
         private var increasePhase: Boolean = true
 
         private def shouldIncrease(sensor: NumericSensor[Double]): Boolean =
@@ -136,7 +139,7 @@ object SimulationStrategies {
     /**
       * A simulation strategy implementation for sensors that manage value Int.
       * This strategy models a behaviour for a sensor that change its value according to its scale
-      * in a monotonic way. The sensor increase its value by the specified "changeStep" parameter value until
+      * in a linear way. The sensor increase its value by the specified "changeStep" parameter value until
       * it reaches the max value. When the sensor reaches the max value, starts to decrease its value
       * (always by the "changeStep") until it reaches the min value. After this, its restart to increase
       * and repeats the previous operations
@@ -144,8 +147,8 @@ object SimulationStrategies {
       * @param changeStep the value added/subtracted to/from the sensor value at each step
       *
       **/
-    case class MonotonicIntSimulation(val changeStep: Int)
-        extends MonotonicSimulation[Int, NumericSensor[Int]] {
+    case class LinearIntSimulation(val changeStep: Int)
+        extends LinearSimulation[Int, NumericSensor[Int]] {
         private var increasePhase: Boolean = true
 
         private def shouldIncrease(sensor: NumericSensor[Int]): Boolean =
