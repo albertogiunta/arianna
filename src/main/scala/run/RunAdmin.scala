@@ -5,7 +5,6 @@ import java.nio.file.Paths
 import javafx.embed.swing.JFXPanel
 
 import admin.actors.AdminManager
-import admin.view.InterfaceView
 import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
 import ontologies.messages.Location._
@@ -19,7 +18,6 @@ object RunAdmin extends App {
         new JFXPanel
         val path2Project = Paths.get("").toFile.getAbsolutePath
         val path2Config = path2Project + "/res/conf/akka/testAdmin.conf"
-        var interfaceView: InterfaceView = new InterfaceView
         val config = ConfigFactory.parseFile(new File(path2Config)).resolve
         val system = ActorSystem.create(NamingSystem.AdminActorSystem, config)
         var admin = system.actorOf(Props[AdminManager], NamingSystem.AdminManager)
