@@ -76,6 +76,8 @@ class AdminManager extends TemplateActor {
             log.info("Map sent again to Master")
             context.become(operational)
         }
+        case _ => desist _
+
     }
 
 }
