@@ -95,7 +95,7 @@ class ChartWindowController extends ViewController {
       * This method is called when the secondary window is closed.
       **/
     def closeWindow(): Unit = {
-        chartActor ! AriadneMessage(Interface, Interface.Subtype.CloseChart, Location.Admin >> Location.Self, roomInfo)
+        chartActor ! AriadneMessage(Interface, Interface.Subtype.CloseChart, Location.Admin >> Location.Self, Empty())
     }
 
 }

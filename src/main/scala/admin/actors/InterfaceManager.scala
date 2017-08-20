@@ -87,9 +87,8 @@ class InterfaceManager extends TemplateActor {
             chartActor ! msg
         }
 
-        case msg@AriadneMessage(Interface, Interface.Subtype.CloseChart, _, cell: RoomInfo) => {
-            chartActors.get(cell.id).get ! PoisonPill
-            interfaceController enableButton cell.id
+        case msg@AriadneMessage(Interface, Interface.Subtype.CloseChart, _, _) => {
+            sender ! PoisonPill
         }
 
         case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => parent ! msg
