@@ -54,7 +54,7 @@ class InterfaceManagerTest extends TestKit(ActorSystem("InterfaceManagerTest")) 
 
     val closeChart = AriadneMessage(
         Interface, Interface.Subtype.CloseChart,
-        Location.Admin >> Location.Self, Empty()
+        Location.Admin >> Location.Self, RoomInfo.empty
     )
 
     val handshake = AriadneMessage(
