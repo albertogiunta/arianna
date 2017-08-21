@@ -4,7 +4,7 @@ import java.io.File
 import java.nio.file.Paths
 
 import akka.actor.{ActorRef, ActorSystem, Props}
-import cell.core.UserManager
+import cell.userManagement.UserManager
 import com.typesafe.config.ConfigFactory
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology

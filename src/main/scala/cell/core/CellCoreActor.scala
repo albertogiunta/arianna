@@ -4,6 +4,7 @@ import akka.actor.{ActorRef, Props}
 import cell.cluster.{CellClusterSupervisor, CellPublisher, CellSubscriber}
 import cell.processor.route.actors.RouteManager
 import cell.sensormanagement.SensorManager
+import cell.userManagement.UserManager
 import com.actors.TemplateActor
 import com.utils.Practicability
 import ontologies.messages.AriannaJsonProtocol._

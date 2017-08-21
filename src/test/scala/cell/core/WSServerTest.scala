@@ -1,6 +1,6 @@
 package cell.core
 
-import cell.WSClient
+import cell.userManagement.{WSClient, WSServer}
 import io.vertx.core.Vertx
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -23,32 +23,32 @@ class WSServerTest extends FlatSpec with Matchers {
     "The server" should "receive a new connection from a new user" in {
         c.sendMessageFirstConnection()
         Thread.sleep(500)
-        s.usersWaitingForArea.size() should be(1)
+        s.usersWaitingForArea.size should be(1)
         s.sendAreaToNewUser("")
-        s.usersWaitingForArea.size() should be(0)
+        s.usersWaitingForArea.size should be(0)
         c.sendMessageFirstConnection()
         Thread.sleep(500)
-        s.usersWaitingForArea.size() should be(1)
+        s.usersWaitingForArea.size should be(1)
     }
 
     "The server" should "receive a new connection from an old user" in {
         c.sendMessageNormalConnection()
         Thread.sleep(500)
-        s.usersWaitingForConnectionAck.size() should be(1)
+        s.usersWaitingForConnectionAck.size should be(1)
         s.sendAckToNewUser("")
-        s.usersWaitingForConnectionAck.size() should be(0)
+        s.usersWaitingForConnectionAck.size should be(0)
         c.sendMessageNormalConnection()
         Thread.sleep(500)
-        s.usersWaitingForConnectionAck.size() should be(1)
+        s.usersWaitingForConnectionAck.size should be(1)
     }
 
 
     "The server" should "receive a route request from a user" in {
         c.sendMessageAskRoute()
         Thread.sleep(500)
-        s.usersWaitingForRoute.size() should be(1)
+        s.usersWaitingForRoute.size should be(1)
         s.sendRouteToUsers(1, 2, "")
-        s.usersWaitingForRoute.size() should be(0)
+        s.usersWaitingForRoute.size should be(0)
         c.sendMessageAskRoute()
         Thread.sleep(500)
     }
@@ -56,10 +56,10 @@ class WSServerTest extends FlatSpec with Matchers {
     "The server" should "receive a new disconnection request from a user" in {
         c.sendMessageDisconnect()
         Thread.sleep(500)
-        s.usersWaitingForDisconnection.size() should be(1)
+        s.usersWaitingForDisconnection.size should be(1)
         s.disconnectUsers()
-        s.usersWaitingForConnectionAck.size() should be(0)
-        s.usersWaitingForArea.size() should be(0)
-        s.usersWaitingForDisconnection.size() should be(0)
+        s.usersWaitingForConnectionAck.size should be(0)
+        s.usersWaitingForArea.size should be(0)
+        s.usersWaitingForDisconnection.size should be(0)
     }
 }

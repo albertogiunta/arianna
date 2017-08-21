@@ -5,6 +5,7 @@ import java.nio.file.Paths
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
+import cell.userManagement.{MSGTAkkaVertx, UserManager}
 import com.actors.CustomActor
 import com.typesafe.config.{Config, ConfigFactory}
 import ontologies.messages.Location._
@@ -23,7 +24,7 @@ class UserManagerTest extends TestKit(ActorSystem("UserManagerTest")) with WordS
     val area: Area = Planimetrics.unmarshal(Source.fromFile(new File(path2map)).getLines.mkString)
 
     val topology = AriadneMessage(Topology, ViewedFromACell, Location.Cell >> Location.Cell, AreaViewedFromACell(area))
-    val routeRequest = RouteRequestShort("uri1", "uri1", "uri1", isEscape = false)
+    val routeRequest = RouteRequestFromClient("uri1", "uri1", "uri1", isEscape = false)
     val routeForward = AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell, RouteRequest("uri1",
         area.rooms.head.info.id, area.rooms.head.info.id, isEscape = false))
     val currentPeopleUpdate0 = AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, CurrentPeopleUpdate(RoomID(1, "uri1"), 0))
