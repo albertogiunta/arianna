@@ -1,6 +1,5 @@
-package cell;
+package cell.userManagement;
 
-import cell.core.MSGTAkkaVertx;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.WebSocket;

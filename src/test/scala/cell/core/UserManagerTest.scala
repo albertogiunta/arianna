@@ -5,6 +5,7 @@ import java.nio.file.Paths
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
+import cell.userManagement.{MSGTAkkaVertx, UserManager}
 import com.actors.CustomActor
 import com.typesafe.config.{Config, ConfigFactory}
 import ontologies.messages.Location._

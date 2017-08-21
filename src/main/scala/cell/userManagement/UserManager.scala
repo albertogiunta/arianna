@@ -1,8 +1,7 @@
-package cell.core
+package cell.userManagement
 
 import _root_.io.vertx.core.Vertx
 import akka.actor.ActorLogging
-import cell.WSClient
 import com.actors.TemplateActor
 import io.vertx.scala.core.http.ServerWebSocket
 import ontologies.messages.AriannaJsonProtocol._
