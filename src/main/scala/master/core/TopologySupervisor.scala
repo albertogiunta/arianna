@@ -53,8 +53,8 @@ class TopologySupervisor extends TemplateActor {
     }
     
     override protected def receptive: Receive = {
-        
-        case msg@AriadneMessage(Topology, Planimetrics, `adminToMaster`, map: Area) =>
+    
+        case AriadneMessage(Topology, Planimetrics, `adminToMaster`, map: Area) =>
             log.info("A topology has been loaded in the server...")
     
             if (topology.isEmpty || map.id != mapVersionID) {
