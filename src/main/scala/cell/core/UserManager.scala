@@ -33,13 +33,13 @@ class UserManager extends TemplateActor with ActorLogging {
     var areaForCell: AreaViewedFromACell = _
     var areaForUser: AreaViewedFromAUser = _
 
-    override protected def init(args: List[Any]): Unit = {
+    override protected def init(args: List[String]): Unit = {
         if (args.size != 2) throw IncorrectInitMessageException(this.name, args)
 
-        uri = args.head.asInstanceOf[String]
+        uri = args.head
         serial = uri.split("uri")(1).toInt
         vertx = Vertx.vertx()
-        s = new WSServer(vertx, self, "/" + args.head.asInstanceOf[String], args(1).asInstanceOf[String].toInt)
+        s = new WSServer(vertx, self, "/" + args.head, args(1).toInt)
         vertx.deployVerticle(s)
         log.info("Started User Manager")
         //        initWSClient()
