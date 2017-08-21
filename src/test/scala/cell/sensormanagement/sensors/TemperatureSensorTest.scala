@@ -53,7 +53,7 @@ class TemperatureSensorTest extends FlatSpec with Matchers {
 
     val refreshRate = 1000
     val changeStep = 0.15
-    var simulatedTempSensor = new SimulatedMonotonicTemperatureSensor(tSensor, refreshRate, changeStep)
+    var simulatedTempSensor = new SimulatedLinearTemperatureSensor(tSensor, refreshRate, changeStep)
     var oTSensor: ObservableTemperatureSensor = new ObservableTemperatureSensor(simulatedTempSensor)
 
 

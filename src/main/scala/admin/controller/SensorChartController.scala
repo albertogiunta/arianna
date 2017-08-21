@@ -6,14 +6,16 @@ import javafx.application.Platform
 import javafx.fxml.FXML
 import javafx.scene.chart.{LineChart, XYChart}
 
+import com.utils.ChartUtils
+
 /**
-  * This is the Controller for the sensor chart, that initialized it and keep it updated.
+  * This is the Controller for the sensor chart, that initializes it and keep it updated.
   **/
 class SensorChartController extends ViewController {
 
     @FXML
     private var chart: LineChart[Double, Double] = _
-
+    
     private var data: XYChart.Series[Double, Double] = new XYChart.Series[Double, Double]
 
     private var time = (0 to Int.MaxValue - 1).iterator
@@ -24,7 +26,7 @@ class SensorChartController extends ViewController {
     }
 
     /**
-      * This method adds a new value in the chart, and provides to keep only the last 20 values.
+      * This method adds a new value in the chart.
       *
       * @param value : new Double to add in the chart
       **/

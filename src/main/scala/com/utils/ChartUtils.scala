@@ -1,0 +1,28 @@
+package com.utils
+
+import javafx.scene.chart.XYChart
+
+/**
+  * This is a utility class for all the methods related to chart management.
+  *
+  **/
+object ChartUtils {
+    private val HEAD = 0
+    private val MAX_DATA_ON_GRAPH = 20
+
+    val positionIterator = List((1, 0), (0, 1), (1, 1), (0, 2), (1, 2)).iterator
+
+    /** *
+      * This method resizes the Series in input in order to keep it of the wanted size.
+      *
+      * @param data : XYChart.Series to be resized
+      *
+      */
+    def resizeIfNeeded(data: XYChart.Series[Double, Double]): XYChart.Series[Double, Double] = {
+        if (data.getData.size.equals(MAX_DATA_ON_GRAPH)) {
+            data.getData remove HEAD
+        }
+        data
+    }
+
+}

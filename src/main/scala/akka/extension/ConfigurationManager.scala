@@ -21,21 +21,21 @@ class ConfigurationManagerImpl(system: ActorSystem) extends Extension {
 }
 
 final case class PropertyChooser(config: Config, path: String) {
-
-    def string: String = config.getString(path)
-
-    def stringList: List[String] =
+    
+    def asString: String = config.getString(path)
+    
+    def asStringList: List[String] =
         asScalaBuffer(config.getStringList(path)).toList
-
-    def number: Number = config.getNumber(path)
-
-    def numberList: List[Number] = asScalaBuffer(config.getNumberList(path)).toList
-
-    def value: ConfigValue = config.getValue(path)
-
-    def configObj: ConfigObject = config.getObject(path)
-
-    def configObjList: List[ConfigObject] = asScalaBuffer(config.getObjectList(path)).toList
+    
+    def asNumber: Number = config.getNumber(path)
+    
+    def asNumberList: List[Number] = asScalaBuffer(config.getNumberList(path)).toList
+    
+    def asConfigValue: ConfigValue = config.getValue(path)
+    
+    def asConfigObject: ConfigObject = config.getObject(path)
+    
+    def asConfigObjList: List[ConfigObject] = asScalaBuffer(config.getObjectList(path)).toList
 }
 
 case class ConfigPathBuilder() {
@@ -101,7 +101,7 @@ object TestConfigManager extends App {
         .withFallback(ConfigFactory.load()).resolve()
     
     implicit val system: ActorSystem = ActorSystem("Arianna-Cluster", config)
-
-    println(ConfigurationManager(system) property ConfigPathBuilder().akka.remote.netty.tcp.get("port") number)
+    
+    println(ConfigurationManager(system) property ConfigPathBuilder().akka.remote.netty.tcp.get("port") asNumber)
 
 }

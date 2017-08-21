@@ -4,6 +4,9 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
+/**
+  * Created by Xander_C on 17/08/2017.
+  */
 @RunWith(classOf[JUnitRunner])
 class PracticabilityTest extends FunSuite with BeforeAndAfter {
     

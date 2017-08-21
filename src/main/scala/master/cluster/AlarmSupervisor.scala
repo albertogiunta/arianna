@@ -19,7 +19,7 @@ class AlarmSupervisor(mediator: ActorRef) extends TemplateSubscriber(mediator) {
     override val topics = Set(Topic.Alarms)
     
     private val topologySupervisor: () => ActorSelection = () => sibling(NamingSystem.TopologySupervisor).get
-    private val admin: () => ActorSelection = () => sibling(NamingSystem.AdminManager).get
+    private val admin: () => ActorSelection = () => sibling(NamingSystem.AdminSupervisor).get
     
     override protected def subscribed: Receive = {
        

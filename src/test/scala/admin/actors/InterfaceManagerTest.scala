@@ -10,7 +10,7 @@ import akka.testkit.{TestActorRef, TestKit, TestProbe}
 import com.actors.CustomActor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Topology.Subtype.Planimetrics
-import ontologies.messages.MessageType.{Alarm, Handshake, Init, Topology, Update}
+import ontologies.messages.MessageType.{Alarm, Handshake, Init, Interface, Topology, Update}
 import ontologies.messages._
 import org.junit.runner.RunWith
 import org.scalatest.WordSpecLike
@@ -52,6 +52,11 @@ class InterfaceManagerTest extends TestKit(ActorSystem("InterfaceManagerTest")) 
         Location.Admin >> Location.Self, Empty()
     )
 
+    val closeChart = AriadneMessage(
+        Interface, Interface.Subtype.CloseChart,
+        Location.Admin >> Location.Self, RoomInfo.empty
+    )
+
     val handshake = AriadneMessage(
         Handshake,
         Handshake.Subtype.CellToMaster,
@@ -63,7 +68,7 @@ class InterfaceManagerTest extends TestKit(ActorSystem("InterfaceManagerTest")) 
 
     "A InterfaceManager" must {
         val probe = TestProbe()
-        val tester: ActorRef = system.actorOf(Props(new Tester(probe.ref)), "Tester")
+        val tester: TestActorRef[Tester] = TestActorRef(Props(new Tester(probe.ref)), "Tester")
 
         "In the beginning receive the map and send it to the parent" in {
             // Giving time to load the map from GUI once started
@@ -81,32 +86,27 @@ class InterfaceManagerTest extends TestKit(ActorSystem("InterfaceManagerTest")) 
             tester ! goodbye
             probe.expectMsg(goodbye)
         }
+
+        "When receiving a CloseChart message, kills the sender" in {
+            probe watch tester
+            tester ! closeChart
+            probe.expectTerminated(tester)
+        }
     }
 
     private class Tester(probe: ActorRef) extends CustomActor {
 
-        val adminActor: TestActorRef[CustomActor] =
-            TestActorRef(Props(new CustomActor {
-                new JFXPanel
-                val interfaceManager = context.actorOf(Props[InterfaceManager], NamingSystem.InterfaceManager)
-
-                override def receive: Receive = {
-                    case "Start" => {
-                        interfaceManager ! AriadneMessage(Init, Init.Subtype.Greetings, Location.Admin >> Location.Self, Greetings(List.empty))
-                    }
-                    case msg if sender == interfaceManager => {
-                        probe ! msg
-                    }
-                    case msg => interfaceManager forward msg
-                }
-            }), self, NamingSystem.AdminActor)
+        private var interfaceManager: ActorRef = _
 
         override def preStart {
-            adminActor ! "Start"
+            new JFXPanel
+            interfaceManager = context.actorOf(Props[InterfaceManager], NamingSystem.InterfaceManager)
+            interfaceManager ! AriadneMessage(Init, Init.Subtype.Greetings, Location.Admin >> Location.Self, Greetings(List.empty))
         }
 
         override def receive: Receive = {
-            case msg => adminActor forward msg
+            case msg if sender == interfaceManager => probe ! msg
+            case msg => interfaceManager ! msg
         }
     }
 

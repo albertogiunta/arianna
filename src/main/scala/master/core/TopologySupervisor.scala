@@ -4,6 +4,7 @@ import akka.actor.{ActorRef, ActorSelection, Props}
 import com.actors.TemplateActor
 import com.utils.Counter
 import com.utils.WatchDog.WatchDogNotification
+import master.cluster.MasterSubscriber
 import ontologies.messages.Location.PreMade._
 import ontologies.messages.MessageType.Handshake.Subtype.CellToMaster
 import ontologies.messages.MessageType.Topology.Subtype.{Acknowledgement, Planimetrics, ViewedFromACell}
@@ -33,14 +34,14 @@ class TopologySupervisor extends TemplateActor {
     
     private val publisher: () => ActorSelection = () => sibling(NamingSystem.Publisher).get
     private val subscriber: () => ActorSelection = () => sibling(NamingSystem.Subscriber).get
-    private val admin: () => ActorSelection = () => sibling(NamingSystem.AdminManager).get
+    private val admin: () => ActorSelection = () => sibling(NamingSystem.AdminSupervisor).get
     
     private val dataStreamer = context.actorOf(Props(new DataStreamer(target = admin())), NamingSystem.DataStreamer)
     private val watchDogSupervisor = context.actorOf(Props[WatchDogSupervisor], NamingSystem.WatchDogSupervisor)
     
     private val synced: Counter = Counter()
     
-    override def init(args: List[Any]): Unit = {
+    protected override def init(args: List[String]): Unit = {
     
         super.init(args)
         log.info("Requesting map to the Admin Application...")
@@ -52,8 +53,8 @@ class TopologySupervisor extends TemplateActor {
     }
     
     override protected def receptive: Receive = {
-        
-        case msg@AriadneMessage(Topology, Planimetrics, `adminToMaster`, map: Area) =>
+    
+        case AriadneMessage(Topology, Planimetrics, `adminToMaster`, map: Area) =>
             log.info("A topology has been loaded in the server...")
     
             if (topology.isEmpty || map.id != mapVersionID) {
@@ -69,7 +70,7 @@ class TopologySupervisor extends TemplateActor {
                 unstashAll
         
                 log.info("Notifying the Subscriber...")
-                subscriber() ! msg
+                subscriber() ! MasterSubscriber.TopologyLoadedACK
             }
 
         case _ => stash
@@ -100,8 +101,10 @@ class TopologySupervisor extends TemplateActor {
     
                     context.become(acknowledging, discardOld = true)
                     log.info("I've Become Acknowledging!")
-        
-                    subscriber() ! AriadneMessage(
+    
+                    subscriber() ! MasterSubscriber.TopologyMappedACK
+    
+                    publisher() ! AriadneMessage(
                         Topology, ViewedFromACell, masterToCell,
                         AreaViewedFromACell(mapVersionID, topology.map(e => RoomViewedFromACell(e._2)).toList)
                     )
@@ -154,9 +157,9 @@ class TopologySupervisor extends TemplateActor {
         case AriadneMessage(Topology, Planimetrics, _, map: Area) => unexpectedPlanimetry(map)
         
         case AriadneMessage(Update, CurrentPeople, `cellToMaster`, pkg: CurrentPeopleUpdate) =>
-            log.info("CAZZI Updating sensors for {} from {} with current people {}", pkg.room.name, sender.path, pkg.currentPeople)
+    
             if (topology.get(pkg.room.name).nonEmpty) {
-                log.info("Updating sensors for {} from {} with current people {}", pkg.room.name, sender.path, pkg.currentPeople)
+                log.info("Updating sensors for {} from {}", pkg.room.name, sender.path)
                 val newRoom = topology(pkg.room.name).copy(currentPeople = pkg.currentPeople)
                 topology.put(pkg.room.name, newRoom)
                 

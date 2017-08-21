@@ -6,7 +6,7 @@ import akka.cluster.pubsub.DistributedPubSubMediator._
 import ontologies.Topic
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Init
-import ontologies.messages.{AriadneMessage, Greetings, Location}
+import ontologies.messages.{AriadneMessage, Greetings, Location, MessageContent}
 
 /**
   * This class gives a common template for a Akka Subscriber.
@@ -21,11 +21,11 @@ import ontologies.messages.{AriadneMessage, Greetings, Location}
 abstract class TemplateSubscriber(mediator: ActorRef) extends TemplateActor {
     
     val cluster: Cluster = akka.cluster.Cluster(context.system)
-
-    protected val topics: Set[Topic] // To Override Necessarily
+    
+    protected val topics: Set[Topic[MessageContent]] // To Override Necessarily
     private var ackTopicReceived: Int = 0
-
-    override protected def init(args: List[Any]): Unit = {
+    
+    override protected def init(args: List[String]): Unit = {
         super.init(args)
         mediator ! Put(self) // Point 2 Point Messaging with other Actors of the cluster
         topics.foreach(topic => mediator ! Subscribe(topic, self))
@@ -49,8 +49,8 @@ abstract class TemplateSubscriber(mediator: ActorRef) extends TemplateActor {
         case _: AriadneMessage[_] => stash
         case _ => desist _
     }
-
-    protected def subscribed: Actor.Receive = ???
+    
+    protected def subscribed: Actor.Receive
 }
 
 /**
@@ -62,7 +62,7 @@ abstract class TemplatePublisher(mediator: ActorRef) extends TemplateActor {
     val cluster: Cluster = akka.cluster.Cluster(context.system)
 
     // Point 2 Point Messaging with other Actors of the cluster
-    override protected def init(args: List[Any]): Unit = {
+    override protected def init(args: List[String]): Unit = {
         super.init(args)
         mediator ! Put(self) // Point 2 Point Messaging with other Actors of the cluster
     }

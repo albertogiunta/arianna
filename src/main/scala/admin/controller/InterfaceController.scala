@@ -13,6 +13,7 @@ import javafx.stage.FileChooser.ExtensionFilter
 
 import admin.view.InterfaceView
 import akka.actor.ActorRef
+import com.utils.{GraphicResources, InterfaceText}
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.{Alarm, Init, Topology}
 import ontologies.messages._
@@ -27,7 +28,7 @@ import scala.io.Source
 class InterfaceController extends ViewController {
     var interfaceActor: ActorRef = _
     var interfaceView: InterfaceView = _
-    private val cellControllers: mutable.Map[RoomID, CellTemplateController] = new mutable.HashMap[RoomID, CellTemplateController]
+    private val cellControllers: mutable.Map[RoomID, RoomTemplateController] = new mutable.HashMap[RoomID, RoomTemplateController]
     private var canvasController: CanvasController = _
 
     @FXML
@@ -54,8 +55,10 @@ class InterfaceController extends ViewController {
                 alarmButton setDisable false
             }
             update.foreach(update => {
-                var cellController = cellControllers.get(update.room).get
-                cellController setDynamicInformation update
+                if (cellControllers.contains(update.room)) {
+                    var cellController = cellControllers.get(update.room).get
+                    cellController setDynamicInformation update
+                }
             })
         })
     }
@@ -171,8 +174,8 @@ class InterfaceController extends ViewController {
     private def createCellTemplate(cell: Room): SplitPane = {
         var loader = new FXMLLoader(getClass.getResource(GraphicResources.cell))
         var node = loader.load[SplitPane]
-        var controller = loader.getController[CellTemplateController]
-        controller.adminActor = interfaceActor
+        var controller = loader.getController[RoomTemplateController]
+        controller.adminManager = interfaceActor
         cellControllers += ((cell.info.id, controller))
         controller setStaticInformation cell
         node
@@ -194,13 +197,13 @@ class InterfaceController extends ViewController {
             cellControllers.values.foreach(cellController => cellController.endAlarm)
         })
     }
-
+    
     private def openAlert(): Unit = {
         val alert = new Alert(AlertType.ERROR)
         alert setTitle InterfaceText.errorTitle
         alert setHeaderText InterfaceText.errorHeader
         alert setContentText InterfaceText.errorText
-
+        
         alert.showAndWait
     }
 

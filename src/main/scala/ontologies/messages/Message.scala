@@ -8,11 +8,11 @@ package ontologies.messages
   *
   * Created by Matteo Gabellini and Alessandro Cevoli on 28/06/2017.
   */
-trait Message[G, L, C] {
+trait Message[C] {
     
-    def supertype: G
+    def supertype: MessageType
     
-    def subtype: L
+    def subtype: MessageSubtype[C]
     
     def direction: MessageDirection
     
@@ -22,7 +22,7 @@ trait Message[G, L, C] {
         "Message of type(" + subtype.toString + ")|" + direction.toString + "|Message Content is \"" + content.toString + "\"\n"
     
     override def equals(obj: Any): Boolean = obj match {
-        case msg: Message[_, _, _] =>
+        case msg: Message[_] =>
             msg.supertype == this.supertype && msg.subtype == this.subtype && msg.content == this.content
         case _ => false
     }
@@ -38,6 +38,6 @@ trait Message[G, L, C] {
   * @tparam C The Type of the content
   */
 final case class AriadneMessage[C <: MessageContent](supertype: MessageType,
-                                                     subtype: MessageSubtype,
+                                                     subtype: MessageSubtype[C],
                                                      direction: MessageDirection,
-                                                     content: C) extends Message[MessageType, MessageSubtype, C]
+                                                     content: C) extends Message[C]

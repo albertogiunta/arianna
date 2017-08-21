@@ -63,7 +63,7 @@ class MasterSubscriberTest extends TestKit(ActorSystem("SubscriberTest", MasterS
         Topology,
         ViewedFromACell,
         Location.Master >> Location.Cell,
-        AreaViewedFromACell(planimetric.content)
+        AreaViewedFromACell(planimetric.content.asInstanceOf[Area])
     )
     
     val updates = AriadneMessage(

@@ -36,9 +36,9 @@ class SensorTest extends org.scalatest.FlatSpec with Matchers {
     var changeStep = 0.1
     var simulatedSensor: SimulatedNumericSensor[Double] = new SimulatedNumericSensor[Double](tSensor,
         refreshRate,
-        SimulationStrategies.MonotonicDoubleSimulation(changeStep))
+        SimulationStrategies.LinearDoubleSimulation(changeStep))
 
-    "A simulated Monotonic Numeric Sensor" should "change its current value after the refresh time" in {
+    "A simulated Linear Numeric Sensor" should "change its current value after the refresh time" in {
         val currentValue = simulatedSensor.currentValue
         Thread.sleep(refreshRate)
         simulatedSensor.currentValue should be(currentValue + changeStep)

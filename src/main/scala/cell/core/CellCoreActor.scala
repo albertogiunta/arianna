@@ -61,8 +61,8 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
 
 
     }
-
-    override protected def init(args: List[Any]): Unit = {
+    
+    override protected def init(args: List[String]): Unit = {
         log.info("Hello there! the cell core is being initialized")
 
         clusterListener = context.actorOf(Props[CellClusterSupervisor], NamingSystem.CellClusterSupervisor)
@@ -162,8 +162,8 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
                     topology(indexByUri(localCellInfo.uri)).info.capacity,
                     cnt.currentPeople,
                     topology(indexByUri(localCellInfo.uri)).passages.length)))
-
-
+    
+    
             cellPublisher ! msg.copy(content = cnt.copy(room = topology(indexByUri(cnt.room.name)).info.id))
             cellPublisher ! AriadneMessage(
                 Update,
@@ -176,8 +176,8 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
             )
         }
     }: Receive) orElse this.proactive
-
-
+    
+    
     protected def localEmergency: Receive = ({
         case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) => {
             userActor ! msg
@@ -186,13 +186,13 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
         }
 
         case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, this.user2Cell, cnt: CurrentPeopleUpdate) => {
-
+    
             actualSelfLoad = cnt.currentPeople
             cellPublisher ! msg.copy(content = cnt.copy(room = topology(indexByUri(cnt.room.name)).info.id))
         }
     }: Receive) orElse this.proactive
-
-
+    
+    
     private def proactive: Receive = {
         case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => {
             log.info("Ariadne system is shutting down...")

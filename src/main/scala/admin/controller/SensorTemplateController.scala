@@ -8,7 +8,7 @@ import ontologies.messages.SensorInfo
 import ontologies.sensor.SensorCategories
 
 /**
-  * This class represents the controller for the Sensor element inside the interface
+  * This class represents the controller for the Sensor element inside the main interface
   *
   **/
 class SensorTemplateController extends ViewController {
@@ -25,7 +25,7 @@ class SensorTemplateController extends ViewController {
     /**
       * This method initializes the sensor template
       *
-      * @param sensor : Sensor object containing data
+      * @param sensor : SensorInfo object containing data
       **/
     def createSensor(sensor: SensorInfo): Unit = {
         sensorCategory = sensor.categoryId
@@ -35,7 +35,7 @@ class SensorTemplateController extends ViewController {
     /**
       * This method updates the current value of the sensor
       *
-      * @param sensor : Sensor object containing the current value
+      * @param sensor : SensorInfo object containing the current value
       * */
     def updateSensor(sensor: SensorInfo): Unit = {
         sensorValue setText sensor.value.toString

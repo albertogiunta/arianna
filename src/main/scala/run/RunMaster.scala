@@ -1,7 +1,6 @@
 package run
 
 import java.io.File
-import java.nio.file.Paths
 
 import akka.actor.{ActorSystem, Props}
 import akka.cluster.pubsub.DistributedPubSub
@@ -17,10 +16,8 @@ object RunMaster extends App {
     val REQUIRED_ARGS = 1
     
     if (args.length == REQUIRED_ARGS) {
-        
-        val path2Project: String = Paths.get("").toFile.getAbsolutePath
-        
-        val path2Config = if (!args(0).contains(path2Project)) path2Project + args(0) else args(0)
+    
+        val path2Config = args(0)
         
         implicit val config: Config = ConfigFactory.parseFile(new File(path2Config))
             .withFallback(ConfigFactory.load()).resolve()

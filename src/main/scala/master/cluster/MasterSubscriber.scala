@@ -3,10 +3,9 @@ package master.cluster
 import akka.actor.{ActorRef, ActorSelection}
 import com.actors.TemplateSubscriber
 import ontologies._
-import ontologies.messages.Location.PreMade.{adminToMaster, cellToMaster}
+import ontologies.messages.Location.PreMade.cellToMaster
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Handshake.Subtype.{Acknowledgement, CellToMaster}
-import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, ViewedFromACell}
 import ontologies.messages.MessageType._
 import ontologies.messages._
 import system.names.NamingSystem
@@ -18,7 +17,7 @@ import system.names.NamingSystem
   */
 class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) {
     
-    override val topics: Set[Topic] = Set(Topic.TopologyACK, Topic.Updates, Topic.HandShakes)
+    override val topics: Set[Topic[MessageContent]] = Set(Topic.TopologyACK, Topic.Updates, Topic.HandShakes)
     
     private val topologySupervisor: () => ActorSelection = () => sibling(NamingSystem.TopologySupervisor).get
     private val publisher: () => ActorSelection = () => sibling(NamingSystem.Publisher).get
@@ -32,8 +31,8 @@ class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) 
                 AriadneMessage(Handshake, Acknowledgement, Location.Master >> Location.Cell, Empty())
             )
             stash
-        
-        case AriadneMessage(Topology, Planimetrics, `adminToMaster`, _) =>
+
+        case MasterSubscriber.TopologyLoadedACK =>
             log.info("A topology has been loaded in the server...")
             
             context.become(behavior = sociable, discardOld = true)
@@ -55,15 +54,13 @@ class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) 
             )
     
             topologySupervisor() forward msg
-    
-        case msg@AriadneMessage(Topology, ViewedFromACell, _, _) =>
+
+        case MasterSubscriber.TopologyMappedACK =>
             log.info("All the Cells have been mapped into their logical position into the Planimetry")
         
             context.become(behavior = proactive, discardOld = true)
             log.info("I've become ProActive...")
         
-            publisher() forward msg
-    
         case _ => desist _
     }
     
@@ -87,4 +84,9 @@ class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) 
             
         case _ => desist _
     }
+}
+
+object MasterSubscriber {
+    val TopologyMappedACK: String = "TopologyMappedACK"
+    val TopologyLoadedACK: String = "TopologyLoadedACK"
 }

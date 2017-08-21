@@ -10,33 +10,29 @@ import system.names.NamingSystem
 
 /**
   * This actor intermediates between the interface and the System. It sends the loaded map, handles the messages coming
-  * from the System and communicates them to the InterfaceManager in order to update the interface. It keeps a copy of the loaded map
-  * if the System goes down and asks it again.
+  * from the System and communicates them to the InterfaceManager (in order to update the interface) and viceversa.
+  * It keeps a copy of the loaded map if the System goes down and asks it again using a LookingForAMap message.
   */
-class AdminActor extends TemplateActor {
+class AdminManager extends TemplateActor {
 
-    //Se si fa partire solo l'admin manager
-    //private val adminManager = context.actorSelection("akka.tcp://Arianna-Cluster@127.0.0.1:25520/user/AdminManager")
-    //Se si fa partire il master
     private val masterSeedNode = ConfigurationManager(context.system)
-        .property(builder.akka.cluster.get("seed-nodes")).stringList.head
+        .property(builder.akka.cluster.get("seed-nodes")).asStringList.head
     
     private val adminManager: () => ActorSelection =
-        () => context.actorSelection(masterSeedNode + "/user/Master/AdminManager")
+        () => context.actorSelection(masterSeedNode + "/user/" + NamingSystem.Master + "/" + NamingSystem.AdminSupervisor)
     
     private val interfaceManager = context.actorOf(Props[InterfaceManager], NamingSystem.InterfaceManager)
     private var areaLoaded: Area = _
     private val toMaster: MessageDirection = Location.Admin >> Location.Master
     private val toSelf: MessageDirection = Location.Admin >> Location.Self
-
-    override def init(args: List[Any]): Unit = {
+    
+    protected override def init(args: List[String]): Unit = {
         interfaceManager ! AriadneMessage(Init, Init.Subtype.Greetings, toSelf, Greetings(List.empty))
     }
 
     context.system.eventStream.subscribe(self, classOf[akka.remote.DisassociatedEvent])
 
     override def receptive: Receive = {
-        //Ricezione del messaggio iniziale dall'interfaccia con aggiornamento iniziale
         case msg@AriadneMessage(_, Topology.Subtype.Planimetrics, _, area: Area) => {
             areaLoaded = area
             adminManager() ! msg.copy(direction = toMaster)
@@ -54,11 +50,9 @@ class AdminActor extends TemplateActor {
 
         case msg@AriadneMessage(_, Alarm.Subtype.FromInterface, _, _) => adminManager() ! msg.copy(direction = toMaster)
 
-
         case msg@AriadneMessage(_, Alarm.Subtype.FromCell, _, content: AlarmContent) => interfaceManager ! msg.copy(direction = toSelf)
 
         case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) => adminManager() ! msg.copy(direction = toMaster)
-
 
         case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => interfaceManager ! msg.copy(direction = toSelf)
 
@@ -82,6 +76,8 @@ class AdminActor extends TemplateActor {
             log.info("Map sent again to Master")
             context.become(operational)
         }
+        case _ => desist _
+
     }
 
 }

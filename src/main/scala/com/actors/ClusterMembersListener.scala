@@ -53,8 +53,8 @@ abstract class ClusterMembersListener extends CustomActor {
             log.info("Member is Removed: {}. {} nodes cluster",
                 member.address, nodes.size)
             whenMemberRemoved(member)
-        
-        case msg => log.info("Unhandled... {} ", msg.toString)
+
+        case _ => // Ignore
     }
 
 

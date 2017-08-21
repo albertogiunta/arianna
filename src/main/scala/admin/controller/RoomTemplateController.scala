@@ -8,6 +8,7 @@ import javafx.scene.paint.Color
 import javafx.scene.text.Text
 
 import akka.actor.ActorRef
+import com.utils.GraphicResources
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Interface
 import ontologies.messages._
@@ -15,11 +16,11 @@ import ontologies.messages._
 import scala.collection.mutable
 
 /**
-  * This class represent the controller for each Cell template inside the interface
+  * This class represent the controller for each Room template inside the interface
   */
-class CellTemplateController extends ViewController {
+class RoomTemplateController extends ViewController {
 
-    var adminActor: ActorRef = _
+    var adminManager: ActorRef = _
     private val ONE: String = "1"
     private val ZERO: String = "0"
     private var roomInfo: RoomInfo = _
@@ -46,7 +47,7 @@ class CellTemplateController extends ViewController {
     /**
       * This method fills the interface with static information about the Cell; it's called only one time when the map is loaded
       *
-      * @param room : Cell object containing data
+      * @param room : Room object containing data
       *
       **/
     def setStaticInformation(room: Room): Unit = {
@@ -55,10 +56,10 @@ class CellTemplateController extends ViewController {
     }
 
     /**
-      * This method update the interface with dynamic information about the Cell; it's called everytime the Application receive
+      * This method update the interface with dynamic information about the Room; it's called everytime the Application receive
       * an update from the System
       *
-      * @param update : CellForView object containing only dynamic data
+      * @param update : RoomDataUpdate object containing only dynamic data
       * */
     def setDynamicInformation(update: RoomDataUpdate): Unit = {
         currentPeopleValue setText update.currentPeople.toString + "/" + maxCapacityValue.getText
@@ -70,7 +71,7 @@ class CellTemplateController extends ViewController {
     }
 
     /**
-      * This method fills the interface with data about sensors of the Cell, once the Application has received it from the System.
+      * This method fills the interface with data about sensors of the Room, once the Application has received it from the System.
       *
       * @param sensorsInfo : SensorsInfoUpdate object containing data
       *
@@ -102,7 +103,7 @@ class CellTemplateController extends ViewController {
       * window with charts.
       **/
     def openCharts(): Unit = {
-        adminActor ! AriadneMessage(Interface, Interface.Subtype.OpenChart, Location.Admin >> Location.Self, CellForChart(roomInfo, sensorsController.keys.toList))
+        adminManager ! AriadneMessage(Interface, Interface.Subtype.OpenChart, Location.Admin >> Location.Self, CellForChart(roomInfo, sensorsController.keys.toList))
         chartsButton setDisable true
     }
 
@@ -112,7 +113,7 @@ class CellTemplateController extends ViewController {
     def enableChartButton(): Unit = {
         chartsButton setDisable false
     }
-
+    
     private def loadSensor(sensor: SensorInfo): Unit = {
         var loader = new FXMLLoader(getClass.getResource(GraphicResources.sensor))
         var sensorTemplate = loader.load[HBox]
@@ -121,7 +122,7 @@ class CellTemplateController extends ViewController {
         sensorsController += ((sensor.categoryId, sensorController))
         sensorsContainer.getChildren add sensorTemplate
     }
-
+    
     private def setRoomInfo(roomInfo: RoomInfo): Unit = {
         roomName setText roomInfo.id.name
         maxCapacityValue setText roomInfo.capacity.toString

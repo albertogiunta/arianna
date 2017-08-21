@@ -1,15 +1,15 @@
 package ontologies
 
-import ontologies.messages.{MessageSubtype, MessageType}
+import ontologies.messages.{MessageContent, MessageSubtype, MessageType}
 
 /**
   * Created by Matteo Gabellini on 28/06/2017.
   */
-trait Topic {
+trait Topic[C] {
 
     def associatedMessageType: MessageType
     
-    def associatedMessageSubtype: Option[MessageSubtype]
+    def associatedMessageSubtype: Option[MessageSubtype[C]]
     
     val topic: String
 
@@ -18,17 +18,17 @@ trait Topic {
     override def toString: String = {
         topic + "/" + subTopic.getOrElse("All")
     }
-
-    override def equals(obj: scala.Any) = obj match {
-        case that: Topic => that.toString == this.toString
+    
+    override def equals(obj: scala.Any): Boolean = obj match {
+        case that: Topic[_] => that.toString == this.toString
         case _ => false
     }
 }
 
-case class AriadneTopic(override val topic: String, override val subTopic: Option[String]) extends Topic {
-    override def associatedMessageType = MessageType.Factory(topic)
+case class AriadneTopic(override val topic: String, override val subTopic: Option[String]) extends Topic[MessageContent] {
+    override def associatedMessageType = MessageType.StaticFactory(topic)
     
-    override def associatedMessageSubtype = Option(MessageSubtype.Factory(subTopic.orNull))
+    override def associatedMessageSubtype = Option(MessageSubtype.StaticFactory(subTopic.orNull))
 }
 
 object Topic {
@@ -49,9 +49,9 @@ object Topic {
     
     val TopologyACK = AriadneTopic(MessageType.Topology, Option(MessageType.Topology.Subtype.Acknowledgement))
     
-    implicit def Topic2String(topic: Topic): String = topic.toString
+    implicit def Topic2String(topic: Topic[_]): String = topic.toString
     
-    implicit def Topic2MessageType(topic: Topic): MessageType = topic.associatedMessageType
-
-    implicit def Topic2MessageSubtype(topic: Topic): MessageSubtype = topic.associatedMessageSubtype.orNull
+    implicit def Topic2MessageType(topic: Topic[_]): MessageType = topic.associatedMessageType
+    
+    implicit def Topic2MessageSubtype(topic: Topic[_]): MessageSubtype[_] = topic.associatedMessageSubtype.orNull
 }

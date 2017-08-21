@@ -29,15 +29,16 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
     val path2Project: String = Paths.get("").toFile.getAbsolutePath
     val path2map: String = path2Project + "/res/json/map4test.json"
     
-    val plan: String = Source.fromFile(new File(path2map)).getLines.mkString
-    
     val cellInfo = CellInfo(uri = "PancoPillo", port = 8080)
+    val plan: Area = Planimetrics.unmarshal(Source.fromFile(new File(path2map)).getLines.mkString)
+    val sensorsInfo = SensorsInfoUpdate(cellInfo, List(SensorInfo(1, 10.0)))
+    val currentPeople = CurrentPeopleUpdate(RoomID(serial = 777, name = "PancoPillo"), 777)
     
     val planimetric = AriadneMessage(
         Topology,
         Topology.Subtype.Planimetrics,
         Location.Admin >> Location.Master,
-        Planimetrics.unmarshal(plan)
+        plan
     )
     
     val ackTop = AriadneMessage(
@@ -51,28 +52,28 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
         Topology,
         ViewedFromACell,
         Location.Master >> Location.Cell,
-        AreaViewedFromACell(planimetric.content)
+        AreaViewedFromACell(plan)
     )
     
     val handshake = AriadneMessage(
         Handshake,
         Handshake.Subtype.CellToMaster,
         Location.Cell >> Location.Master,
-        SensorsInfoUpdate(cellInfo, List(SensorInfo(1, 10.0)))
+        sensorsInfo
     )
     
     val currentPeopleUpdate = AriadneMessage(
         Update,
         Update.Subtype.CurrentPeople,
         Location.Cell >> Location.Master,
-        CurrentPeopleUpdate(RoomID(serial = 777, name = "PancoPillo"), 777)
+        currentPeople
     )
     
-    val sensorsUpdate = AriadneMessage(
+    val sensorsInfoUpdate = AriadneMessage(
         Update,
         Update.Subtype.Sensors,
         Location.Cell >> Location.Master,
-        SensorsInfoUpdate(cellInfo, List(SensorInfo(1, 10.0)))
+        sensorsInfo
     )
     
     override def afterAll {
@@ -153,45 +154,55 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
             
             "accept new sensors values" in {
     
-                val topology = mutable.HashMap(planimetric.content.rooms.map(r => r.cell.info.uri -> r): _*)
+                val topology = mutable.HashMap(plan.rooms.map(r => r.cell.info.uri -> r): _*)
     
-                val newCell = topology(handshake.content.cell.uri).cell
+                val newCell = topology(sensorsInfo.cell.uri).cell
                     .copy(
-                        info = handshake.content.cell,
-                        sensors = sensorsUpdate.content.sensors
+                        info = sensorsInfo.cell,
+                        sensors = sensorsInfo.sensors
                     )
     
-                val newRoom = topology(handshake.content.cell.uri).copy(cell = newCell)
+                val newRoom = topology(sensorsInfo.cell.uri).copy(cell = newCell)
     
-                topology.put(handshake.content.cell.uri, newRoom)
-                tester ! sensorsUpdate
-                probe.expectMsg(AdminUpdate(0, topology.values.map(c => RoomDataUpdate(c)).toList))
+                topology.put(sensorsInfo.cell.uri, newRoom)
+                tester ! sensorsInfoUpdate
+                probe.expectMsg(
+                    AriadneMessage(
+                        Update, Update.Subtype.Admin, Location.Master >> Location.Admin,
+                        AdminUpdate(0, topology.values.map(c => RoomDataUpdate(c)).toList)
+                    )
+                )
             }
             
             "accept new current people" in {
     
                 val topology: mutable.Map[String, Room] =
-                    mutable.HashMap(planimetric.content
+                    mutable.HashMap(plan
                         .rooms.map(room => room.cell.info.uri -> room): _*)
     
-                val oldRoom = topology(handshake.content.cell.uri)
+                val oldRoom = topology(sensorsInfo.cell.uri)
     
-                val newRoom: Room = topology(handshake.content.cell.uri)
+                val newRoom: Room = topology(sensorsInfo.cell.uri)
                     .copy(
-                        cell = ontologies.messages.Cell(handshake.content.cell, sensorsUpdate.content.sensors),
-                        currentPeople = currentPeopleUpdate.content.currentPeople,
+                        cell = ontologies.messages.Cell(sensorsInfo.cell, sensorsInfo.sensors),
+                        currentPeople = currentPeople.currentPeople,
                         practicability = Practicability(
                             oldRoom.info.capacity,
-                            currentPeopleUpdate.content.currentPeople,
+                            currentPeople.currentPeople,
                             oldRoom.passages.length
                         )
                     )
     
-                topology.put(handshake.content.cell.uri, newRoom)
+                topology.put(sensorsInfo.cell.uri, newRoom)
                 
                 tester ! currentPeopleUpdate
     
-                probe.expectMsg(AdminUpdate(0, topology.values.map(c => RoomDataUpdate(c)).toList))
+                probe.expectMsg(
+                    AriadneMessage(
+                        Update, Update.Subtype.Admin, Location.Master >> Location.Admin,
+                        AdminUpdate(0, topology.values.map(c => RoomDataUpdate(c)).toList)
+                    )
+                )
             }
     
             "accept late handshakes, temporary becoming acknowledging and then returning ProActive" in {
@@ -229,13 +240,9 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
     
         val admin: TestActorRef[CustomActor] = TestActorRef(Props(new CustomActor {
             override def receive: Receive = {
-                case AriadneMessage(Update, Update.Subtype.Admin, _, cnt: AdminUpdate) =>
-                    probe ! cnt
-                case msg =>
-                    println(msg.toString)
-                    probe ! msg
+                case msg => probe ! msg
             }
-        }), self, NamingSystem.AdminManager)
+        }), self, NamingSystem.AdminSupervisor)
     
         val supervisor: TestActorRef[TopologySupervisor] =
             TestActorRef(Props[TopologySupervisor], self, NamingSystem.TopologySupervisor)

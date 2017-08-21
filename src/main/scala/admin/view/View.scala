@@ -1,5 +1,8 @@
 package admin.view
 
+/**
+  * This is the common trait to all View classes.
+  **/
 trait View {
 
     /**

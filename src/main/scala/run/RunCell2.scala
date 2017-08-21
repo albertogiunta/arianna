@@ -6,7 +6,7 @@ import java.nio.file.Paths
 import akka.actor.{ActorSystem, Props}
 import akka.cluster.pubsub.DistributedPubSub
 import cell.core.CellCoreActor
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.Init
 import ontologies.messages.{AriadneMessage, Greetings, Location}
@@ -20,7 +20,7 @@ object RunCell2 extends App {
     val path2Project = Paths.get("").toFile.getAbsolutePath
     val path2Config = path2Project + "/res/conf/test/testCell2.conf"
     
-    implicit val config = ConfigFactory.parseFile(new File(path2Config))
+    implicit val config: Config = ConfigFactory.parseFile(new File(path2Config))
         .withFallback(ConfigFactory.load()).resolve()
     
     val system = ActorSystem("Arianna-Cluster", config)

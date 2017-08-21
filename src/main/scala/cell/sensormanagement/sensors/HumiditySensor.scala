@@ -23,14 +23,14 @@ protected class BasicHumiditySensor(override val name: String,
 
 /**
   * This is a decoration for a humidity sensor. This class provide
-  * a simulated monotonic behaviour to the decorated sensor
+  * a simulated linear behaviour to the decorated sensor
   **/
-protected class SimulatedMonotonicHumiditySensor(override val sensor: HumiditySensor,
-                                                 override val millisRefreshRate: Long,
-                                                 val changeStep: Double)
+protected class SimulatedLinearHumiditySensor(override val sensor: HumiditySensor,
+                                              override val millisRefreshRate: Long,
+                                              val changeStep: Double)
     extends SimulatedNumericSensor[Double](sensor,
         millisRefreshRate,
-        SimulationStrategies.MonotonicDoubleSimulation(changeStep)) with HumiditySensor {
+        SimulationStrategies.LinearDoubleSimulation(changeStep)) with HumiditySensor {
     override def threshold: Threshold[Double] = sensor.threshold
 }
 

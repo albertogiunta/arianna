@@ -53,11 +53,11 @@ class DataStreamerTest extends TestKit(ActorSystem("DataStreamerTest"))
             override def receive: Receive = {
                 case msg => probe ! msg
             }
-        }), self, NamingSystem.AdminManager)
+        }), self, NamingSystem.AdminSupervisor)
     
         val streamer: TestActorRef[TopologySupervisor] =
             TestActorRef(Props(new DataStreamer(
-                target = child(NamingSystem.AdminManager).get,
+                target = child(NamingSystem.AdminSupervisor).get,
                 (msg, dest) => {
                     probe ! "I'm the hot stream"
                     dest ! msg

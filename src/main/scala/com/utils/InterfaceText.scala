@@ -1,10 +1,17 @@
-package admin.controller
+package com.utils
 
+/**
+  * This is a utility class that keeps together all the Strings that compose the Interface.
+  **/
 object InterfaceText {
 
     val none: String = ""
 
     val mainTitle: String = "Arianna admin Interface"
+
+    val chartTitle: String = "Arianna Charts"
+
+    val loadTitle: String = "Load configuration file"
 
     val fileSelectionText: String = "Get JSON Map"
 
@@ -22,18 +29,3 @@ object InterfaceText {
 
 }
 
-object GraphicResources {
-
-    val interface: String = "/interfaceTemplate.fxml"
-
-    val canvas: String = "/canvasTemplate.fxml"
-
-    val cell: String = "/cellTemplate.fxml"
-
-    val chartWindow: String = "/chartWindowTemplate.fxml"
-
-    val chart: String = "/chartTemplate.fxml"
-
-    val sensor: String = "/sensorTemplate.fxml"
-
-}

@@ -15,8 +15,9 @@ import system.names.NamingSystem
 import scala.collection.mutable
 
 /**
-  * This actor keeps the interface updated when it receives messages from its parent and it also creates
-  * a ChartManager for each chart window opened by the administrator and forward to it only
+  * This actor keeps the interface updated when it receives messages from its parent, and receives the interface
+  * event and inform the AdminSupervisor, his parent, about them.
+  * It also creates a ChartManager for each chart window opened by the administrator and forward to it only
   * the updates about the correct cell.
   *
   **/
@@ -26,10 +27,9 @@ class InterfaceManager extends TemplateActor {
     private val chartActors: mutable.Map[RoomID, ActorRef] = new mutable.HashMap[RoomID, ActorRef]
     private var roomIDs: mutable.Map[CellInfo, RoomID] = new mutable.HashMap[CellInfo, RoomID]
     val counter: Counter = new Counter(0)
-
-
-
-    override def init(args: List[Any]): Unit = {
+    
+    
+    protected override def init(args: List[String]): Unit = {
         Platform.runLater(() => {
             val view: InterfaceView = new InterfaceView
             view.start
@@ -46,7 +46,6 @@ class InterfaceManager extends TemplateActor {
       */
 
     override def receptive: Receive = {
-        //Ricezione del messaggio iniziale dall'interfaccia con aggiornamento iniziale
         case msg@AriadneMessage(_, Topology.Subtype.Planimetrics, _, area: Area) => {
             area.rooms.foreach(r => roomIDs += ((r.cell.info, r.info.id)))
             parent ! msg
@@ -68,6 +67,8 @@ class InterfaceManager extends TemplateActor {
             }
         }
 
+        case _ => desist _
+
     }
 
     def operational: Receive = {
@@ -83,16 +84,15 @@ class InterfaceManager extends TemplateActor {
 
         case msg@AriadneMessage(_, Alarm.Subtype.FromCell, _, content: AlarmContent) => interfaceController triggerAlarm content
 
-
         case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
             var chartActor = context.actorOf(Props[ChartManager], NamingSystem.ChartManager + chartActors.size.toString)
             chartActors += ((cell.cell.id, chartActor))
             chartActor ! msg
         }
 
-        case msg@AriadneMessage(Interface, Interface.Subtype.CloseChart, _, cell: RoomInfo) => {
-            chartActors.get(cell.id).get ! PoisonPill
-            interfaceController enableButton cell.id
+        case msg@AriadneMessage(Interface, Interface.Subtype.CloseChart, _, info: RoomInfo) => {
+            sender ! PoisonPill
+            chartActors.remove(info.id)
         }
 
         case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => parent ! msg
