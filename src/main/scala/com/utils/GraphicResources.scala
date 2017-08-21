@@ -1,5 +1,8 @@
 package com.utils
 
+/**
+  * This is a utility class that keeps together all the file names of the FXML template files.
+  **/
 object GraphicResources {
 
     val interface: String = "/interfaceTemplate.fxml"

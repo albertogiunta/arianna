@@ -15,6 +15,9 @@ class ChartView() extends View {
 
     var controller: ChartWindowController = _
 
+    /**
+      * Main method that starts the View and show it to the user
+      **/
     def start(): Unit = {
         val loader = new FXMLLoader(getClass.getResource(GraphicResources.chartWindow));
         val template = loader.load[Pane]

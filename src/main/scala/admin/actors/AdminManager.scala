@@ -10,8 +10,8 @@ import system.names.NamingSystem
 
 /**
   * This actor intermediates between the interface and the System. It sends the loaded map, handles the messages coming
-  * from the System and communicates them to the InterfaceManager in order to update the interface. It keeps a copy of the loaded map
-  * if the System goes down and asks it again.
+  * from the System and communicates them to the InterfaceManager (in order to update the interface) and viceversa.
+  * It keeps a copy of the loaded map if the System goes down and asks it again using a LookingForAMap message.
   */
 class AdminManager extends TemplateActor {
 

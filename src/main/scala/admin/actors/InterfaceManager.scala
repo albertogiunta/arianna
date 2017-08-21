@@ -15,8 +15,9 @@ import system.names.NamingSystem
 import scala.collection.mutable
 
 /**
-  * This actor keeps the interface updated when it receives messages from its parent and it also creates
-  * a ChartManager for each chart window opened by the administrator and forward to it only
+  * This actor keeps the interface updated when it receives messages from its parent, and receives the interface
+  * event and inform the AdminSupervisor, his parent, about them.
+  * It also creates a ChartManager for each chart window opened by the administrator and forward to it only
   * the updates about the correct cell.
   *
   **/

@@ -10,7 +10,8 @@ import system.names.NamingSystem
 import scala.collection.mutable.ListBuffer
 
 /**
-  * This is the Actor inside the cluster that forwards messages to the Administrator system.
+  * This is the Actor inside the cluster that forwards messages to the Administrator system from the Cluster,
+  * and viceversa. It also modifies data from Cluster, in order to make it ready to be shown on the Interface.
   *
   **/
 class AdminSupervisor extends CustomActor {

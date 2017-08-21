@@ -28,7 +28,7 @@ import scala.io.Source
 class InterfaceController extends ViewController {
     var interfaceActor: ActorRef = _
     var interfaceView: InterfaceView = _
-    private val cellControllers: mutable.Map[RoomID, CellTemplateController] = new mutable.HashMap[RoomID, CellTemplateController]
+    private val cellControllers: mutable.Map[RoomID, RoomTemplateController] = new mutable.HashMap[RoomID, RoomTemplateController]
     private var canvasController: CanvasController = _
 
     @FXML
@@ -174,7 +174,7 @@ class InterfaceController extends ViewController {
     private def createCellTemplate(cell: Room): SplitPane = {
         var loader = new FXMLLoader(getClass.getResource(GraphicResources.cell))
         var node = loader.load[SplitPane]
-        var controller = loader.getController[CellTemplateController]
+        var controller = loader.getController[RoomTemplateController]
         controller.adminManager = interfaceActor
         cellControllers += ((cell.info.id, controller))
         controller setStaticInformation cell

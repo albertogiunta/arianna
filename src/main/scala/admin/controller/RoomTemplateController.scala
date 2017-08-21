@@ -16,9 +16,9 @@ import ontologies.messages._
 import scala.collection.mutable
 
 /**
-  * This class represent the controller for each Cell template inside the interface
+  * This class represent the controller for each Room template inside the interface
   */
-class CellTemplateController extends ViewController {
+class RoomTemplateController extends ViewController {
 
     var adminManager: ActorRef = _
     private val ONE: String = "1"
@@ -47,7 +47,7 @@ class CellTemplateController extends ViewController {
     /**
       * This method fills the interface with static information about the Cell; it's called only one time when the map is loaded
       *
-      * @param room : Cell object containing data
+      * @param room : Room object containing data
       *
       **/
     def setStaticInformation(room: Room): Unit = {
@@ -56,10 +56,10 @@ class CellTemplateController extends ViewController {
     }
 
     /**
-      * This method update the interface with dynamic information about the Cell; it's called everytime the Application receive
+      * This method update the interface with dynamic information about the Room; it's called everytime the Application receive
       * an update from the System
       *
-      * @param update : CellForView object containing only dynamic data
+      * @param update : RoomDataUpdate object containing only dynamic data
       * */
     def setDynamicInformation(update: RoomDataUpdate): Unit = {
         currentPeopleValue setText update.currentPeople.toString + "/" + maxCapacityValue.getText
@@ -71,7 +71,7 @@ class CellTemplateController extends ViewController {
     }
 
     /**
-      * This method fills the interface with data about sensors of the Cell, once the Application has received it from the System.
+      * This method fills the interface with data about sensors of the Room, once the Application has received it from the System.
       *
       * @param sensorsInfo : SensorsInfoUpdate object containing data
       *

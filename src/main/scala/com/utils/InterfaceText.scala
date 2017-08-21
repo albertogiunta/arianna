@@ -1,5 +1,8 @@
 package com.utils
 
+/**
+  * This is a utility class that keeps together all the Strings that compose the Interface.
+  **/
 object InterfaceText {
 
     val none: String = ""

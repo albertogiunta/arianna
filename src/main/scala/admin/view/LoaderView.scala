@@ -14,7 +14,7 @@ class LoaderView extends View {
     var controller: LoaderController = _
 
     /**
-      * Main method that starts the View and show it to the user
+      * Main method to start this View
       **/
     override def start(): Unit = {
         val mainStage = new Stage
