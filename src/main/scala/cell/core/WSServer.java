@@ -7,7 +7,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.impl.ConcurrentHashSet;
-import ontologies.messages.RouteRequestShort;
+import ontologies.messages.RouteRequestFromClient;
 import ontologies.messages.RouteResponse;
 import scala.tools.jline_embedded.internal.Log;
 
@@ -74,7 +74,7 @@ public class WSServer extends AbstractVerticle {
                     usersWaitingForRoute.computeIfAbsent(data.toString(), k -> new ConcurrentHashSet<>()).add(new Pair<>(ws.textHandlerID(), ws));
                     Log.info("asked route " + data.toString() + " " + usersWaitingForRoute.size());
                     if (userActor != null)
-                        userActor.tell(new RouteRequestShort(ws.textHandlerID(), uriStart, uriEnd, false), ActorRef.noSender());
+                        userActor.tell(new RouteRequestFromClient(ws.textHandlerID(), uriStart, uriEnd, false), ActorRef.noSender());
                 });
             } else if (ws.path().equals(baseUrl + "/alarm")) {
                 this.usersReadyForAlarm.put(ws.textHandlerID(), ws);
