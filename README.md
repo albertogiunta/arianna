@@ -58,3 +58,29 @@ In order for the App to be working, you need to change the IP address associated
 You can change this information in the ```build.gradle``` file, at line ```22```:
 
 ```buildConfigField "String", "IP_ADDRESS", "\"192.168.0.111\""```
+
+## Running the System ##
+
+### Cluster ###
+
+Master and Cell need to be launched from command line by specifying as parameter 
+the path leading to the proper akka configuration the system has to load.
+
+More over, for the Cell node a second parameter is required, containing path leading 
+json containing the information of the cell.
+
+###### NOTE ######
+
+The launch order of the Master and Admin Application can be any, Cell Node should be usually executed 
+after the Master node.
+
+The suggested order is Master Node > Desktop App > All the Cell in any order
+
+### Admin Application ###
+
+When launching the Application a small form will appear where it's required to place 
+the path leading to the akka configuration file of the admin ActorSystem.
+
+### Teseo ###
+
+Download, Install, Run and Enjoy :D

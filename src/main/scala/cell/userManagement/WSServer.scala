@@ -11,13 +11,13 @@ import scala.collection.mutable
 import scala.tools.jline_embedded.internal.Log
 
 class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Integer) extends AbstractVerticle {
-
+    
     var usersWaitingForDisconnection: mutable.Map[String, ServerWebSocket] = new mutable.HashMap[String, ServerWebSocket]
     var usersWaitingForConnectionAck: mutable.Map[String, ServerWebSocket] = new scala.collection.mutable.HashMap[String, ServerWebSocket]
     var usersWaitingForArea: mutable.Map[String, ServerWebSocket] = new scala.collection.mutable.HashMap[String, ServerWebSocket]
     var usersReadyForAlarm: mutable.Map[String, ServerWebSocket] = new scala.collection.mutable.HashMap[String, ServerWebSocket]
     var usersWaitingForRoute: mutable.Map[String, ConcurrentHashSet[Pair[String, ServerWebSocket]]] = new scala.collection.mutable.HashMap[String, ConcurrentHashSet[Pair[String, ServerWebSocket]]]
-
+    
     @throws[Exception]
     override def start(): Unit = {
         val options = new HttpServerOptions().setTcpKeepAlive(true)
@@ -52,7 +52,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
             }
         }).listen(port)
     }
-
+    
     /**
       * Called after a user asks to connect to a specific cell but was already present in the system,
       * hence he
@@ -65,7 +65,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
         usersWaitingForConnectionAck.values.foreach((ws: ServerWebSocket) => ws.writeTextMessage(ack))
         usersWaitingForConnectionAck.clear()
     }
-
+    
     /**
       * Called when the user first connects to a cell, he should receive the area, so that he can
       * complete his work
@@ -78,7 +78,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
         usersWaitingForArea.values.foreach((ws: ServerWebSocket) => ws.writeTextMessage(area))
         usersWaitingForArea.clear()
     }
-
+    
     /**
       * Called when a user disconnects from a cell because he wants to connect to the next one
       */
@@ -91,14 +91,14 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
         })
         this.usersWaitingForDisconnection.clear()
     }
-
+    
     /**
       * Called when an alarm is shut down because the emergency's done
       */
     def sendSystemShutDownToUsers(): Unit = {
         usersReadyForAlarm.foreach(p => p._2.writeTextMessage(MSGTAkkaVertx.SYS_SHUTDOWN))
     }
-
+    
     /**
       * Called when an alarm is the detected in the system and should be propagated to all the end
       * users
@@ -108,14 +108,14 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
     def sendAlarmToUsers(routeAsJson: String): Unit = {
         usersReadyForAlarm.foreach(p => p._2.writeTextMessage(routeAsJson))
     }
-
+    
     /**
       * Called when an alarm is shut down because the emergency's done
       */
     def sendAlarmEndToUsers(): Unit = {
         usersReadyForAlarm.foreach(p => p._2.writeTextMessage(MSGTAkkaVertx.END_ALARM))
     }
-
+    
     /**
       * Called when a route is requested from one or more users and it's finally calculated and sent
       *
@@ -127,7 +127,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
         val arrivalCellId = route.request.toCell.serial
         sendRouteToUsers(departureCellId, arrivalCellId, routeAsJson)
     }
-
+    
     def sendRouteToUsers(initialRouteId: Int, finalRouteId: Int, routeAsJson: String): Unit = {
         System.out.println(usersWaitingForRoute.toString)
         val routeId = buildRouteId(initialRouteId, finalRouteId)
@@ -136,12 +136,12 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
         }
         this.usersWaitingForRoute.remove(routeId)
     }
-
+    
     private def buildRouteId(departureCell: Int, arrivalCell: Int) = {
         val uri = "uri"
         s"$uri$departureCell-$uri$arrivalCell"
     }
-
+    
     private def buildRouteId(departureCell: String, arrivalCell: String) = {
         s"$departureCell-$arrivalCell"
     }

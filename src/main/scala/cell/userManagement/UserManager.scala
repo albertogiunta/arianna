@@ -34,7 +34,7 @@ class UserManager extends TemplateActor with ActorLogging {
 
     override protected def init(args: List[String]): Unit = {
         if (args.size != 2) throw IncorrectInitMessageException(this.name, args)
-
+    
         uri = args.head
         serial = uri.split("uri")(1).toInt
         vertx = Vertx.vertx()
@@ -58,9 +58,9 @@ class UserManager extends TemplateActor with ActorLogging {
             context.become(operational)
         case _ => desist _
     }
-
+    
     protected def operational: Receive = operationalForCell orElse operationalForMobile
-
+    
     protected def operationalForCell: Receive = {
         case AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, _, response@RouteResponse(request, route)) =>
             request match {
@@ -70,7 +70,7 @@ class UserManager extends TemplateActor with ActorLogging {
         case AriadneMessage(Alarm, Alarm.Subtype.End, _, _) =>
             s.sendAlarmEndToUsers()
     }
-
+    
     protected def operationalForMobile: Receive = {
         case MSGTAkkaVertx.FIRST_CONNECTION =>
             s.sendAreaToNewUser(areaForUser.toJson.toString())
@@ -94,15 +94,15 @@ class UserManager extends TemplateActor with ActorLogging {
         s.sendSystemShutDownToUsers()
         super.postStop()
     }
-
+    
     private def incrementUserNumber(): Unit = usrNumber = usrNumber + 1
-
+    
     private def decrementUserNumber(): Unit = usrNumber = usrNumber - 1
 
     private def sendCurrentPeopleUpdate(): Unit = {
         parent ! AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, CurrentPeopleUpdate(RoomID(serial, uri), usrNumber))
     }
-
+    
     private def getCellWithUri(uri: String): RoomID = {
         areaForCell.rooms.filter(p => p.cell.uri == uri).map(f => f.info.id).head
     }
