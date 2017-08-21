@@ -95,7 +95,7 @@ object ConfigurationManager extends ExtensionId[ConfigurationManagerImpl] with E
 
 object TryConfigManager extends App {
     val path2Project = Paths.get("").toFile.getAbsolutePath
-    val path2Config = path2Project + "/res/conf/akka/master.conf"
+    val path2Config = path2Project + "/res/conf/akka/system.master.conf"
     
     implicit val config: Config = ConfigFactory.parseFile(new File(path2Config))
         .withFallback(ConfigFactory.load()).resolve()

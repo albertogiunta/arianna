@@ -1,11 +1,11 @@
 package akka.serialization
 
-import ontologies.messages.Location._
-import ontologies.messages.MessageType.Update
-import ontologies.messages._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfter, FunSuite}
+import system.ontologies.messages.Location._
+import system.ontologies.messages.MessageType.Update
+import system.ontologies.messages._
 
 /**
   * Created by Alessandro on 13/07/2017.

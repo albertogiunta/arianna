@@ -5,7 +5,7 @@
 <?import javafx.scene.control.TitledPane?>
 <TitledPane fx:id="sensorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
             prefHeight="182.0" prefWidth="380.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="admin.controller.SensorChartController">
+            fx:controller="system.admin.controller.SensorChartController">
     <content>
         <LineChart fx:id="chart">
             <xAxis>

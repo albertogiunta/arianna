@@ -1,7 +1,7 @@
 package akka.serialization
 
-import ontologies.messages.Location._
-import ontologies.messages._
+import system.ontologies.messages.Location._
+import system.ontologies.messages._
 
 /**
   * A Custom Serializer for Message(s) to be handled by the ActorSystem itself
@@ -13,7 +13,7 @@ class AriadneMessageSerializer extends SerializerWithStringManifest {
     
     override def manifest(obj: AnyRef): String = obj match {
         case _: AriadneMessage[MessageContent] => AriadneMessage.getClass.getName
-        case _: Message[MessageContent] => "ontologies.messages.Message$"
+        case _: Message[MessageContent] => "system.ontologies.messages.Message$"
         case _ => null
     }
     
@@ -25,7 +25,7 @@ class AriadneMessageSerializer extends SerializerWithStringManifest {
     
     override def fromBinary(bytes: Array[Byte], manifest: String): AnyRef = manifest match {
         case man if man == AriadneMessage.getClass.getName ||
-            man == "ontologies.Message$" =>
+            man == "system.ontologies.Message$" =>
             MessageSerializer.deserialize(bytes)
         case _ => null
     }

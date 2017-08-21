@@ -4,12 +4,12 @@ import java.io.File
 import java.nio.file.Paths
 
 import akka.actor.{ActorRef, ActorSystem, Props}
-import cell.userManagement.UserManager
 import com.typesafe.config.ConfigFactory
-import ontologies.messages.Location._
-import ontologies.messages.MessageType.Topology
-import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, ViewedFromACell}
-import ontologies.messages._
+import system.cell.userManagement.UserManager
+import system.ontologies.messages.Location._
+import system.ontologies.messages.MessageType.Topology
+import system.ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, ViewedFromACell}
+import system.ontologies.messages._
 
 import scala.collection.mutable
 import scala.io.Source

@@ -5,7 +5,7 @@ import java.io.File
 import akka.actor.{ActorSystem, Props}
 import akka.cluster.pubsub.DistributedPubSub
 import com.typesafe.config.{Config, ConfigFactory}
-import master.Master
+import system.master.Master
 import system.names.NamingSystem
 
 /**

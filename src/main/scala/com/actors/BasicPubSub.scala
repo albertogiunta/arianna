@@ -3,10 +3,10 @@ package com.actors
 import akka.actor.{Actor, ActorRef}
 import akka.cluster.Cluster
 import akka.cluster.pubsub.DistributedPubSubMediator._
-import ontologies.Topic
-import ontologies.messages.Location._
-import ontologies.messages.MessageType.Init
-import ontologies.messages.{AriadneMessage, Greetings, Location, MessageContent}
+import system.ontologies.Topic
+import system.ontologies.messages.Location._
+import system.ontologies.messages.MessageType.Init
+import system.ontologies.messages.{AriadneMessage, Greetings, Location, MessageContent}
 
 /**
   * This class gives a common template for a Akka Subscriber.

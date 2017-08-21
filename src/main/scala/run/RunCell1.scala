@@ -5,12 +5,12 @@ import java.nio.file.Paths
 
 import akka.actor.{ActorSystem, Props}
 import akka.cluster.pubsub.DistributedPubSub
-import cell.core.CellCoreActor
 import com.typesafe.config.{Config, ConfigFactory}
-import ontologies.messages.Location._
-import ontologies.messages.MessageType.Init
-import ontologies.messages.{AriadneMessage, Greetings, Location}
+import system.cell.core.CellCoreActor
 import system.names.NamingSystem
+import system.ontologies.messages.Location._
+import system.ontologies.messages.MessageType.Init
+import system.ontologies.messages.{AriadneMessage, Greetings, Location}
 
 /**
   * Created by Alessandro on 28/06/2017.
@@ -30,5 +30,5 @@ object RunCell1 extends App {
     var core = system.actorOf(Props(new CellCoreActor(middleware)), NamingSystem.CellCore + 1)
     
     core ! AriadneMessage(Init, Init.Subtype.Greetings,
-        Location.Master >> Location.Self, Greetings(List("res/json/cell/cell1.json")))
+        Location.Master >> Location.Self, Greetings(List("res/json/system.cell/cell1.json")))
 }
