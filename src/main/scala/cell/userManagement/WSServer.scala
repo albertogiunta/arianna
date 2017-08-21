@@ -26,7 +26,6 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
             ws.path.split(baseUrl)(1) match {
                 case "/connect" =>
                     ws.handler((data) => {
-                        Log.info("[SERVER " + baseUrl + "] GOT NEW USER | " + data.toString())
                         data.toString() match {
                             case MSGTAkkaVertx.FIRST_CONNECTION => this.usersWaitingForArea.put(ws.textHandlerID, ws)
                             case MSGTAkkaVertx.NORMAL_CONNECTION => this.usersWaitingForConnectionAck.put(ws.textHandlerID, ws)
