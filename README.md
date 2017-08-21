@@ -51,4 +51,4 @@ The port of the master node can be left as it is and go incrementally for each c
 
 ### Teseo ###
 
-Doesn't need any configuration, can be downloaded from <Here it goes the url>
+Doesn't need any configuration, can be downloaded from "https://github.com/albertogiunta/teseo"
