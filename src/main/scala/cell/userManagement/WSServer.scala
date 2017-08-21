@@ -22,7 +22,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
     override def start(): Unit = {
         val options = new HttpServerOptions().setTcpKeepAlive(true)
         vertx.createHttpServer(options).websocketHandler((ws: ServerWebSocket) => {
-            System.out.println("[SERVER " + baseUrl + "] PATH " + ws.path + " " + ws.uri + " " + ws.query)
+            Log.info("[SERVER " + baseUrl + "] PATH " + ws.path + " " + ws.uri + " " + ws.query)
             ws.path.split(baseUrl)(1) match {
                 case "/connect" =>
                     ws.handler((data) => {
@@ -61,7 +61,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
       * @param ack the ack message
       */
     def sendAckToNewUser(ack: String): Unit = {
-        System.out.println("Waiting for ACK " + usersWaitingForConnectionAck.size)
+        Log.info("Waiting for ACK " + usersWaitingForConnectionAck.size)
         usersWaitingForConnectionAck.values.foreach((ws: ServerWebSocket) => ws.writeTextMessage(ack))
         usersWaitingForConnectionAck.clear()
     }
@@ -74,7 +74,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
       * @param area the marshaled version of the area
       */
     def sendAreaToNewUser(area: String): Unit = {
-        System.out.println("Waiting for AREA " + usersWaitingForArea.size)
+        Log.info("Waiting for AREA " + usersWaitingForArea.size)
         usersWaitingForArea.values.foreach((ws: ServerWebSocket) => ws.writeTextMessage(area))
         usersWaitingForArea.clear()
     }
@@ -83,7 +83,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
       * Called when a user disconnects from a cell because he wants to connect to the next one
       */
     def disconnectUsers(): Unit = {
-        System.out.println("Waiting for DISCONNECTION " + usersWaitingForDisconnection.size)
+        Log.info("Waiting for DISCONNECTION " + usersWaitingForDisconnection.size)
         this.usersWaitingForDisconnection.keySet.foreach((id: String) => {
             usersWaitingForConnectionAck.remove(id)
             usersWaitingForArea.remove(id)
@@ -129,7 +129,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
     }
 
     def sendRouteToUsers(initialRouteId: Int, finalRouteId: Int, routeAsJson: String): Unit = {
-        System.out.println(usersWaitingForRoute.toString)
+        Log.info(usersWaitingForRoute.toString)
         val routeId = buildRouteId(initialRouteId, finalRouteId)
         if (this.usersWaitingForRoute.get(routeId).isDefined) {
             this.usersWaitingForRoute(routeId).forEach(p => p.snd.writeTextMessage(routeAsJson))

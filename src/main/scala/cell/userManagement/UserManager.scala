@@ -75,7 +75,6 @@ class UserManager extends TemplateActor with ActorLogging {
         case MSGTAkkaVertx.FIRST_CONNECTION =>
             s.sendAreaToNewUser(areaForUser.toJson.toString())
             incrementUserNumber()
-            println(usrNumber)
             sendCurrentPeopleUpdate()
         case MSGTAkkaVertx.NORMAL_CONNECTION =>
             s.sendAckToNewUser(MSGTAkkaVertx.NORMAL_CONNECTION_RESPONSE)
