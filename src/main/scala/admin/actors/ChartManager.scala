@@ -12,7 +12,7 @@ import ontologies.messages._
 /**
   * This actor handles the creation of a external window for charts, and it keeps them constantly updated with new
   * values received from the System (through his parent InterfaceManager).
-  *
+  * It receives a CloseChart message when the window is closed.
   *
   **/
 class ChartManager extends CustomActor {

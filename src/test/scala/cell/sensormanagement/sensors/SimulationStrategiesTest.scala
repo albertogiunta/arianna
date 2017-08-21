@@ -52,26 +52,26 @@ class SimulationStrategiesTest extends FlatSpec with Matchers with BeforeAndAfte
     override def beforeEach(): Unit = {
         simulatedDoubleSensor = new SimulatedNumericSensor[Double](doubleSensor,
             refreshTime,
-            SimulationStrategies.MonotonicDoubleSimulation(doubleChangeStep))
+            SimulationStrategies.LinearDoubleSimulation(doubleChangeStep))
         simulatedIntSensor = new SimulatedNumericSensor[Int](intSensor,
             refreshTime,
-            SimulationStrategies.MonotonicIntSimulation(intChangeStep))
+            SimulationStrategies.LinearIntSimulation(intChangeStep))
     }
 
-    "A monotonic double strategies" should "change the sensor value after the defined refresh time" in {
+    "A linear double strategies" should "change the sensor value after the defined refresh time" in {
         @volatile var oldValue = simulatedDoubleSensor.currentValue
         Thread.sleep(sleepTime)
         oldValue should not be (simulatedDoubleSensor.currentValue)
     }
 
-    "A monotonic double strategies" should "increase the sensor value after the defined refresh time " +
+    "A linear double strategies" should "increase the sensor value after the defined refresh time " +
         "if the current value hasn't reached the max value" in {
         @volatile var oldValue = simulatedDoubleSensor.currentValue
         Thread.sleep(sleepTime)
         oldValue should be < (simulatedDoubleSensor.currentValue)
     }
 
-    "A monotonic double strategies" should "decrease the sensor value after the defined refresh time " +
+    "A linear double strategies" should "decrease the sensor value after the defined refresh time " +
         "if the current value has reached the max value" in {
         Thread.sleep(refreshTime * simulatedDoubleSensor.maxValue.toInt)
         @volatile var oldValue = simulatedDoubleSensor.currentValue
@@ -79,7 +79,7 @@ class SimulationStrategiesTest extends FlatSpec with Matchers with BeforeAndAfte
         oldValue should be > (simulatedDoubleSensor.currentValue)
     }
 
-    "A monotonic double strategies" should "increase the sensor value after the defined refresh time " +
+    "A linear double strategies" should "increase the sensor value after the defined refresh time " +
         "if the current value has reached the min value during the decreasing phase" in {
         Thread.sleep(refreshTime * simulatedDoubleSensor.maxValue.toInt)
         @volatile var oldValue = simulatedDoubleSensor.currentValue
@@ -127,20 +127,20 @@ class SimulationStrategiesTest extends FlatSpec with Matchers with BeforeAndAfte
     }
 
 
-    "A monotonic integer strategies" should "change the sensor value after the defined refresh time" in {
+    "A linear integer strategies" should "change the sensor value after the defined refresh time" in {
         @volatile var oldValue = simulatedIntSensor.currentValue
         Thread.sleep(sleepTime)
         oldValue should not be (simulatedIntSensor.currentValue)
     }
 
-    "A monotonic integer strategies" should "increase the sensor value after the defined refresh time, " +
+    "A linear integer strategies" should "increase the sensor value after the defined refresh time, " +
         "if the current value hasn't reached the max value" in {
         @volatile var oldValue = simulatedIntSensor.currentValue
         Thread.sleep(sleepTime)
         oldValue should be < (simulatedIntSensor.currentValue)
     }
 
-    "A monotonic integer strategies" should "decrease the sensor value after the defined refresh time, " +
+    "A linear integer strategies" should "decrease the sensor value after the defined refresh time, " +
         "if the current value has reached the max value" in {
         Thread.sleep(refreshTime * simulatedIntSensor.maxValue)
         @volatile var oldValue = simulatedIntSensor.currentValue
@@ -148,7 +148,7 @@ class SimulationStrategiesTest extends FlatSpec with Matchers with BeforeAndAfte
         oldValue should be > (simulatedIntSensor.currentValue)
     }
 
-    "A monotonic integer strategies" should "increase the sensor value after the defined refresh time, " +
+    "A linear integer strategies" should "increase the sensor value after the defined refresh time, " +
         "if the current value has reached the min value during the decreasing phase" in {
         Thread.sleep(refreshTime * simulatedIntSensor.maxValue)
         @volatile var oldValue = simulatedIntSensor.currentValue

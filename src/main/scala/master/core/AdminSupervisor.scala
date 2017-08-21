@@ -5,32 +5,34 @@ import com.actors.CustomActor
 import ontologies.messages.Location._
 import ontologies.messages.MessageType.{Alarm, Error, Handshake, Init, Update}
 import ontologies.messages._
+import system.names.NamingSystem
 
 import scala.collection.mutable.ListBuffer
 
 /**
-  * This is the Actor inside the cluster that forwards messages to the Administrator system.
+  * This is the Actor inside the cluster that forwards messages to the Administrator system from the Cluster,
+  * and viceversa. It also modifies data from Cluster, in order to make it ready to be shown on the Interface.
   *
   **/
 class AdminSupervisor extends CustomActor {
-    
-    val toAdmin: MessageDirection = Location.Master >> Location.Admin
-    val fromAdmin: MessageDirection = Location.Admin >> Location.Master
-    val admin = context.actorSelection("akka.tcp://adminSystem@127.0.0.1:4550/user/admin")
-    val topologySupervisor: ActorSelection = sibling("TopologySupervisor").get
-    val publisher: ActorSelection = sibling("Publisher").get
+
+    private val IPAddress: String = "127.0.0.1"
+    private val port: String = "4550"
+    private val toAdmin: MessageDirection = Location.Master >> Location.Admin
+    private val fromAdmin: MessageDirection = Location.Admin >> Location.Master
+    private val admin = context.actorSelection("akka.tcp://" + NamingSystem.AdminActorSystem + "@" + IPAddress + ":" + port + "/user/" + NamingSystem.AdminManager)
+    private val topologySupervisor: ActorSelection = sibling(NamingSystem.TopologySupervisor).get
+    private val publisher: ActorSelection = sibling(NamingSystem.Publisher).get
 
     def operational: Receive = {
-        //Ricezione di un update dal server
         case msg@AriadneMessage(Update, Update.Subtype.Admin, _, content: AdminUpdate) => admin ! roundData(content)
 
-        //Ricezione di un allarme dall'admin
         case msg@AriadneMessage(Alarm, Alarm.Subtype.FromInterface, fromAdmin, _) => publisher ! msg.copy(direction = fromAdmin)
-        //Ricezione di un allarme da parte del sistema
+
         case msg@AriadneMessage(Alarm, Alarm.Subtype.FromCell, _, _) => admin ! msg.copy(direction = toAdmin)
 
         case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) => publisher ! msg.copy(direction = toAdmin)
-        //Ricezione di aggiornamento sensori
+
         case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, _) => admin ! msg
 
         case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => parent ! msg.copy(direction = fromAdmin)

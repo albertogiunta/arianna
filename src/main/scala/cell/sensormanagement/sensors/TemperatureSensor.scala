@@ -36,14 +36,14 @@ object TemperatureMeasureUnit {
 
 /**
   * This is a decoration for a temperature sensor. This class provide
-  * a simulated monotonic behaviour to the decorated sensor
+  * a simulated linear behaviour to the decorated sensor
   **/
-protected class SimulatedMonotonicTemperatureSensor(override val sensor: TemperatureSensor,
-                                                    override val millisRefreshRate: Long,
-                                                    val changeStep: Double)
+protected class SimulatedLinearTemperatureSensor(override val sensor: TemperatureSensor,
+                                                 override val millisRefreshRate: Long,
+                                                 val changeStep: Double)
     extends SimulatedNumericSensor[Double](sensor,
         millisRefreshRate,
-        SimulationStrategies.MonotonicDoubleSimulation(changeStep)) with TemperatureSensor {
+        SimulationStrategies.LinearDoubleSimulation(changeStep)) with TemperatureSensor {
     override def measureUnit: String = sensor.measureUnit
 
     override def threshold: Threshold[Double] = sensor.threshold

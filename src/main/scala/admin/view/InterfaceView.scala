@@ -18,6 +18,9 @@ class InterfaceView extends View {
 
     var controller: InterfaceController = _
 
+    /**
+      * Main method that starts the View and show it to the user
+      **/
     def start(): Unit = {
         val mainStage = new Stage
         mainStage setTitle InterfaceText.mainTitle

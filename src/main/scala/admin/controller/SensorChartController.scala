@@ -9,7 +9,7 @@ import javafx.scene.chart.{LineChart, XYChart}
 import com.utils.ChartUtils
 
 /**
-  * This is the Controller for the sensor chart, that initialized it and keep it updated.
+  * This is the Controller for the sensor chart, that initializes it and keep it updated.
   **/
 class SensorChartController extends ViewController {
 
@@ -26,7 +26,7 @@ class SensorChartController extends ViewController {
     }
 
     /**
-      * This method adds a new value in the chart, and provides to keep only the last 20 values.
+      * This method adds a new value in the chart.
       *
       * @param value : new Double to add in the chart
       **/

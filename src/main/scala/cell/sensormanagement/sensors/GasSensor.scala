@@ -94,15 +94,15 @@ case class OxygenThreshold(var value: Double) extends SingleThreshold[Double] {
 
 /**
   * This is a decoration for a gas sensor. This class provide
-  * a simulated monotonic behaviour to the decorated sensor
+  * a simulated linear behaviour to the decorated sensor
   **/
-protected class SimulatedMonotonicGasSensor(override val sensor: GasSensor,
-                                            override val millisRefreshRate: Long,
-                                            val changeStep: Double)
+protected class SimulatedLinearGasSensor(override val sensor: GasSensor,
+                                         override val millisRefreshRate: Long,
+                                         val changeStep: Double)
     extends SimulatedNumericSensor[Double](
         sensor,
         millisRefreshRate,
-        SimulationStrategies.MonotonicDoubleSimulation(changeStep)) with GasSensor {
+        SimulationStrategies.LinearDoubleSimulation(changeStep)) with GasSensor {
     override def gasMeasured: String = sensor.gasMeasured
 
     override def threshold: Threshold[Double] = sensor.threshold

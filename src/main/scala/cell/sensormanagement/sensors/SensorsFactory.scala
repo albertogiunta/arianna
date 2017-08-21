@@ -40,7 +40,7 @@ object SensorsFactory {
                 minValue,
                 maxValue,
                 new TemperatureThreshold(minThreshold, maxThreshold))
-            new SimulatedMonotonicTemperatureSensor(sensor, refreshRate, DefaultValues.ChangeStep.temperature)
+            new SimulatedLinearTemperatureSensor(sensor, refreshRate, DefaultValues.ChangeStep.temperature)
         }
 
         def createSmokeSensor(minValue: Double,
@@ -53,7 +53,7 @@ object SensorsFactory {
                 minValue,
                 maxValue,
                 new SmokeThreshold(threshold))
-            new SimulatedMonotonicGasSensor(sensor, refreshRate, DefaultValues.ChangeStep.gas)
+            new SimulatedLinearGasSensor(sensor, refreshRate, DefaultValues.ChangeStep.gas)
         }
 
         def createCO2Sensor(minValue: Double,
@@ -66,7 +66,7 @@ object SensorsFactory {
                 minValue,
                 maxValue,
                 new CO2Threshold(threshold))
-            new SimulatedMonotonicGasSensor(sensor, refreshRate, DefaultValues.ChangeStep.gas)
+            new SimulatedLinearGasSensor(sensor, refreshRate, DefaultValues.ChangeStep.gas)
         }
 
         def createOxygenSensor(minValue: Double,
@@ -79,7 +79,7 @@ object SensorsFactory {
                 minValue,
                 maxValue,
                 new OxygenThreshold(threshold))
-            new SimulatedMonotonicGasSensor(sensor, refreshRate, DefaultValues.ChangeStep.gas)
+            new SimulatedLinearGasSensor(sensor, refreshRate, DefaultValues.ChangeStep.gas)
         }
 
         def createHumiditySensor(minValue: Double,
@@ -93,7 +93,7 @@ object SensorsFactory {
                 minValue,
                 maxValue,
                 new HumidityThreshold(minThreshold, maxThreshold))
-            new SimulatedMonotonicHumiditySensor(sensor, refreshRate, DefaultValues.ChangeStep.humidity)
+            new SimulatedLinearHumiditySensor(sensor, refreshRate, DefaultValues.ChangeStep.humidity)
         }
     }
 
