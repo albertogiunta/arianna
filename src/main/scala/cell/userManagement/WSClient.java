@@ -3,6 +3,7 @@ package cell.userManagement;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.WebSocket;
+import scala.tools.jline_embedded.internal.Log;
 
 public class WSClient extends AbstractVerticle {
 
@@ -23,7 +24,7 @@ public class WSClient extends AbstractVerticle {
             }
 
             websocket.handler(data -> {
-                System.out.println("[CLIENT CONNECT] Received " + data);
+                Log.info("[CLIENT CONNECT] Received " + data);
             });
         });
 
@@ -33,28 +34,28 @@ public class WSClient extends AbstractVerticle {
             }
 
             websocket.handler(data -> {
-                System.out.println("[CLIENT ROUTE] Received " + data);
+                Log.info("[CLIENT ROUTE] Received " + data);
             });
         });
     }
 
     public void sendMessageFirstConnection() {
-        System.out.println("[CLIENT CLIENT CONNECT] " + MSGTAkkaVertx.FIRST_CONNECTION());
+        Log.info("[CLIENT CLIENT CONNECT] " + MSGTAkkaVertx.FIRST_CONNECTION());
         webSocketConnect.writeTextMessage(MSGTAkkaVertx.FIRST_CONNECTION());
     }
 
     public void sendMessageNormalConnection() {
-        System.out.println("[CLIENT CONNECT] " + MSGTAkkaVertx.NORMAL_CONNECTION());
+        Log.info("[CLIENT CONNECT] " + MSGTAkkaVertx.NORMAL_CONNECTION());
         webSocketConnect.writeTextMessage(MSGTAkkaVertx.NORMAL_CONNECTION());
     }
 
     public void sendMessageDisconnect() {
-        System.out.println("[CLIENT CONNECT] " + MSGTAkkaVertx.DISCONNECT());
+        Log.info("[CLIENT CONNECT] " + MSGTAkkaVertx.DISCONNECT());
         webSocketConnect.writeTextMessage(MSGTAkkaVertx.DISCONNECT());
     }
 
     public void sendMessageAskRoute() {
-        System.out.println("[CLIENT ROUTE] " + "uri1-uri2");
+        Log.info("[CLIENT ROUTE] " + "uri1-uri2");
         webSocketRoute.writeTextMessage("uri1-uri2");
     }
 }

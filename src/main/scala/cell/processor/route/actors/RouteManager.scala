@@ -31,9 +31,6 @@ class RouteManager extends TemplateActor {
     override protected def receptive: Receive = {
 
         case AriadneMessage(Route, Info, _, info: RouteInfo) =>
-            
-            // Se non è già presente in cache o il valore in cache è troppo vecchio
-            // => Si calcola con A* il Percorso :: Si ritorna la strada in cache
             if (info.request.isEscape) manageEscape(info)
             else {
                 log.info("Requesting route from Cache...")

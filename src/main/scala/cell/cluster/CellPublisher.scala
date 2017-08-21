@@ -40,7 +40,7 @@ class CellPublisher(mediator: ActorRef) extends TemplatePublisher(mediator) {
 
     override protected def receptive = {
         case msg@AriadneMessage(Info, Info.Subtype.Response, this.selfToSelf, sensorsInfoUpdate: SensorsInfoUpdate) => {
-            println("Sensor Info " + sensorsInfoUpdate)
+            log.info("Sensor Info " + sensorsInfoUpdate)
             val handshakeMsg = AriadneMessage(
                 Handshake,
                 Handshake.Subtype.CellToMaster,
