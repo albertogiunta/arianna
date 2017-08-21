@@ -93,7 +93,7 @@ object ConfigurationManager extends ExtensionId[ConfigurationManagerImpl] with E
     override def get(system: ActorSystem): ConfigurationManagerImpl = super.get(system)
 }
 
-object TestConfigManager extends App {
+object TryConfigManager extends App {
     val path2Project = Paths.get("").toFile.getAbsolutePath
     val path2Config = path2Project + "/res/conf/akka/master.conf"
     

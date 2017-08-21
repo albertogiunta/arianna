@@ -52,3 +52,29 @@ The port of the master node can be left as it is and go incrementally for each c
 ### Teseo ###
 
 Doesn't need any configuration, can be downloaded from "https://github.com/albertogiunta/teseo"
+
+## Running the System ##
+
+### Cluster ###
+
+Master and Cell need to be launched from command line by specifying as parameter 
+the path leading to the proper akka configuration the system has to load.
+
+More over, for the Cell node a second parameter is required, containing path leading 
+json containing the information of the cell.
+
+###### NOTE ######
+
+The launch order of the Master and Admin Application can be any, Cell Node should be usually executed 
+after the Master node.
+
+The suggested order is Master Node > Desktop App > All the Cell in any order
+
+### Admin Application ###
+
+When launching the Application a small form will appear where it's required to place 
+the path leading to the akka configuration file of the admin ActorSystem.
+
+### Teseo ###
+
+Download, Install, Run and Enjoy :D
