@@ -36,12 +36,12 @@ trait GenericSensor[A] extends Sensor {
 }
 
 /**
-  * A trait for a sensor that works with an ordered scale of value
-  * with a min and a max value
+  * A trait for a sensor that works with a scale of value
+  * that has a min and a max value
   *
   * @tparam B the type of data managed by the sensor
   **/
-trait OrderedScaleSensor[B] extends GenericSensor[B] {
+trait ScaleSensor[B] extends GenericSensor[B] {
 
     /**
       * Get the minimum value that the sensor can reach
@@ -60,7 +60,7 @@ trait OrderedScaleSensor[B] extends GenericSensor[B] {
   *
   * @tparam C the type of data managed by the sensor
   */
-trait NumericSensor[C] extends OrderedScaleSensor[C] {
+trait NumericSensor[C] extends ScaleSensor[C] {
     /**
       * Get the range of value that the sensor can assume
       **/

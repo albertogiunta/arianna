@@ -15,15 +15,15 @@ class SensorTest extends org.scalatest.FlatSpec with Matchers {
 
     var sensor: Sensor = tSensor
 
-    var orderedScaleSensor: OrderedScaleSensor[Double] = tSensor
+    var scaleSensor: ScaleSensor[Double] = tSensor
 
-    "A Sensor with a ordered scale" should "have a minimum value assigned during the creation" in {
-        orderedScaleSensor.minValue should be(minValue)
+    "A Sensor with a scale" should "have a minimum value assigned during the creation" in {
+        scaleSensor.minValue should be(minValue)
     }
 
 
-    "A Sensor with a ordered scale" should "have a maximum value assigned during the creation" in {
-        orderedScaleSensor.maxValue should be(maxValue)
+    "A Sensor with a scale" should "have a maximum value assigned during the creation" in {
+        scaleSensor.maxValue should be(maxValue)
     }
 
     var numericSensor: NumericSensor[Double] = tSensor
