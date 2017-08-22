@@ -27,21 +27,28 @@ object RunCellN extends App {
         
         implicit val config: Config = ConfigFactory.parseFile(new File(path2AkkaConfig))
             .withFallback(ConfigFactory.load()).resolve()
+        try {
+            val system = ActorSystem(NamingSystem.ActorSystem, config)
         
-        val system = ActorSystem(NamingSystem.ActorSystem, config)
+            val middleware = DistributedPubSub(system).mediator
         
-        val middleware = DistributedPubSub(system).mediator
+            val loadedConf = ConfigurationManager(system)
+            val builder = ConfigPathBuilder()
         
-        val loadedConf = ConfigurationManager(system)
-        val builder = ConfigPathBuilder()
+            val serialNumber = loadedConf.property(builder.akka.actor.get("serial-number")).asString
+        
+            val core = system.actorOf(Props(new CellCoreActor(middleware)), NamingSystem.CellCore + serialNumber)
+        
+            core ! AriadneMessage(Init, Init.Subtype.Greetings,
+                Location.Master >> Location.Self, Greetings(List(pathToCellConfig)))
+        
+        } catch {
+            case ex: Exception =>
+                ex.printStackTrace()
+                System.exit(0)
+        }
     
-        val serialNumber = loadedConf.property(builder.akka.actor.get("serial-number")).asString
-        
-        val core = system.actorOf(Props(new CellCoreActor(middleware)), NamingSystem.CellCore + serialNumber)
-        
-        core ! AriadneMessage(Init, Init.Subtype.Greetings,
-            Location.Master >> Location.Self, Greetings(List(pathToCellConfig)))
-        
+        println("System online...")
     } else {
         println(s"Wrong number of Arguments... Wanted $REQUIRED_ARGS, found " + args.length)
         System.exit(0)

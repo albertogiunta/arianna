@@ -71,6 +71,7 @@ class TopologySupervisor extends TemplateActor {
         
                 log.info("Notifying the Subscriber...")
                 subscriber() ! MasterSubscriber.TopologyLoadedACK
+                admin() ! AriadneMessage(Topology, Acknowledgement, masterToAdmin, Empty())
             }
 
         case _ => stash
