@@ -2,7 +2,7 @@ package com.actors
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSelection, Stash}
 import akka.extension._
-import ontologies.messages.{AriadneMessage, Greetings, MessageType}
+import system.ontologies.messages.{AriadneMessage, Greetings, MessageType}
 
 /**
   * A CustomActor that ease the use of few overused methods

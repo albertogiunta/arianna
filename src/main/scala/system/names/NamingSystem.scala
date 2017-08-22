@@ -22,5 +22,5 @@ object NamingSystem {
     val UserManager = "UserManager"
     val CellClusterSupervisor = "CellClusterSupervisor"
     val ClusterSupervisor = "ClusterSupervisor"
-    val WatchDogSupervisor = "WatchDogSupervisor"
+    val WatchDogSupervisor = "WatchdogSupervisor"
 }

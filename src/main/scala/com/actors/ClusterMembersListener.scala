@@ -31,7 +31,7 @@ abstract class ClusterMembersListener extends CustomActor {
                 .filter(m => m.status == MemberStatus.Up)
                 .map(m => m.address).toSet
             //Check if the current node is already up
-            //in order to complete the cell initialization
+            //in order to complete the system.cell initialization
             val currentMember = state.members.toStream
                 .filter(m => m.status == MemberStatus.Up)
                 .map(m => (m.address, m))

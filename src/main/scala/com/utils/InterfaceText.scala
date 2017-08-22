@@ -6,8 +6,8 @@ package com.utils
 object InterfaceText {
 
     val none: String = ""
-
-    val mainTitle: String = "Arianna admin Interface"
+    
+    val mainTitle: String = "Arianna system.admin Interface"
 
     val chartTitle: String = "Arianna Charts"
 

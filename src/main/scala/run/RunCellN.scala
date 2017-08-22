@@ -5,12 +5,12 @@ import java.io.File
 import akka.actor.{ActorSystem, Props}
 import akka.cluster.pubsub.DistributedPubSub
 import akka.extension.{ConfigPathBuilder, ConfigurationManager}
-import cell.core.CellCoreActor
 import com.typesafe.config.{Config, ConfigFactory}
-import ontologies.messages.Location._
-import ontologies.messages.MessageType.Init
-import ontologies.messages.{AriadneMessage, Greetings, Location}
+import system.cell.core.CellCoreActor
 import system.names.NamingSystem
+import system.ontologies.messages.Location._
+import system.ontologies.messages.MessageType.Init
+import system.ontologies.messages.{AriadneMessage, Greetings, Location}
 
 /**
   * Created by Alessandro on 28/06/2017.
@@ -21,7 +21,7 @@ object RunCellN extends App {
     
     if (args.length == REQUIRED_ARGS) {
     
-        // "*root*/res/conf/test/testCell1.conf" "*root*/res/json/cell/cell1.json"
+        // "*root*/res/conf/test/testCell1.conf" "*root*/res/json/system.cell/cell1.json"
         val path2AkkaConfig = args(0)
         val pathToCellConfig = args(1)
         

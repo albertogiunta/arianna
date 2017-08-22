@@ -4,12 +4,12 @@ import java.io.File
 import java.nio.file.Paths
 
 import akka.actor.{ActorRef, ActorSystem, Props}
-import cell.userManagement.UserManager
 import com.typesafe.config.ConfigFactory
-import ontologies.messages.Location._
-import ontologies.messages.MessageType.Topology
-import ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, ViewedFromACell}
-import ontologies.messages._
+import system.cell.userManagement.UserManager
+import system.ontologies.messages.Location._
+import system.ontologies.messages.MessageType.Topology
+import system.ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, ViewedFromACell}
+import system.ontologies.messages._
 
 import scala.collection.mutable
 import scala.io.Source
@@ -33,7 +33,7 @@ object RunUser {
     def main(args: Array[String]): Unit = {
 
         val path2Project = Paths.get("").toFile.getAbsolutePath
-        val path2Config = path2Project + "/res/conf/akka/application.conf"
+        val path2Config = path2Project + "/res/conf/test/application.conf"
         val path2map: String = path2Project + "/res/json/map15_room.json"
         val config = ConfigFactory.parseFile(new File(path2Config))
         val system = ActorSystem.create("userSystem", config.getConfig("user"))

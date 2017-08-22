@@ -3,8 +3,6 @@ package com.utils
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
 import com.actors.CustomActor
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 
 import scala.concurrent.duration._
@@ -12,7 +10,6 @@ import scala.concurrent.duration._
 /**
   * Created by Matteo Gabellini on 15/08/2017.
   */
-@RunWith(classOf[JUnitRunner])
 class BasicWatchDogTest extends TestKit(ActorSystem("BasicWatchDogTest"))
     with ImplicitSender
     with WordSpecLike

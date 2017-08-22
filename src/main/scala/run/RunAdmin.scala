@@ -4,14 +4,14 @@ import java.io.File
 import javafx.application.Platform
 import javafx.embed.swing.JFXPanel
 
-import admin.actors.AdminManager
-import admin.view.LoaderView
 import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
-import ontologies.messages.Location._
-import ontologies.messages.MessageType.Init
-import ontologies.messages.{AriadneMessage, Greetings, Location}
+import system.admin.actors.AdminManager
+import system.admin.view.LoaderView
 import system.names.NamingSystem
+import system.ontologies.messages.Location._
+import system.ontologies.messages.MessageType.Init
+import system.ontologies.messages.{AriadneMessage, Greetings, Location}
 
 object RunAdmin extends App with LoaderListener {
 
