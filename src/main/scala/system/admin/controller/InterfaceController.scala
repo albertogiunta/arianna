@@ -7,6 +7,7 @@ import javafx.scene.canvas.Canvas
 import javafx.scene.control.Alert.AlertType
 import javafx.scene.control.{Alert, Button, SplitPane}
 import javafx.scene.layout.{Pane, VBox}
+import javafx.scene.paint.Color
 import javafx.scene.text.Text
 import javafx.stage.FileChooser
 import javafx.stage.FileChooser.ExtensionFilter
@@ -38,11 +39,11 @@ class InterfaceController extends ViewController {
     @FXML
     private var alarmButton: Button = _
     @FXML
-    private var closeButton: Button = _
-    @FXML
     private var vBoxPane: VBox = _
     @FXML
     private var mapContainer: Pane = _
+    @FXML
+    private var status: Text = _
 
     /**
       * This method updates the interface with the information about all the cells
@@ -51,9 +52,7 @@ class InterfaceController extends ViewController {
       **/
     def updateView(update: List[RoomDataUpdate]): Unit = {
         Platform.runLater(() => {
-            if (alarmButton.isDisabled) {
-                alarmButton setDisable false
-            }
+            checkStatus
             update.foreach(update => {
                 if (cellControllers.contains(update.room)) {
                     var cellController = cellControllers.get(update.room).get
@@ -89,6 +88,7 @@ class InterfaceController extends ViewController {
       *
       **/
     def initializeSensors(sensorsInfo: SensorsInfoUpdate, roomID: RoomID): Unit = {
+        checkStatus
         var cellController = cellControllers.get(roomID).get
         Platform.runLater(() => cellController addSensors sensorsInfo)
     }
@@ -145,6 +145,20 @@ class InterfaceController extends ViewController {
         })
     }
 
+    /**
+      * This method set the Status text value, showing if the Master node is connected to the application
+      **/
+    def connected(isConnected: Boolean): Unit = {
+        if (isConnected) {
+            status setFill Color.GREEN
+            status setText InterfaceText.connected
+        } else {
+            status setFill Color.RED
+            status setText InterfaceText.disconnected
+        }
+
+    }
+
     private def parseFile(file: File): Unit = {
         val source = Source.fromFile(file).getLines.mkString
         val area = Topology.Subtype.Planimetrics.unmarshal(source)
@@ -197,14 +211,23 @@ class InterfaceController extends ViewController {
             cellControllers.values.foreach(cellController => cellController.endAlarm)
         })
     }
-    
+
     private def openAlert(): Unit = {
         val alert = new Alert(AlertType.ERROR)
         alert setTitle InterfaceText.errorTitle
         alert setHeaderText InterfaceText.errorHeader
         alert setContentText InterfaceText.errorText
-        
+
         alert.showAndWait
+    }
+
+    private def checkStatus(): Unit = {
+        if (status.getText.equals(InterfaceText.disconnected)) {
+            connected(true)
+        }
+        if (alarmButton.isDisabled) {
+            alarmButton setDisable false
+        }
     }
 
 
