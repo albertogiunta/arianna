@@ -31,7 +31,11 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
                             case MSGTAkkaVertx.NORMAL_CONNECTION => this.usersWaitingForConnectionAck.put(ws.textHandlerID, ws)
                             case MSGTAkkaVertx.DISCONNECT => this.usersWaitingForDisconnection.put(ws.textHandlerID, ws)
                         }
-                        if (userActor != null) userActor.tell(data.toString(), ActorRef.noSender)
+                        tell(data.toString())
+                    })
+                    ws.closeHandler((_) => {
+                        this.usersWaitingForDisconnection.put(ws.textHandlerID, ws)
+                        tell(MSGTAkkaVertx.DISCONNECT)
                     })
                 case "/route" =>
                     ws.handler((data) => {
@@ -44,7 +48,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
                         }
                         usersWaitingForRoute(uri).add(value)
                         Log.info("asked route " + uri + " " + usersWaitingForRoute.size)
-                        if (userActor != null) userActor.tell(RouteRequestFromClient(ws.textHandlerID, uriStart, uriEnd, isEscape = false), ActorRef.noSender)
+                        tell(RouteRequestFromClient(ws.textHandlerID, uriStart, uriEnd, isEscape = false))
                     })
                 case "/alarm" => this.usersReadyForAlarm.put(ws.textHandlerID, ws)
                 case "/position-update" => throw new UnsupportedOperationException
@@ -90,6 +94,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
             usersReadyForAlarm.remove(id)
         })
         this.usersWaitingForDisconnection.clear()
+
     }
     
     /**
@@ -136,7 +141,13 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
         }
         this.usersWaitingForRoute.remove(routeId)
     }
-    
+
+    private def tell(obj: Any): Unit = {
+        if (userActor != null) {
+            userActor.tell(obj, ActorRef.noSender)
+        }
+    }
+
     private def buildRouteId(departureCell: Int, arrivalCell: Int) = {
         val uri = "uri"
         s"$uri$departureCell-$uri$arrivalCell"

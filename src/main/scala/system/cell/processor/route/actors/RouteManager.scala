@@ -21,7 +21,6 @@ class RouteManager extends TemplateActor {
     
     private var processor: ActorRef = _
     
-    
     override def preStart: Unit = {
         super.preStart()
         cacher = context.actorOf(Props(new CacheManager(cacheKeepAlive = 2500L)), NamingSystem.CacheManager)

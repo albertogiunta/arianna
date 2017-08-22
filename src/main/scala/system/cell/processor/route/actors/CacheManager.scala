@@ -6,7 +6,7 @@ import system.ontologies.messages._
 import scala.collection.mutable
 
 /**
-  * This actor manages a cache of Route. Routes are valid for a time of X seconds
+  * This actor manages a cache of the Routes. Routes are valid for a time of X seconds
   *
   */
 class CacheManager(val cacheKeepAlive: Long) extends CustomActor {

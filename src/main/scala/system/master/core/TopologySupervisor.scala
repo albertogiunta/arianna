@@ -71,6 +71,7 @@ class TopologySupervisor extends TemplateActor {
         
                 log.info("Notifying the Subscriber...")
                 subscriber() ! MasterSubscriber.TopologyLoadedACK
+                admin() ! AriadneMessage(Topology, Acknowledgement, masterToAdmin, CellInfo.empty)
             }
 
         case _ => stash
@@ -205,6 +206,8 @@ class TopologySupervisor extends TemplateActor {
                 Empty()
             )
         } else {
+            admin() ! AriadneMessage(Topology, Acknowledgement, masterToAdmin, Empty())
+            
             topology.valuesIterator.foreach(room =>
                 admin() ! AriadneMessage(Handshake, CellToMaster, cellToMaster, SensorsInfoUpdate(room))
             )

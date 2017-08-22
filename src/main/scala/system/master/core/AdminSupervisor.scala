@@ -4,7 +4,7 @@ import akka.actor.ActorSelection
 import com.actors.CustomActor
 import system.names.NamingSystem
 import system.ontologies.messages.Location._
-import system.ontologies.messages.MessageType.{Alarm, Error, Handshake, Init, Update}
+import system.ontologies.messages.MessageType.{Alarm, Error, Handshake, Init, Topology, Update}
 import system.ontologies.messages._
 
 import scala.collection.mutable.ListBuffer
@@ -15,9 +15,13 @@ import scala.collection.mutable.ListBuffer
   *
   **/
 class AdminSupervisor extends CustomActor {
-
-    private val IPAddress: String = "127.0.0.1"
-    private val port: String = "4550"
+    
+    private val IPAddress: String = configManager.config("Ariadne-Admin")
+        .getString("akka.remote.netty.tcp.hostname")
+    
+    private val port: Int = configManager.config("Ariadne-Admin")
+        .getNumber("akka.remote.netty.tcp.port").intValue()
+    
     private val toAdmin: MessageDirection = Location.Master >> Location.Admin
     private val fromAdmin: MessageDirection = Location.Admin >> Location.Master
     private val admin = context.actorSelection("akka.tcp://" + NamingSystem.AdminActorSystem + "@" + IPAddress + ":" + port + "/user/" + NamingSystem.AdminManager)
@@ -25,6 +29,8 @@ class AdminSupervisor extends CustomActor {
     private val publisher: ActorSelection = sibling(NamingSystem.Publisher).get
 
     def operational: Receive = {
+        case msg@AriadneMessage(Topology, Topology.Subtype.Acknowledgement, _, _) => admin ! msg
+
         case msg@AriadneMessage(Update, Update.Subtype.Admin, _, content: AdminUpdate) => admin ! roundData(content)
 
         case msg@AriadneMessage(Alarm, Alarm.Subtype.FromInterface, fromAdmin, _) => publisher ! msg.copy(direction = fromAdmin)

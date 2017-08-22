@@ -19,18 +19,26 @@ object RunMaster extends App {
     
         val path2Config = args(0)
         
-        implicit val config: Config = ConfigFactory.parseFile(new File(path2Config))
-            .withFallback(ConfigFactory.load()).resolve()
+        try {
+    
+            implicit val config: Config = ConfigFactory.parseFile(new File(path2Config))
+                .withFallback(ConfigFactory.load())
+                .resolve()
+            
+            implicit val system: ActorSystem = ActorSystem(NamingSystem.ActorSystem, config)
         
-        implicit val system: ActorSystem = ActorSystem(NamingSystem.ActorSystem, config)
+            val middleware = DistributedPubSub(system).mediator
+            val master = system.actorOf(Props(new Master(middleware)), NamingSystem.Master)
         
-        val middleware = DistributedPubSub(system).mediator
-        
-        val master = system.actorOf(Props(new Master(middleware)), NamingSystem.Master)
-        
+        } catch {
+            case ex: Exception =>
+                ex.printStackTrace()
+                System.exit(0)
+        }
+    
+        println("System online...")
     } else {
         println(s"Wrong number of Arguments... Wanted $REQUIRED_ARGS, found " + args.length)
         System.exit(0)
     }
-    
 }

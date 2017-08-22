@@ -73,6 +73,8 @@ class InterfaceManager extends TemplateActor {
 
     def operational: Receive = {
 
+        case msg@AriadneMessage(Topology, Topology.Subtype.Acknowledgement, _, _) => interfaceController connected true
+
         case msg@AriadneMessage(_, MessageType.Update.Subtype.Admin, _, adminUpdate: AdminUpdate) => {
             val updateCells: mutable.Map[RoomID, RoomDataUpdate] = new mutable.HashMap[RoomID, RoomDataUpdate]
             adminUpdate.list.foreach(update => updateCells += ((update.room, update)))
@@ -98,6 +100,8 @@ class InterfaceManager extends TemplateActor {
         case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => parent ! msg
 
         case msg@AriadneMessage(Error, Error.Subtype.MapIdentifierMismatch, _, _) => interfaceController.showErrorDialog
+
+        case msg@AriadneMessage(Error, Error.Subtype.LostConnectionFromMaster, _, _) => interfaceController connected false
 
         case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) => parent ! msg
 

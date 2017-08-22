@@ -69,6 +69,8 @@ object MessageSubtype {
                 Error.Subtype.MapIdentifierMismatch
             case st if st == Error.Subtype.CellMappingMismatch.toLowerCase =>
                 Error.Subtype.CellMappingMismatch
+            case st if st == Error.Subtype.LostConnectionFromMaster.toLowerCase =>
+                Error.Subtype.LostConnectionFromMaster
             /* Alarm Messages */
             case st if st == Alarm.Subtype.FromCell.toLowerCase =>
                 Alarm.Subtype.FromCell
