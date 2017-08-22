@@ -4,7 +4,7 @@ import akka.actor.ActorSelection
 import com.actors.CustomActor
 import system.names.NamingSystem
 import system.ontologies.messages.Location._
-import system.ontologies.messages.MessageType.{Alarm, Error, Handshake, Init, Update}
+import system.ontologies.messages.MessageType.{Alarm, Error, Handshake, Init, Topology, Update}
 import system.ontologies.messages._
 
 import scala.collection.mutable.ListBuffer
@@ -25,6 +25,8 @@ class AdminSupervisor extends CustomActor {
     private val publisher: ActorSelection = sibling(NamingSystem.Publisher).get
 
     def operational: Receive = {
+        case msg@AriadneMessage(Topology, Topology.Subtype.Acknowledgement, _, _) => admin ! msg
+
         case msg@AriadneMessage(Update, Update.Subtype.Admin, _, content: AdminUpdate) => admin ! roundData(content)
 
         case msg@AriadneMessage(Alarm, Alarm.Subtype.FromInterface, fromAdmin, _) => publisher ! msg.copy(direction = fromAdmin)

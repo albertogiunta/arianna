@@ -46,6 +46,8 @@ class AdminManager extends TemplateActor {
 
     def operational: Receive = {
 
+        case msg@AriadneMessage(Topology, Topology.Subtype.Acknowledgement, _, _) => interfaceManager ! msg
+
         case msg@AriadneMessage(_, MessageType.Update.Subtype.Admin, _, adminUpdate: AdminUpdate) => interfaceManager ! msg.copy(direction = toSelf)
 
         case msg@AriadneMessage(_, Alarm.Subtype.FromInterface, _, _) => adminManager() ! msg.copy(direction = toMaster)
@@ -61,6 +63,7 @@ class AdminManager extends TemplateActor {
         case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => adminManager() ! msg.copy(direction = toMaster)
 
         case event: akka.remote.DisassociatedEvent => {
+            interfaceManager ! AriadneMessage(Error, Error.Subtype.LostConnectionFromMaster, toSelf, Empty())
             context.become(waitingForMaster)
             log.info("Lost connection with Master... Waiting for LookingForAMap message")
         }

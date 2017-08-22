@@ -27,5 +27,9 @@ object InterfaceText {
 
     val endAlarm: String = "END ALARM"
 
+    val connected: String = "Connected"
+
+    val disconnected: String = "Disconnected"
+
 }
 
