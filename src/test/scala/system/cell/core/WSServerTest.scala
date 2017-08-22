@@ -1,12 +1,9 @@
 package system.cell.core
 
 import io.vertx.core.Vertx
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import org.scalatest.{FlatSpec, Matchers}
 import system.cell.userManagement.{WSClient, WSServer}
 
-@RunWith(classOf[JUnitRunner])
 class WSServerTest extends FlatSpec with Matchers {
 
     var vertx: Vertx = Vertx.vertx()

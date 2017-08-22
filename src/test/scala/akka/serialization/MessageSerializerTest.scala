@@ -1,7 +1,5 @@
 package akka.serialization
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import system.ontologies.messages.Location._
 import system.ontologies.messages.MessageType.Update
@@ -10,7 +8,6 @@ import system.ontologies.messages._
 /**
   * Created by Alessandro on 13/07/2017.
   */
-@RunWith(classOf[JUnitRunner])
 class MessageSerializerTest extends FunSuite with BeforeAndAfter {
     
     var jsonStr: String = MessageType.Update.Subtype.Sensors

@@ -3,8 +3,6 @@ package system.cell.processor.route.actors
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit, TestProbe}
 import com.actors.CustomActor
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import system.names.NamingSystem
 import system.ontologies.messages.Location._
@@ -15,7 +13,6 @@ import scala.concurrent.duration
 import scala.concurrent.duration.FiniteDuration
 import scala.util.Random
 
-@RunWith(classOf[JUnitRunner])
 class RouteProcessorTest extends TestKit(ActorSystem("RouteProcessorTest"))
     with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll {
     

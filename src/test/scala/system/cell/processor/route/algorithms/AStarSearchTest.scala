@@ -1,14 +1,11 @@
 package system.cell.processor.route.algorithms
 
-import org.junit.runner.RunWith
 import org.scalatest._
-import org.scalatest.junit.JUnitRunner
 import system.cell.processor.route.algorithms.AStarSearch.Graph
 
 /**
   * Created by Alessandro on 12/07/2017.
   */
-@RunWith(classOf[JUnitRunner])
 class AStarSearchTest extends FunSuite with BeforeAndAfter {
     
     val graph: Graph[String] = Map(

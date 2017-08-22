@@ -3,8 +3,6 @@ package system.master.core
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit, TestProbe}
 import com.actors.CustomActor
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import system.names.NamingSystem
 import system.ontologies.messages.Location._
@@ -14,7 +12,6 @@ import system.ontologies.messages._
 /**
   * Created by Xander_C on 09/07/2017.
   */
-@RunWith(classOf[JUnitRunner])
 class DataStreamerTest extends TestKit(ActorSystem("DataStreamerTest"))
     with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll {
     

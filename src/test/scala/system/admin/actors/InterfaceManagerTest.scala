@@ -20,7 +20,6 @@ import system.names.NamingSystem
 import scala.io.Source
 
 
-@RunWith(classOf[JUnitRunner])
 class InterfaceManagerTest extends TestKit(ActorSystem("InterfaceManagerTest")) with WordSpecLike {
 
     val path2Project: String = Paths.get("").toFile.getAbsolutePath

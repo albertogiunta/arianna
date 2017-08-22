@@ -7,8 +7,6 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit, TestProbe}
 import com.actors.CustomActor
 import com.utils.Practicability
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import system.master.cluster.MasterSubscriber
 import system.names.NamingSystem
@@ -23,7 +21,6 @@ import scala.io.Source
 /**
   * Created by Xander_C on 09/07/2017.
   */
-@RunWith(classOf[JUnitRunner])
 class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest"))
     with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll {
     

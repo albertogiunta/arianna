@@ -17,7 +17,7 @@ import system.ontologies.messages.{AriadneMessage, Greetings, Location}
 object RunCells extends App {
 
     val path2Project = Paths.get("").toFile.getAbsolutePath
-    val path2Config = path2Project + "/res/conf/akka/testCell.conf"
+    val path2Config = path2Project + "/res/conf/test/testCell.conf"
 
     implicit val config = ConfigFactory.parseFile(new File(path2Config))
         .withFallback(ConfigFactory.load()).resolve()

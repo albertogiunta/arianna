@@ -159,7 +159,7 @@ class CellPublisherTest extends TestKit(ActorSystem("CellPublisherTest", CellPub
 
 object CellPublisherTest {
     val path2Project: String = Paths.get("").toFile.getAbsolutePath
-    val configPath: String = path2Project + "/res/conf/akka/testCellPublisher.conf"
+    val configPath: String = path2Project + "/res/conf/test/testCellPublisher.conf"
 
     val config: Config = ConfigFactory.parseFile(new File(configPath)).withFallback(ConfigFactory.load()).resolve()
 

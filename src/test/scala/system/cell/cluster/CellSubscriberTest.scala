@@ -167,7 +167,7 @@ class CellSubscriberTest extends TestKit(ActorSystem("CellSubscriberTest", CellS
 
 object CellSubscriberTest {
     val path2Project: String = Paths.get("").toFile.getAbsolutePath
-    val configPath: String = path2Project + "/res/conf/akka/testCellSubscriber.conf"
+    val configPath: String = path2Project + "/res/conf/test/testCellSubscriber.conf"
 
     val config: Config = ConfigFactory.parseFile(new File(configPath)).withFallback(ConfigFactory.load()).resolve()
 

@@ -8,8 +8,6 @@ import akka.cluster.pubsub.DistributedPubSub
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit, TestProbe}
 import com.actors.{ClusterMembersListener, CustomActor}
 import com.typesafe.config.{Config, ConfigFactory}
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import system.names.NamingSystem
 import system.ontologies.messages.Location._
@@ -24,7 +22,6 @@ import scala.util.Random
 /**
   * Created by Xander_C on 09/07/2017.
   */
-@RunWith(classOf[JUnitRunner])
 class MasterSubscriberTest extends TestKit(ActorSystem("SubscriberTest", MasterSubscriberTest.config))
     with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll {
     
@@ -212,7 +209,7 @@ class MasterSubscriberTest extends TestKit(ActorSystem("SubscriberTest", MasterS
 
 object MasterSubscriberTest {
     val path2Project: String = Paths.get("").toFile.getAbsolutePath
-    val path2Config: String = path2Project + "/res/conf/akka/testMaster.conf"
+    val path2Config: String = path2Project + "/res/conf/test/testMaster.conf"
     
     val config: Config = ConfigFactory.parseFile(new File(path2Config)).withFallback(ConfigFactory.load()).resolve()
 }

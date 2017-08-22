@@ -1,7 +1,5 @@
 package system.cell.processor.route.actors
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import system.ontologies.messages._
 
@@ -13,7 +11,6 @@ import scala.util.Random
 /**
   * Created by Alessandro on 14/07/2017.
   */
-@RunWith(classOf[JUnitRunner])
 class RouteProcessingTest extends FunSuite with BeforeAndAfter {
     
     val infoCells: Map[Int, (CellInfo, RoomInfo)] = (1 to 9).map(i => i ->

@@ -14,7 +14,6 @@ import org.scalatest.junit.JUnitRunner
 import system.names.NamingSystem
 
 
-@RunWith(classOf[JUnitRunner])
 class ChartManagerTest extends TestKit(ActorSystem("InterfaceManagerTest")) with WordSpecLike {
 
     "A ChartManager" must {
