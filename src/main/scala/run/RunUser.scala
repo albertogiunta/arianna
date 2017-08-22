@@ -34,7 +34,8 @@ object RunUser {
 
         val path2Project = Paths.get("").toFile.getAbsolutePath
         val path2Config = path2Project + "/res/conf/test/application.conf"
-        val path2map: String = path2Project + "/res/json/map15_room.json"
+        //        val path2map: String = path2Project + "/res/json/map15_room.json"
+        val path2map: String = path2Project + "/res/json/map2.json"
         val config = ConfigFactory.parseFile(new File(path2Config))
         val system = ActorSystem.create("userSystem", config.getConfig("user"))
 
@@ -43,7 +44,7 @@ object RunUser {
         val greetings: mutable.LinkedHashMap[String, Greetings] = mutable.LinkedHashMap()
         val actors: mutable.MutableList[ActorRef] = mutable.MutableList()
 
-        for (i <- 1 to 15) {
+        for (i <- 1 to 2) {
             greetings.put(s"user$i", Greetings(List(s"uri$i", (8080 + i).toString)))
         }
 
