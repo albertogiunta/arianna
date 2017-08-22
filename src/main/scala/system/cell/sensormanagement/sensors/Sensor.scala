@@ -129,12 +129,14 @@ object SimulationStrategies {
                 increasePhase
             }
 
-        private def increase(sensor: NumericSensor[Double]): Double = sensor.currentValue + changeStep
+        private def increasedValueOf(sensor: NumericSensor[Double]): Double =
+            if (sensor.currentValue + changeStep <= sensor.maxValue) sensor.currentValue + changeStep else sensor.maxValue
 
-        private def decrease(sensor: NumericSensor[Double]): Double = sensor.currentValue - changeStep
+        private def decreasedValueOf(sensor: NumericSensor[Double]): Double =
+            if (sensor.currentValue - changeStep >= sensor.minValue) sensor.currentValue - changeStep else sensor.minValue
 
         override def nextValue(sensor: NumericSensor[Double]): Double = if (this shouldIncrease sensor)
-            this increase sensor else this decrease sensor
+            this increasedValueOf sensor else this decreasedValueOf sensor
     }
 
     /**
@@ -161,12 +163,14 @@ object SimulationStrategies {
                 increasePhase
             }
 
-        private def increase(sensor: NumericSensor[Int]): Int = sensor.currentValue + changeStep
+        private def increasedValueOf(sensor: NumericSensor[Int]): Int =
+            if (sensor.currentValue + changeStep <= sensor.maxValue) sensor.currentValue + changeStep else sensor.maxValue
 
-        private def decrease(sensor: NumericSensor[Int]): Int = sensor.currentValue - changeStep
+        private def decreasedValueOf(sensor: NumericSensor[Int]): Int =
+            if (sensor.currentValue - changeStep >= sensor.minValue) sensor.currentValue - changeStep else sensor.minValue
 
         override def nextValue(sensor: NumericSensor[Int]): Int = if (this shouldIncrease sensor)
-            this increase sensor else this decrease sensor
+            this increasedValueOf sensor else this decreasedValueOf sensor
     }
 
 }

@@ -73,7 +73,7 @@ class SimulationStrategiesTest extends FlatSpec with Matchers with BeforeAndAfte
 
     "A linear double strategies" should "decrease the sensor value after the defined refresh time " +
         "if the current value has reached the max value" in {
-        Thread.sleep(refreshTime * simulatedDoubleSensor.maxValue.toInt)
+        Thread.sleep(((refreshTime * simulatedDoubleSensor.maxValue) / doubleChangeStep).toLong)
         @volatile var oldValue = simulatedDoubleSensor.currentValue
         Thread.sleep(sleepTime)
         oldValue should be > (simulatedDoubleSensor.currentValue)
@@ -81,10 +81,10 @@ class SimulationStrategiesTest extends FlatSpec with Matchers with BeforeAndAfte
 
     "A linear double strategies" should "increase the sensor value after the defined refresh time " +
         "if the current value has reached the min value during the decreasing phase" in {
-        Thread.sleep(refreshTime * simulatedDoubleSensor.maxValue.toInt)
+        Thread.sleep(((refreshTime * simulatedDoubleSensor.maxValue) / doubleChangeStep).toLong)
         @volatile var oldValue = simulatedDoubleSensor.currentValue
         var waitTime: Long = (simulatedDoubleSensor.minValue + oldValue).toLong
-        Thread.sleep(refreshTime * waitTime)
+        Thread.sleep((refreshTime * waitTime) / doubleChangeStep.toInt)
         oldValue = simulatedDoubleSensor.currentValue
         Thread.sleep(sleepTime)
         oldValue should be < (simulatedDoubleSensor.currentValue)
@@ -142,7 +142,7 @@ class SimulationStrategiesTest extends FlatSpec with Matchers with BeforeAndAfte
 
     "A linear integer strategies" should "decrease the sensor value after the defined refresh time, " +
         "if the current value has reached the max value" in {
-        Thread.sleep(refreshTime * simulatedIntSensor.maxValue)
+        Thread.sleep((refreshTime * simulatedIntSensor.maxValue) / intChangeStep)
         @volatile var oldValue = simulatedIntSensor.currentValue
         Thread.sleep(sleepTime)
         oldValue should be > (simulatedIntSensor.currentValue)
@@ -150,10 +150,10 @@ class SimulationStrategiesTest extends FlatSpec with Matchers with BeforeAndAfte
 
     "A linear integer strategies" should "increase the sensor value after the defined refresh time, " +
         "if the current value has reached the min value during the decreasing phase" in {
-        Thread.sleep(refreshTime * simulatedIntSensor.maxValue)
+        Thread.sleep((refreshTime * simulatedIntSensor.maxValue) / intChangeStep)
         @volatile var oldValue = simulatedIntSensor.currentValue
         var waitTime: Long = (simulatedIntSensor.minValue + oldValue).toLong
-        Thread.sleep(refreshTime * waitTime)
+        Thread.sleep((refreshTime * waitTime) / intChangeStep)
         oldValue = simulatedIntSensor.currentValue
         Thread.sleep(sleepTime)
         oldValue should be < (simulatedIntSensor.currentValue)
