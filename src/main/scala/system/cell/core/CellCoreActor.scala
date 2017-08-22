@@ -183,6 +183,26 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
         case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) => {
             userActor ! msg
             context.become(cultured, discardOld = true)
+            //Update the practicability value of this cell
+            topology.put(
+                indexByUri(localCellInfo.uri),
+                topology(indexByUri(localCellInfo.uri)).copy(practicability =
+                    Practicability(
+                        topology(indexByUri(localCellInfo.uri)).info.capacity,
+                        actualSelfLoad,
+                        topology(indexByUri(localCellInfo.uri)).passages.length)
+                )
+            )
+
+            cellPublisher ! AriadneMessage(
+                Update,
+                Update.Subtype.Practicability,
+                self2Self,
+                PracticabilityUpdate(
+                    topology(indexByUri(localCellInfo.uri)).info.id,
+                    topology(indexByUri(localCellInfo.uri)).practicability
+                )
+            )
             log.info("Alarm deactiveted")
         }
 
