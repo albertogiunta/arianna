@@ -19,9 +19,12 @@ object RunMaster extends App {
     
         val path2Config = args(0)
         
-        implicit val config: Config = ConfigFactory.parseFile(new File(path2Config))
-            .withFallback(ConfigFactory.load()).resolve()
         try {
+    
+            implicit val config: Config = ConfigFactory.parseFile(new File(path2Config))
+                .withFallback(ConfigFactory.load())
+                .resolve()
+            
             implicit val system: ActorSystem = ActorSystem(NamingSystem.ActorSystem, config)
         
             val middleware = DistributedPubSub(system).mediator

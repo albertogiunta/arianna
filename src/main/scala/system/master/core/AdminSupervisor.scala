@@ -15,9 +15,13 @@ import scala.collection.mutable.ListBuffer
   *
   **/
 class AdminSupervisor extends CustomActor {
-
-    private val IPAddress: String = "127.0.0.1"
-    private val port: String = "4550"
+    
+    private val IPAddress: String = configManager.config("Ariadne-Admin")
+        .getString("akka.remote.netty.tcp.hostname")
+    
+    private val port: Int = configManager.config("Ariadne-Admin")
+        .getNumber("akka.remote.netty.tcp.port").intValue()
+    
     private val toAdmin: MessageDirection = Location.Master >> Location.Admin
     private val fromAdmin: MessageDirection = Location.Admin >> Location.Master
     private val admin = context.actorSelection("akka.tcp://" + NamingSystem.AdminActorSystem + "@" + IPAddress + ":" + port + "/user/" + NamingSystem.AdminManager)
