@@ -40,7 +40,10 @@ object SensorsFactory {
                 minValue,
                 maxValue,
                 new TemperatureThreshold(minThreshold, maxThreshold))
-            new SimulatedLinearTemperatureSensor(sensor, refreshRate, DefaultValues.ChangeStep.temperature)
+            new SimulatedTemperatureSensor(
+                sensor,
+                refreshRate,
+                SimulationStrategies.LinearDoubleSimulation(DefaultValues.ChangeStep.temperature))
         }
 
         def createSmokeSensor(minValue: Double,
@@ -53,7 +56,10 @@ object SensorsFactory {
                 minValue,
                 maxValue,
                 new SmokeThreshold(threshold))
-            new SimulatedLinearGasSensor(sensor, refreshRate, DefaultValues.ChangeStep.gas)
+            new SimulatedGasSensor(
+                sensor,
+                refreshRate,
+                SimulationStrategies.LinearDoubleSimulation(DefaultValues.ChangeStep.gas))
         }
 
         def createCO2Sensor(minValue: Double,
@@ -66,7 +72,10 @@ object SensorsFactory {
                 minValue,
                 maxValue,
                 new CO2Threshold(threshold))
-            new SimulatedLinearGasSensor(sensor, refreshRate, DefaultValues.ChangeStep.gas)
+            new SimulatedGasSensor(
+                sensor,
+                refreshRate,
+                SimulationStrategies.LinearDoubleSimulation(DefaultValues.ChangeStep.gas))
         }
 
         def createOxygenSensor(minValue: Double,
@@ -79,7 +88,10 @@ object SensorsFactory {
                 minValue,
                 maxValue,
                 new OxygenThreshold(threshold))
-            new SimulatedLinearGasSensor(sensor, refreshRate, DefaultValues.ChangeStep.gas)
+            new SimulatedGasSensor(
+                sensor,
+                refreshRate,
+                SimulationStrategies.LinearDoubleSimulation(DefaultValues.ChangeStep.gas))
         }
 
         def createHumiditySensor(minValue: Double,
@@ -93,7 +105,10 @@ object SensorsFactory {
                 minValue,
                 maxValue,
                 new HumidityThreshold(minThreshold, maxThreshold))
-            new SimulatedLinearHumiditySensor(sensor, refreshRate, DefaultValues.ChangeStep.humidity)
+            new SimulatedHumiditySensor(
+                sensor,
+                refreshRate,
+                SimulationStrategies.LinearDoubleSimulation(DefaultValues.ChangeStep.humidity))
         }
     }
 

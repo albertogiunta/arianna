@@ -45,7 +45,7 @@ class OxygenSensorTest extends FlatSpec with Matchers {
 
     val refreshRate = 1000
     val changeStep = 0.15
-    var simulatedOxygenSensor = new SimulatedLinearGasSensor(oSensor, refreshRate, changeStep)
+    var simulatedOxygenSensor = new SimulatedGasSensor(oSensor, refreshRate, SimulationStrategies.LinearDoubleSimulation(changeStep))
     var oGSensor: ObservableGasSensor = new ObservableGasSensor(simulatedOxygenSensor)
 
 

@@ -45,7 +45,7 @@ class SmokeSensorTest extends FlatSpec with Matchers {
 
     val refreshRate = 1000
     val changeStep = 0.15
-    var simulatedSmokeSensor = new SimulatedLinearGasSensor(sSensor, refreshRate, changeStep)
+    var simulatedSmokeSensor = new SimulatedGasSensor(sSensor, refreshRate, SimulationStrategies.LinearDoubleSimulation(changeStep))
     var oGSensor: ObservableGasSensor = new ObservableGasSensor(simulatedSmokeSensor)
 
 
