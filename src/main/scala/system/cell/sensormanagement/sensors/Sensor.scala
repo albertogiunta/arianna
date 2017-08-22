@@ -84,7 +84,12 @@ trait SensorWithThreshold[H] extends Sensor[H] {
   * @tparam S an implementation of a Sensor
   */
 trait SimulationStrategy[D, S <: Sensor[D]] {
-    def execute(sensor: S): D
+    /**
+      * Get the next value for the simulated sensor
+      * depending on the status of the sensor and
+      * strategy algorithm
+      **/
+    def nextValue(sensor: S): D
 }
 
 /**
@@ -128,7 +133,7 @@ object SimulationStrategies {
 
         private def decrease(sensor: NumericSensor[Double]): Double = sensor.currentValue - changeStep
 
-        override def execute(sensor: NumericSensor[Double]): Double = if (this shouldIncrease sensor)
+        override def nextValue(sensor: NumericSensor[Double]): Double = if (this shouldIncrease sensor)
             this increase sensor else this decrease sensor
     }
 
@@ -160,7 +165,7 @@ object SimulationStrategies {
 
         private def decrease(sensor: NumericSensor[Int]): Int = sensor.currentValue - changeStep
 
-        override def execute(sensor: NumericSensor[Int]): Int = if (this shouldIncrease sensor)
+        override def nextValue(sensor: NumericSensor[Int]): Int = if (this shouldIncrease sensor)
             this increase sensor else this decrease sensor
     }
 
@@ -191,7 +196,7 @@ abstract class SimulatedSensor[E](val sensor: Sensor[E],
 
     private val executor = Executors.newScheduledThreadPool(1)
 
-    private def changeLogic(): Runnable = () => this.currentValue = changeStrategy.execute(this)
+    private def changeLogic(): Runnable = () => this.currentValue = changeStrategy.nextValue(this)
 
     this.executor.scheduleAtFixedRate(changeLogic, 0L, millisRefreshRate, TimeUnit.MILLISECONDS)
 
