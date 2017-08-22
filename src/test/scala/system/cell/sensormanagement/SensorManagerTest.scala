@@ -13,6 +13,7 @@ import system.ontologies.messages.MessageType._
 import system.ontologies.messages._
 import system.ontologies.sensor.SensorCategories
 
+import scala.collection.mutable
 import scala.concurrent.duration._
 
 /**
@@ -52,6 +53,8 @@ class SensorManagerTest extends TestKit(ActorSystem("SensorManagerTest",
         Location.Self >> Location.Self,
         Greetings(List(loadedConfig.sensors.toJson.toString())))
 
+    val updateResponse = Set(tempSensConfig.categoryId, smokeSensConfig.categoryId)
+
     override def afterAll {
         TestKit.shutdownActorSystem(system)
     }
@@ -73,7 +76,7 @@ class SensorManagerTest extends TestKit(ActorSystem("SensorManagerTest",
 
             proxy.send(parent, sensorManagerInitMsg)
 
-            proxy.expectMsg("Update Received")
+            proxy.expectMsg(updateResponse)
             system.stop(proxy.ref)
             system.stop(parent)
         }
@@ -89,7 +92,7 @@ class SensorManagerTest extends TestKit(ActorSystem("SensorManagerTest",
 
             proxy.fishForMessage((timeForAlarm + 1) seconds, "") {
                 case "Alarm Received" => true
-                case "Update Received" => false
+                case updateResponse => false
             }
 
             system.stop(proxy.ref)
@@ -108,7 +111,10 @@ class TestParent(proxy: ActorRef, sonName: String) extends CustomActor {
 
     override def receive: Receive = {
         case msg@AriadneMessage(Update, Update.Subtype.Sensors, this.self2Self, cnt: SensorsInfoUpdate)
-            if sender == child => proxy ! "Update Received"
+            if sender == child =>
+            val response = mutable.HashSet[Int]()
+            cnt.sensors.foreach(X => response += X.categoryId)
+            proxy ! response
         case msg@AriadneMessage(Alarm, _, _, cnt: SensorInfo) if sender == child =>
             proxy ! "Alarm Received"
         case x => child forward x

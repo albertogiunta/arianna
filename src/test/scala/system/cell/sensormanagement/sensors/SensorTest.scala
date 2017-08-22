@@ -13,7 +13,7 @@ class SensorTest extends org.scalatest.FlatSpec with Matchers {
     var tSensor = new BasicTemperatureSensor(sensorName, 0, minValue, maxValue, temperatureTreshold)
 
 
-    var sensor: Sensor = tSensor
+    var sensor: Sensor[Double] = tSensor
 
     var scaleSensor: ScaleSensor[Double] = tSensor
 

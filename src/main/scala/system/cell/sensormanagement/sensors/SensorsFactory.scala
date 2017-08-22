@@ -104,7 +104,7 @@ object SensorsFactory {
       * @param sensor The sensor of which you want
       *               to create the observable decoration
       **/
-    def createTheObservableVersion(sensor: Sensor): ObservableSensor[_ <: Any] = sensor.category match {
+    def createTheObservableVersion(sensor: Sensor[_]): ObservableSensor[_ <: Any] = sensor.category match {
         case Temperature => new ObservableTemperatureSensor(sensor.asInstanceOf[TemperatureSensor])
         case Smoke | Oxygen | CO2 => new ObservableGasSensor(sensor.asInstanceOf[GasSensor])
         case Humidity => new ObservableHumiditySensor(sensor.asInstanceOf[HumiditySensor])
@@ -116,7 +116,7 @@ object SensorsFactory {
       *
       * @param sensorInfo the sensor info loaded from the config json file
       **/
-    def createASensorFromConfig(sensorInfo: SensorInfoFromConfig): Sensor = SensorCategories.categoryWithId(sensorInfo.categoryId) match {
+    def createASensorFromConfig(sensorInfo: SensorInfoFromConfig): Sensor[_] = SensorCategories.categoryWithId(sensorInfo.categoryId) match {
         case Temperature =>
             val threshold = sensorInfo.threshold.asInstanceOf[DoubleThresholdInfo]
             Simulated.createTempSensor(

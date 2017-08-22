@@ -5,10 +5,21 @@ import java.util.concurrent.{Executors, TimeUnit}
 import io.reactivex.{BackpressureStrategy, Flowable}
 import system.ontologies.sensor.{SensorCategory, Threshold}
 
+
 /**
-  * a trait for a sensor
-  **/
-trait Sensor {
+  * A trait for a sensor, it's implementation should have only a public getter method of the current value,
+  * because the real management of it should be encapsulated internally
+  *
+  * @tparam A the type of data managed by the sensor in order to
+  *           represents the physical quantity measured
+  *           Created by Matteo Gabellini on 05/07/2017.
+  */
+trait Sensor[A] {
+    /**
+      * Get the current sensor value of type
+      **/
+    def currentValue: A
+
     /**
       * Get the sensor name
       **/
@@ -21,27 +32,12 @@ trait Sensor {
 }
 
 /**
-  * A trait for a generic sensor a generic sensor have only a public getter method of the current value,
-  * because the real management of it is encapsulated in the real implementation of the sensor
-  *
-  * @tparam A the type of data managed by the sensor in order to
-  *           represents the physical quantity measured
-  *           Created by Matteo Gabellini on 05/07/2017.
-  */
-trait GenericSensor[A] extends Sensor {
-    /**
-      * Get the current sensor value of type
-      **/
-    def currentValue: A
-}
-
-/**
   * A trait for a sensor that works with a scale of value
   * that has a min and a max value
   *
   * @tparam B the type of data managed by the sensor
   **/
-trait ScaleSensor[B] extends GenericSensor[B] {
+trait ScaleSensor[B] extends Sensor[B] {
 
     /**
       * Get the minimum value that the sensor can reach
@@ -73,7 +69,7 @@ trait NumericSensor[C] extends ScaleSensor[C] {
   *
   * @tparam H the type of data managed by the sensor
   */
-trait SensorWithThreshold[H] extends GenericSensor[H] {
+trait SensorWithThreshold[H] extends Sensor[H] {
     /**
       * Get the sensor threshold
       **/
@@ -87,7 +83,7 @@ trait SensorWithThreshold[H] extends GenericSensor[H] {
   *           corresponds to the T type of the sensor (see the trait Sensor)
   * @tparam S an implementation of a Sensor
   */
-trait SimulationStrategy[D, S <: GenericSensor[D]] {
+trait SimulationStrategy[D, S <: Sensor[D]] {
     def execute(sensor: S): D
 }
 
@@ -100,7 +96,7 @@ object SimulationStrategies {
     /**
       * A trait that define the basic method that a linear simulations must have
       */
-    trait LinearSimulation[D, S <: GenericSensor[D]] extends SimulationStrategy[D, S] {
+    trait LinearSimulation[D, S <: Sensor[D]] extends SimulationStrategy[D, S] {
         def changeStep: D
     }
 
@@ -171,16 +167,16 @@ object SimulationStrategies {
 }
 
 /**
-  * An abstract decoration of a generic sensor in order to simulate a real sensor
+  * An abstract decoration of a sensor in order to simulate a real sensor
   *
   * @param sensor            a generic sensor implementation to decorate
   * @param millisRefreshRate rate at the sensor change its value
   * @param changeStrategy    the strategy that specifies the sensor behaviour
   */
-abstract class SimulatedSensor[E](val sensor: GenericSensor[E],
+abstract class SimulatedSensor[E](val sensor: Sensor[E],
                                   val millisRefreshRate: Long,
-                                  var changeStrategy: SimulationStrategy[E, GenericSensor[E]])
-    extends GenericSensor[E] {
+                                  var changeStrategy: SimulationStrategy[E, Sensor[E]])
+    extends Sensor[E] {
     @volatile var value: E = sensor.currentValue
 
     //thread safe read-access to the current value
@@ -220,7 +216,7 @@ class SimulatedNumericSensor[F](override val sensor: NumericSensor[F],
                                 var numericChangeStrategy: SimulationStrategy[F, NumericSensor[F]])
     extends SimulatedSensor[F](sensor,
         millisRefreshRate,
-        numericChangeStrategy.asInstanceOf[SimulationStrategy[F, GenericSensor[F]]])
+        numericChangeStrategy.asInstanceOf[SimulationStrategy[F, Sensor[F]]])
         with NumericSensor[F] {
 
     override def minValue: F = sensor.minValue
@@ -235,7 +231,7 @@ class SimulatedNumericSensor[F](override val sensor: NumericSensor[F],
   * A trait for an object that can be observed with the
   * Scala ReactiveX API
   **/
-trait ObservableSensor[G] extends GenericSensor[G] {
+trait ObservableSensor[G] extends Sensor[G] {
     /**
       * Create a Flowable for the sensor values
       *

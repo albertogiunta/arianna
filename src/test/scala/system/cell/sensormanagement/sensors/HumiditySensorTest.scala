@@ -15,7 +15,7 @@ class HumiditySensorTest extends FlatSpec with Matchers {
     var hSensor = new BasicHumiditySensor(sensorName, 0, minValue, maxValue, hThreshold)
 
 
-    var sensor: Sensor = hSensor
+    var sensor: Sensor[Double] = hSensor
 
     "A Humidity Sensor" should "have the same name assigned during the creation" in {
         sensor.name should be(sensorName)

@@ -285,7 +285,7 @@ final case class SensorInfoFromConfig(categoryId: Int, minValue: Double, maxValu
 
 /**
   * An abstract representation of information relative
-  * to a threshold of a generic sensor
+  * to a threshold of a sensor
   **/
 abstract class ThresholdInfo extends MessageContent
 

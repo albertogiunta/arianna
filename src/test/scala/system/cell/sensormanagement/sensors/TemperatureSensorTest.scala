@@ -16,7 +16,7 @@ class TemperatureSensorTest extends FlatSpec with Matchers {
     var tSensor = new BasicTemperatureSensor(sensorName, 0, minValue, maxValue, tThreshold)
 
 
-    var sensor: Sensor = tSensor
+    var sensor: Sensor[Double] = tSensor
 
     "A Temperature Sensor" should "have the same name assigned during the creation" in {
         sensor.name should be(sensorName)

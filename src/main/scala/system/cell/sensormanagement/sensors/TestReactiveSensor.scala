@@ -71,7 +71,7 @@ object TestReactiveSensor extends App {
     println("Bye Bye!")
 
 
-    private def linearGasSensorTest(sensor: Sensor,
+    private def linearGasSensorTest(sensor: Sensor[_],
                                     simulatedGasSensor: SimulatedLinearGasSensor,
                                     oSensor: ObservableGasSensor) {
         println("Test Simulated Generation for " + oSensor.name)
