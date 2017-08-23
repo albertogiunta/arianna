@@ -7,15 +7,12 @@ import javafx.embed.swing.JFXPanel
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 import com.actors.CustomActor
+import org.scalatest.WordSpecLike
+import system.names.NamingSystem
 import system.ontologies.messages.Location._
 import system.ontologies.messages.MessageType.Topology.Subtype.Planimetrics
 import system.ontologies.messages.MessageType.{Alarm, Handshake, Init, Interface, Topology, Update}
-import system.ontologies.messages._
-import system.ontologies.messages.Cell
-import org.junit.runner.RunWith
-import org.scalatest.WordSpecLike
-import org.scalatest.junit.JUnitRunner
-import system.names.NamingSystem
+import system.ontologies.messages.{Cell, _}
 
 import scala.io.Source
 
@@ -34,7 +31,7 @@ class InterfaceManagerTest extends TestKit(ActorSystem("InterfaceManagerTest")) 
     )
 
     val roomDataUpdate: RoomDataUpdate = RoomDataUpdate(RoomID(0, "room1"),
-        Cell(CellInfo("uri", 8080), List.empty[SensorInfo]), 50)
+        Cell(CellInfo("uri", "", 8080), List.empty[SensorInfo]), 50)
     val list: List[RoomDataUpdate] = List(roomDataUpdate)
 
     val update = AriadneMessage(
@@ -61,7 +58,7 @@ class InterfaceManagerTest extends TestKit(ActorSystem("InterfaceManagerTest")) 
         Handshake,
         Handshake.Subtype.CellToMaster,
         Location.Cell >> Location.Master,
-        SensorsInfoUpdate(CellInfo(uri = "PancoPillo", port = 8080)
+        SensorsInfoUpdate(CellInfo(uri = "PancoPillo", "", port = 8080)
             , List(SensorInfo(1, 10.0)))
     )
 
