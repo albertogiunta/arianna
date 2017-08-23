@@ -14,9 +14,7 @@ import system.ontologies.messages._
   * It keeps a copy of the loaded map if the System goes down and asks it again using a LookingForAMap message.
   */
 class AdminManager extends TemplateActor {
-
-    println(ConfigurationManager(context.system)
-        .property("akka.cluster.seed-nodes").asStringList.head)
+    
     private val masterSeedNode = ConfigurationManager(context.system)
         .property("akka.cluster.seed-nodes").asStringList.head
     
