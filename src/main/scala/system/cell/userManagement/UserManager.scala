@@ -32,6 +32,7 @@ class UserManager extends TemplateActor with ActorLogging {
     var areaForCell: AreaViewedFromACell = _
     var areaForUser: AreaViewedFromAUser = _
     var alarmMessage: AriadneMessage[MessageContent] = _
+    var isAlarmed: Boolean = false
 
 
     override protected def init(args: List[String]): Unit = {
@@ -63,7 +64,7 @@ class UserManager extends TemplateActor with ActorLogging {
     
     protected def operational: Receive = operationalForCell orElse operationalForMobile
 
-    protected def operationalWithAlarm: Receive = operational andThen operationalAndProactiveForMobile
+    //    protected def operationalWithAlarm: Receive = operational andThen operationalAndProactiveForMobile
 
     protected def operationalForCell: Receive = {
         case msg@AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, _, response@RouteResponse(request, route)) =>
@@ -72,11 +73,13 @@ class UserManager extends TemplateActor with ActorLogging {
                 case RouteRequest(_, _, _, true) =>
                     s.sendAlarmToUsers(RouteResponseShort(route).toJson.toString())
                     alarmMessage = msg
-                    context.become(operationalWithAlarm)
+                    isAlarmed = true
+                //                    context.become(operationalWithAlarm)
             }
         case AriadneMessage(Alarm, Alarm.Subtype.End, _, _) =>
             s.sendAlarmEndToUsers()
-            context.become(operational)
+            isAlarmed = false
+        //            context.become(operational)
     }
 
     protected def operationalForMobile: Receive = {
@@ -95,12 +98,12 @@ class UserManager extends TemplateActor with ActorLogging {
         case _ => desist _
     }
 
-    protected def operationalAndProactiveForMobile: Receive = {
-        case MSGTAkkaVertx.FIRST_CONNECTION =>
-            s.sendAlarmToUsers(alarmMessage.content.asInstanceOf[RouteResponse].route.toJson.toString())
-        case MSGTAkkaVertx.NORMAL_CONNECTION =>
-            s.sendAlarmToUsers(alarmMessage.content.asInstanceOf[RouteResponse].route.toJson.toString())
-    }
+    //    protected def operationalAndProactiveForMobile: Receive = {
+    //        case MSGTAkkaVertx.FIRST_CONNECTION =>
+    //            s.sendAlarmToUsers(alarmMessage.content.asInstanceOf[RouteResponse].route.toJson.toString())
+    //        case MSGTAkkaVertx.NORMAL_CONNECTION =>
+    //            s.sendAlarmToUsers(alarmMessage.content.asInstanceOf[RouteResponse].route.toJson.toString())
+    //    }
 
     override def postStop(): Unit = {
         s.sendSystemShutDownToUsers()
@@ -110,6 +113,7 @@ class UserManager extends TemplateActor with ActorLogging {
     private def doOnEveryNewConnection() {
         incrementUserNumber()
         sendCurrentPeopleUpdate()
+        if (isAlarmed) s.sendAlarmToUsers(alarmMessage.content.asInstanceOf[RouteResponse].route.toJson.toString())
     }
     
     private def incrementUserNumber(): Unit = usrNumber = usrNumber + 1
