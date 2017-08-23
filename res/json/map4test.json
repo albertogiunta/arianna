@@ -37,6 +37,7 @@
       "cell": {
         "info": {
           "uri": "PancoPillo",
+          "ip": "",
           "port": 8080
         },
         "sensors": []

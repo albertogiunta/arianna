@@ -1,5 +1,7 @@
 package system.cell.core
 
+import java.net.InetAddress
+
 import akka.actor.{ActorRef, Props}
 import com.actors.TemplateActor
 import com.utils.Practicability
@@ -73,7 +75,7 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
         val loadedConfig = cellConfiguration.parseJson.convertTo[CellConfig]
         if (loadedConfig.cellInfo == CellInfo.empty) throw IncorrectConfigurationException(this.name)
         localCellInfo = loadedConfig.cellInfo
-
+        localCellInfo.ip = InetAddress.getLocalHost.getHostAddress
         sensorManager ! AriadneMessage(Init,
             Init.Subtype.Greetings,
             self2Self,
