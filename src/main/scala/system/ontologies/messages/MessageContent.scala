@@ -107,6 +107,7 @@ object Cell {
     
     implicit def SensorUpdateToCell(up: SensorsInfoUpdate): Cell = Cell(up.cell, up.sensors)
 }
+
 /**
   * This Class is a Static representation of a Cell
   *
