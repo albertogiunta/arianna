@@ -67,7 +67,7 @@ class UserManager extends TemplateActor with ActorLogging {
     //    protected def operationalWithAlarm: Receive = operational andThen operationalAndProactiveForMobile
 
     protected def operationalForCell: Receive = {
-        case msg@AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, _, response@RouteResponse(request, route)) =>
+        case AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, _, response@RouteResponse(request, route)) =>
             request match {
                 case RouteRequest(_, _, _, false) => s.sendRouteToUsers(response, RouteResponseShort(route).toJson.toString())
                 case RouteRequest(_, _, _, true) =>
