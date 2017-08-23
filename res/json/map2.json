@@ -1,5 +1,5 @@
 {
-  "id": 2,
+    "id": 2,
     "rooms": [
         {
             "info": {
@@ -30,13 +30,14 @@
                     "y": 150
                 },
                 "isEntryPoint": true,
-              "isExitPoint": false,
+                "isExitPoint": false,
                 "capacity": 100,
                 "squareMeters": 50.0
             },
             "cell": {
                 "info": {
                     "uri": "uri1",
+                    "ip": "",
                     "port": 8081
                 },
                 "sensors": []
@@ -102,7 +103,7 @@
                     "x": 375,
                     "y": 150
                 },
-              "isEntryPoint": false,
+                "isEntryPoint": false,
                 "isExitPoint": true,
                 "capacity": 100,
                 "squareMeters": 50.0
@@ -110,6 +111,7 @@
             "cell": {
                 "info": {
                     "uri": "uri2",
+                    "ip": "",
                     "port": 8082
                 },
                 "sensors": []

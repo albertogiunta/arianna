@@ -1,6 +1,7 @@
 {
     "cellInfo": {
         "uri": "uri2",
+        "ip": "",
         "port": 8082
     },
     "sensors": [
