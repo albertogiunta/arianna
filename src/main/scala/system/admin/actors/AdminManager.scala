@@ -15,8 +15,10 @@ import system.ontologies.messages._
   */
 class AdminManager extends TemplateActor {
 
+    println(ConfigurationManager(context.system)
+        .property("akka.cluster.seed-nodes").asStringList.head)
     private val masterSeedNode = ConfigurationManager(context.system)
-        .property(builder.akka.cluster.get("seed-nodes")).asStringList.head
+        .property("akka.cluster.seed-nodes").asStringList.head
     
     private val adminManager: () => ActorSelection =
         () => context.actorSelection(masterSeedNode + "/user/" + NamingSystem.Master + "/" + NamingSystem.AdminSupervisor)
@@ -46,7 +48,10 @@ class AdminManager extends TemplateActor {
 
     def operational: Receive = {
 
-        case msg@AriadneMessage(Topology, Topology.Subtype.Acknowledgement, _, _) => interfaceManager ! msg
+        case msg@AriadneMessage(Topology, Topology.Subtype.Acknowledgement, _, _) => {
+            log.info("ACK received from Master: Master connected")
+            interfaceManager ! msg
+        }
 
         case msg@AriadneMessage(_, MessageType.Update.Subtype.Admin, _, adminUpdate: AdminUpdate) => interfaceManager ! msg.copy(direction = toSelf)
 

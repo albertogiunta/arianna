@@ -1,9 +1,12 @@
 package system.admin.controller
 
+import java.io.File
 import javafx.fxml._
 import javafx.scene.control.TextField
-import javafx.stage.Stage
+import javafx.stage.FileChooser.ExtensionFilter
+import javafx.stage.{FileChooser, Stage}
 
+import com.utils.InterfaceText
 import run.LoaderListener
 
 class LoaderController extends ViewController {
@@ -17,7 +20,11 @@ class LoaderController extends ViewController {
 
     @FXML
     private def loadConfig(): Unit = {
-        listener onLoadConfig configField.getText
+        val fc = new FileChooser
+        fc setTitle InterfaceText.fileSelectionText
+        fc setSelectedExtensionFilter new ExtensionFilter(InterfaceText.extension, "*.conf")
+        val config: File = fc.showOpenDialog(null)
+        listener onLoadConfig config.getAbsolutePath
         stage.close
     }
 

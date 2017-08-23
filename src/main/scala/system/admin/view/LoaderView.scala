@@ -20,7 +20,7 @@ class LoaderView extends View {
         val mainStage = new Stage
         mainStage setTitle InterfaceText.loadTitle
         mainStage setHeight 125
-        mainStage setWidth 466
+        mainStage setWidth 383
         mainStage setResizable false
         var loader: FXMLLoader = new FXMLLoader(getClass.getResource(GraphicResources.loader))
         val root: Pane = loader.load[Pane]
