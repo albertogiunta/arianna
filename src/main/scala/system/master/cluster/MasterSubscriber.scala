@@ -10,6 +10,8 @@ import system.ontologies.messages.MessageType.Handshake.Subtype.{Acknowledgement
 import system.ontologies.messages.MessageType._
 import system.ontologies.messages._
 
+import scala.collection.mutable
+
 /**
   * A Simple Subscriber for a Clustered Publish-Subscribe Model
   *
@@ -22,15 +24,25 @@ class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) 
     private val topologySupervisor: () => ActorSelection = () => sibling(NamingSystem.TopologySupervisor).get
     private val publisher: () => ActorSelection = () => sibling(NamingSystem.Publisher).get
     
+    private val stashedHandshakes: mutable.Set[String] = mutable.HashSet.empty
+    
     override protected def subscribed: Receive = {
-        
-        case AriadneMessage(Handshake, CellToMaster, `cellToMaster`, _) =>
-            log.info("Stashing handshake from {} for later administration...", sender.path)
+    
+        case AriadneMessage(Handshake, CellToMaster, `cellToMaster`, pkg: SensorsInfoUpdate) =>
+            
             publisher() ! (
                 sender.path.elements.mkString("/"),
                 AriadneMessage(Handshake, Acknowledgement, Location.Master >> Location.Cell, Empty())
             )
-            stash
+        
+            if (stashedHandshakes.apply(pkg.cell.uri)) {
+                log.info("Stashing handshake from {} for later administration...", sender.path)
+                stashedHandshakes.add(pkg.cell.uri)
+                stash
+            } else {
+                log.info("Handshakes from {} already stashed...", sender.path)
+            }
+            
 
         case MasterSubscriber.TopologyLoadedACK =>
             log.info("A topology has been loaded in the server...")

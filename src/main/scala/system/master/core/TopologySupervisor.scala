@@ -72,6 +72,7 @@ class TopologySupervisor extends TemplateActor {
         
                 log.info("Notifying the Subscriber...")
                 subscriber() ! MasterSubscriber.TopologyLoadedACK
+                log.info("Sending Topology ACK to Admin...")
                 admin() ! AriadneMessage(Topology, Acknowledgement, masterToAdmin, CellInfo.empty)
             }
 
