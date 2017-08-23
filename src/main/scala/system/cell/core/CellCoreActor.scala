@@ -268,7 +268,7 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
             //route response from route manager for the user
             userActor ! msg
 
-        case AriadneMessage(Alarm, _, this.cell2Cluster, alarm) => {
+        case AriadneMessage(Alarm, _, _, alarm) => {
             val (id, area) = alarm match {
                 case AlarmContent(compromisedCell, _) =>
                     ("-1", topology.values.map(cell => {
