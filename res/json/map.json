@@ -1,0 +1,640 @@
+{
+  "id": 42,
+  "rooms": [
+    {
+      "info": {
+        "id": {
+          "serial": 1,
+          "name": "Room A"
+        },
+        "roomVertices": {
+          "northWest": {
+            "x": 100,
+            "y": 100
+          },
+          "northEast": {
+            "x": 250,
+            "y": 100
+          },
+          "southWest": {
+            "x": 100,
+            "y": 200
+          },
+          "southEast": {
+            "x": 250,
+            "y": 200
+          }
+        },
+        "antennaPosition": {
+          "x": 175,
+          "y": 150
+        },
+        "isEntryPoint": true,
+        "isExitPoint": false,
+        "capacity": 100,
+        "squareMeters": 50.0
+      },
+      "cell": {
+        "info": {
+          "uri": "uri1",
+          "ip": "",
+          "port": 8081
+        },
+        "sensors": []
+      },
+      "neighbors": [
+        {
+          "serial": 2,
+          "name": "Room B"
+        },
+        {
+          "serial": 4,
+          "name": "Room D"
+        }
+      ],
+      "passages": [
+        {
+          "neighborId": -1,
+          "startCoordinates": {
+            "x": 100,
+            "y": 140
+          },
+          "endCoordinates": {
+            "x": 100,
+            "y": 160
+          }
+        },
+        {
+          "neighborId": 2,
+          "startCoordinates": {
+            "x": 250,
+            "y": 130
+          },
+          "endCoordinates": {
+            "x": 250,
+            "y": 170
+          }
+        },
+        {
+          "neighborId": 4,
+          "startCoordinates": {
+            "x": 150,
+            "y": 200
+          },
+          "endCoordinates": {
+            "x": 210,
+            "y": 200
+          }
+        }
+      ],
+      "currentPeople": 20,
+      "practicability": 5.0
+    },
+    {
+      "info": {
+        "id": {
+          "serial": 2,
+          "name": "Room B"
+        },
+        "roomVertices": {
+          "northWest": {
+            "x": 250,
+            "y": 130
+          },
+          "northEast": {
+            "x": 330,
+            "y": 130
+          },
+          "southWest": {
+            "x": 250,
+            "y": 170
+          },
+          "southEast": {
+            "x": 330,
+            "y": 170
+          }
+        },
+        "antennaPosition": {
+          "x": 290,
+          "y": 150
+        },
+        "isEntryPoint": false,
+        "isExitPoint": false,
+        "capacity": 100,
+        "squareMeters": 50.0
+      },
+      "cell": {
+        "info": {
+          "ip": "",
+          "port": 8082,
+          "uri": "uri2"
+        },
+        "sensors": []
+      },
+      "neighbors": [
+        {
+          "serial": 1,
+          "name": "Room A"
+        },
+        {
+          "serial": 3,
+          "name": "Room C"
+        }
+      ],
+      "passages": [
+        {
+          "neighborId": 1,
+          "startCoordinates": {
+            "x": 250,
+            "y": 130
+          },
+          "endCoordinates": {
+            "x": 250,
+            "y": 170
+          }
+        },
+        {
+          "neighborId": 3,
+          "startCoordinates": {
+            "x": 330,
+            "y": 130
+          },
+          "endCoordinates": {
+            "x": 330,
+            "y": 170
+          }
+        }
+      ],
+      "currentPeople": 20,
+      "practicability": 5.0
+    },
+    {
+      "info": {
+        "id": {
+          "serial": 3,
+          "name": "Room C"
+        },
+        "roomVertices": {
+          "northWest": {
+            "x": 330,
+            "y": 100
+          },
+          "northEast": {
+            "x": 480,
+            "y": 100
+          },
+          "southWest": {
+            "x": 330,
+            "y": 200
+          },
+          "southEast": {
+            "x": 480,
+            "y": 200
+          }
+        },
+        "antennaPosition": {
+          "x": 390,
+          "y": 150
+        },
+        "isEntryPoint": false,
+        "isExitPoint": false,
+        "capacity": 100,
+        "squareMeters": 50.0
+      },
+      "cell": {
+        "info": {
+          "uri": "uri3",
+          "ip": "",
+          "port": 8083
+        },
+        "sensors": []
+      },
+      "neighbors": [
+        {
+          "serial": 2,
+          "name": "Room B"
+        },
+        {
+          "serial": 5,
+          "name": "Room E"
+        }
+      ],
+      "passages": [
+        {
+          "neighborId": 2,
+          "startCoordinates": {
+            "x": 330,
+            "y": 130
+          },
+          "endCoordinates": {
+            "x": 330,
+            "y": 170
+          }
+        },
+        {
+          "neighborId": 5,
+          "startCoordinates": {
+            "x": 380,
+            "y": 200
+          },
+          "endCoordinates": {
+            "x": 440,
+            "y": 200
+          }
+        }
+      ],
+      "currentPeople": 20,
+      "practicability": 5.0
+    },
+    {
+      "info": {
+        "id": {
+          "serial": 4,
+          "name": "Room D"
+        },
+        "roomVertices": {
+          "northWest": {
+            "x": 150,
+            "y": 200
+          },
+          "northEast": {
+            "x": 210,
+            "y": 200
+          },
+          "southWest": {
+            "x": 150,
+            "y": 250
+          },
+          "southEast": {
+            "x": 210,
+            "y": 250
+          }
+        },
+        "antennaPosition": {
+          "x": 175,
+          "y": 225
+        },
+        "isEntryPoint": false,
+        "isExitPoint": false,
+        "capacity": 100,
+        "squareMeters": 50.0
+      },
+      "cell": {
+        "info": {
+          "uri": "uri4",
+          "ip": "",
+          "port": 8084
+        },
+        "sensors": []
+      },
+      "neighbors": [
+        {
+          "serial": 1,
+          "name": "Room A"
+        },
+        {
+          "serial": 6,
+          "name": "Room F"
+        }
+      ],
+      "passages": [
+        {
+          "neighborId": 1,
+          "startCoordinates": {
+            "x": 150,
+            "y": 200
+          },
+          "endCoordinates": {
+            "x": 210,
+            "y": 200
+          }
+        },
+        {
+          "neighborId": 6,
+          "startCoordinates": {
+            "x": 150,
+            "y": 250
+          },
+          "endCoordinates": {
+            "x": 210,
+            "y": 250
+          }
+        }
+      ],
+      "currentPeople": 20,
+      "practicability": 5.0
+    },
+    {
+      "info": {
+        "id": {
+          "serial": 5,
+          "name": "Room E"
+        },
+        "roomVertices": {
+          "northWest": {
+            "x": 380,
+            "y": 200
+          },
+          "northEast": {
+            "x": 440,
+            "y": 200
+          },
+          "southWest": {
+            "x": 380,
+            "y": 250
+          },
+          "southEast": {
+            "x": 440,
+            "y": 250
+          }
+        },
+        "antennaPosition": {
+          "x": 410,
+          "y": 225
+        },
+        "isEntryPoint": false,
+        "isExitPoint": false,
+        "capacity": 100,
+        "squareMeters": 50.0
+      },
+      "cell": {
+        "info": {
+          "uri": "uri5",
+          "ip": "",
+          "port": 8085
+        },
+        "sensors": []
+      },
+      "neighbors": [
+        {
+          "serial": 3,
+          "name": "Room C"
+        },
+        {
+          "serial": 8,
+          "name": "Room H"
+        }
+      ],
+      "passages": [
+        {
+          "neighborId": 3,
+          "startCoordinates": {
+            "x": 380,
+            "y": 200
+          },
+          "endCoordinates": {
+            "x": 440,
+            "y": 200
+          }
+        },
+        {
+          "neighborId": 8,
+          "startCoordinates": {
+            "x": 380,
+            "y": 250
+          },
+          "endCoordinates": {
+            "x": 440,
+            "y": 250
+          }
+        }
+      ],
+      "currentPeople": 20,
+      "practicability": 5.0
+    },
+    {
+      "info": {
+        "id": {
+          "serial": 6,
+          "name": "Room F"
+        },
+        "roomVertices": {
+          "northWest": {
+            "x": 100,
+            "y": 250
+          },
+          "northEast": {
+            "x": 260,
+            "y": 250
+          },
+          "southWest": {
+            "x": 100,
+            "y": 400
+          },
+          "southEast": {
+            "x": 260,
+            "y": 400
+          }
+        },
+        "antennaPosition": {
+          "x": 175,
+          "y": 325
+        },
+        "isEntryPoint": false,
+        "isExitPoint": false,
+        "capacity": 100,
+        "squareMeters": 50.0
+      },
+      "cell": {
+        "info": {
+          "uri": "uri6",
+          "ip": "",
+          "port": 8086
+        },
+        "sensors": []
+      },
+      "neighbors": [
+        {
+          "serial": 4,
+          "name": "Room D"
+        },
+        {
+          "serial": 7,
+          "name": "Room G"
+        }
+      ],
+      "passages": [
+        {
+          "neighborId": 4,
+          "startCoordinates": {
+            "x": 150,
+            "y": 250
+          },
+          "endCoordinates": {
+            "x": 210,
+            "y": 250
+          }
+        },
+        {
+          "neighborId": 7,
+          "startCoordinates": {
+            "x": 260,
+            "y": 280
+          },
+          "endCoordinates": {
+            "x": 260,
+            "y": 370
+          }
+        }
+      ],
+      "currentPeople": 20,
+      "practicability": 5.0
+    },
+    {
+      "info": {
+        "id": {
+          "serial": 7,
+          "name": "Room G"
+        },
+        "roomVertices": {
+          "northWest": {
+            "x": 260,
+            "y": 280
+          },
+          "northEast": {
+            "x": 330,
+            "y": 280
+          },
+          "southWest": {
+            "x": 260,
+            "y": 370
+          },
+          "southEast": {
+            "x": 330,
+            "y": 370
+          }
+        },
+        "antennaPosition": {
+          "x": 295,
+          "y": 325
+        },
+        "isEntryPoint": false,
+        "isExitPoint": false,
+        "capacity": 100,
+        "squareMeters": 50.0
+      },
+      "cell": {
+        "info": {
+          "uri": "uri7",
+          "ip": "",
+          "port": 8087
+        },
+        "sensors": []
+      },
+      "neighbors": [
+        {
+          "serial": 6,
+          "name": "Room F"
+        },
+        {
+          "serial": 8,
+          "name": "Room H"
+        }
+      ],
+      "passages": [
+        {
+          "neighborId": 6,
+          "startCoordinates": {
+            "x": 260,
+            "y": 280
+          },
+          "endCoordinates": {
+            "x": 260,
+            "y": 370
+          }
+        },
+        {
+          "neighborId": 8,
+          "startCoordinates": {
+            "x": 330,
+            "y": 280
+          },
+          "endCoordinates": {
+            "x": 330,
+            "y": 370
+          }
+        }
+      ],
+      "currentPeople": 20,
+      "practicability": 5.0
+    },
+    {
+      "info": {
+        "id": {
+          "serial": 8,
+          "name": "Room H"
+        },
+        "roomVertices": {
+          "northWest": {
+            "x": 330,
+            "y": 250
+          },
+          "northEast": {
+            "x": 480,
+            "y": 250
+          },
+          "southWest": {
+            "x": 330,
+            "y": 400
+          },
+          "southEast": {
+            "x": 480,
+            "y": 400
+          }
+        },
+        "antennaPosition": {
+          "x": 405,
+          "y": 325
+        },
+        "isEntryPoint": false,
+        "isExitPoint": false,
+        "capacity": 100,
+        "squareMeters": 50.0
+      },
+      "cell": {
+        "info": {
+          "uri": "uri8",
+          "ip": "",
+          "port": 8088
+        },
+        "sensors": []
+      },
+      "neighbors": [
+        {
+          "serial": 5,
+          "name": "Room E"
+        },
+        {
+          "serial": 7,
+          "name": "Room G"
+        }
+      ],
+      "passages": [
+        {
+          "neighborId": 5,
+          "startCoordinates": {
+            "x": 380,
+            "y": 250
+          },
+          "endCoordinates": {
+            "x": 440,
+            "y": 250
+          }
+        },
+        {
+          "neighborId": 7,
+          "startCoordinates": {
+            "x": 330,
+            "y": 280
+          },
+          "endCoordinates": {
+            "x": 330,
+            "y": 370
+          }
+        }
+      ],
+      "currentPeople": 20,
+      "practicability": 5.0
+    }
+  ]
+}
