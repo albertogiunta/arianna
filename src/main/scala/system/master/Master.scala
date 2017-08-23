@@ -9,6 +9,7 @@ import system.ontologies.messages.AriadneMessage
 import system.ontologies.messages.MessageType.Init
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 /**
   * Created by Alessandro on 29/06/2017.
   */
@@ -43,11 +44,16 @@ class Master(mediator: ActorRef) extends CustomActor {
     
         case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) =>
             publisher ! msg
-            context.system.terminate().onComplete(_ => {
-                println("Ariadne has shat down...");
-                System.exit(1)
-            })
     
+            Future {
+                Thread.sleep(10000)
+            }.onComplete(_ => {
+                context.system.terminate.onComplete(_ => {
+                    println("Ariadne has shat down...")
+                    System.exit(1)
+                })
+            })
+
         case msg => log.info("Ignoring {}", msg)
     }
 }
