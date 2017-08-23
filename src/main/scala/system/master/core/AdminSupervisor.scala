@@ -24,6 +24,7 @@ class AdminSupervisor extends CustomActor {
     
     private val toAdmin: MessageDirection = Location.Master >> Location.Admin
     private val fromAdmin: MessageDirection = Location.Admin >> Location.Master
+    println("akka.tcp://" + NamingSystem.AdminActorSystem + "@" + IPAddress + ":" + port + "/user/" + NamingSystem.AdminManager)
     private val admin = context.actorSelection("akka.tcp://" + NamingSystem.AdminActorSystem + "@" + IPAddress + ":" + port + "/user/" + NamingSystem.AdminManager)
     private val topologySupervisor: ActorSelection = sibling(NamingSystem.TopologySupervisor).get
     private val publisher: ActorSelection = sibling(NamingSystem.Publisher).get

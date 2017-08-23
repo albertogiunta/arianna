@@ -25,7 +25,7 @@ class InterfaceManager extends TemplateActor {
 
     private var interfaceController: InterfaceController = _
     private val chartActors: mutable.Map[RoomID, ActorRef] = new mutable.HashMap[RoomID, ActorRef]
-    private var roomIDs: mutable.Map[CellInfo, RoomID] = new mutable.HashMap[CellInfo, RoomID]
+    private var roomIDs: mutable.Map[String, RoomID] = new mutable.HashMap[String, RoomID]
     val counter: Counter = new Counter(0)
     
     
@@ -47,8 +47,9 @@ class InterfaceManager extends TemplateActor {
 
     override def receptive: Receive = {
         case msg@AriadneMessage(_, Topology.Subtype.Planimetrics, _, area: Area) => {
-            area.rooms.foreach(r => roomIDs += ((r.cell.info, r.info.id)))
+            area.rooms.foreach(r => roomIDs += ((r.cell.info.uri, r.info.id)))
             parent ! msg
+            println("Rooms " + roomIDs.toString)
             context.become(initializer)
         }
 
@@ -57,15 +58,19 @@ class InterfaceManager extends TemplateActor {
     }
 
     def initializer(): Receive = {
+        case msg@AriadneMessage(Topology, Topology.Subtype.Acknowledgement, _, _) => interfaceController connected true
+
         case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => {
             log.info("Received an handshake with sensor data")
             counter.++
-            interfaceController.initializeSensors(sensorsInfo, roomIDs.get(sensorsInfo.cell).get)
+            interfaceController.initializeSensors(sensorsInfo, roomIDs.get(sensorsInfo.cell.uri).get)
             if (counter == roomIDs.size) {
                 context.become(operational)
                 log.info("Finish initialize sensors, now become operational")
             }
         }
+
+        case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => parent ! msg
 
         case _ => desist _
 
@@ -76,6 +81,7 @@ class InterfaceManager extends TemplateActor {
         case msg@AriadneMessage(Topology, Topology.Subtype.Acknowledgement, _, _) => interfaceController connected true
 
         case msg@AriadneMessage(_, MessageType.Update.Subtype.Admin, _, adminUpdate: AdminUpdate) => {
+            log.info("Received update values")
             val updateCells: mutable.Map[RoomID, RoomDataUpdate] = new mutable.HashMap[RoomID, RoomDataUpdate]
             adminUpdate.list.foreach(update => updateCells += ((update.room, update)))
             interfaceController updateView updateCells.values.toList

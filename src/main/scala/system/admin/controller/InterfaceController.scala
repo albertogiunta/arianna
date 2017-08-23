@@ -149,13 +149,15 @@ class InterfaceController extends ViewController {
       * This method set the Status text value, showing if the Master node is connected to the application
       **/
     def connected(isConnected: Boolean): Unit = {
-        if (isConnected) {
-            status setFill Color.GREEN
-            status setText InterfaceText.connected
-        } else {
-            status setFill Color.RED
-            status setText InterfaceText.disconnected
-        }
+        Platform.runLater(() => {
+            if (isConnected) {
+                status setFill Color.GREEN
+                status setText InterfaceText.connected
+            } else {
+                status setFill Color.RED
+                status setText InterfaceText.disconnected
+            }
+        })
 
     }
 
