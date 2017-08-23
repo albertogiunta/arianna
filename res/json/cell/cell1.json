@@ -11,7 +11,7 @@
             "maxValue": 100.0,
             "threshold": {
                 "lowThreshold": -10,
-                "highThreshold": 50
+                "highThreshold": 80
             }
         },
         {
@@ -19,16 +19,16 @@
             "minValue": 0.0,
             "maxValue": 50.0,
             "threshold": {
-                "value": 30
+                "value": 40
             }
         },
         {
             "categoryId": 3,
             "minValue": 0,
-          "maxValue": 100,
+            "maxValue": 100,
             "threshold": {
                 "lowThreshold": 20,
-              "highThreshold": 101
+                "highThreshold": 101
             }
         }
     ]
