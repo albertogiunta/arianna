@@ -37,7 +37,7 @@ object TryClusterJoin extends App {
         Handshake.Subtype.CellToMaster,
         Location.Cell >> Location.Master,
         SensorsInfoUpdate(
-            CellInfo("uri", 0),
+            CellInfo("uri", "0.0.0.0", 0),
             List(SensorInfo(1, 2.0), SensorInfo(2, 1.55))
         )
     )

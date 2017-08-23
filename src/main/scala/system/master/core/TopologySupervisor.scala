@@ -86,12 +86,8 @@ class TopologySupervisor extends TemplateActor {
     
             log.info("Received handshake from cell {}", cell.uri)
     
-            val uri = cell.uri.split("/", 2).tail.head
-    
-            if (indexByUri.get(uri).nonEmpty && !alreadyMapped(cell.uri)) {
+            if (indexByUri.get(cell.uri).nonEmpty && !alreadyMapped(cell.uri)) {
         
-                indexByUri.put(cell.uri, indexByUri.remove(uri).get)
-                
                 log.info("Found a match into the loaded Topology for {}", cell.uri)
     
                 val newRoom = topology(indexByUri(cell.uri)).copy(cell = cnt)

@@ -11,8 +11,8 @@ object AriannaJsonProtocol extends DefaultJsonProtocol {
     implicit val pointFormat: RootJsonFormat[Point] = jsonFormat2(Point.apply)
     implicit val coordinatesFormat: RootJsonFormat[Coordinates] = jsonFormat4(Coordinates.apply)
     implicit val passageFormat: RootJsonFormat[Passage] = jsonFormat3(Passage)
-
-    implicit val infoCellFormat: RootJsonFormat[CellInfo] = jsonFormat2(CellInfo.apply)
+    
+    implicit val infoCellFormat: RootJsonFormat[CellInfo] = jsonFormat3(CellInfo.apply)
     implicit val roomIDFormat: RootJsonFormat[RoomID] = jsonFormat2(RoomID.apply)
     implicit val rcInfoFormat: RootJsonFormat[RCInfo] = jsonFormat2(RCInfo.apply)
     implicit val infoRoomFormat: RootJsonFormat[RoomInfo] = jsonFormat7(RoomInfo.apply)

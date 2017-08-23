@@ -114,10 +114,10 @@ object Cell {
   * @param uri  The URI that point to this Cell
   * @param port The port on which the cell is listening for user connections
   */
-final case class CellInfo(uri: String, port: Int) extends MessageContent
+final case class CellInfo(uri: String, ip: String, port: Int) extends MessageContent
 
 object CellInfo {
-    def empty: CellInfo = CellInfo("", Int.MinValue)
+    def empty: CellInfo = CellInfo("", "0.0.0.0", Int.MinValue)
 }
 
 /**

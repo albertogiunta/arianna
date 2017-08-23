@@ -16,8 +16,8 @@ class WatchDogSupervisor extends CustomActor {
     private val synced: Counter = Counter()
     
     override def receive: Receive = {
-        
-        case CellInfo(uri, _) if actorByUri.get(uri).isEmpty =>
+    
+        case CellInfo(uri, _, _) if actorByUri.get(uri).isEmpty =>
             log.info("Watching {}", sender.path)
             actorByUri.put(uri, sender -> new CellWatchDog(self, uri))
             synced ++

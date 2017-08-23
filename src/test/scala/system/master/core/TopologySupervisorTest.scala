@@ -27,7 +27,7 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
     val path2Project: String = Paths.get("").toFile.getAbsolutePath
     val path2map: String = path2Project + "/res/json/map4test.json"
     
-    val cellInfo = CellInfo(uri = "PancoPillo", port = 8080)
+    val cellInfo = CellInfo(uri = "PancoPillo", ip = "0.0.0.0", port = 8080)
     val plan: Area = Planimetrics.unmarshal(Source.fromFile(new File(path2map)).getLines.mkString)
     val sensorsInfo = SensorsInfoUpdate(cellInfo, List(SensorInfo(1, 10.0)))
     val currentPeople = CurrentPeopleUpdate(RoomID(serial = 777, name = "PancoPillo"), 777)

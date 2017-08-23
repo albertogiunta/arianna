@@ -31,7 +31,7 @@ class MasterSubscriberTest extends TestKit(ActorSystem("SubscriberTest", MasterS
     
     val plan: String = Source.fromFile(new File(path2map)).getLines.mkString
     
-    val cellInfo = CellInfo(uri = "PancoPillo", port = 8080)
+    val cellInfo = CellInfo(uri = "PancoPillo", ip = "0.0.0.0", port = 8080)
     
     val handshake = AriadneMessage(
         Handshake,

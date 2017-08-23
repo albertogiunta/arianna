@@ -15,7 +15,7 @@ class RouteProcessingTest extends FunSuite with BeforeAndAfter {
     
     val infoCells: Map[Int, (CellInfo, RoomInfo)] = (1 to 9).map(i => i ->
         (
-            CellInfo(uri = "http://Arianna/Cell" + i + "@127.0.0.1:" + Random.nextInt(65535) + "/", port = 0),
+            CellInfo(uri = "uri/Cell1", "127.0.0.1", port = 25521),
             RoomInfo(
                 id = RoomID(i, "Cell" + i),
                 isEntryPoint = if (i == 2 || i == 8) true else false,

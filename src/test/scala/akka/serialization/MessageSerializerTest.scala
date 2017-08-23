@@ -13,7 +13,7 @@ class MessageSerializerTest extends FunSuite with BeforeAndAfter {
     var jsonStr: String = MessageType.Update.Subtype.Sensors
         .marshal(
             SensorsInfoUpdate(
-                CellInfo("uri", 0),
+                CellInfo("uri", "127.0.0.1", 0),
                 List(SensorInfo(1, 2.0), SensorInfo(2, 1.55))
             )
         )
