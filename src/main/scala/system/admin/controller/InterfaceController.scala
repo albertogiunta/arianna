@@ -84,7 +84,7 @@ class InterfaceController extends ViewController {
     /**
       * This method add all the information about sensors of a single Cell after getting it from the System
       *
-      * @param sensorsInfo : SensorsInfoUpdate object containing sensors data of a system.cell
+      * @param sensorsInfo : SensorsInfoUpdate object containing sensors data of a cell
       *
       **/
     def initializeSensors(sensorsInfo: SensorsInfoUpdate, roomID: RoomID): Unit = {

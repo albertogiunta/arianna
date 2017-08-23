@@ -16,8 +16,8 @@ class WatchDogSupervisor extends CustomActor {
     private val synced: Counter = Counter()
     
     override def receive: Receive = {
-        
-        case CellInfo(uri, _) if actorByUri.get(uri).isEmpty =>
+    
+        case CellInfo(uri, _, _) if actorByUri.get(uri).isEmpty =>
             log.info("Watching {}", sender.path)
             actorByUri.put(uri, sender -> new CellWatchDog(self, uri))
             synced ++
@@ -51,7 +51,7 @@ class WatchDogSupervisor extends CustomActor {
     /**
       *
       * @param actorToNotifyTimeOut the actor that will be notified when the time exceed
-      * @param hookedCell           the system.cell to which this WatchDog is associated
+      * @param hookedCell           the cell to which this WatchDog is associated
       * @param waitTime             the time value after which the actor will be notified,
       *                             the default value is the waitTime value specified in the WatchDog companion object
       */

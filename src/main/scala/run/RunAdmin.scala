@@ -14,21 +14,18 @@ import system.ontologies.messages.MessageType.Init
 import system.ontologies.messages.{AriadneMessage, Greetings, Location}
 
 object RunAdmin extends App with LoaderListener {
-
-    override def main(args: Array[String]): Unit = {
-        new JFXPanel
-        Platform.runLater(() => {
-            val loader = new LoaderView
-            loader.start()
-            loader.controller.listener = this
-        })
-
-    }
-
+    
+    new JFXPanel
+    Platform.runLater(() => {
+        val loader = new LoaderView
+        loader.start()
+        loader.controller.listener = this
+    })
+    
     override def onLoadConfig(path2Config: String): Unit = {
         val config = ConfigFactory.parseFile(new File(path2Config)).resolve
         val system = ActorSystem.create(NamingSystem.AdminActorSystem, config)
-        var admin = system.actorOf(Props[AdminManager], NamingSystem.AdminManager)
+        val admin = system.actorOf(Props[AdminManager], NamingSystem.AdminManager)
         admin ! AriadneMessage(Init, Init.Subtype.Greetings, Location.Admin >> Location.Self, Greetings(List.empty))
     }
 }

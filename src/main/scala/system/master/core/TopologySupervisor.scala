@@ -62,6 +62,7 @@ class TopologySupervisor extends TemplateActor {
                 mapVersionID = map.id
     
                 topology = mutable.HashMap(map.rooms.map(room => room.info.id.name -> room): _*)
+    
                 indexByUri = mutable.HashMap(map.rooms.map(room => room.cell.info.uri -> room.info.id.name): _*)
                 
                 context.become(behavior = sociable, discardOld = true)
@@ -83,10 +84,10 @@ class TopologySupervisor extends TemplateActor {
 
         case msg@AriadneMessage(Handshake, CellToMaster, `cellToMaster`, cnt@SensorsInfoUpdate(cell, _)) =>
     
-            log.info("Received handshake from system.cell {}", cell.uri)
+            log.info("Received handshake from cell {}", cell.uri)
     
             if (indexByUri.get(cell.uri).nonEmpty && !alreadyMapped(cell.uri)) {
-                
+        
                 log.info("Found a match into the loaded Topology for {}", cell.uri)
     
                 val newRoom = topology(indexByUri(cell.uri)).copy(cell = cnt)

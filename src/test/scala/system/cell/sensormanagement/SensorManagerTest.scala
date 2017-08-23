@@ -41,7 +41,7 @@ class SensorManagerTest extends TestKit(ActorSystem("SensorManagerTest",
         SingleThresholdInfo(30))
 
     var loadedConfig: CellConfig = CellConfig(
-        CellInfo("uriTest", 8080),
+        CellInfo("uriTest", "127.0.0.1", 8080),
         List(tempSensConfig, smokeSensConfig))
 
     val sensorsNumber = loadedConfig.sensors.size

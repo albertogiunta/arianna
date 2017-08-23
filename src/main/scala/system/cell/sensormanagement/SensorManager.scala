@@ -15,7 +15,7 @@ import scala.collection.mutable.{ListBuffer, _}
 /**
   * This class implements an Actor that manage the different sensors of the cell,
   * It is responsive to the sensor update and checks if the sensors values exceeds
-  * the threshold (set in the configuration file of the system.cell) in an reactive way
+  * the threshold (set in the configuration file of the cell) in an reactive way
   * Created by Matteo Gabellini on 05/07/2017.
   */
 class SensorManager extends TemplateActor {
