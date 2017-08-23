@@ -74,8 +74,8 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
         val cellConfiguration = Source.fromFile(args.head.asInstanceOf[String]).getLines.mkString
         val loadedConfig = cellConfiguration.parseJson.convertTo[CellConfig]
         if (loadedConfig.cellInfo == CellInfo.empty) throw IncorrectConfigurationException(this.name)
-        localCellInfo = loadedConfig.cellInfo
-        localCellInfo.ip = InetAddress.getLocalHost.getHostAddress
+    
+        localCellInfo = loadedConfig.cellInfo.copy(ip = InetAddress.getLocalHost.getHostAddress)
         sensorManager ! AriadneMessage(Init,
             Init.Subtype.Greetings,
             self2Self,
