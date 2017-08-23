@@ -31,7 +31,7 @@ class UserManager extends TemplateActor with ActorLogging {
     var usrNumber = 0
     var areaForCell: AreaViewedFromACell = _
     var areaForUser: AreaViewedFromAUser = _
-    var alarmMessage: AriadneMessage[MessageContent] = _
+    var alarmMessage: String = _
     var isAlarmed: Boolean = false
 
 
@@ -71,8 +71,9 @@ class UserManager extends TemplateActor with ActorLogging {
             request match {
                 case RouteRequest(_, _, _, false) => s.sendRouteToUsers(response, RouteResponseShort(route).toJson.toString())
                 case RouteRequest(_, _, _, true) =>
-                    s.sendAlarmToUsers(RouteResponseShort(route).toJson.toString())
-                    alarmMessage = msg
+                    val routeAsString = RouteResponseShort(route).toJson.toString()
+                    s.sendAlarmToUsers(routeAsString)
+                    alarmMessage = routeAsString
                     isAlarmed = true
                 //                    context.become(operationalWithAlarm)
             }
@@ -113,12 +114,12 @@ class UserManager extends TemplateActor with ActorLogging {
     private def doOnEveryNewConnection() {
         incrementUserNumber()
         sendCurrentPeopleUpdate()
-        if (isAlarmed) s.sendAlarmToUsers(alarmMessage.content.asInstanceOf[RouteResponse].route.toJson.toString())
+        if (isAlarmed) s.sendAlarmToUsers(alarmMessage)
     }
     
     private def incrementUserNumber(): Unit = usrNumber = usrNumber + 1
-    
-    private def decrementUserNumber(): Unit = usrNumber = usrNumber - 1
+
+    private def decrementUserNumber(): Unit = usrNumber = if (usrNumber > 0) usrNumber - 1 else usrNumber
 
     private def sendCurrentPeopleUpdate(): Unit = {
         parent ! AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, CurrentPeopleUpdate(RoomID(serial, uri), usrNumber))
