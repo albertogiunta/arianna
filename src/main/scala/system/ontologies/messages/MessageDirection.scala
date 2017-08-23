@@ -108,6 +108,7 @@ object Location {
         val cellToCluster: MessageDirection = Location.Cell >> Location.Cluster
         val cellToUser: MessageDirection = Location.Cell >> Location.User
         val userToCell: MessageDirection = cellToUser.reverse
+        val cellToCell: MessageDirection = Location.Cell >> Location.Cell
     }
 
 }

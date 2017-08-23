@@ -14,7 +14,7 @@ import system.ontologies.messages._
 /**
   * Created by Matteo Gabellini on 10/07/2017.
   */
-class TestPracticabilityExchange extends App {
+class TryPracticabilityExchange extends App {
 
     val path2Project = Paths.get("").toFile.getAbsolutePath
     val path2Config = path2Project + "/conf/cell.conf"

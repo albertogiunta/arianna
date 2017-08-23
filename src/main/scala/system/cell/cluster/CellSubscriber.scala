@@ -5,9 +5,8 @@ import com.actors.{ClusterMembersListener, TemplateSubscriber}
 import system.exceptions.IncorrectInitMessageException
 import system.names.NamingSystem
 import system.ontologies._
-import system.ontologies.messages.Location._
+import system.ontologies.messages.AriadneMessage
 import system.ontologies.messages.MessageType._
-import system.ontologies.messages.{AriadneMessage, Location, MessageDirection}
 
 /**
   * An actor that models a Cell receiver for the Cells-MasterServer
@@ -24,9 +23,6 @@ class CellSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) {
         Topic.Practicabilities,
         Topic.ShutDown
     )
-    
-    private val cell2Server: MessageDirection = Location.Master << Location.Cell
-    private val server2Cell: MessageDirection = Location.Master >> Location.Cell
     
     override protected def init(args: List[String]): Unit = {
         super.init(args)
