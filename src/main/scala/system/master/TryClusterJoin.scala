@@ -19,7 +19,7 @@ import system.ontologies.messages._
   */
 object TryClusterJoin extends App {
     val path2Project = Paths.get("").toFile.getAbsolutePath
-    val path2Config = path2Project + "/res/conf/akka/system.cell.conf"
+    val path2Config = path2Project + "/res/conf/akka/cell.conf"
 
     implicit val config = ConfigFactory.parseFile(new File(path2Config))
         .withFallback(ConfigFactory.load()).resolve()

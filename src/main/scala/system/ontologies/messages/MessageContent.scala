@@ -25,11 +25,11 @@ final case class Passage(neighborId: Int,
 
 /**
   * This class is the correspondent class-mapping of
-  * the json configuration file used by a system.cell during
+  * the json configuration file used by a cell during
   * its boot
   *
-  * @param cellInfo represent the system.cell basic information
-  *                 used to set up the system.cell actors (uri & connection port)
+  * @param cellInfo represent the cell basic information
+  *                 used to set up the cell actors (uri & connection port)
   * @param sensors  is the list of Sensor configurations to load
   **/
 final case class CellConfig(cellInfo: CellInfo, sensors: List[SensorInfoFromConfig]) extends MessageContent
@@ -112,7 +112,7 @@ object Cell {
   * This Class is a Static representation of a Cell
   *
   * @param uri  The URI that point to this Cell
-  * @param port The port on which the system.cell is listening for user connections
+  * @param port The port on which the cell is listening for user connections
   */
 final case class CellInfo(uri: String, port: Int) extends MessageContent
 
@@ -124,7 +124,7 @@ object CellInfo {
   * This class wrap toeghter identification info for both a Room and a Cell
   *
   * @param room The room associated to the Cell
-  * @param cell The system.cell associated to the room
+  * @param cell The cell associated to the room
   */
 final case class RCInfo(room: RoomID, cell: CellInfo) extends MessageContent
 
@@ -198,7 +198,7 @@ object AreaViewedFromACell {
   * View of another Cell from the perspective of a Cell
   *
   * @param cell           Static Info of a Cell
-  * @param neighbors      Cells near this system.cell
+  * @param neighbors      Cells near this cell
   * @param passages       Openings that lead to neighbor Cells
   * @param practicability How much likely you should walk through this Room
   */
@@ -217,7 +217,7 @@ object RoomViewedFromACell {
   * View of a Cell from the Perspective of a User
   *
   * @param info      Static Info of a Cell
-  * @param neighbors Cells near this system.cell
+  * @param neighbors Cells near this cell
   * @param passages  Openings that lead to neighbor Cells
   */
 final case class RoomViewedFromAUser(info: RoomInfo,
@@ -274,7 +274,7 @@ object CurrentPeopleUpdate {
 final case class SensorInfo(categoryId: Int, value: Double) extends MessageContent
 
 /**
-  * This is the information that a system.cell load during the start up
+  * This is the information that a cell load during the start up
   * configuration relative to a sensor that must be initialized
   *
   * @param categoryId the sensor category
@@ -331,7 +331,7 @@ object SensorsInfoUpdate {
   * This case Class is only meant to be used under the hood of a List into LightArea representations.
   *
   * This class give a simplified view of a Cell for other cells, contaning the new number of people
-  * and the calculated practicability level for the system.cell to be updated
+  * and the calculated practicability level for the cell to be updated
   *
   * @param room           The Identification Info of the room to be updated.
   * @param practicability The actual practicability level of the Room.
@@ -348,7 +348,7 @@ object PracticabilityUpdate {
   *
   * This Class grant a simplified view of a Cell, only containing dynamic and identification Info of it
   *
-  * @param cell          Identification Info of the system.cell and the room
+  * @param cell          Identification Info of the cell and the room
   * @param currentPeople Actual number of people inside the Room
   *
   */
@@ -396,7 +396,7 @@ final case class Greetings(args: List[String]) extends MessageContent
 /**
   * This case class in meant to be sent as Content for Alarm sent by Cells to other Cells and the Master
   *
-  * @param info The info of the system.cell associated to the room that had the alarm triggered
+  * @param info The info of the cell associated to the room that had the alarm triggered
   * @param room The room where the Alarm has originated
   */
 final case class AlarmContent(info: CellInfo, room: RoomInfo) extends MessageContent
@@ -413,10 +413,10 @@ final case class Empty() extends MessageContent
 
 /**
   * This Case Class is meant to be used as a Content for Messages inside the Admin System in order to update the view
-  * with new data from a single system.cell
+  * with new data from a single cell
   *
-  * @param id            : Int representing system.cell ID
-  * @param name          : String containing system.cell name
+  * @param id            : Int representing cell ID
+  * @param name          : String containing cell name
   * @param currentPeople : Int values how the actual number of people inside the room
   * @param sensors       : list of Sensor object containing updated values coming from them
   **/
@@ -424,9 +424,9 @@ final case class CellForView(id: Int, name: String, currentPeople: Int, sensors:
 
 /**
   * This Case Class is meant to be used as a Content for Messages inside the Admin Systemi in order to initialize
-  * the charts with information about a single system.cell
+  * the charts with information about a single cell
   *
-  * @param cell      : RCInfo object containing all information about the system.cell
+  * @param cell      : RCInfo object containing all information about the cell
   * @param sensorsId : list of Int representing the sensor ID inside the room
   *
   **/

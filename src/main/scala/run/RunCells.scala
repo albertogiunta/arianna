@@ -28,7 +28,7 @@ object RunCells extends App {
     (1 to 15) map {
         i =>
             val core = system.actorOf(Props(new CellCoreActor(middleware)), "CellCore" + i)
-            val configPath: String = "res/json/system.cell/system.cell" + i + ".json"
+            val configPath: String = "res/json/cell/cell" + i + ".json"
             core ! AriadneMessage(Init, Init.Subtype.Greetings,
                 Location.Master >> Location.Self, Greetings(List(configPath)))
     }
@@ -37,7 +37,7 @@ object RunCells extends App {
     //    var core = system.actorOf(Props(new CellCoreActor(middleware)), NamingSystem.CellCore)
     //    var server2Cell = Location.Master >> Location.Cell
     //    Thread.sleep(500)
-    //    private val configPath: String = "res/json/system.cell/cell1.json"
+    //    private val configPath: String = "res/json/cell/cell1.json"
     //    core ! AriadneMessage(Init, Init.Subtype.Greetings,
     //        Location.Master >> Location.Self, Greetings(List(configPath)))
 }

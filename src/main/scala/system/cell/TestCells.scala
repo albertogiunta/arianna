@@ -12,7 +12,7 @@ import system.ontologies.messages.Location
   */
 object TestCells extends App {
     /*val path2Project = Paths.get("").toFile.getAbsolutePath
-    val path2Config = path2Project + "/res/conf/akka/system.cell.conf"
+    val path2Config = path2Project + "/res/conf/akka/cell.conf"
 
     implicit val config = ConfigFactory.parseFile(new File(path2Config))
         .withFallback(ConfigFactory.load()).resolve()
@@ -49,7 +49,7 @@ object TestCells extends App {
     //    (1 to 15) map {
     //        i =>
     //            val core = system.actorOf(Props[CellCoreActor], "CellCore" + i)
-    //            val configPath: String = "res/json/system.cell/system.cell" + i + ".json"
+    //            val configPath: String = "res/json/cell/cell" + i + ".json"
     //            core ! AriadneMessage(Init, Init.Subtype.Greetings,
     //                Location.Master >> Location.Self, Greetings(List(configPath)))
     //    }
@@ -65,10 +65,10 @@ object TestCells extends App {
     //def areaForCell: AreaViewedFromACell = AreaViewedFromACell(loadArea)
 
     //    Thread.sleep(500)
-    //    private val configPath: String = "res/json/system.cell/cell1.json"
+    //    private val configPath: String = "res/json/cell/cell1.json"
     //    core ! AriadneMessage(Init, Init.Subtype.Greetings,
     //        Location.Master >> Location.Self, Greetings(List(configPath)))
     
-    //println("Area sended to system.cell core")
+    //println("Area sended to cell core")
     //core ! AriadneMessage(Topology, Topology4Cell, server2Cell, areaForCell)
 }

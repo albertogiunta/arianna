@@ -70,9 +70,9 @@ object RouteProcessor {
       * This compute the SHP from Cell A to Cell B,
       * doing the need transformation from the given list of cells to a graph
       *
-      * @param fromRoom The source system.cell on which compute the SHP
-      * @param toRoom   The terget system.cell on which compute the SHP
-      * @param rooms    The List of system.cell composing the graph
+      * @param fromRoom The source cell on which compute the SHP
+      * @param toRoom   The terget cell on which compute the SHP
+      * @param rooms    The List of cell composing the graph
       * @return A Future that will Asynchronously compute the Route
       */
     def computeRoute(fromRoom: String, toRoom: String, rooms: List[RoomViewedFromACell]): Future[(List[RoomID], Double)] =

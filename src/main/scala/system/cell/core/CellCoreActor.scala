@@ -22,8 +22,8 @@ import scala.io.Source
 import scala.util.Random
 
 /**
-  * This is the main actor of a system.cell, it provide the main system.cell management and
-  * the other system.cell's actors initialization
+  * This is the main actor of a cell, it provide the main cell management and
+  * the other cell's actors initialization
   * Created by Matteo Gabellini on 14/07/2017.
   */
 class CellCoreActor(mediator: ActorRef) extends TemplateActor {
@@ -66,7 +66,7 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
     }
     
     override protected def init(args: List[String]): Unit = {
-        log.info("Hello there! the system.cell core is being initialized")
+        log.info("Hello there! the cell core is being initialized")
 
         clusterListener = context.actorOf(Props[CellClusterSupervisor], NamingSystem.CellClusterSupervisor)
         val cellConfiguration = Source.fromFile(args.head.asInstanceOf[String]).getLines.mkString
@@ -83,7 +83,7 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
     override protected def receptive: Receive = {
 
         case msg@AriadneMessage(Info, Info.Subtype.Request, this.self2Self, cnt: SensorsInfoUpdate) => {
-            //Informations request from the system.cell publisher in order to complete the handshake task with the system.master
+            //Informations request from the cell publisher in order to complete the handshake task with the system.master
             if (sensorsMounted.isEmpty) {
                 log.debug("Sensor Data not yet ready, stash the info request")
                 stash()
@@ -139,7 +139,7 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
     protected def cultured: Receive = ({
 
         case msg@AriadneMessage(Alarm, _, this.self2Self, _) => {
-            //Alarm triggered in the current system.cell
+            //Alarm triggered in the current cell
             //Check if the topology is initialized
             if (topology.nonEmpty) {
                 val currentCell: RoomViewedFromACell = topology(indexByUri(localCellInfo.uri))

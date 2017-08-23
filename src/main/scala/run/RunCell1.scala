@@ -30,5 +30,5 @@ object RunCell1 extends App {
     var core = system.actorOf(Props(new CellCoreActor(middleware)), NamingSystem.CellCore + 1)
     
     core ! AriadneMessage(Init, Init.Subtype.Greetings,
-        Location.Master >> Location.Self, Greetings(List("res/json/system.cell/cell1.json")))
+        Location.Master >> Location.Self, Greetings(List("res/json/cell/cell1.json")))
 }

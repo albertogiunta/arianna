@@ -28,7 +28,7 @@ class CellPublisher(mediator: ActorRef) extends TemplatePublisher(mediator) {
         if (args.head != ClusterMembersListener.greetings) throw new Exception()
         log.info("Hello there from {}!", name)
     
-        //Ask to the core actor the system.cell information in order to continue the handshake task
+        //Ask to the core actor the cell information in order to continue the handshake task
         parent ! AriadneMessage(
             Info,
             Info.Subtype.Request,
@@ -59,7 +59,7 @@ class CellPublisher(mediator: ActorRef) extends TemplatePublisher(mediator) {
             this.context.become(cultured, discardOld = true)
             log.info("I've become cultured")
         case WatchDogNotification => {
-            //Ask to the core actor the system.cell information in order to continue the handshake task
+            //Ask to the core actor the cell information in order to continue the handshake task
             parent ! AriadneMessage(
                 Info,
                 Info.Subtype.Request,

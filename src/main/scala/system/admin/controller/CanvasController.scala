@@ -59,7 +59,7 @@ class CanvasController extends ViewController {
     /**
       * This method draws on the Canvas a rectangle representing the Cell passed as parameter
       *
-      * @param room : system.cell to be drawn
+      * @param room : cell to be drawn
       *
       * */
     def drawOnMap(room: Room): Unit = {
@@ -74,7 +74,7 @@ class CanvasController extends ViewController {
     /**
       * This method handles the alarm, redrawing and marking on the interface the room from which the alarm comes
       *
-      * @param id : id of the system.cell where the alarm comes from
+      * @param id : id of the cell where the alarm comes from
       *
       * */
     def handleAlarm(id: String): Unit = {

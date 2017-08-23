@@ -127,7 +127,7 @@ object SensorsFactory {
 
     /**
       * A method that automatic create the correct sensor instance from a SensorInfoFromConfig
-      * loaded from the json file of the system.cell configuration
+      * loaded from the json file of the cell configuration
       *
       * @param sensorInfo the sensor info loaded from the config json file
       **/

@@ -21,7 +21,7 @@ object RunCellN extends App {
     
     if (args.length == REQUIRED_ARGS) {
     
-        // "*root*/res/conf/test/testCell1.conf" "*root*/res/json/system.cell/cell1.json"
+        // "*root*/res/conf/test/testCell1.conf" "*root*/res/json/cell/cell1.json"
         val path2AkkaConfig = args(0)
         val pathToCellConfig = args(1)
         

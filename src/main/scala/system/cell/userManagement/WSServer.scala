@@ -58,7 +58,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
     }
     
     /**
-      * Called after a user asks to connect to a specific system.cell but was already present in the system,
+      * Called after a user asks to connect to a specific cell but was already present in the system,
       * hence he
       * doesn't need no further information about it
       *
@@ -71,7 +71,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
     }
     
     /**
-      * Called when the user first connects to a system.cell, he should receive the area, so that he can
+      * Called when the user first connects to a cell, he should receive the area, so that he can
       * complete his work
       * on his end
       *
@@ -84,7 +84,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
     }
     
     /**
-      * Called when a user disconnects from a system.cell because he wants to connect to the next one
+      * Called when a user disconnects from a cell because he wants to connect to the next one
       */
     def disconnectUsers(): Unit = {
         Log.info("Waiting for DISCONNECTION " + usersWaitingForDisconnection.size)
@@ -108,7 +108,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
       * Called when an alarm is the detected in the system and should be propagated to all the end
       * users
       *
-      * @param routeAsJson the marshaled version of the route from this system.cell to the exit
+      * @param routeAsJson the marshaled version of the route from this cell to the exit
       */
     def sendAlarmToUsers(routeAsJson: String): Unit = {
         usersReadyForAlarm.foreach(p => p._2.writeTextMessage(routeAsJson))

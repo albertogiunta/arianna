@@ -9,7 +9,7 @@ import system.ontologies.messages.MessageType.Route.Subtype.{Info, Response}
 import system.ontologies.messages._
 
 /**
-  * This Actor manages the processing of Route from a system.cell A to a system.cell B.
+  * This Actor manages the processing of Route from a cell A to a cell B.
   *
   * It either calculates the route from scratch or retrieves it from a caching actor
   *
