@@ -35,7 +35,7 @@ object RunUser {
         val path2Project = Paths.get("").toFile.getAbsolutePath
         val path2Config = path2Project + "/res/conf/test/application.conf"
         //        val path2map: String = path2Project + "/res/json/map15_room.json"
-        val path2map: String = path2Project + "/res/json/map2.json"
+        val path2map: String = path2Project + "/res/json/map2forUser.json"
         val config = ConfigFactory.parseFile(new File(path2Config))
         val system = ActorSystem.create("userSystem", config.getConfig("user"))
 
