@@ -69,11 +69,14 @@ class InterfaceManager extends TemplateActor {
             }
         }
 
+        case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => parent ! msg
+
         case _ => desist _
 
     }
 
     def operational: Receive = {
+
         case msg@AriadneMessage(Topology, Topology.Subtype.Acknowledgement, _, _) => interfaceController connected true
 
         case msg@AriadneMessage(_, MessageType.Update.Subtype.Admin, _, adminUpdate: AdminUpdate) => {
