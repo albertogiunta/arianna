@@ -46,6 +46,13 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
         cellInfo
     )
     
+    val ack = AriadneMessage(
+        Topology,
+        Topology.Subtype.Acknowledgement,
+        Location.Master >> Location.Admin,
+        CellInfo.empty
+    )
+    
     val topologyViewedFromACell = AriadneMessage(
         Topology,
         ViewedFromACell,
@@ -111,8 +118,12 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
             
             "wait for the Planimetry, unstashing messages and becoming sociable" in {
                 tester ! planimetric
+    
                 probe.expectMsg(MasterSubscriber.TopologyLoadedACK)
                 assert(probe.sender == tester.underlyingActor.subscriber)
+    
+                probe.expectMsg(ack)
+                assert(probe.sender == tester.underlyingActor.admin)
             }
         }
         
@@ -121,6 +132,7 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
             
             "wait for the Handshakes to be forwarded" in {
                 tester ! handshake
+    
                 probe.expectMsg(handshake)
                 assert(probe.sender == tester.underlyingActor.admin)
             }
@@ -215,6 +227,9 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
             "resend mock handshakes to the system.admin when an unexpected planimetry is loaded" in {
     
                 tester ! planimetric
+    
+                probe.expectMsg(ack)
+                assert(probe.sender == tester.underlyingActor.admin)
         
                 probe.expectMsg(handshake)
         

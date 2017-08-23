@@ -206,7 +206,7 @@ class TopologySupervisor extends TemplateActor {
                 Empty()
             )
         } else {
-            admin() ! AriadneMessage(Topology, Acknowledgement, masterToAdmin, Empty())
+            admin() ! AriadneMessage(Topology, Acknowledgement, masterToAdmin, CellInfo.empty)
             
             topology.valuesIterator.foreach(room =>
                 admin() ! AriadneMessage(Handshake, CellToMaster, cellToMaster, SensorsInfoUpdate(room))
