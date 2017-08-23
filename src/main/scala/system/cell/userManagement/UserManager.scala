@@ -31,6 +31,8 @@ class UserManager extends TemplateActor with ActorLogging {
     var usrNumber = 0
     var areaForCell: AreaViewedFromACell = _
     var areaForUser: AreaViewedFromAUser = _
+    var alarmMessage: AriadneMessage[MessageContent] = _
+
 
     override protected def init(args: List[String]): Unit = {
         if (args.size != 2) throw IncorrectInitMessageException(this.name, args)
@@ -60,26 +62,30 @@ class UserManager extends TemplateActor with ActorLogging {
     }
     
     protected def operational: Receive = operationalForCell orElse operationalForMobile
-    
+
+    protected def operationalWithAlarm: Receive = operational andThen operationalAndProactiveForMobile
+
     protected def operationalForCell: Receive = {
-        case AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, _, response@RouteResponse(request, route)) =>
+        case msg@AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, _, response@RouteResponse(request, route)) =>
             request match {
                 case RouteRequest(_, _, _, false) => s.sendRouteToUsers(response, RouteResponseShort(route).toJson.toString())
-                case RouteRequest(_, _, _, true) => s.sendAlarmToUsers(RouteResponseShort(route).toJson.toString())
+                case RouteRequest(_, _, _, true) =>
+                    s.sendAlarmToUsers(RouteResponseShort(route).toJson.toString())
+                    alarmMessage = msg
+                    context.become(operationalWithAlarm)
             }
         case AriadneMessage(Alarm, Alarm.Subtype.End, _, _) =>
             s.sendAlarmEndToUsers()
+            context.become(operational)
     }
-    
+
     protected def operationalForMobile: Receive = {
         case MSGTAkkaVertx.FIRST_CONNECTION =>
             s.sendAreaToNewUser(areaForUser.toJson.toString())
-            incrementUserNumber()
-            sendCurrentPeopleUpdate()
+            doOnEveryNewConnection()
         case MSGTAkkaVertx.NORMAL_CONNECTION =>
             s.sendAckToNewUser(MSGTAkkaVertx.NORMAL_CONNECTION_RESPONSE)
-            incrementUserNumber()
-            sendCurrentPeopleUpdate()
+            doOnEveryNewConnection()
         case MSGTAkkaVertx.DISCONNECT =>
             s.disconnectUsers()
             decrementUserNumber()
@@ -89,9 +95,21 @@ class UserManager extends TemplateActor with ActorLogging {
         case _ => desist _
     }
 
+    protected def operationalAndProactiveForMobile: Receive = {
+        case MSGTAkkaVertx.FIRST_CONNECTION =>
+            s.sendAlarmToUsers(alarmMessage.content.asInstanceOf[RouteResponse].route.toJson.toString())
+        case MSGTAkkaVertx.NORMAL_CONNECTION =>
+            s.sendAlarmToUsers(alarmMessage.content.asInstanceOf[RouteResponse].route.toJson.toString())
+    }
+
     override def postStop(): Unit = {
         s.sendSystemShutDownToUsers()
         super.postStop()
+    }
+
+    private def doOnEveryNewConnection() {
+        incrementUserNumber()
+        sendCurrentPeopleUpdate()
     }
     
     private def incrementUserNumber(): Unit = usrNumber = usrNumber + 1
