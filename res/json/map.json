@@ -30,7 +30,7 @@
           "y": 150
         },
         "isEntryPoint": true,
-        "isExitPoint": false,
+        "isExitPoint": true,
         "capacity": 100,
         "squareMeters": 50.0
       },
@@ -87,7 +87,7 @@
           }
         }
       ],
-      "currentPeople": 20,
+      "currentPeople": 0,
       "practicability": 5.0
     },
     {
@@ -165,7 +165,7 @@
           }
         }
       ],
-      "currentPeople": 20,
+      "currentPeople": 0,
       "practicability": 5.0
     },
     {
@@ -243,7 +243,7 @@
           }
         }
       ],
-      "currentPeople": 20,
+      "currentPeople": 0,
       "practicability": 5.0
     },
     {
@@ -321,7 +321,7 @@
           }
         }
       ],
-      "currentPeople": 20,
+      "currentPeople": 0,
       "practicability": 5.0
     },
     {
@@ -399,7 +399,7 @@
           }
         }
       ],
-      "currentPeople": 20,
+      "currentPeople": 0,
       "practicability": 5.0
     },
     {
@@ -477,7 +477,7 @@
           }
         }
       ],
-      "currentPeople": 20,
+      "currentPeople": 0,
       "practicability": 5.0
     },
     {
@@ -555,7 +555,7 @@
           }
         }
       ],
-      "currentPeople": 20,
+      "currentPeople": 0,
       "practicability": 5.0
     },
     {
@@ -611,6 +611,17 @@
       ],
       "passages": [
         {
+          "neighborId": -1,
+          "startCoordinates": {
+            "x": 100,
+            "y": 140
+          },
+          "endCoordinates": {
+            "x": 100,
+            "y": 160
+          }
+        },
+        {
           "neighborId": 5,
           "startCoordinates": {
             "x": 380,
@@ -633,7 +644,7 @@
           }
         }
       ],
-      "currentPeople": 20,
+      "currentPeople": 0,
       "practicability": 5.0
     }
   ]

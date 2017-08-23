@@ -72,6 +72,7 @@ class TopologySupervisor extends TemplateActor {
         
                 log.info("Notifying the Subscriber...")
                 subscriber() ! MasterSubscriber.TopologyLoadedACK
+    
                 log.info("Sending Topology ACK to Admin...")
                 admin() ! AriadneMessage(Topology, Acknowledgement, masterToAdmin, CellInfo.empty)
             }
@@ -137,7 +138,6 @@ class TopologySupervisor extends TemplateActor {
         case WatchDogNotification(true) =>
             context.become(proactive, discardOld = true)
             log.info("I've become ProActive")
-            unstashAll
         
         case WatchDogNotification(hookedActor: ActorRef) =>
             log.info("Resending new Topology to {}", hookedActor.path.address)
@@ -150,9 +150,7 @@ class TopologySupervisor extends TemplateActor {
                 )
             )
 
-        case AriadneMessage(Handshake, CellToMaster, _, _) => // Ignore
-        
-        case _ => stash
+        case _ => // Ignore
     }
     
     private def proactive: Receive = {

@@ -30,7 +30,7 @@
                     "y": 150
                 },
                 "isEntryPoint": true,
-                "isExitPoint": false,
+              "isExitPoint": true,
                 "capacity": 100,
                 "squareMeters": 50.0
             },
