@@ -118,7 +118,7 @@ class TopologySupervisor extends TemplateActor {
                 }
         
             } else if (!alreadyMapped(cell.uri)) {
-                log.error("Received Handshake as no matching in the current loaded Topology for {}", cell.uri)
+                log.error("Received Handshake has no matching in the current loaded Topology for {}", cell.uri)
                 publisher() ! (
                     sender.path.elements.mkString("/"),
                     AriadneMessage(Error, Error.Subtype.CellMappingMismatch, masterToCell, Empty())
@@ -133,6 +133,7 @@ class TopologySupervisor extends TemplateActor {
         case AriadneMessage(Topology, Planimetrics, _, map: Area) => unexpectedPlanimetry(map)
         
         case msg@AriadneMessage(Topology, Acknowledgement, `cellToMaster`, _) =>
+            log.info("Received Topology Acknowledgement from {}, forwarding to W.D.Supervisor...", sender.path)
             watchDogSupervisor forward msg
         
         case WatchDogNotification(true) =>

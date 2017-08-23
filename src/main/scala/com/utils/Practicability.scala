@@ -18,3 +18,8 @@ object Practicability {
     
     def round(value: Double): Double = BigDecimal(value).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
 }
+
+object TryPracticability extends App {
+    
+    println(Practicability(100.0, 1.0, 2.0))
+}

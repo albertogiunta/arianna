@@ -586,8 +586,8 @@
           "x": 405,
           "y": 325
         },
-        "isEntryPoint": false,
-        "isExitPoint": false,
+        "isEntryPoint": true,
+        "isExitPoint": true,
         "capacity": 100,
         "squareMeters": 50.0
       },
@@ -613,12 +613,12 @@
         {
           "neighborId": -1,
           "startCoordinates": {
-            "x": 100,
-            "y": 140
+            "x": 480,
+            "y": 280
           },
           "endCoordinates": {
-            "x": 100,
-            "y": 160
+            "x": 480,
+            "y": 370
           }
         },
         {

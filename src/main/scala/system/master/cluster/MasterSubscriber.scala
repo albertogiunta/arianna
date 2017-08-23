@@ -50,6 +50,7 @@ class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) 
             context.become(behavior = sociable, discardOld = true)
             log.info("I've Become Sociable...")
             log.info("Unstashing cool'n preserved Handshakes...")
+    
             unstashAll
         
         case _ => desist _
@@ -79,11 +80,11 @@ class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) 
     def proactive: Receive = {
     
         case msg@AriadneMessage(Update, _, `cellToMaster`, _) =>
-            log.info("Forwarding message {} from {} to TopologySupervisor with content {}", msg.subtype, sender.path, msg.content)
+            //            log.info("Forwarding message {} from {} to TopologySupervisor", msg.subtype, sender.path)
             topologySupervisor() forward msg
 
         case msg@AriadneMessage(Handshake, CellToMaster, `cellToMaster`, _) =>
-            log.info("Late handshake from {}, forwarding to Supervisor...", sender.path)
+            //            log.info("Late handshake from {}, forwarding to Supervisor...", sender.path)
             publisher() ! (
                 sender.path.elements.mkString("/"),
                 AriadneMessage(Handshake, Acknowledgement, Location.Master >> Location.Cell, Empty())
@@ -91,7 +92,6 @@ class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) 
             topologySupervisor() forward msg
 
         case msg@AriadneMessage(Topology, Topology.Subtype.Acknowledgement, _, _) =>
-            log.info("Received Topology Acknowledgement from {}, forwarding to Supervisor...", sender.path)
             topologySupervisor() forward msg
             
         case _ => desist _
