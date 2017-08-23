@@ -20,7 +20,8 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
 
     @throws[Exception]
     override def start(): Unit = {
-        val options = new HttpServerOptions().setTcpKeepAlive(true).setIdleTimeout(0)
+        //        val options = new HttpServerOptions().setTcpKeepAlive(true).setIdleTimeout(0)
+        val options = new HttpServerOptions().setIdleTimeout(0)
         vertx.createHttpServer(options).websocketHandler((ws: ServerWebSocket) => {
             Log.info("[SERVER " + baseUrl + "] PATH " + ws.path + " " + ws.uri + " " + ws.query)
             ws.path.split(baseUrl)(1) match {
