@@ -6,7 +6,6 @@ import system.cell.sensormanagement.sensors._
 import system.exceptions.IncorrectInitMessageException
 import system.ontologies.messages
 import system.ontologies.messages.AriannaJsonProtocol._
-import system.ontologies.messages.Location._
 import system.ontologies.messages.MessageType.{Alarm, Update}
 import system.ontologies.messages._
 
@@ -23,8 +22,6 @@ class SensorManager extends TemplateActor {
     private var sensors = new HashMap[Int, SensorInfo]
     private val simulatedSensor: ListBuffer[SimulatedSensor[Double]] = new ListBuffer[SimulatedSensor[Double]]
     private val observableSensors: ListBuffer[ObservableSensor[_ <: Any]] = new ListBuffer[ObservableSensor[_ <: Any]]
-
-    private val internalMessage: MessageDirection = Location.Self >> Location.Self
     
     
     override protected def init(args: List[String]): Unit = {
@@ -51,7 +48,7 @@ class SensorManager extends TemplateActor {
                         .subscribe((K: Double) => self ! AriadneMessage(
                             Alarm,
                             Alarm.Subtype.FromCell,
-                            internalMessage,
+                            Location.PreMade.selfToSelf,
                             messages.SensorInfo(X.category.id, K)))
                 }
             }
@@ -65,7 +62,7 @@ class SensorManager extends TemplateActor {
             this.parent ! AriadneMessage(
                 Update,
                 Update.Subtype.Sensors,
-                internalMessage,
+                Location.PreMade.selfToSelf,
                 new SensorsInfoUpdate(CellInfo.empty, this.sensors.values.toList))
         case msg@AriadneMessage(Alarm, _, _, cnt: SensorInfo) =>
             this.parent ! msg

@@ -5,7 +5,7 @@ import io.reactivex.Flowable
 /**
   * Created by Matteo Gabellini on 05/07/2017.
   */
-object TestReactiveSensor extends App {
+object TryReactiveSensor extends App {
     var tSensor = new BasicTemperatureSensor("tSensor", 0, -40.0, 100.0, new TemperatureThreshold(-10, 50))
     var simulatedTempSensor = new SimulatedTemperatureSensor(tSensor, 1000, SimulationStrategies.LinearDoubleSimulation(0.15))
     var oTSensor: ObservableTemperatureSensor = new ObservableTemperatureSensor(simulatedTempSensor)

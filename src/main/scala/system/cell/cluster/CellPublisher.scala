@@ -6,7 +6,6 @@ import com.actors.{ClusterMembersListener, TemplatePublisher}
 import com.utils.BasicWatchDog
 import com.utils.WatchDog.WatchDogNotification
 import system.ontologies._
-import system.ontologies.messages.Location._
 import system.ontologies.messages.MessageType._
 import system.ontologies.messages._
 
@@ -15,11 +14,6 @@ import system.ontologies.messages._
   * Created by Matteo Gabellini on 29/06/2017.
   */
 class CellPublisher(mediator: ActorRef) extends TemplatePublisher(mediator) {
-
-    private val selfToSelf: MessageDirection = Location.Self >> Location.Self
-    private val cellToCluster: MessageDirection = Location.Cell >> Location.Cluster
-    private val cellToCell: MessageDirection = Location.Cell >> Location.Cell
-    private val cellToMaster: MessageDirection = Location.Cell >> Location.Master
 
     private var watchDog: BasicWatchDog = _
     
@@ -32,19 +26,19 @@ class CellPublisher(mediator: ActorRef) extends TemplatePublisher(mediator) {
         parent ! AriadneMessage(
             Info,
             Info.Subtype.Request,
-            selfToSelf,
+            Location.PreMade.selfToSelf,
             SensorsInfoUpdate.empty
         )
 
     }
 
     override protected def receptive = {
-        case msg@AriadneMessage(Info, Info.Subtype.Response, this.selfToSelf, sensorsInfoUpdate: SensorsInfoUpdate) => {
+        case msg@AriadneMessage(Info, Info.Subtype.Response, Location.PreMade.selfToSelf, sensorsInfoUpdate: SensorsInfoUpdate) => {
             log.info("Sensor Info " + sensorsInfoUpdate)
             val handshakeMsg = AriadneMessage(
                 Handshake,
                 Handshake.Subtype.CellToMaster,
-                Location.Cell >> Location.Master,
+                Location.PreMade.cellToMaster,
                 sensorsInfoUpdate
             )
             mediator ! Publish(Topic.HandShakes,
@@ -63,7 +57,7 @@ class CellPublisher(mediator: ActorRef) extends TemplatePublisher(mediator) {
             parent ! AriadneMessage(
                 Info,
                 Info.Subtype.Request,
-                selfToSelf,
+                Location.PreMade.selfToSelf,
                 SensorsInfoUpdate.empty
             )
         }
@@ -73,15 +67,15 @@ class CellPublisher(mediator: ActorRef) extends TemplatePublisher(mediator) {
 
     private def cultured: Receive = {
         case msg@AriadneMessage(Alarm, _, _, _) =>
-            mediator ! Publish(Topic.Alarms, msg.copy(direction = cellToCluster))
+            mediator ! Publish(Topic.Alarms, msg.copy(direction = Location.PreMade.cellToCluster))
         case msg@AriadneMessage(Update, Update.Subtype.Sensors, _, _) =>
-            mediator ! Publish(Topic.Updates, msg.copy(direction = cellToMaster))
+            mediator ! Publish(Topic.Updates, msg.copy(direction = Location.PreMade.cellToMaster))
         case msg@AriadneMessage(Update, Update.Subtype.Practicability, _, _) =>
-            mediator ! Publish(Topic.Practicabilities, msg.copy(direction = cellToCell))
+            mediator ! Publish(Topic.Practicabilities, msg.copy(direction = Location.PreMade.cellToCell))
         case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, _, _) =>
-            mediator ! Publish(Topic.Updates, msg.copy(direction = cellToMaster))
+            mediator ! Publish(Topic.Updates, msg.copy(direction = Location.PreMade.cellToMaster))
         case msg@AriadneMessage(Topology, Topology.Subtype.Acknowledgement, _, _) =>
-            mediator ! Publish(Topic.TopologyACK, msg.copy(direction = cellToMaster))
+            mediator ! Publish(Topic.TopologyACK, msg.copy(direction = Location.PreMade.cellToMaster))
         case _ => // Ignore
     }
 }

@@ -104,7 +104,7 @@ abstract class TemplateActor extends CustomActor {
                 this.context.become(receptive, discardOld = true)
                 log.info("I've become receptive!")
             } catch {
-                case ex: Throwable => ex.printStackTrace()
+                case ex: Throwable => log.error(ex.getMessage)
             }
         case _ => desist _
     }

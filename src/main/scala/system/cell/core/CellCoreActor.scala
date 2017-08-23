@@ -13,7 +13,6 @@ import system.cell.userManagement.UserManager
 import system.exceptions.IncorrectConfigurationException
 import system.names.NamingSystem
 import system.ontologies.messages.AriannaJsonProtocol._
-import system.ontologies.messages.Location._
 import system.ontologies.messages.MessageType.Topology.Subtype.ViewedFromACell
 import system.ontologies.messages.MessageType._
 import system.ontologies.messages._
@@ -46,13 +45,6 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
     var userActor: ActorRef = _
     var routeManager: ActorRef = _
 
-    private val self2Self: MessageDirection = Location.Self >> Location.Self
-    private val server2Cell: MessageDirection = Location.Master >> Location.Cell
-    private val cell2Server: MessageDirection = Location.Master << Location.Cell
-    private val cell2Cell: MessageDirection = Location.Cell << Location.Cell
-    private val cell2Cluster: MessageDirection = Location.Cell >> Location.Cluster
-    private val cell2User: MessageDirection = Location.Cell >> Location.User
-    private val user2Cell: MessageDirection = Location.Cell << Location.User
 
     override def preStart: Unit = {
         super.preStart()
@@ -78,13 +70,13 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
         localCellInfo = loadedConfig.cellInfo.copy(ip = InetAddress.getLocalHost.getHostAddress)
         sensorManager ! AriadneMessage(Init,
             Init.Subtype.Greetings,
-            self2Self,
+            Location.PreMade.selfToSelf,
             Greetings(List(loadedConfig.sensors.toJson.toString())))
     }
 
     override protected def receptive: Receive = {
 
-        case msg@AriadneMessage(Info, Info.Subtype.Request, this.self2Self, cnt: SensorsInfoUpdate) => {
+        case msg@AriadneMessage(Info, Info.Subtype.Request, Location.PreMade.selfToSelf, cnt: SensorsInfoUpdate) => {
             //Informations request from the cell publisher in order to complete the handshake task with the system.master
             if (sensorsMounted.isEmpty) {
                 log.debug("Sensor Data not yet ready, stash the info request")
@@ -97,7 +89,7 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
             }
         }
 
-        case msg@AriadneMessage(Update, Update.Subtype.Sensors, this.self2Self, cnt: SensorsInfoUpdate) => {
+        case msg@AriadneMessage(Update, Update.Subtype.Sensors, Location.PreMade.selfToSelf, cnt: SensorsInfoUpdate) => {
             if (sensorsMounted.isEmpty) {
                 sensorsMounted = cnt.sensors
                 unstashAll()
@@ -109,14 +101,14 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
         case msg@AriadneMessage(Error, Error.Subtype.CellMappingMismatch, _, cnt: Empty) =>
             log.error("Mapping Error")
 
-        case msg@AriadneMessage(Topology, ViewedFromACell, this.server2Cell, cnt: AreaViewedFromACell) => {
+        case msg@AriadneMessage(Topology, ViewedFromACell, Location.PreMade.masterToCell, cnt: AreaViewedFromACell) => {
             log.info(s"Area arrived from Server $cnt")
             log.info("Sending ACK to Master for Topology...")
     
             cellPublisher ! AriadneMessage(
                 Topology,
                 Topology.Subtype.Acknowledgement,
-                this.self2Self,
+                Location.PreMade.selfToSelf,
                 localCellInfo
             )
             
@@ -126,10 +118,10 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
             userActor ! AriadneMessage(
                 Init,
                 Init.Subtype.Greetings,
-                self2Self,
+                Location.PreMade.selfToSelf,
                 Greetings(List(localCellInfo.uri, localCellInfo.port.toString)))
-    
-            userActor ! msg.copy(direction = cell2User)
+
+            userActor ! msg.copy(direction = Location.PreMade.cellToUser)
 
             this.context.become(cultured, discardOld = true)
             log.info("I've become cultured")
@@ -140,7 +132,7 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
 
     protected def cultured: Receive = ({
 
-        case msg@AriadneMessage(Alarm, _, this.self2Self, _) => {
+        case msg@AriadneMessage(Alarm, _, Location.PreMade.selfToSelf, _) => {
             //Alarm triggered in the current cell
             //Check if the topology is initialized
             if (topology.nonEmpty) {
@@ -149,31 +141,30 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
                     content = AlarmContent(localCellInfo, currentCell.info)
                 )
                 cellPublisher ! msgToSend
+                context.become(localEmergency, discardOld = true)
+                log.info("Alarm triggered locally")
             }
-            context.become(localEmergency, discardOld = true)
-            log.info("Alarm triggered locally")
         }
 
         case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) =>
             userActor ! msg
             log.info("Alarm deactiveted")
 
-        case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, this.user2Cell, cnt: CurrentPeopleUpdate) => {
+        case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.PreMade.userToCell, cnt: CurrentPeopleUpdate) => {
 
             actualSelfLoad = cnt.currentPeople
 
-            topology.put(cnt.room.name, topology(indexByUri(localCellInfo.uri)).copy(practicability =
-                Practicability(
-                    topology(indexByUri(localCellInfo.uri)).info.capacity,
-                    cnt.currentPeople,
-                    topology(indexByUri(localCellInfo.uri)).passages.length)))
+            topology.put(
+                cnt.room.name,
+                topology(indexByUri(localCellInfo.uri)).copy(practicability = updatedPracticability())
+            )
     
     
             cellPublisher ! msg.copy(content = cnt.copy(room = topology(indexByUri(cnt.room.name)).info.id))
             cellPublisher ! AriadneMessage(
                 Update,
                 Update.Subtype.Practicability,
-                self2Self,
+                Location.PreMade.selfToSelf,
                 PracticabilityUpdate(
                     topology(indexByUri(localCellInfo.uri)).info.id,
                     topology(indexByUri(localCellInfo.uri)).practicability
@@ -181,7 +172,7 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
             )
         }
 
-        case AriadneMessage(Update, Update.Subtype.Practicability, this.cell2Cell, cnt: PracticabilityUpdate) =>
+        case AriadneMessage(Update, Update.Subtype.Practicability, Location.PreMade.cellToCell, cnt: PracticabilityUpdate) =>
             topology.put(cnt.room.name, topology(cnt.room.name)
                 .copy(practicability = cnt.practicability))
     }: Receive) orElse this.proactive
@@ -191,27 +182,13 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
         case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) => {
             userActor ! msg
             context.become(cultured, discardOld = true)
-            //Update the practicability value of this cell
-            practicabilityToBeRestored.put(
-                indexByUri(localCellInfo.uri),
-                Practicability(
-                    topology(indexByUri(localCellInfo.uri)).info.capacity,
-                    actualSelfLoad,
-                    topology(indexByUri(localCellInfo.uri)).passages.length
-                )
-            )
 
-            practicabilityToBeRestored.keys.foreach(X =>
-                topology.put(
-                    X,
-                    topology(X).copy(practicability = practicabilityToBeRestored(X))
-                )
-            )
+            this.updatePracticabilityOnAlarmEnd()
 
             cellPublisher ! AriadneMessage(
                 Update,
                 Update.Subtype.Practicability,
-                self2Self,
+                Location.PreMade.selfToSelf,
                 PracticabilityUpdate(
                     topology(indexByUri(localCellInfo.uri)).info.id,
                     topology(indexByUri(localCellInfo.uri)).practicability
@@ -220,16 +197,18 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
             log.info("Alarm deactiveted")
         }
 
-        case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, this.user2Cell, cnt: CurrentPeopleUpdate) => {
+        case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.PreMade.userToCell, cnt: CurrentPeopleUpdate) => {
             actualSelfLoad = cnt.currentPeople
             cellPublisher ! msg.copy(content = cnt.copy(room = topology(indexByUri(cnt.room.name)).info.id))
         }
 
-        case AriadneMessage(Update, Update.Subtype.Practicability, this.cell2Cell, cnt: PracticabilityUpdate) => {
+        case AriadneMessage(Update, Update.Subtype.Practicability, Location.PreMade.cellToCell, cnt: PracticabilityUpdate) => {
             if (topology(cnt.room.name).practicability == Double.PositiveInfinity) {
-                /*save the practicability update of a cell considered in alarm to prevent
+                /*
+                * save the practicability update of a cell considered in alarm to prevent
                 * the receiving ordering problem between the Alarm End message and Practicability Update
-                * sended from a cell in alarm during the alarm deactivation*/
+                * sended from a cell in alarm during the alarm deactivation
+                * */
                 practicabilityToBeRestored.put(cnt.room.name, cnt.practicability)
             } else {
                 topology.put(cnt.room.name, topology(cnt.room.name)
@@ -247,16 +226,16 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
             System.exit(0)
         }
 
-        case msg@AriadneMessage(Update, Update.Subtype.Sensors, this.self2Self, cnt: SensorsInfoUpdate) => {
+        case msg@AriadneMessage(Update, Update.Subtype.Sensors, Location.PreMade.selfToSelf, cnt: SensorsInfoUpdate) => {
             cellPublisher ! msg.copy(content = cnt.copy(cell = this.localCellInfo))
         }
 
-        case AriadneMessage(Route, Route.Subtype.Request, this.user2Cell, cnt: RouteRequest) => {
+        case AriadneMessage(Route, Route.Subtype.Request, Location.PreMade.userToCell, cnt: RouteRequest) => {
             //route request from user management
             routeManager ! AriadneMessage(
                 Route,
                 Route.Subtype.Info,
-                self2Self,
+                Location.PreMade.selfToSelf,
                 RouteInfo(
                     cnt,
                     AreaViewedFromACell(Random.nextInt(), topology.values.toList)
@@ -264,7 +243,7 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
             )
         }
 
-        case msg@AriadneMessage(Route, Route.Subtype.Response, this.cell2User, _) =>
+        case msg@AriadneMessage(Route, Route.Subtype.Response, Location.PreMade.cellToUser, _) =>
             //route response from route manager for the user
             userActor ! msg
 
@@ -283,7 +262,7 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
             routeManager ! AriadneMessage(
                 Route,
                 Route.Subtype.Info,
-                self2Self,
+                Location.PreMade.selfToSelf,
                 RouteInfo(
                     RouteRequest(id, topology(indexByUri(localCellInfo.uri)).info.id, RoomID.empty, isEscape = true),
                     AreaViewedFromACell(Random.nextInt(), area)
@@ -292,5 +271,27 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
         }
 
         case _ => desist _
+    }
+
+    private def updatePracticabilityOnAlarmEnd(): Unit = {
+        practicabilityToBeRestored.put(
+            indexByUri(localCellInfo.uri),
+            updatedPracticability()
+        )
+
+        practicabilityToBeRestored.keys.foreach(X =>
+            topology.put(
+                X,
+                topology(X).copy(practicability = practicabilityToBeRestored(X))
+            )
+        )
+    }
+
+    private def updatedPracticability(): Double = {
+        Practicability(
+            topology(indexByUri(localCellInfo.uri)).info.capacity,
+            actualSelfLoad,
+            topology(indexByUri(localCellInfo.uri)).passages.length
+        )
     }
 }

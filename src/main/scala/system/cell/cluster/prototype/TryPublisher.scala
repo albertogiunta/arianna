@@ -1,4 +1,4 @@
-package system.cell.cluster.test
+package system.cell.cluster.prototype
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import akka.cluster.pubsub.DistributedPubSub
@@ -11,7 +11,7 @@ import system.ontologies.messages.MessageType._
   * A generic publisher actor to test the message delivery to CellSubscriber actor in the cluster
   * Created by Matteo Gabellini on 29/06/2017 based on a Alessandro Cevoli's publisher.
   */
-class TestPublisher extends Actor with ActorLogging {
+class TryPublisher extends Actor with ActorLogging {
 
     // activate the extension
     private val mediator: ActorRef = DistributedPubSub(context.system).mediator
