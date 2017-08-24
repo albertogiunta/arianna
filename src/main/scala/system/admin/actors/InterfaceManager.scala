@@ -60,6 +60,8 @@ class InterfaceManager extends TemplateActor {
     def initializer(): Receive = {
         case msg@AriadneMessage(Topology, Topology.Subtype.Acknowledgement, _, _) => interfaceController connected true
 
+        case msg@AriadneMessage(Error, Error.Subtype.LostConnectionFromMaster, _, _) => interfaceController connected false
+
         case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => {
             log.info("Received an handshake with sensor data")
             counter.++
