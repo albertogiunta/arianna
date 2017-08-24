@@ -29,11 +29,8 @@ class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) 
     override protected def subscribed: Receive = {
     
         case AriadneMessage(Handshake, CellToMaster, `cellToMaster`, pkg: SensorsInfoUpdate) =>
-            
-            publisher() ! (
-                sender.path.elements.mkString("/"),
-                AriadneMessage(Handshake, Acknowledgement, Location.Master >> Location.Cell, Empty())
-            )
+    
+            publisher() ! HACK()
         
             if (stashedHandshakes.apply(pkg.cell.uri)) {
                 log.info("Stashing handshake from {} for later administration...", sender.path)
@@ -42,14 +39,11 @@ class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) 
             } else {
                 log.info("Handshakes from {} already stashed...", sender.path)
             }
-            
 
         case MasterSubscriber.TopologyLoadedACK =>
-            log.info("A topology has been loaded in the server...")
             
             context.become(behavior = sociable, discardOld = true)
             log.info("I've Become Sociable...")
-            log.info("Unstashing cool'n preserved Handshakes...")
     
             unstashAll
         
@@ -59,18 +53,11 @@ class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) 
     def sociable: Receive = {
     
         case msg@AriadneMessage(Handshake, CellToMaster, `cellToMaster`, _) =>
-            log.info("Resolving Handshake from {}", sender.path)
     
-            publisher() ! (
-                sender.path.elements.mkString("/"),
-                AriadneMessage(Handshake, Acknowledgement, Location.Master >> Location.Cell, Empty())
-            )
-    
+            publisher() ! HACK()
             topologySupervisor() forward msg
 
         case MasterSubscriber.TopologyMappedACK =>
-            log.info("All the Cells have been mapped into their logical position into the Planimetry")
-        
             context.become(behavior = proactive, discardOld = true)
             log.info("I've become ProActive...")
         
@@ -80,15 +67,10 @@ class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) 
     def proactive: Receive = {
     
         case msg@AriadneMessage(Update, _, `cellToMaster`, _) =>
-            //            log.info("Forwarding message {} from {} to TopologySupervisor", msg.subtype, sender.path)
             topologySupervisor() forward msg
 
         case msg@AriadneMessage(Handshake, CellToMaster, `cellToMaster`, _) =>
-            //            log.info("Late handshake from {}, forwarding to Supervisor...", sender.path)
-            publisher() ! (
-                sender.path.elements.mkString("/"),
-                AriadneMessage(Handshake, Acknowledgement, Location.Master >> Location.Cell, Empty())
-            )
+            publisher() ! HACK()
             topologySupervisor() forward msg
 
         case msg@AriadneMessage(Topology, Topology.Subtype.Acknowledgement, _, _) =>
@@ -96,6 +78,11 @@ class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) 
             
         case _ => desist _
     }
+    
+    private val HACK: () => (String, AriadneMessage[MessageContent]) = () => (
+        sender.path.elements.mkString("/"),
+        AriadneMessage(Handshake, Acknowledgement, Location.Master >> Location.Cell, Empty())
+    )
 }
 
 object MasterSubscriber {

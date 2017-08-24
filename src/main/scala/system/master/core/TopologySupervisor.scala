@@ -27,19 +27,24 @@ class TopologySupervisor extends TemplateActor {
     
     private var mapVersionID: Int = 0
     
-    private var topology: mutable.Map[String, Room] = mutable.HashMap.empty
-    private var indexByUri: mutable.Map[String, String] = mutable.HashMap.empty
-    
+    private val topology: mutable.Map[String, Room] = mutable.HashMap.empty
+    private val indexByUri: mutable.Map[String, String] = mutable.HashMap.empty
     private val alreadyMapped: mutable.Set[String] = mutable.HashSet.empty
     
     private val publisher: () => ActorSelection = () => sibling(NamingSystem.Publisher).get
     private val subscriber: () => ActorSelection = () => sibling(NamingSystem.Subscriber).get
     private val admin: () => ActorSelection = () => sibling(NamingSystem.AdminSupervisor).get
     
-    private val dataStreamer = context.actorOf(Props(new DataStreamer(target = admin())), NamingSystem.DataStreamer)
-    private val watchDogSupervisor = context.actorOf(Props[WatchDogSupervisor], NamingSystem.WatchDogSupervisor)
+    private var dataStreamer: ActorRef = _
+    private var watchDogSupervisor: ActorRef = _
     
     private val synced: Counter = Counter()
+    
+    override def preStart: Unit = {
+        super.preStart
+        dataStreamer = context.actorOf(Props(new DataStreamer(target = admin())), NamingSystem.DataStreamer)
+        watchDogSupervisor = context.actorOf(Props[WatchDogSupervisor], NamingSystem.WatchDogSupervisor)
+    }
     
     protected override def init(args: List[String]): Unit = {
     
@@ -61,20 +66,21 @@ class TopologySupervisor extends TemplateActor {
     
                 mapVersionID = map.id
     
-                topology = mutable.HashMap(map.rooms.map(room => room.info.id.name -> room): _*)
-    
-                indexByUri = mutable.HashMap(map.rooms.map(room => room.cell.info.uri -> room.info.id.name): _*)
+                map.rooms.foreach(room => {
+                    topology.put(room.info.id.name, room)
+                    indexByUri.put(room.cell.info.uri, room.info.id.name)
+                })
                 
                 context.become(behavior = sociable, discardOld = true)
                 log.info("I've become Sociable...")
-    
-                unstashAll
         
                 log.info("Notifying the Subscriber...")
                 subscriber() ! MasterSubscriber.TopologyLoadedACK
     
                 log.info("Sending Topology ACK to Admin...")
                 admin() ! AriadneMessage(Topology, Acknowledgement, masterToAdmin, CellInfo.empty)
+    
+                unstashAll
             }
 
         case _ => stash
@@ -96,13 +102,13 @@ class TopologySupervisor extends TemplateActor {
         
                 topology.put(indexByUri(cell.uri), newRoom)
                 alreadyMapped.add(cell.uri)
-                
-                admin() ! msg
+    
+                admin() forward msg
         
                 watchDogSupervisor forward cell
     
                 if (synced ++== topology.size) {
-    
+                    log.info("All the Cells have been mapped into their logical position into the Planimetry")
                     context.become(acknowledging, discardOld = true)
                     log.info("I've Become Acknowledging!")
     
@@ -133,12 +139,13 @@ class TopologySupervisor extends TemplateActor {
         case AriadneMessage(Topology, Planimetrics, _, map: Area) => unexpectedPlanimetry(map)
         
         case msg@AriadneMessage(Topology, Acknowledgement, `cellToMaster`, _) =>
-            log.info("Received Topology Acknowledgement from {}, forwarding to W.D.Supervisor...", sender.path)
+            log.info("Received Topology Acknowledgement from {}, forwarding to W.D.Supervisor...", sender.path.address)
             watchDogSupervisor forward msg
         
         case WatchDogNotification(true) =>
             context.become(proactive, discardOld = true)
             log.info("I've become ProActive")
+            unstashAll
         
         case WatchDogNotification(hookedActor: ActorRef) =>
             log.info("Resending new Topology to {}", hookedActor.path.address)
@@ -151,7 +158,7 @@ class TopologySupervisor extends TemplateActor {
                 )
             )
 
-        case _ => // Ignore
+        case _ => stash
     }
     
     private def proactive: Receive = {
@@ -161,7 +168,7 @@ class TopologySupervisor extends TemplateActor {
         case AriadneMessage(Update, CurrentPeople, `cellToMaster`, pkg: CurrentPeopleUpdate) =>
     
             if (topology.get(pkg.room.name).nonEmpty) {
-                log.info("Updating sensors for {} from {}", pkg.room.name, sender.path)
+                log.info("Updating current people in {} from {}", pkg.room.name, sender.path.address)
                 val newRoom = topology(pkg.room.name).copy(currentPeople = pkg.currentPeople)
                 topology.put(pkg.room.name, newRoom)
                 
@@ -171,7 +178,7 @@ class TopologySupervisor extends TemplateActor {
         case AriadneMessage(Update, Sensors, `cellToMaster`, SensorsInfoUpdate(cell, sensors)) =>
     
             if (topology.get(indexByUri(cell.uri)).nonEmpty) {
-                log.info("Updating sensors for {} from {}", cell.uri, sender.path)
+                log.info("Updating sensor values in {} from {}", cell.uri, sender.path.address)
                 val newCell = topology(indexByUri(cell.uri)).cell.copy(sensors = sensors)
                 val newRoom = topology(indexByUri(cell.uri)).copy(cell = newCell)
                 topology.put(indexByUri(cell.uri), newRoom)
@@ -179,7 +186,7 @@ class TopologySupervisor extends TemplateActor {
             }
     
         case AriadneMessage(Handshake, CellToMaster, `cellToMaster`, SensorsInfoUpdate(cell, _)) =>
-            log.info("Late handshake from {}...", sender.path)
+            log.info("Late handshake from {}...", sender.path.address)
             context.become(acknowledging, discardOld = true)
             
             watchDogSupervisor forward cell
@@ -197,9 +204,9 @@ class TopologySupervisor extends TemplateActor {
     }
     
     private def unexpectedPlanimetry(map: Area): Unit = {
-        log.error("A topology has already been loaded in the server...")
+    
         if (map.id != mapVersionID) {
-            
+            log.error("Received an unexpected Topology from {} but Map ID mismatch ...", sender.path.address)
             admin() ! AriadneMessage(
                 Error,
                 Error.Subtype.MapIdentifierMismatch,
@@ -207,6 +214,8 @@ class TopologySupervisor extends TemplateActor {
                 Empty()
             )
         } else {
+            log.error("Received an unexpected Topology from {}, synchronizing...", sender.path.address)
+    
             admin() ! AriadneMessage(Topology, Acknowledgement, masterToAdmin, CellInfo.empty)
             
             topology.valuesIterator.foreach(room =>

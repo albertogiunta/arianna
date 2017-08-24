@@ -27,7 +27,7 @@ class WatchDogSupervisor extends CustomActor {
             actorByUri.valuesIterator.foreach(e => if (!e._2.isAlive) e._2.start())
         
         case AriadneMessage(Topology, Acknowledgement, _, info: CellInfo) =>
-            log.info("Found Topology Acknowledgement from {}", sender.path)
+            log.info("Found Topology ACK for {}", sender.path.address)
             if (actorByUri.get(info.uri).nonEmpty) {
     
                 actorByUri.remove(info.uri)
