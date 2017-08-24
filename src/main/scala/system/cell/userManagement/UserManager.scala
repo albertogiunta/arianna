@@ -74,6 +74,7 @@ class UserManager extends TemplateActor with ActorLogging {
                     s.sendAlarmToUsers(routeAsString)
                     isAlarmed = true
                     alarmMessage = routeAsString
+                    log.info(s"alarmMessage is ${RouteResponseShort(route).route.size}")
             }
         case AriadneMessage(Alarm, Alarm.Subtype.End, _, _) =>
             s.sendAlarmEndToUsers()
