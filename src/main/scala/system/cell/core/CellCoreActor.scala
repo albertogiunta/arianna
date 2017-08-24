@@ -145,6 +145,7 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
 
         case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) =>
             userActor ! msg
+            this.updatePracticabilityOnAlarmEnd()
             log.info("Alarm deactiveted")
 
         case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.PreMade.userToCell, cnt: CurrentPeopleUpdate) => {
@@ -168,10 +169,6 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
                 )
             )
         }
-
-        case AriadneMessage(Update, Update.Subtype.Practicability, Location.PreMade.cellToCell, cnt: PracticabilityUpdate) =>
-            topology.put(cnt.room.name, topology(cnt.room.name)
-                .copy(practicability = cnt.practicability))
     }: Receive) orElse this.proactive
     
     
@@ -180,7 +177,12 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
             userActor ! msg
             context.become(cultured, discardOld = true)
 
+            practicabilityToBeRestored.put(
+                indexByUri(localCellInfo.uri),
+                updatedPracticability()
+            )
             this.updatePracticabilityOnAlarmEnd()
+
 
             cellPublisher ! AriadneMessage(
                 Update,
@@ -199,20 +201,6 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
             cellPublisher ! msg.copy(content = cnt.copy(room = topology(indexByUri(cnt.room.name)).info.id))
         }
 
-        case AriadneMessage(Update, Update.Subtype.Practicability, Location.PreMade.cellToCell, cnt: PracticabilityUpdate) => {
-            if (topology(cnt.room.name).practicability == Double.PositiveInfinity) {
-                /*
-                * save the practicability update of a cell considered in alarm to prevent
-                * the receiving ordering problem between the Alarm End message and Practicability Update
-                * sended from a cell in alarm during the alarm deactivation
-                * */
-                practicabilityToBeRestored.put(cnt.room.name, cnt.practicability)
-            } else {
-                topology.put(cnt.room.name, topology(cnt.room.name)
-                    .copy(practicability = cnt.practicability))
-            }
-        }
-
     }: Receive) orElse this.proactive
     
     
@@ -225,6 +213,20 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
 
         case msg@AriadneMessage(Update, Update.Subtype.Sensors, Location.PreMade.selfToSelf, cnt: SensorsInfoUpdate) => {
             cellPublisher ! msg.copy(content = cnt.copy(cell = this.localCellInfo))
+        }
+
+        case AriadneMessage(Update, Update.Subtype.Practicability, Location.PreMade.cellToCell, cnt: PracticabilityUpdate) => {
+            if (topology(cnt.room.name).practicability == Double.PositiveInfinity) {
+                /*
+                * save the practicability update of a cell considered in alarm to prevent
+                * the receiving ordering problem between Alarm, Alarm End and Practicability Update messages
+                * sent from a cell in alarm during the alarm deactivation
+                * */
+                practicabilityToBeRestored.put(cnt.room.name, cnt.practicability)
+            } else {
+                topology.put(cnt.room.name, topology(cnt.room.name)
+                    .copy(practicability = cnt.practicability))
+            }
         }
 
         case AriadneMessage(Route, Route.Subtype.Request, Location.PreMade.userToCell, cnt: RouteRequest) => {
@@ -281,17 +283,13 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
     }
 
     private def updatePracticabilityOnAlarmEnd(): Unit = {
-        practicabilityToBeRestored.put(
-            indexByUri(localCellInfo.uri),
-            updatedPracticability()
-        )
-
         practicabilityToBeRestored.keys.foreach(X =>
             topology.put(
                 X,
                 topology(X).copy(practicability = practicabilityToBeRestored(X))
             )
         )
+        practicabilityToBeRestored.clear()
     }
 
     private def updatedPracticability(): Double = {
