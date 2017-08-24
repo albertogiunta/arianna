@@ -16,6 +16,7 @@ import system.ontologies.messages.{AriadneMessage, Greetings, Location}
 object RunAdmin extends App with LoaderListener {
     
     new JFXPanel
+    Platform setImplicitExit false
     Platform.runLater(() => {
         val loader = new LoaderView
         loader.start()

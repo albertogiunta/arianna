@@ -36,6 +36,8 @@ class InterfaceView extends View {
             System.exit(0)
         })
         mainStage setScene scene
+        mainStage.getScene.getWindow setHeight 850
+        mainStage.getScene.getWindow setWidth 1200
         mainStage.show
     }
 

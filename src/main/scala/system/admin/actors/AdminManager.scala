@@ -17,8 +17,8 @@ class AdminManager extends TemplateActor {
     
     private val masterSeedNode = ConfigurationManager(context.system)
         .property("akka.cluster.seed-nodes").asStringList.head
-    
-    private val adminManager: () => ActorSelection =
+
+    private val adminSupervisor: () => ActorSelection =
         () => context.actorSelection(masterSeedNode + "/user/" + NamingSystem.Master + "/" + NamingSystem.AdminSupervisor)
     
     private val interfaceManager = context.actorOf(Props[InterfaceManager], NamingSystem.InterfaceManager)
@@ -35,7 +35,7 @@ class AdminManager extends TemplateActor {
     override def receptive: Receive = {
         case msg@AriadneMessage(_, Topology.Subtype.Planimetrics, _, area: Area) => {
             areaLoaded = area
-            adminManager() ! msg.copy(direction = toMaster)
+            adminSupervisor() ! msg.copy(direction = toMaster)
             context.become(operational)
             log.info("Map loaded from GUI")
         }
@@ -51,19 +51,22 @@ class AdminManager extends TemplateActor {
             interfaceManager ! msg
         }
 
-        case msg@AriadneMessage(_, MessageType.Update.Subtype.Admin, _, adminUpdate: AdminUpdate) => interfaceManager ! msg.copy(direction = toSelf)
+        case msg@AriadneMessage(_, MessageType.Update.Subtype.Admin, _, adminUpdate: AdminUpdate) => {
+            log.info("AdminManager receveid")
+            interfaceManager ! msg.copy(direction = toSelf)
+        }
 
-        case msg@AriadneMessage(_, Alarm.Subtype.FromInterface, _, _) => adminManager() ! msg.copy(direction = toMaster)
+        case msg@AriadneMessage(_, Alarm.Subtype.FromInterface, _, _) => adminSupervisor() ! msg.copy(direction = toMaster)
 
         case msg@AriadneMessage(_, Alarm.Subtype.FromCell, _, content: AlarmContent) => interfaceManager ! msg.copy(direction = toSelf)
 
-        case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) => adminManager() ! msg.copy(direction = toMaster)
+        case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) => adminSupervisor() ! msg.copy(direction = toMaster)
 
         case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => interfaceManager ! msg.copy(direction = toSelf)
 
         case msg@AriadneMessage(Error, Error.Subtype.MapIdentifierMismatch, _, _) => interfaceManager ! msg.copy(direction = toSelf)
 
-        case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => adminManager() ! msg.copy(direction = toMaster)
+        case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => adminSupervisor() ! msg.copy(direction = toMaster)
 
         case event: akka.remote.DisassociatedEvent => {
             interfaceManager ! AriadneMessage(Error, Error.Subtype.LostConnectionFromMaster, toSelf, Empty())
@@ -78,7 +81,7 @@ class AdminManager extends TemplateActor {
     def waitingForMaster: Receive = {
         case msg@AriadneMessage(Error, Error.Subtype.LookingForAMap, _, _) => {
             log.info("Connection with Master established again")
-            adminManager() ! AriadneMessage(Topology, Topology.Subtype.Planimetrics, toMaster, areaLoaded)
+            adminSupervisor() ! AriadneMessage(Topology, Topology.Subtype.Planimetrics, toMaster, areaLoaded)
             log.info("Map sent again to Master")
             context.become(operational)
         }

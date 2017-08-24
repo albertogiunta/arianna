@@ -32,6 +32,8 @@ class LoaderView extends View {
             System.exit(0)
         })
         mainStage setScene scene
+        mainStage.getScene.getWindow setHeight 125
+        mainStage.getScene.getWindow setWidth 383
         mainStage.show
     }
 }
