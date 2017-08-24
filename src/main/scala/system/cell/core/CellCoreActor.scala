@@ -60,7 +60,7 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
     }
     
     override protected def init(args: List[String]): Unit = {
-        log.info("Hello there! the cell core is being initialized")
+        log.debug("Hello there! the cell core is being initialized")
 
         clusterListener = context.actorOf(Props[CellClusterSupervisor], NamingSystem.CellClusterSupervisor)
         val cellConfiguration = Source.fromFile(args.head.asInstanceOf[String]).getLines.mkString
@@ -102,7 +102,7 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
             log.error("Mapping Error")
 
         case msg@AriadneMessage(Topology, ViewedFromACell, Location.PreMade.masterToCell, cnt: AreaViewedFromACell) => {
-            log.info(s"Area arrived from Server $cnt")
+            log.info(s"Topology arrived from Master $cnt")
             log.info("Sending ACK to Master for Topology...")
     
             cellPublisher ! AriadneMessage(
@@ -267,6 +267,16 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
                     RouteRequest(id, topology(indexByUri(localCellInfo.uri)).info.id, RoomID.empty, isEscape = true),
                     AreaViewedFromACell(Random.nextInt(), area)
                 )
+            )
+        }
+
+        case msg@AriadneMessage(Topology, ViewedFromACell, Location.PreMade.masterToCell, cnt: AreaViewedFromACell) => {
+            //The master did not receive the ack -> resend acknowledgement
+            cellPublisher ! AriadneMessage(
+                Topology,
+                Topology.Subtype.Acknowledgement,
+                Location.PreMade.selfToSelf,
+                localCellInfo
             )
         }
 

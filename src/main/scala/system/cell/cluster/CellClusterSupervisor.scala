@@ -15,7 +15,7 @@ class CellClusterSupervisor extends ClusterMembersListener {
     override protected def whenMemberUp(member: Member): Unit = {
         if (member.address == cluster.selfAddress) {
             //init actors of current node that must interact in the cluster
-            log.info("Awakening Actors on Cell Actor-System")
+            log.debug("Awakening Actors on Cell Actor-System")
             sibling(NamingSystem.Subscriber).get ! AriadneMessage(Init, Init.Subtype.Greetings,
                 Location.Cell >> Location.Self, Greetings(List(ClusterMembersListener.greetings)))
         }
