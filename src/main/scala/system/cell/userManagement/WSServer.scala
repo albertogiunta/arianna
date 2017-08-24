@@ -12,6 +12,7 @@ import scala.tools.jline_embedded.internal.Log
 
 class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Integer) extends AbstractVerticle {
 
+    var usersOnChannelConnect: mutable.Map[String, ServerWebSocket] = new mutable.HashMap[String, ServerWebSocket]
     var usersWaitingForDisconnection: mutable.Map[String, ServerWebSocket] = new mutable.HashMap[String, ServerWebSocket]
     var usersWaitingForConnectionAck: mutable.Map[String, ServerWebSocket] = new scala.collection.mutable.HashMap[String, ServerWebSocket]
     var usersWaitingForArea: mutable.Map[String, ServerWebSocket] = new scala.collection.mutable.HashMap[String, ServerWebSocket]
@@ -33,11 +34,14 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
                         }
                         data.toString() match {
                             case str if MSGTAkkaVertx.FIRST_CONNECTION == str ||
-                                    MSGTAkkaVertx.NORMAL_CONNECTION == str => tell(data.toString())
+                                    MSGTAkkaVertx.NORMAL_CONNECTION == str =>
+                                tell(data.toString())
+                                usersOnChannelConnect.put(ws.textHandlerID(), ws)
                             case _ =>
                         }
                     })
                     ws.closeHandler((_) => {
+                        this.usersOnChannelConnect.remove(ws.textHandlerID())
                         this.usersWaitingForArea.remove(ws.textHandlerID())
                         this.usersWaitingForConnectionAck.remove(ws.textHandlerID())
                         this.usersWaitingForDisconnection.remove(ws.textHandlerID())
@@ -165,6 +169,10 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
             this.usersWaitingForRoute(routeId).forEach(p => p.snd.writeTextMessage(routeAsJson))
         }
         this.usersWaitingForRoute.remove(routeId)
+    }
+
+    def getUserNumber(): Int = {
+        usersOnChannelConnect.size
     }
 
     private def tell(obj: Any): Unit = {
