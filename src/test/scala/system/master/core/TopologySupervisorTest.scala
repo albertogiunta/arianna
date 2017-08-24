@@ -267,5 +267,4 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
             case msg => supervisor forward msg
         }
     }
-    
 }

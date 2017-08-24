@@ -29,22 +29,19 @@ class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) 
     override protected def subscribed: Receive = {
     
         case AriadneMessage(Handshake, CellToMaster, `cellToMaster`, pkg: SensorsInfoUpdate) =>
-    
             publisher() ! HACK()
-        
             if (stashedHandshakes.apply(pkg.cell.uri)) {
-                log.info("Stashing handshake from {} for later administration...", sender.path)
+                log.info("Stashing handshake from {} for later administration...", sender.path.address)
                 stashedHandshakes.add(pkg.cell.uri)
                 stash
             } else {
-                log.info("Handshakes from {} already stashed...", sender.path)
+                log.info("Handshakes from {} already stashed...", sender.path.address)
             }
 
         case MasterSubscriber.TopologyLoadedACK =>
-            
+            stashedHandshakes.clear
             context.become(behavior = sociable, discardOld = true)
-            log.info("I've Become Sociable...")
-    
+            log.info("I've Become Sociable!")
             unstashAll
         
         case _ => desist _
@@ -53,13 +50,12 @@ class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) 
     def sociable: Receive = {
     
         case msg@AriadneMessage(Handshake, CellToMaster, `cellToMaster`, _) =>
-    
             publisher() ! HACK()
             topologySupervisor() forward msg
 
         case MasterSubscriber.TopologyMappedACK =>
             context.become(behavior = proactive, discardOld = true)
-            log.info("I've become ProActive...")
+            log.info("I've become ProActive!")
         
         case _ => desist _
     }

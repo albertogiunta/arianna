@@ -47,10 +47,8 @@ class TopologySupervisor extends TemplateActor {
     }
     
     protected override def init(args: List[String]): Unit = {
-    
         super.init(args)
         log.info("Requesting map to the Admin Application...")
-        
         admin() ! AriadneMessage(
             Error, Error.Subtype.LookingForAMap,
             masterToAdmin, Empty()
@@ -61,7 +59,6 @@ class TopologySupervisor extends TemplateActor {
     
         case AriadneMessage(Topology, Planimetrics, `adminToMaster`, map: Area) =>
             log.info("A topology has been loaded in the server...")
-    
             if (topology.isEmpty || map.id != mapVersionID) {
     
                 mapVersionID = map.id
@@ -91,20 +88,14 @@ class TopologySupervisor extends TemplateActor {
         case AriadneMessage(Topology, Planimetrics, _, map: Area) => unexpectedPlanimetry(map)
 
         case msg@AriadneMessage(Handshake, CellToMaster, `cellToMaster`, cnt@SensorsInfoUpdate(cell, _)) =>
-    
             log.info("Received handshake from cell {}", cell.uri)
     
             if (indexByUri.get(cell.uri).nonEmpty && !alreadyMapped(cell.uri)) {
-        
                 log.info("Found a match into the loaded Topology for {}", cell.uri)
-    
-                val newRoom = topology(indexByUri(cell.uri)).copy(cell = cnt)
-        
-                topology.put(indexByUri(cell.uri), newRoom)
+                topology.put(indexByUri(cell.uri), topology(indexByUri(cell.uri)).copy(cell = cnt))
                 alreadyMapped.add(cell.uri)
     
                 admin() forward msg
-        
                 watchDogSupervisor forward cell
     
                 if (synced ++== topology.size) {
@@ -166,7 +157,6 @@ class TopologySupervisor extends TemplateActor {
         case AriadneMessage(Topology, Planimetrics, _, map: Area) => unexpectedPlanimetry(map)
         
         case AriadneMessage(Update, CurrentPeople, `cellToMaster`, pkg: CurrentPeopleUpdate) =>
-    
             if (topology.get(pkg.room.name).nonEmpty) {
                 log.info("Updating current people in {} from {}", pkg.room.name, sender.path.address)
                 val newRoom = topology(pkg.room.name).copy(currentPeople = pkg.currentPeople)
@@ -176,7 +166,6 @@ class TopologySupervisor extends TemplateActor {
             }
 
         case AriadneMessage(Update, Sensors, `cellToMaster`, SensorsInfoUpdate(cell, sensors)) =>
-    
             if (topology.get(indexByUri(cell.uri)).nonEmpty) {
                 log.info("Updating sensor values in {} from {}", cell.uri, sender.path.address)
                 val newCell = topology(indexByUri(cell.uri)).cell.copy(sensors = sensors)
@@ -187,7 +176,7 @@ class TopologySupervisor extends TemplateActor {
     
         case AriadneMessage(Handshake, CellToMaster, `cellToMaster`, SensorsInfoUpdate(cell, _)) =>
             log.info("Late handshake from {}...", sender.path.address)
-            context.become(acknowledging, discardOld = true)
+            context.become(tardy, discardOld = true)
             
             watchDogSupervisor forward cell
     
@@ -203,8 +192,9 @@ class TopologySupervisor extends TemplateActor {
         case _ => desist _
     }
     
-    private def unexpectedPlanimetry(map: Area): Unit = {
+    private def tardy: Receive = proactive orElse acknowledging
     
+    private def unexpectedPlanimetry(map: Area): Unit = {
         if (map.id != mapVersionID) {
             log.error("Received an unexpected Topology from {} but Map ID mismatch ...", sender.path.address)
             admin() ! AriadneMessage(

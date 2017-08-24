@@ -110,14 +110,9 @@ class MasterSubscriberTest extends TestKit(ActorSystem("SubscriberTest", MasterS
             " and Forward handshake requests to the TopologySupervisor, After becoming Sociable" in {
     
             tester ! MasterSubscriber.TopologyLoadedACK
-            
-            probe.expectMsg(ackHand)
     
-            assert(probe.sender == tester.underlyingActor.publisher)
-            
-            probe.expectMsg(handshake)
-    
-            assert(probe.sender == tester.underlyingActor.supervisor)
+            probe.expectNoMsg()
+
         }
         
         "Ignore everything that isn't an Handshake or an Update" in {

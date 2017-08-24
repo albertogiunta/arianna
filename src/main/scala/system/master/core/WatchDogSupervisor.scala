@@ -38,6 +38,7 @@ class WatchDogSupervisor extends CustomActor {
             }
         
         case WatchDog.WatchDogNotification(hookedCell: String) =>
+            log.warning("Timer for {} has expired...", hookedCell)
             if (actorByUri.get(hookedCell).nonEmpty) {
                 val doggy = new CellWatchDog(self, hookedCell)
                 actorByUri.put(hookedCell, actorByUri(hookedCell).copy(_2 = doggy))
