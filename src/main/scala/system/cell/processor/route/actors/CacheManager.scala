@@ -20,8 +20,6 @@ class CacheManager(val cacheKeepAlive: Long) extends CustomActor {
             log.info("Evaluating cache...")
     
             sender ! (
-                // Maybe we can check also the if there is a path saved going from "to" to "from"
-                // that is a reverse path
                 if (routesTimelife.get((from.name, to.name)).nonEmpty
                     && System.currentTimeMillis - routesTimelife((from.name, to.name)) < cacheKeepAlive) {
                     log.info("Match found in Cache...")
