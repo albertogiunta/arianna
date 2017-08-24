@@ -63,7 +63,15 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
                         Log.info(s"closed a /route, now at ${usersWaitingForRoute.size}")
                     })
                 case "/alarm" =>
-                    this.usersReadyForAlarm.put(ws.textHandlerID, ws)
+                    ws.handler((data) => {
+                        data.toString() match {
+                            case MSGTAkkaVertx.ALARM_SETUP =>
+                                this.usersReadyForAlarm.put(ws.textHandlerID, ws)
+                                tell(MSGTAkkaVertx.ALARM_SETUP)
+                            case _ =>
+                        }
+                    })
+                    Log.info(s"shameless useless log ${usersReadyForAlarm.size}")
                     ws.closeHandler((_) => {
                         this.usersReadyForAlarm.remove(ws.textHandlerID())
                         Log.info(s"closed a /alarm, now at ${usersReadyForAlarm.size}")
@@ -111,7 +119,6 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
             usersReadyForAlarm.remove(id)
         })
         this.usersWaitingForDisconnection.clear()
-
     }
 
     /**
@@ -128,6 +135,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
       * @param routeAsJson the marshaled version of the route from this cell to the exit
       */
     def sendAlarmToUsers(routeAsJson: String): Unit = {
+        Log.info(s"writing alarm to users ${usersReadyForAlarm.size}")
         usersReadyForAlarm.foreach(p => p._2.writeTextMessage(routeAsJson))
     }
 

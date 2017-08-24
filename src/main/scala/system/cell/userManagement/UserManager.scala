@@ -17,6 +17,7 @@ object MSGTAkkaVertx {
     val FIRST_CONNECTION: String = "firstConnection"
     val NORMAL_CONNECTION_RESPONSE = "ack"
     val DISCONNECT: String = "disconnect"
+    val ALARM_SETUP: String = "okToReceiveAlarms"
     val END_ALARM: String = "endAlarm"
     val SYS_SHUTDOWN: String = "sysShutdown"
 }
@@ -64,8 +65,6 @@ class UserManager extends TemplateActor with ActorLogging {
     
     protected def operational: Receive = operationalForCell orElse operationalForMobile
 
-    //    protected def operationalWithAlarm: Receive = operational andThen operationalAndProactiveForMobile
-
     protected def operationalForCell: Receive = {
         case AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Response, _, response@RouteResponse(request, route)) =>
             request match {
@@ -73,54 +72,47 @@ class UserManager extends TemplateActor with ActorLogging {
                 case RouteRequest(_, _, _, true) =>
                     val routeAsString = RouteResponseShort(route).toJson.toString()
                     s.sendAlarmToUsers(routeAsString)
-                    alarmMessage = routeAsString
                     isAlarmed = true
-                //                    context.become(operationalWithAlarm)
+                    alarmMessage = routeAsString
             }
         case AriadneMessage(Alarm, Alarm.Subtype.End, _, _) =>
             s.sendAlarmEndToUsers()
             isAlarmed = false
-        //            context.become(operational)
     }
 
     protected def operationalForMobile: Receive = {
         case MSGTAkkaVertx.FIRST_CONNECTION =>
             s.sendAreaToNewUser(areaForUser.toJson.toString())
-            doOnEveryNewConnection()
+            incrementUserNumber()
         case MSGTAkkaVertx.NORMAL_CONNECTION =>
             s.sendAckToNewUser(MSGTAkkaVertx.NORMAL_CONNECTION_RESPONSE)
-            doOnEveryNewConnection()
+            incrementUserNumber()
         case MSGTAkkaVertx.DISCONNECT =>
-            s.disconnectUsers()
             decrementUserNumber()
+        case MSGTAkkaVertx.ALARM_SETUP =>
+            log.info(s"is alarmed? $isAlarmed")
+            if (isAlarmed) s.sendAlarmToUsers(alarmMessage)
         case msg: RouteRequestFromClient =>
             parent ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell, RouteRequest(msg.userID, getCellWithUri(msg.fromCellUri), getCellWithUri(msg.toCellUri), isEscape = false))
         case _ => desist _
     }
-
-    //    protected def operationalAndProactiveForMobile: Receive = {
-    //        case MSGTAkkaVertx.FIRST_CONNECTION =>
-    //            s.sendAlarmToUsers(alarmMessage.content.asInstanceOf[RouteResponse].route.toJson.toString())
-    //        case MSGTAkkaVertx.NORMAL_CONNECTION =>
-    //            s.sendAlarmToUsers(alarmMessage.content.asInstanceOf[RouteResponse].route.toJson.toString())
-    //    }
 
     override def postStop(): Unit = {
         s.sendSystemShutDownToUsers()
         super.postStop()
     }
 
-    private def doOnEveryNewConnection() {
-        incrementUserNumber()
-        if (isAlarmed) s.sendAlarmToUsers(alarmMessage)
+    private def incrementUserNumber(): Unit = {
+        usrNumber = usrNumber + 1
+        sendCurrentPeopleUpdate()
     }
 
-    private def incrementUserNumber(): Unit = usrNumber = usrNumber + 1;
-    sendCurrentPeopleUpdate()
 
+    private def decrementUserNumber(): Unit = {
+        usrNumber = if (usrNumber > 0) usrNumber - 1 else usrNumber
+        sendCurrentPeopleUpdate()
+    }
 
-    private def decrementUserNumber(): Unit = usrNumber = if (usrNumber > 0) usrNumber - 1 else usrNumber;
-    sendCurrentPeopleUpdate()
 
     private def sendCurrentPeopleUpdate(): Unit = {
         parent ! AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, CurrentPeopleUpdate(RoomID(serial, uri), usrNumber))
