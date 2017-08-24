@@ -21,15 +21,15 @@ class MasterPublisher(mediator: ActorRef) extends TemplatePublisher(mediator) {
             mediator ! Publish(Topic.ShutDown, msg)
             
         case msg@AriadneMessage(Alarm, _, _, _) =>
-            log.info("Forwarding... {}", msg)
+            log.info("Forwarding... {}", msg.subtype.toString)
             mediator ! Publish(Topic.Alarms, msg)
         
         case msg@AriadneMessage(Topology, _, _, _) =>
-            log.info("Forwarding... {}", msg)
+            log.info("Forwarding... {}", msg.subtype.toString)
             mediator ! Publish(Topic.Topologies, msg)
     
         case msg@AriadneMessage(Handshake, Acknowledgement, _, _) =>
-            log.info("Forwarding... {}", msg)
+            log.info("Forwarding... {}", msg.subtype.toString)
             mediator ! Publish(Topic.HandShakes, msg)
             
         case (dest: String, cnt: AriadneMessage[_]) =>
