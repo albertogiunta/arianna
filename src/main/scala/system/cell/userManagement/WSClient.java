@@ -51,7 +51,7 @@ public class WSClient extends AbstractVerticle {
 
     public void sendMessageDisconnect() {
         Log.info("[CLIENT CONNECT] " + MSGTAkkaVertx.DISCONNECT());
-        webSocketConnect.writeTextMessage(MSGTAkkaVertx.DISCONNECT());
+        webSocketConnect.close();
     }
 
     public void sendMessageAskRoute() {
