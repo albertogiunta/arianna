@@ -22,7 +22,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
     override def start(): Unit = {
         val options = new HttpServerOptions().setTcpKeepAlive(true).setIdleTimeout(0)
         vertx.createHttpServer(options).websocketHandler((ws: ServerWebSocket) => {
-            Log.info("[SERVER " + baseUrl + "] PATH " + ws.path + " " + ws.uri + " " + ws.query)
+            Log.info(s"[SERVER $baseUrl] PATH ${ws.path}  ${ws.uri}")
             ws.path.split(baseUrl)(1) match {
                 case "/connect" =>
                     ws.handler((data) => {
@@ -64,6 +64,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
                     })
                 case "/alarm" =>
                     ws.handler((data) => {
+                        Log.info(s"/alarm ricevuto: ${data.toString()}")
                         data.toString() match {
                             case MSGTAkkaVertx.ALARM_SETUP =>
                                 this.usersReadyForAlarm.put(ws.textHandlerID, ws)
@@ -71,7 +72,6 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
                             case _ =>
                         }
                     })
-                    Log.info(s"shameless useless log ${usersReadyForAlarm.size}")
                     ws.closeHandler((_) => {
                         this.usersReadyForAlarm.remove(ws.textHandlerID())
                         Log.info(s"closed a /alarm, now at ${usersReadyForAlarm.size}")
