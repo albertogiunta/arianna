@@ -112,18 +112,18 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
         usersWaitingForArea.clear()
     }
 
-    /**
-      * Called when a user disconnects from a cell because he wants to connect to the next one
-      */
-    def disconnectUsers(): Unit = {
-        Log.info("Waiting for DISCONNECTION " + usersWaitingForDisconnection.size)
-        this.usersWaitingForDisconnection.keySet.foreach((id: String) => {
-            usersWaitingForConnectionAck.remove(id)
-            usersWaitingForArea.remove(id)
-            usersReadyForAlarm.remove(id)
-        })
-        this.usersWaitingForDisconnection.clear()
-    }
+    //    /**
+    //      * Called when a user disconnects from a cell because he wants to connect to the next one
+    //      */
+    //    def disconnectUsers(): Unit = {
+    //        Log.info("Waiting for DISCONNECTION " + usersWaitingForDisconnection.size)
+    //        this.usersWaitingForDisconnection.keySet.foreach((id: String) => {
+    //            usersWaitingForConnectionAck.remove(id)
+    //            usersWaitingForArea.remove(id)
+    //            usersReadyForAlarm.remove(id)
+    //        })
+    //        this.usersWaitingForDisconnection.clear()
+    //    }
 
     /**
       * Called when an alarm is shut down because the emergency's done

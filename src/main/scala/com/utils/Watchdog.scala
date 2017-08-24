@@ -1,13 +1,13 @@
 package com.utils
 
 import akka.actor.ActorRef
-import com.utils.WatchDog.WatchDogNotification
+import com.utils.Watchdog.WatchDogNotification
 
 /**
   * Trait for a generic watch dog timer
   * Created by Matteo Gabellini on 10/08/2017.
   */
-trait WatchDog {
+trait Watchdog {
     
     /**
       * Notify to the watch dog that the expected
@@ -16,7 +16,7 @@ trait WatchDog {
     def notifyEventOccurred: Unit
 }
 
-object WatchDog {
+object Watchdog {
     val waitTime = 5000
     
     /**
@@ -32,7 +32,7 @@ object WatchDog {
   * @param waitTime             the time value after which the actor will be notified,
   *                             the default value is the waitTime value specified in the WatchDog companion object
   **/
-class BasicWatchDog(actorToNotifyTimeOut: ActorRef, waitTime: Long = WatchDog.waitTime) extends Thread with WatchDog {
+class BasicWatchdog(actorToNotifyTimeOut: ActorRef, waitTime: Long = Watchdog.waitTime) extends Thread with Watchdog {
     
     var eventOccurred: Boolean = false
 

@@ -8,7 +8,7 @@ import akka.cluster.pubsub.DistributedPubSubMediator.Publish
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit, TestProbe}
 import com.actors.{ClusterMembersListener, CustomActor}
 import com.typesafe.config.{Config, ConfigFactory}
-import com.utils.WatchDog
+import com.utils.Watchdog
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import system.names.NamingSystem
 import system.ontologies.messages.Location._
@@ -118,14 +118,14 @@ class CellPublisherTest extends TestKit(ActorSystem("CellPublisherTest", CellPub
 
         "if the acknowledge isn't received between the first sending and the watchdog notification," +
             "request another time the info to the father and resend the handshake message" in {
-            proxy.expectMsg((WatchDog.waitTime + 1000) millisecond, "Info Request Received")
+            proxy.expectMsg((Watchdog.waitTime + 1000) millisecond, "Info Request Received")
             proxy.send(parent, simulatedResponse)
             proxy.expectMsg(CellPublisherTest.handshakeResponse)
         }
 
         "after receiving the handshake ack, not resend another handshake message" in {
             proxy.send(parent, handshakeAck)
-            proxy.expectNoMsg((WatchDog.waitTime + 1000) millisecond)
+            proxy.expectNoMsg((Watchdog.waitTime + 1000) millisecond)
         }
 
         "when has \"cultured\", forward messages to the mediator of type Alarm" in {

@@ -16,7 +16,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 /**
-  * This Actor transform the Topology in a graph and calculate a given route using Dijkstra Algorithm
+  * This Actor transform the Topology in a graph and calculate a given route using A* Algorithm
   *
   */
 class RouteProcessor(val core: ActorRef) extends CustomActor {
@@ -24,9 +24,9 @@ class RouteProcessor(val core: ActorRef) extends CustomActor {
     val cacheManager: () => ActorSelection = () => sibling(NamingSystem.CacheManager).get
     
     override def receive: Receive = {
-        case RouteInfo(req, AreaViewedFromACell(_, rooms)) =>
-            req match {
-                case RouteRequest(_, actualRoom, _, true) =>
+        case RouteInfo(request, AreaViewedFromACell(_, rooms)) =>
+            request match {
+                case RouteRequest(_, actualRoom, _, isEscape@true) =>
                     val futures = rooms.filter(r => r.info.isExitPoint)
                         .map(exit => RouteProcessor.computeRoute(actualRoom.name, exit.info.id.name, rooms))
                     
@@ -34,32 +34,29 @@ class RouteProcessor(val core: ActorRef) extends CustomActor {
                         futures.map(f => Await.result(f, Duration.Inf)).minBy(res => res._2)
                     }.onComplete(p => if (p.isSuccess) {
                         log.info("Found route {} with a cost of {}", p.get._1.mkString(" -> "), p.get._2)
-                        core ! ResponseMessage(req.copy(toCell = p.get._1.last), p.get._1)
+                        core ! Response(request.copy(toCell = p.get._1.last), p.get._1)
                     })
-
-                case RouteRequest(_, fromCell, toCell, false) =>
+            
+                case RouteRequest(_, fromCell, toCell, isEscape@false) =>
                     RouteProcessor.computeRoute(fromCell.name, toCell.name, rooms)
                         .onComplete(p => if (p.isSuccess) {
-    
                             log.info("Found route {} with a cost of {}", p.get._1.mkString(" -> "), p.get._2)
-                            
-                            log.info("Sending route data for Caching")
     
-                            cacheManager() ! RouteResponse(req, p.get._1)
+                            cacheManager() ! RouteResponse(request, p.get._1)
     
-                            core ! ResponseMessage(req, p.get._1)
+                            core ! Response(request, p.get._1)
                         })
             }
 
         case _ => // Ignore
     }
     
-    private val ResponseMessage = (req: RouteRequest, route: List[RoomID]) =>
+    private val Response = (request: RouteRequest, route: List[RoomID]) =>
         AriadneMessage(
             Route,
             Route.Subtype.Response,
             Location.Cell >> Location.User,
-            RouteResponse(req, route)
+            RouteResponse(request, route)
         )
     
 }
@@ -77,7 +74,7 @@ object RouteProcessor {
       */
     def computeRoute(fromRoom: String, toRoom: String, rooms: List[RoomViewedFromACell]): Future[(List[RoomID], Double)] =
         Future[(List[RoomID], Double)] {
-            val indexByName: Map[String, RoomViewedFromACell] = HashMap(rooms.map(c => c.info.id.name -> c): _*)
+            val indexByName: Map[String, RoomViewedFromACell] = HashMap(rooms.map(r => r.info.id.name -> r): _*)
     
             val graph: Graph[String] = toGraph(indexByName)
     

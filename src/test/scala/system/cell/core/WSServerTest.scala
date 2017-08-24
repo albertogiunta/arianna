@@ -53,8 +53,6 @@ class WSServerTest extends FlatSpec with Matchers {
     "The server" should "receive a new disconnection request from a user" in {
         c.sendMessageDisconnect()
         Thread.sleep(500)
-        s.usersWaitingForDisconnection.size should be(1)
-        s.disconnectUsers()
         s.usersWaitingForConnectionAck.size should be(0)
         s.usersWaitingForArea.size should be(0)
         s.usersWaitingForDisconnection.size should be(0)
