@@ -10,7 +10,7 @@ class SimulationStrategiesTest extends FlatSpec with Matchers with BeforeAndAfte
 
 
     val refreshTime = 1000
-    val sleepTime = refreshTime + 500
+    val sleepTime = refreshTime + 600
     val doubleChangeStep = 1.0
     val minDoubleValue = 0.0
     val maxDoubleValue = 5.0
