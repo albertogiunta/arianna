@@ -3,19 +3,18 @@ package system.master.core
 import akka.actor.{ActorRef, ActorSelection, Props}
 import com.actors.TemplateActor
 import com.utils.Counter
-import com.utils.WatchDog.WatchDogNotification
+import com.utils.Watchdog.WatchDogNotification
 import system.master.cluster.MasterSubscriber
 import system.names.NamingSystem
 import system.ontologies.messages.Location.PreMade._
 import system.ontologies.messages.MessageType.Handshake.Subtype.CellToMaster
 import system.ontologies.messages.MessageType.Topology.Subtype.{Acknowledgement, Planimetrics, ViewedFromACell}
 import system.ontologies.messages.MessageType.Update.Subtype.{CurrentPeople, Sensors}
-import system.ontologies.messages.MessageType.{Error, Handshake, Topology, Update}
+import system.ontologies.messages.MessageType.{Error, Handshake, Init, Topology, Update}
 import system.ontologies.messages.SensorsInfoUpdate._
 import system.ontologies.messages._
 
 import scala.collection.mutable
-
 
 /**
   * This Actor has the main duty to maintain the Topology Updated with the incoming information
@@ -36,14 +35,14 @@ class TopologySupervisor extends TemplateActor {
     private val admin: () => ActorSelection = () => sibling(NamingSystem.AdminSupervisor).get
     
     private var dataStreamer: ActorRef = _
-    private var watchDogSupervisor: ActorRef = _
+    private var watchdogSupervisor: ActorRef = _
     
     private val synced: Counter = Counter()
     
     override def preStart: Unit = {
         super.preStart
         dataStreamer = context.actorOf(Props(new DataStreamer(target = admin())), NamingSystem.DataStreamer)
-        watchDogSupervisor = context.actorOf(Props[WatchDogSupervisor], NamingSystem.WatchDogSupervisor)
+        watchdogSupervisor = context.actorOf(Props[WatchdogSupervisor], NamingSystem.WatchdogSupervisor)
     }
     
     protected override def init(args: List[String]): Unit = {
@@ -52,6 +51,11 @@ class TopologySupervisor extends TemplateActor {
         admin() ! AriadneMessage(
             Error, Error.Subtype.LookingForAMap,
             masterToAdmin, Empty()
+        )
+    
+        watchdogSupervisor ! AriadneMessage(
+            Init, Init.Subtype.Greetings,
+            selfToSelf, Greetings(List())
         )
     }
     
@@ -96,22 +100,26 @@ class TopologySupervisor extends TemplateActor {
                 alreadyMapped.add(cell.uri)
     
                 admin() forward msg
-                watchDogSupervisor forward cell
+                watchdogSupervisor forward cell
     
                 if (synced ++== topology.size) {
                     log.info("All the Cells have been mapped into their logical position into the Planimetry")
                     context.become(acknowledging, discardOld = true)
                     log.info("I've Become Acknowledging!")
     
+                    alreadyMapped.clear
+                    
                     subscriber() ! MasterSubscriber.TopologyMappedACK
     
+                    log.info("Notifying the watchdog supervisor to run timers...")
+                    watchdogSupervisor ! true
+                    
                     publisher() ! AriadneMessage(
                         Topology, ViewedFromACell, masterToCell,
                         AreaViewedFromACell(mapVersionID, topology.map(e => RoomViewedFromACell(e._2)).toList)
                     )
     
-                    log.info("Notifying the watchdog supervisor to run timers...")
-                    watchDogSupervisor ! true
+                    unstashAll
                 }
         
             } else if (!alreadyMapped(cell.uri)) {
@@ -122,22 +130,19 @@ class TopologySupervisor extends TemplateActor {
                 )
             }
 
-        case _ => desist _
+        case _ => stash
     }
     
     private def acknowledging: Receive = {
         
-        case AriadneMessage(Topology, Planimetrics, _, map: Area) => unexpectedPlanimetry(map)
-        
         case msg@AriadneMessage(Topology, Acknowledgement, `cellToMaster`, _) =>
             log.info("Received Topology Acknowledgement from {}, forwarding to W.D.Supervisor...", sender.path.address)
-            watchDogSupervisor forward msg
+            watchdogSupervisor forward msg
         
         case WatchDogNotification(true) =>
             context.become(proactive, discardOld = true)
             log.info("I've become ProActive")
-            unstashAll
-        
+
         case WatchDogNotification(hookedActor: ActorRef) =>
             log.info("Resending new Topology to {}", hookedActor.path.address)
             
@@ -148,8 +153,7 @@ class TopologySupervisor extends TemplateActor {
                     AreaViewedFromACell(mapVersionID, topology.map(e => RoomViewedFromACell(e._2)).toList)
                 )
             )
-
-        case _ => stash
+        case _ => desist _
     }
     
     private def proactive: Receive = {
@@ -177,8 +181,8 @@ class TopologySupervisor extends TemplateActor {
         case AriadneMessage(Handshake, CellToMaster, `cellToMaster`, SensorsInfoUpdate(cell, _)) =>
             log.info("Late handshake from {}...", sender.path.address)
             context.become(tardy, discardOld = true)
-            
-            watchDogSupervisor forward cell
+    
+            watchdogSupervisor forward cell
     
             publisher() ! (
                 sender.path.elements.mkString("/"),
@@ -187,7 +191,7 @@ class TopologySupervisor extends TemplateActor {
                     AreaViewedFromACell(mapVersionID, topology.map(e => RoomViewedFromACell(e._2)).toList)
                 )
             )
-            watchDogSupervisor ! true
+            watchdogSupervisor ! true
         
         case _ => desist _
     }

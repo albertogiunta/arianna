@@ -56,8 +56,10 @@ class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) 
         case MasterSubscriber.TopologyMappedACK =>
             context.become(behavior = proactive, discardOld = true)
             log.info("I've become ProActive!")
-        
-        case _ => desist _
+            unstashAll
+
+        case AriadneMessage(Update, _, _, _) => desist _
+        case _ => stash
     }
     
     def proactive: Receive = {

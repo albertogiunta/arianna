@@ -133,5 +133,5 @@ abstract class TemplateActor extends CustomActor {
       *
       * @param msg The unhandled message from the current behaviour
       */
-    protected def desist(msg: Any): Unit = log.info("Unhandled... {}", msg.toString) // Ignore
+    protected def desist(msg: Any): Unit = log.debug("Unhandled... {}", msg.toString) // Ignore
 }

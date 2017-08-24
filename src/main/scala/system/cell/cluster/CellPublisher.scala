@@ -3,8 +3,8 @@ package system.cell.cluster
 import akka.actor.ActorRef
 import akka.cluster.pubsub.DistributedPubSubMediator.Publish
 import com.actors.{ClusterMembersListener, TemplatePublisher}
-import com.utils.BasicWatchDog
-import com.utils.WatchDog.WatchDogNotification
+import com.utils.BasicWatchdog
+import com.utils.Watchdog.WatchDogNotification
 import system.ontologies._
 import system.ontologies.messages.MessageType._
 import system.ontologies.messages._
@@ -14,8 +14,8 @@ import system.ontologies.messages._
   * Created by Matteo Gabellini on 29/06/2017.
   */
 class CellPublisher(mediator: ActorRef) extends TemplatePublisher(mediator) {
-
-    private var watchDog: BasicWatchDog = _
+    
+    private var watchdog: BasicWatchdog = _
     
     override protected def init(args: List[String]): Unit = {
         super.init(args)
@@ -44,12 +44,12 @@ class CellPublisher(mediator: ActorRef) extends TemplatePublisher(mediator) {
             mediator ! Publish(Topic.HandShakes,
                 handshakeMsg
             )
-            this.watchDog = new BasicWatchDog(self)
-            this.watchDog.start()
+            this.watchdog = new BasicWatchdog(self)
+            this.watchdog.start()
             log.info("Sending Handshake to Master...")
         }
         case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, _, cnt) =>
-            this.watchDog.notifyEventOccurred
+            this.watchdog.notifyEventOccurred
             this.context.become(cultured, discardOld = true)
             log.debug("I've become cultured")
         case WatchDogNotification => {
