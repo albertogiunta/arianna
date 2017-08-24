@@ -134,16 +134,13 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
 
         case msg@AriadneMessage(Alarm, _, Location.PreMade.selfToSelf, _) => {
             //Alarm triggered in the current cell
-            //Check if the topology is initialized
-            if (topology.nonEmpty) {
-                val currentCell: RoomViewedFromACell = topology(indexByUri(localCellInfo.uri))
-                val msgToSend = msg.copy(
-                    content = AlarmContent(localCellInfo, currentCell.info)
-                )
-                cellPublisher ! msgToSend
-                context.become(localEmergency, discardOld = true)
-                log.info("Alarm triggered locally")
-            }
+            val currentCell: RoomViewedFromACell = topology(indexByUri(localCellInfo.uri))
+            val msgToSend = msg.copy(
+                content = AlarmContent(localCellInfo, currentCell.info)
+            )
+            cellPublisher ! msgToSend
+            context.become(localEmergency, discardOld = true)
+            log.info("Alarm triggered locally")
         }
 
         case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) =>
