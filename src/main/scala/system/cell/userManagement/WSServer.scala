@@ -20,8 +20,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
 
     @throws[Exception]
     override def start(): Unit = {
-        //        val options = new HttpServerOptions().setTcpKeepAlive(true).setIdleTimeout(0)
-        val options = new HttpServerOptions().setIdleTimeout(0)
+        val options = new HttpServerOptions().setTcpKeepAlive(true).setIdleTimeout(0)
         vertx.createHttpServer(options).websocketHandler((ws: ServerWebSocket) => {
             Log.info("[SERVER " + baseUrl + "] PATH " + ws.path + " " + ws.uri + " " + ws.query)
             ws.path.split(baseUrl)(1) match {
@@ -30,19 +29,20 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
                         data.toString() match {
                             case MSGTAkkaVertx.FIRST_CONNECTION => this.usersWaitingForArea.put(ws.textHandlerID, ws)
                             case MSGTAkkaVertx.NORMAL_CONNECTION => this.usersWaitingForConnectionAck.put(ws.textHandlerID, ws)
-                            case MSGTAkkaVertx.DISCONNECT => this.usersWaitingForDisconnection.put(ws.textHandlerID, ws)
                             case _ => Log.info("Unknown message received: " + data.toString())
                         }
                         data.toString() match {
                             case str if MSGTAkkaVertx.FIRST_CONNECTION == str ||
-                                    MSGTAkkaVertx.NORMAL_CONNECTION == str ||
-                                    MSGTAkkaVertx.DISCONNECT == str => tell(data.toString())
+                                    MSGTAkkaVertx.NORMAL_CONNECTION == str => tell(data.toString())
                             case _ =>
                         }
                     })
                     ws.closeHandler((_) => {
-                        this.usersWaitingForDisconnection.put(ws.textHandlerID, ws)
+                        this.usersWaitingForArea.remove(ws.textHandlerID())
+                        this.usersWaitingForConnectionAck.remove(ws.textHandlerID())
+                        this.usersWaitingForDisconnection.remove(ws.textHandlerID())
                         tell(MSGTAkkaVertx.DISCONNECT)
+                        Log.info(s"closed a /connect, now at ${usersWaitingForConnectionAck.size} and ${usersWaitingForArea.size} and ${usersWaitingForDisconnection.size}")
                     })
                 case "/route" =>
                     ws.handler((data) => {
@@ -57,7 +57,17 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
                         Log.info("asked route " + uri + " " + usersWaitingForRoute.size)
                         tell(RouteRequestFromClient(ws.textHandlerID, uriStart, uriEnd, isEscape = false))
                     })
-                case "/alarm" => this.usersReadyForAlarm.put(ws.textHandlerID, ws)
+                    ws.closeHandler((_) => {
+                        val value = new Pair[String, ServerWebSocket](ws.textHandlerID, ws)
+                        usersWaitingForRoute.foreach(r => r._2.remove(value))
+                        Log.info(s"closed a /route, now at ${usersWaitingForRoute.size}")
+                    })
+                case "/alarm" =>
+                    this.usersReadyForAlarm.put(ws.textHandlerID, ws)
+                    ws.closeHandler((_) => {
+                        this.usersReadyForAlarm.remove(ws.textHandlerID())
+                        Log.info(s"closed a /alarm, now at ${usersReadyForAlarm.size}")
+                    })
                 case "/position-update" => throw new UnsupportedOperationException
                 case _ => ws.reject()
             }

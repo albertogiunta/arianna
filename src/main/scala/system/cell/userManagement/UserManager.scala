@@ -93,7 +93,6 @@ class UserManager extends TemplateActor with ActorLogging {
         case MSGTAkkaVertx.DISCONNECT =>
             s.disconnectUsers()
             decrementUserNumber()
-            sendCurrentPeopleUpdate()
         case msg: RouteRequestFromClient =>
             parent ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell, RouteRequest(msg.userID, getCellWithUri(msg.fromCellUri), getCellWithUri(msg.toCellUri), isEscape = false))
         case _ => desist _
@@ -113,13 +112,15 @@ class UserManager extends TemplateActor with ActorLogging {
 
     private def doOnEveryNewConnection() {
         incrementUserNumber()
-        sendCurrentPeopleUpdate()
         if (isAlarmed) s.sendAlarmToUsers(alarmMessage)
     }
-    
-    private def incrementUserNumber(): Unit = usrNumber = usrNumber + 1
 
-    private def decrementUserNumber(): Unit = usrNumber = if (usrNumber > 0) usrNumber - 1 else usrNumber
+    private def incrementUserNumber(): Unit = usrNumber = usrNumber + 1;
+    sendCurrentPeopleUpdate()
+
+
+    private def decrementUserNumber(): Unit = usrNumber = if (usrNumber > 0) usrNumber - 1 else usrNumber;
+    sendCurrentPeopleUpdate()
 
     private def sendCurrentPeopleUpdate(): Unit = {
         parent ! AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, CurrentPeopleUpdate(RoomID(serial, uri), usrNumber))
