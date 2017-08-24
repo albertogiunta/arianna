@@ -17,7 +17,6 @@ import system.ontologies.messages.MessageType._
 class CellSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) {
 
     override protected val topics = Set(
-        //        Topic.HandShakes,
         Topic.Alarms,
         Topic.Topologies,
         Topic.Practicabilities,
@@ -32,14 +31,14 @@ class CellSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) {
 
     override protected def subscribed = this.proactive orElse {
         case msg@AriadneMessage(Topology, Topology.Subtype.ViewedFromACell, _, cnt) =>
-            log.info("I received the topology: {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
+            log.debug("I received the topology: {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
     
             this.parent ! msg
     
             context.become(behavior = cultured, discardOld = true)
-            log.info("I've Become Cultured...")
+            log.debug("I've Become Cultured...")
 
-            log.info("Unstashing the other messages that I could not manage")
+            log.debug("Unstashing the other messages that I could not manage")
             unstashAll
 
         case _ => stash
@@ -48,10 +47,10 @@ class CellSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) {
     private def cultured: Receive = this.proactive orElse {
         case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) =>
             this.parent ! msg
-            log.info("Got {} from {} of Type {}", msg.subtype, sender.path.name, msg.supertype)
+            log.debug("Got {} from {} of Type {}", msg.subtype, sender.path.name, msg.supertype)
 
         case msg@AriadneMessage(Alarm, _, _, cnt) =>
-            log.info("Got {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
+            log.info("Alarm triggered from ", sender.path.name)
             this.parent ! msg
 
         case msg@AriadneMessage(Update, Update.Subtype.Practicability, _, cnt) =>
@@ -65,7 +64,7 @@ class CellSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) {
         case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) =>
             this.parent ! msg
         case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, _, cnt) =>
-            log.info("Got ack {} from {} of Type {}", cnt, sender.path.name, msg.supertype)
+            log.info("Got handshake ack from {}", sender.path.name)
             sibling(NamingSystem.Publisher).get ! msg
     }: Receive)
 }

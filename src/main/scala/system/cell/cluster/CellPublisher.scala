@@ -34,7 +34,7 @@ class CellPublisher(mediator: ActorRef) extends TemplatePublisher(mediator) {
 
     override protected def receptive = {
         case msg@AriadneMessage(Info, Info.Subtype.Response, Location.PreMade.selfToSelf, sensorsInfoUpdate: SensorsInfoUpdate) => {
-            log.info("Sensor Info " + sensorsInfoUpdate)
+            log.debug("Sensor Info " + sensorsInfoUpdate)
             val handshakeMsg = AriadneMessage(
                 Handshake,
                 Handshake.Subtype.CellToMaster,
@@ -51,7 +51,7 @@ class CellPublisher(mediator: ActorRef) extends TemplatePublisher(mediator) {
         case msg@AriadneMessage(Handshake, Handshake.Subtype.Acknowledgement, _, cnt) =>
             this.watchDog.notifyEventOccurred
             this.context.become(cultured, discardOld = true)
-            log.info("I've become cultured")
+            log.debug("I've become cultured")
         case WatchDogNotification => {
             //Ask to the core actor the cell information in order to continue the handshake task
             parent ! AriadneMessage(
