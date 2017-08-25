@@ -15,7 +15,7 @@ class MasterClusterSupervisor extends ClusterMembersListener {
     
         // If this is the system.master node, Actors should be already Initialized
         try {
-            if (configManager.property(builder.akka.cluster.get("seed-nodes"))
+            if (configManager.property(builder.akka.cluster("seed-nodes"))
                 .asStringList.contains(cluster.selfAddress.toString)) {
 
                 log.info("Awakening Actors on {}", cluster.selfAddress.toString)

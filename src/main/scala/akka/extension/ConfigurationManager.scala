@@ -36,6 +36,8 @@ final case class PropertyChooser(config: Config, path: String) {
     def asConfigObject: ConfigObject = config.getObject(path)
     
     def asConfigObjList: List[ConfigObject] = asScalaBuffer(config.getObjectList(path)).toList
+    
+    def asAnyRef: AnyRef = config.getAnyRef(path)
 }
 
 case class ConfigPathBuilder() {
@@ -76,8 +78,18 @@ case class ConfigPathBuilder() {
         path = "extensions" :: path
         this
     }
-
-    def get(prop: String): String = (prop :: path).reverse.mkString(".")
+    
+    def serializers: ConfigPathBuilder = {
+        path = "serializers" :: path
+        this
+    }
+    
+    def serialization_bindings: ConfigPathBuilder = {
+        path = "serialization-bindings" :: path
+        this
+    }
+    
+    def apply(prop: String): String = (prop :: path).reverse.mkString(".")
 }
 
 object ConfigurationManager extends ExtensionId[ConfigurationManagerImpl] with ExtensionIdProvider {
@@ -95,13 +107,18 @@ object ConfigurationManager extends ExtensionId[ConfigurationManagerImpl] with E
 
 object TryConfigManager extends App {
     val path2Project = Paths.get("").toFile.getAbsolutePath
-    val path2Config = path2Project + "/res/conf/akka/system.master.conf"
+    val path2Config = path2Project + "/res/conf/akka/master.conf"
     
     implicit val config: Config = ConfigFactory.parseFile(new File(path2Config))
         .withFallback(ConfigFactory.load()).resolve()
     
     implicit val system: ActorSystem = ActorSystem("Arianna-Cluster", config)
     
-    println(ConfigurationManager(system) property ConfigPathBuilder().akka.remote.netty.tcp.get("port") asNumber)
-
+    println(ConfigurationManager(system) property ConfigPathBuilder().akka.remote.netty.tcp("port") asNumber)
+    
+    println(ConfigurationManager(system) property ConfigPathBuilder().akka.cluster("seed-nodes") asStringList)
+    
+    println(ConfigurationManager(system).config("Ariadne-Admin").getAnyRef(ConfigPathBuilder().akka.remote.netty.tcp("port")))
+    
+    println(ConfigurationManager(system).config("Ariadne-Admin").getAnyRef(ConfigPathBuilder().akka.remote.netty.tcp("hostname")))
 }

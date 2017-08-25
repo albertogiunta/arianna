@@ -20,10 +20,10 @@ class ChartManager extends CustomActor {
     private var windowController: ChartWindowController = _
 
     override def receive: Receive = {
-        case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
+        case AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) =>
             Platform.runLater(() => {
                 val view = new ChartView
-                view.start
+                view.start()
                 windowController = view.controller
                 windowController.chartActor = self
                 windowController initializeWindow cell.cell
@@ -31,14 +31,14 @@ class ChartManager extends CustomActor {
             })
             context.become(operational)
         }
-    }
+
 
     def operational: Receive = {
-        case msg@AriadneMessage(Interface, Interface.Subtype.UpdateChart, _, update: RoomDataUpdate) => {
+        case AriadneMessage(Interface, Interface.Subtype.UpdateChart, _, update: RoomDataUpdate) =>
             Platform.runLater(() => {
                 windowController updateCharts update
             })
-        }
+
 
         case msg@AriadneMessage(Interface, Interface.Subtype.CloseChart, _, _) => parent ! msg
 

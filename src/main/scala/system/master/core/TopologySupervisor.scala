@@ -39,6 +39,8 @@ class TopologySupervisor extends TemplateActor {
     
     private val synced: Counter = Counter()
     
+    private var isTardy = false
+    
     override def preStart: Unit = {
         super.preStart
         dataStreamer = context.actorOf(Props(new DataStreamer(target = admin())), NamingSystem.DataStreamer)
@@ -140,7 +142,8 @@ class TopologySupervisor extends TemplateActor {
             watchdogSupervisor forward msg
         
         case WatchDogNotification(true) =>
-            context.become(proactive, discardOld = true)
+            context.become(proactive, discardOld = true);
+            isTardy = false
             log.info("I've become ProActive")
 
         case WatchDogNotification(hookedActor: ActorRef) =>
@@ -180,7 +183,8 @@ class TopologySupervisor extends TemplateActor {
     
         case AriadneMessage(Handshake, CellToMaster, `cellToMaster`, SensorsInfoUpdate(cell, _)) =>
             log.info("Late handshake from {}...", sender.path.address)
-            context.become(tardy, discardOld = true)
+            context.become(tardy, discardOld = true);
+            isTardy = true
     
             watchdogSupervisor forward cell
     
@@ -192,8 +196,8 @@ class TopologySupervisor extends TemplateActor {
                 )
             )
             watchdogSupervisor ! true
-        
-        case _ => desist _
+
+        case _ if !isTardy => desist _
     }
     
     private def tardy: Receive = proactive orElse acknowledging

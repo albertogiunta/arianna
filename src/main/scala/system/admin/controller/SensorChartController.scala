@@ -18,7 +18,7 @@ class SensorChartController extends ViewController {
     
     private var data: XYChart.Series[Double, Double] = new XYChart.Series[Double, Double]
 
-    private var time = (0 to Int.MaxValue - 1).iterator
+    private val time: Iterator[Int] = ChartUtils.timeIterator()
 
 
     override def initialize(location: URL, resources: ResourceBundle): Unit = {

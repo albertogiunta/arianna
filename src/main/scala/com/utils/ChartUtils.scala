@@ -7,10 +7,10 @@ import javafx.scene.chart.XYChart
   *
   **/
 object ChartUtils {
-    private val HEAD = 0
-    private val MAX_DATA_ON_GRAPH = 20
+    private val Head = 0
+    private val MaxNumberOfData = 20
 
-    val positionIterator = List((1, 0), (0, 1), (1, 1), (0, 2), (1, 2)).iterator
+    val positionIterator: Iterator[(Int, Int)] = List((1, 0), (0, 1), (1, 1), (0, 2), (1, 2)).iterator
 
     /** *
       * This method resizes the Series in input in order to keep it of the wanted size.
@@ -19,10 +19,14 @@ object ChartUtils {
       *
       */
     def resizeIfNeeded(data: XYChart.Series[Double, Double]): XYChart.Series[Double, Double] = {
-        if (data.getData.size.equals(MAX_DATA_ON_GRAPH)) {
-            data.getData remove HEAD
+        if (data.getData.size.equals(MaxNumberOfData)) {
+            data.getData remove Head
         }
         data
+    }
+
+    def timeIterator(): Iterator[Int] = {
+        (0 until Int.MaxValue).iterator
     }
 
 }

@@ -19,17 +19,17 @@ class ChartView() extends View {
       * Main method that starts the View and show it to the user
       **/
     def start(): Unit = {
-        val loader = new FXMLLoader(getClass.getResource(GraphicResources.chartWindow));
+        val loader = new FXMLLoader(getClass.getResource(GraphicResources.ChartWindow))
         val template = loader.load[Pane]
         controller = loader.getController[ChartWindowController]
         val stage = new Stage
         stage.setOnCloseRequest((e) => {
-            controller.closeWindow
+            controller.closeWindow()
         })
-        stage setTitle InterfaceText.chartTitle
+        stage setTitle InterfaceText.ChartTitle
         stage setScene new Scene(template)
         stage setResizable false
-        stage.show
+        stage.show()
     }
 
 }
