@@ -12,7 +12,7 @@ import system.cell.userManagement.{MSGTAkkaVertx, UserManager}
 import system.names.NamingSystem
 import system.ontologies.messages.Location._
 import system.ontologies.messages.MessageType.Topology.Subtype.{Planimetrics, ViewedFromACell}
-import system.ontologies.messages.MessageType.{Init, Topology, Update}
+import system.ontologies.messages.MessageType.{Init, Topology}
 import system.ontologies.messages._
 
 import scala.io.Source
@@ -27,10 +27,6 @@ class UserManagerTest extends TestKit(ActorSystem("UserManagerTest")) with WordS
     val routeRequest = RouteRequestFromClient("uri1", "uri1", "uri1", isEscape = false)
     val routeForward = AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell, RouteRequest("uri1",
         area.rooms.head.info.id, area.rooms.head.info.id, isEscape = false))
-    val currentPeopleUpdate0 = AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, CurrentPeopleUpdate(RoomID(1, "uri1"), 0))
-    val currentPeopleUpdate1 = AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, CurrentPeopleUpdate(RoomID(1, "uri1"), 1))
-    val currentPeopleUpdate2 = AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, CurrentPeopleUpdate(RoomID(1, "uri1"), 2))
-    val currentPeopleUpdate3 = AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, CurrentPeopleUpdate(RoomID(1, "uri1"), 3))
 
     "A UserManager" must {
         val probe = TestProbe()
@@ -43,26 +39,6 @@ class UserManagerTest extends TestKit(ActorSystem("UserManagerTest")) with WordS
             probe.expectNoMsg()
             tester ! topology
             probe.expectNoMsg()
-        }
-
-        "After the map is sent it's ready to accept messages from users and the users number increases" in {
-            tester ! MSGTAkkaVertx.FIRST_CONNECTION
-            probe.expectMsg(currentPeopleUpdate1)
-        }
-
-        "If a user disconnects the total number of users decreases and vice versa" in {
-            tester ! MSGTAkkaVertx.DISCONNECT
-            probe.expectMsg(currentPeopleUpdate0)
-            tester ! MSGTAkkaVertx.FIRST_CONNECTION
-            probe.expectMsg(currentPeopleUpdate1)
-            tester ! MSGTAkkaVertx.FIRST_CONNECTION
-            probe.expectMsg(currentPeopleUpdate2)
-            tester ! MSGTAkkaVertx.NORMAL_CONNECTION
-            probe.expectMsg(currentPeopleUpdate3)
-            tester ! MSGTAkkaVertx.DISCONNECT
-            probe.expectMsg(currentPeopleUpdate2)
-            tester ! MSGTAkkaVertx.NORMAL_CONNECTION
-            probe.expectMsg(currentPeopleUpdate3)
         }
 
         "If a route is asked by a user" in {
