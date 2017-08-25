@@ -28,15 +28,15 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
                 case "/connect" =>
                     ws.handler((data) => {
                         data.toString() match {
-                            case MSGTAkkaVertx.FirstConnection => this.usersWaitingForArea.put(ws.textHandlerID, ws)
-                            case MSGTAkkaVertx.NormalConnection => this.usersWaitingForConnectionAck.put(ws.textHandlerID, ws)
+                            case MSGTAkkaVertx.FirstConnection => this.usersWaitingForArea += ws.textHandlerID -> ws
+                            case MSGTAkkaVertx.NormalConnection => this.usersWaitingForConnectionAck += ws.textHandlerID -> ws
                             case _ => Log.info("Unknown message received in /connect: " + data.toString())
                         }
                         data.toString() match {
                             case str if MSGTAkkaVertx.FirstConnection == str ||
                                     MSGTAkkaVertx.NormalConnection == str =>
                                 tell(data.toString())
-                                usersOnChannelConnect.put(ws.textHandlerID(), ws)
+                                usersOnChannelConnect += ws.textHandlerID() -> ws
                                 Log.info(s"OPENED a /connect, (${usersOnChannelConnect.size} currently active on this channel)")
                             case _ =>
                         }
@@ -57,7 +57,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
                                 val uriEnd = data.toString().split("-")(1)
                                 val uri = buildRouteId(uriStart, uriEnd)
                                 val value = new Pair[String, ServerWebSocket](ws.textHandlerID, ws)
-                                if (usersWaitingForRoute.get(uri).isEmpty) usersWaitingForRoute.put(uri, new ConcurrentHashSet[Pair[String, ServerWebSocket]]())
+                                if (usersWaitingForRoute.get(uri).isEmpty) usersWaitingForRoute += uri -> new ConcurrentHashSet[Pair[String, ServerWebSocket]]()
                                 usersWaitingForRoute(uri).add(value)
                                 tell(RouteRequestFromClient(ws.textHandlerID, uriStart, uriEnd, isEscape = false))
                             case _ => Log.info("Unknown message received in /route: " + data.toString())
@@ -73,7 +73,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
                     ws.handler((data) => {
                         data.toString() match {
                             case MSGTAkkaVertx.AlarmSetup =>
-                                this.usersReadyForAlarm.put(ws.textHandlerID, ws)
+                                this.usersReadyForAlarm += ws.textHandlerID -> ws
                                 tell(MSGTAkkaVertx.AlarmSetup)
                             case _ => Log.info("Unknown message received in /alarm: " + data.toString())
                         }

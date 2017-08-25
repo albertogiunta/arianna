@@ -1,5 +1,15 @@
 package com.utils
 
+import java.io.File
+import java.nio.file.Paths
+
+import spray.json._
+import system.ontologies.messages.AriannaJsonProtocol._
+import system.ontologies.messages._
+
+import scala.collection.mutable
+import scala.io.Source
+
 object Practicability {
     
     val log_b: (Double, Double) => Double = (b, n) => Math.log(n) / Math.log(b)
@@ -22,4 +32,22 @@ object Practicability {
 object TryPracticability extends App {
     
     println(Practicability(100.0, 1.0, 2.0))
+    
+    val path2Project: String = Paths.get("").toFile.getAbsolutePath
+    val path2map: String = path2Project + "/res/json/map15_room.json"
+    
+    val plan: String = Source.fromFile(new File(path2map)).getLines.mkString
+    val map: Area = plan.parseJson.convertTo[Area]
+    
+    val mapViewedFromACell: mutable.Map[String, RoomViewedFromACell] =
+        mutable.HashMap(AreaViewedFromACell(map).rooms.map(r => r.info.id.name -> r): _*)
+    
+    mapViewedFromACell += "Room A" -> mapViewedFromACell("Room A").copy(practicability = Practicability(100.0, 1.0, 2.0))
+    
+    val x = mutable.HashMap.empty[String, Double]
+    
+    x += "A" -> 666
+    
+    println(mapViewedFromACell("Room A").practicability)
+    println(x)
 }

@@ -19,7 +19,7 @@ class WatchdogSupervisor extends TemplateActor {
         
         case CellInfo(uri, _, _) if actorByUri.get(uri).isEmpty =>
             log.info("Watching {}", sender.path)
-            actorByUri.put(uri, sender -> new CellWatchdog(self, uri))
+            actorByUri += uri -> (sender -> new CellWatchdog(self, uri))
             synced ++
         
         case true =>
@@ -54,7 +54,7 @@ class WatchdogSupervisor extends TemplateActor {
             log.warning("Timer for {} has expired...", uri)
             if (actorByUri.get(uri).nonEmpty) {
                 val doggy = new CellWatchdog(self, uri)
-                actorByUri.put(uri, actorByUri(uri).copy(_2 = doggy))
+                actorByUri += uri -> actorByUri(uri).copy(_2 = doggy)
                 doggy.start()
                 parent ! Watchdog.WatchDogNotification(actorByUri(uri)._1)
                 log.info("New timer for {} has started", uri)

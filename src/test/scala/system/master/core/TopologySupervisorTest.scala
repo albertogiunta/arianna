@@ -176,7 +176,7 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
     
                 val newRoom = topology(sensorsInfo.cell.uri).copy(cell = newCell)
     
-                topology.put(sensorsInfo.cell.uri, newRoom)
+                topology += sensorsInfo.cell.uri -> newRoom
                 tester ! sensorsInfoUpdate
                 probe.expectMsg(
                     AriadneMessage(
@@ -205,7 +205,7 @@ class TopologySupervisorTest extends TestKit(ActorSystem("TopologySupervisorTest
                         )
                     )
     
-                topology.put(sensorsInfo.cell.uri, newRoom)
+                topology += sensorsInfo.cell.uri -> newRoom
                 
                 tester ! currentPeopleUpdate
     

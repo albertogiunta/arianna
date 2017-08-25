@@ -60,6 +60,12 @@ class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) 
             log.info("I've become ProActive!")
             unstashAll
 
+        case msg@AriadneMessage(Topology, Topology.Subtype.Acknowledgement, _, _) =>
+            topologySupervisor() forward msg
+            context.become(behavior = proactive, discardOld = true)
+            log.info("I've become ProActive!")
+            unstashAll
+            
         case AriadneMessage(Update, _, _, _) => desist _
 
         case _ => stash

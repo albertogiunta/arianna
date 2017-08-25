@@ -29,7 +29,7 @@ class SensorManager extends TemplateActor {
 
         var sensorsToLoad = args.head.asInstanceOf[String].parseJson.convertTo[List[SensorInfoFromConfig]]
         sensorsToLoad foreach (X => {
-            sensors.put(X.categoryId, SensorInfo(X.categoryId, 0))
+            sensors += X.categoryId -> SensorInfo(X.categoryId, 0)
             val simSensor = SensorsFactory.createASensorFromConfig(X)
             simulatedSensor += simSensor.asInstanceOf[SimulatedSensor[Double]]
             observableSensors += SensorsFactory.createTheObservableVersion(simSensor)
@@ -58,7 +58,7 @@ class SensorManager extends TemplateActor {
 
     override protected def receptive: Receive = {
         case msg: SensorInfo =>
-            this.sensors.put(msg.categoryId, msg)
+            this.sensors += msg.categoryId -> msg
             this.parent ! AriadneMessage(
                 Update,
                 Update.Subtype.Sensors,

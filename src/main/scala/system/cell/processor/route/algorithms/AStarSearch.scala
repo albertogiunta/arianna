@@ -68,9 +68,9 @@ object AStarSearch {
                         val gScore = gScores(current) + neighbor._2
                         
                         if (!gScores.contains(neighbor._1) || gScore <= gScores(neighbor._1)) {
-                            parents.put(neighbor._1, current)
-                            gScores.put(neighbor._1, gScore)
-                            fScores.put(neighbor._1, gScore + heuristicCost(neighbor._1, target))
+                            parents += neighbor._1 -> current
+                            gScores += neighbor._1 -> gScore
+                            fScores += neighbor._1 -> (gScore + heuristicCost(neighbor._1, target))
                         }
                     })
                 

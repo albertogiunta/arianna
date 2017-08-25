@@ -70,8 +70,8 @@ class TopologySupervisor extends TemplateActor {
                 mapVersionID = map.id
     
                 map.rooms.foreach(room => {
-                    topology.put(room.info.id.name, room)
-                    indexByUri.put(room.cell.info.uri, room.info.id.name)
+                    topology += room.info.id.name -> room
+                    indexByUri += room.cell.info.uri -> room.info.id.name
                 })
                 
                 context.become(behavior = sociable, discardOld = true)
@@ -98,7 +98,7 @@ class TopologySupervisor extends TemplateActor {
     
             if (indexByUri.get(cell.uri).nonEmpty && !alreadyMapped(cell.uri)) {
                 log.info("Found a match into the loaded Topology for {}", cell.uri)
-                topology.put(indexByUri(cell.uri), topology(indexByUri(cell.uri)).copy(cell = cnt))
+                topology += indexByUri(cell.uri) -> topology(indexByUri(cell.uri)).copy(cell = cnt)
                 alreadyMapped.add(cell.uri)
     
                 admin() forward msg
@@ -167,7 +167,7 @@ class TopologySupervisor extends TemplateActor {
             if (topology.get(pkg.room.name).nonEmpty) {
                 log.info("Updating current people in {} from {}", pkg.room.name, sender.path.address)
                 val newRoom = topology(pkg.room.name).copy(currentPeople = pkg.currentPeople)
-                topology.put(pkg.room.name, newRoom)
+                topology += pkg.room.name -> newRoom
                 
                 dataStreamer ! topology.values
             }
@@ -177,7 +177,7 @@ class TopologySupervisor extends TemplateActor {
                 log.info("Updating sensor values in {} from {}", cell.uri, sender.path.address)
                 val newCell = topology(indexByUri(cell.uri)).cell.copy(sensors = sensors)
                 val newRoom = topology(indexByUri(cell.uri)).copy(cell = newCell)
-                topology.put(indexByUri(cell.uri), newRoom)
+                topology += indexByUri(cell.uri) -> newRoom
                 dataStreamer ! topology.values
             }
     

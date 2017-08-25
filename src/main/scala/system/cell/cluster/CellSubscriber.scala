@@ -45,6 +45,9 @@ class CellSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) {
     }
 
     private def cultured: Receive = this.proactive orElse {
+        case msg@AriadneMessage(Topology, Topology.Subtype.ViewedFromACell, _, cnt) =>
+            log.info("Got an unexpected topology...")
+            this.parent ! msg
         case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) =>
             this.parent ! msg
             log.debug("Got {} from {} of Type {}", msg.subtype, sender.path.name, msg.supertype)

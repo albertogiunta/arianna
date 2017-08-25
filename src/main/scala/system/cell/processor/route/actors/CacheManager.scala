@@ -37,8 +37,8 @@ class CacheManager(val cacheKeepAlive: Long) extends CustomActor {
 
         case RouteResponse(RouteRequest(_, from, to, _), route) =>
             log.info("Caching new route... ")
-            routeCache.put((from.name, to.name), route)
-            routesTimelife.put((from.name, to.name), System.currentTimeMillis)
+            routeCache += (from.name, to.name) -> route
+            routesTimelife += (from.name, to.name) -> System.currentTimeMillis
         case _ =>
     }
 }

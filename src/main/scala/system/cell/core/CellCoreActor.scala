@@ -111,9 +111,9 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
                 Location.PreMade.selfToSelf,
                 localCellInfo
             )
-            
-            cnt.rooms.foreach(room => topology.put(room.info.id.name, room))
-            cnt.rooms.foreach(room => indexByUri.put(room.cell.uri, room.info.id.name))
+    
+            cnt.rooms.foreach(room => topology += room.info.id.name -> room)
+            cnt.rooms.foreach(room => indexByUri += room.cell.uri -> room.info.id.name)
 
             userActor ! AriadneMessage(
                 Init,
@@ -151,13 +151,9 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
         case msg@AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.PreMade.userToCell, cnt: CurrentPeopleUpdate) => {
 
             actualSelfLoad = cnt.currentPeople
-
-            topology.put(
-                cnt.room.name,
-                topology(indexByUri(localCellInfo.uri)).copy(practicability = updatedPracticability())
-            )
     
-    
+            topology += indexByUri(localCellInfo.uri) -> topology(indexByUri(localCellInfo.uri)).copy(practicability = updatedPracticability())
+            
             cellPublisher ! msg.copy(content = cnt.copy(room = topology(indexByUri(cnt.room.name)).info.id))
             cellPublisher ! AriadneMessage(
                 Update,
@@ -176,14 +172,11 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
         case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) => {
             userActor ! msg
             context.become(cultured, discardOld = true)
-
-            practicabilityToBeRestored.put(
-                indexByUri(localCellInfo.uri),
-                updatedPracticability()
-            )
+    
+            practicabilityToBeRestored += indexByUri(localCellInfo.uri) -> updatedPracticability()
+            
             this.updatePracticabilityOnAlarmEnd()
-
-
+    
             cellPublisher ! AriadneMessage(
                 Update,
                 Update.Subtype.Practicability,
@@ -222,10 +215,9 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
                 * the receiving ordering problem between Alarm, Alarm End and Practicability Update messages
                 * sent from a cell in alarm during the alarm deactivation
                 * */
-                practicabilityToBeRestored.put(cnt.room.name, cnt.practicability)
+                practicabilityToBeRestored += cnt.room.name -> cnt.practicability
             } else {
-                topology.put(cnt.room.name, topology(cnt.room.name)
-                    .copy(practicability = cnt.practicability))
+                topology += cnt.room.name -> topology(cnt.room.name).copy(practicability = cnt.practicability)
             }
         }
 
@@ -284,10 +276,7 @@ class CellCoreActor(mediator: ActorRef) extends TemplateActor {
 
     private def updatePracticabilityOnAlarmEnd(): Unit = {
         practicabilityToBeRestored.keys.foreach(X =>
-            topology.put(
-                X,
-                topology(X).copy(practicability = practicabilityToBeRestored(X))
-            )
+            topology += X -> topology(X).copy(practicability = practicabilityToBeRestored(X))
         )
         practicabilityToBeRestored.clear()
     }

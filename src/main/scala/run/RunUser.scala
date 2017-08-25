@@ -45,7 +45,7 @@ object RunUser {
         val actors: mutable.MutableList[ActorRef] = mutable.MutableList()
 
         for (i <- 1 to 2) {
-            greetings.put(s"user$i", Greetings(List(s"uri$i", (8080 + i).toString)))
+            greetings += s"user$i" -> Greetings(List(s"uri$i", (8080 + i).toString))
         }
 
         greetings.foreach(u => {
