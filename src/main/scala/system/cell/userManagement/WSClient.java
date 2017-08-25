@@ -40,17 +40,17 @@ public class WSClient extends AbstractVerticle {
     }
 
     public void sendMessageFirstConnection() {
-        Log.info("[CLIENT CLIENT CONNECT] " + MSGTAkkaVertx.FIRST_CONNECTION());
-        webSocketConnect.writeTextMessage(MSGTAkkaVertx.FIRST_CONNECTION());
+        Log.info("[CLIENT CLIENT CONNECT] " + MSGTAkkaVertx.FirstConnection());
+        webSocketConnect.writeTextMessage(MSGTAkkaVertx.FirstConnection());
     }
 
     public void sendMessageNormalConnection() {
-        Log.info("[CLIENT CONNECT] " + MSGTAkkaVertx.NORMAL_CONNECTION());
-        webSocketConnect.writeTextMessage(MSGTAkkaVertx.NORMAL_CONNECTION());
+        Log.info("[CLIENT CONNECT] " + MSGTAkkaVertx.NormalConnection());
+        webSocketConnect.writeTextMessage(MSGTAkkaVertx.NormalConnection());
     }
 
     public void sendMessageDisconnect() {
-        Log.info("[CLIENT CONNECT] " + MSGTAkkaVertx.DISCONNECT());
+        Log.info("[CLIENT CONNECT] " + MSGTAkkaVertx.Disconnect());
         webSocketConnect.close();
     }
 

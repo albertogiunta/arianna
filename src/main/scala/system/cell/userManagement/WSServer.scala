@@ -9,6 +9,7 @@ import system.ontologies.messages.{RouteRequestFromClient, RouteResponse}
 
 import scala.collection.mutable
 import scala.tools.jline_embedded.internal.Log
+import scala.util.matching.Regex
 
 class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Integer) extends AbstractVerticle {
 
@@ -19,6 +20,8 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
     var usersReadyForAlarm: mutable.Map[String, ServerWebSocket] = new scala.collection.mutable.HashMap[String, ServerWebSocket]
     var usersWaitingForRoute: mutable.Map[String, ConcurrentHashSet[Pair[String, ServerWebSocket]]] = new scala.collection.mutable.HashMap[String, ConcurrentHashSet[Pair[String, ServerWebSocket]]]
 
+    val routePattern: Regex = "[1-9]+\\-[1-9]+".r
+
     @throws[Exception]
     override def start(): Unit = {
         val options = new HttpServerOptions().setTcpKeepAlive(true).setIdleTimeout(0)
@@ -28,15 +31,16 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
                 case "/connect" =>
                     ws.handler((data) => {
                         data.toString() match {
-                            case MSGTAkkaVertx.FIRST_CONNECTION => this.usersWaitingForArea.put(ws.textHandlerID, ws)
-                            case MSGTAkkaVertx.NORMAL_CONNECTION => this.usersWaitingForConnectionAck.put(ws.textHandlerID, ws)
-                            case _ => Log.info("Unknown message received: " + data.toString())
+                            case MSGTAkkaVertx.FirstConnection => this.usersWaitingForArea.put(ws.textHandlerID, ws)
+                            case MSGTAkkaVertx.NormalConnection => this.usersWaitingForConnectionAck.put(ws.textHandlerID, ws)
+                            case _ => Log.info("Unknown message received in /connect: " + data.toString())
                         }
                         data.toString() match {
-                            case str if MSGTAkkaVertx.FIRST_CONNECTION == str ||
-                                    MSGTAkkaVertx.NORMAL_CONNECTION == str =>
+                            case str if MSGTAkkaVertx.FirstConnection == str ||
+                                    MSGTAkkaVertx.NormalConnection == str =>
                                 tell(data.toString())
                                 usersOnChannelConnect.put(ws.textHandlerID(), ws)
+                                Log.info(s"OPENED a /connect, (${usersOnChannelConnect.size} currently active on this channel)")
                             case _ =>
                         }
                     })
@@ -45,40 +49,41 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
                         this.usersWaitingForArea.remove(ws.textHandlerID())
                         this.usersWaitingForConnectionAck.remove(ws.textHandlerID())
                         this.usersWaitingForDisconnection.remove(ws.textHandlerID())
-                        tell(MSGTAkkaVertx.DISCONNECT)
-                        Log.info(s"closed a /connect, now at ${usersWaitingForConnectionAck.size} and ${usersWaitingForArea.size} and ${usersWaitingForDisconnection.size}")
+                        tell(MSGTAkkaVertx.Disconnect)
+                        Log.info(s"CLOSED a /connect, (${usersOnChannelConnect.size} currently active on this channel)")
                     })
                 case "/route" =>
                     ws.handler((data) => {
-                        val uriStart = data.toString().split("-")(0)
-                        val uriEnd = data.toString().split("-")(1)
-                        val uri = buildRouteId(uriStart, uriEnd)
-                        val value = new Pair[String, ServerWebSocket](ws.textHandlerID, ws)
-                        if (usersWaitingForRoute.get(uri).isEmpty) {
-                            usersWaitingForRoute.put(uri, new ConcurrentHashSet[Pair[String, ServerWebSocket]]())
+                        data.toString() match {
+                            case s if s.matches("[1-9]+-[1-9]+") =>
+                                val uriStart = data.toString().split("-")(0)
+                                val uriEnd = data.toString().split("-")(1)
+                                val uri = buildRouteId(uriStart, uriEnd)
+                                val value = new Pair[String, ServerWebSocket](ws.textHandlerID, ws)
+                                if (usersWaitingForRoute.get(uri).isEmpty) usersWaitingForRoute.put(uri, new ConcurrentHashSet[Pair[String, ServerWebSocket]]())
+                                usersWaitingForRoute(uri).add(value)
+                                tell(RouteRequestFromClient(ws.textHandlerID, uriStart, uriEnd, isEscape = false))
+                            case _ => Log.info("Unknown message received in /route: " + data.toString())
                         }
-                        usersWaitingForRoute(uri).add(value)
-                        Log.info("asked route " + uri + " " + usersWaitingForRoute.size)
-                        tell(RouteRequestFromClient(ws.textHandlerID, uriStart, uriEnd, isEscape = false))
+
                     })
                     ws.closeHandler((_) => {
                         val value = new Pair[String, ServerWebSocket](ws.textHandlerID, ws)
                         usersWaitingForRoute.foreach(r => r._2.remove(value))
-                        Log.info(s"closed a /route, now at ${usersWaitingForRoute.size}")
+                        Log.info(s"CLOSED a /route, (${usersWaitingForRoute.size} currently active on this channel)")
                     })
                 case "/alarm" =>
                     ws.handler((data) => {
-                        Log.info(s"/alarm ricevuto: ${data.toString()}")
                         data.toString() match {
-                            case MSGTAkkaVertx.ALARM_SETUP =>
+                            case MSGTAkkaVertx.AlarmSetup =>
                                 this.usersReadyForAlarm.put(ws.textHandlerID, ws)
-                                tell(MSGTAkkaVertx.ALARM_SETUP)
-                            case _ =>
+                                tell(MSGTAkkaVertx.AlarmSetup)
+                            case _ => Log.info("Unknown message received in /alarm: " + data.toString())
                         }
                     })
                     ws.closeHandler((_) => {
                         this.usersReadyForAlarm.remove(ws.textHandlerID())
-                        Log.info(s"closed a /alarm, now at ${usersReadyForAlarm.size}")
+                        Log.info(s"CLOSED a /alarm (${usersReadyForAlarm.size} currently active on this channel)")
                     })
                 case "/position-update" => throw new UnsupportedOperationException
                 case _ => ws.reject()
@@ -94,7 +99,6 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
       * @param ack the ack message
       */
     def sendAckToNewUser(ack: String): Unit = {
-        Log.info("Waiting for ACK " + usersWaitingForConnectionAck.size)
         usersWaitingForConnectionAck.values.foreach((ws: ServerWebSocket) => ws.writeTextMessage(ack))
         usersWaitingForConnectionAck.clear()
     }
@@ -107,29 +111,15 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
       * @param area the marshaled version of the area
       */
     def sendAreaToNewUser(area: String): Unit = {
-        Log.info("Waiting for AREA " + usersWaitingForArea.size)
         usersWaitingForArea.values.foreach((ws: ServerWebSocket) => ws.writeTextMessage(area))
         usersWaitingForArea.clear()
     }
-
-    //    /**
-    //      * Called when a user disconnects from a cell because he wants to connect to the next one
-    //      */
-    //    def disconnectUsers(): Unit = {
-    //        Log.info("Waiting for DISCONNECTION " + usersWaitingForDisconnection.size)
-    //        this.usersWaitingForDisconnection.keySet.foreach((id: String) => {
-    //            usersWaitingForConnectionAck.remove(id)
-    //            usersWaitingForArea.remove(id)
-    //            usersReadyForAlarm.remove(id)
-    //        })
-    //        this.usersWaitingForDisconnection.clear()
-    //    }
 
     /**
       * Called when an alarm is shut down because the emergency's done
       */
     def sendSystemShutDownToUsers(): Unit = {
-        usersReadyForAlarm.foreach(p => p._2.writeTextMessage(MSGTAkkaVertx.SYS_SHUTDOWN))
+        usersReadyForAlarm.foreach(p => p._2.writeTextMessage(MSGTAkkaVertx.SysShutdown))
     }
 
     /**
@@ -139,7 +129,6 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
       * @param routeAsJson the marshaled version of the route from this cell to the exit
       */
     def sendAlarmToUsers(routeAsJson: String): Unit = {
-        Log.info(s"writing alarm to users ${usersReadyForAlarm.size}")
         usersReadyForAlarm.foreach(p => p._2.writeTextMessage(routeAsJson))
     }
 
@@ -147,7 +136,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
       * Called when an alarm is shut down because the emergency's done
       */
     def sendAlarmEndToUsers(): Unit = {
-        usersReadyForAlarm.foreach(p => p._2.writeTextMessage(MSGTAkkaVertx.END_ALARM))
+        usersReadyForAlarm.foreach(p => p._2.writeTextMessage(MSGTAkkaVertx.EndAlarm))
     }
 
     /**
@@ -162,8 +151,14 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
         sendRouteToUsers(departureCellId, arrivalCellId, routeAsJson)
     }
 
+    /**
+      * Called when a route is requested from one or more users and it's finally calculated and sent
+      *
+      * @param initialRouteId The ID of the first cell
+      * @param finalRouteId   The ID of the final cell
+      * @param routeAsJson    The route as a JSON String
+      */
     def sendRouteToUsers(initialRouteId: Int, finalRouteId: Int, routeAsJson: String): Unit = {
-        Log.info(usersWaitingForRoute.toString)
         val routeId = buildRouteId(initialRouteId, finalRouteId)
         if (this.usersWaitingForRoute.get(routeId).isDefined) {
             this.usersWaitingForRoute(routeId).forEach(p => p.snd.writeTextMessage(routeAsJson))
@@ -171,9 +166,12 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
         this.usersWaitingForRoute.remove(routeId)
     }
 
-    def getUserNumber(): Int = {
-        usersOnChannelConnect.size
-    }
+    /**
+      * Get the user number as the number of active connections on /connect
+      *
+      * @return the current user number
+      */
+    def getUserNumber: Int = usersOnChannelConnect.size
 
     private def tell(obj: Any): Unit = {
         if (userActor != null) {

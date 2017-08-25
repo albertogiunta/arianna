@@ -33,9 +33,9 @@ class UserManagerTest extends TestKit(ActorSystem("UserManagerTest")) with WordS
         val tester: TestActorRef[Tester] = TestActorRef(Props(new Tester(probe.ref)), "Tester")
 
         "In the beginning only wants to receive the map and nothing else" in {
-            tester ! MSGTAkkaVertx.FIRST_CONNECTION
-            tester ! MSGTAkkaVertx.NORMAL_CONNECTION
-            tester ! MSGTAkkaVertx.DISCONNECT
+            tester ! MSGTAkkaVertx.FirstConnection
+            tester ! MSGTAkkaVertx.NormalConnection
+            tester ! MSGTAkkaVertx.Disconnect
             probe.expectNoMsg()
             tester ! topology
             probe.expectNoMsg()

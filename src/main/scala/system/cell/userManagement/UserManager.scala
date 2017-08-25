@@ -13,13 +13,13 @@ import system.ontologies.messages.MessageType.{Alarm, Topology, Update}
 import system.ontologies.messages._
 
 object MSGTAkkaVertx {
-    val NORMAL_CONNECTION: String = "normalConnection"
-    val FIRST_CONNECTION: String = "firstConnection"
-    val NORMAL_CONNECTION_RESPONSE = "ack"
-    val DISCONNECT: String = "disconnect"
-    val ALARM_SETUP: String = "okToReceiveAlarms"
-    val END_ALARM: String = "endAlarm"
-    val SYS_SHUTDOWN: String = "sysShutdown"
+    val NormalConnection: String = "normalConnection"
+    val FirstConnection: String = "firstConnection"
+    val NormalConnectionResponse = "ack"
+    val Disconnect: String = "disconnect"
+    val AlarmSetup: String = "okToReceiveAlarms"
+    val EndAlarm: String = "endAlarm"
+    val SysShutdown: String = "sysShutdown"
 }
 
 class UserManager extends TemplateActor with ActorLogging {
@@ -29,30 +29,18 @@ class UserManager extends TemplateActor with ActorLogging {
     var vertx: Vertx = _
     var wsServer: WSServer = _
     var c: WSClient = _
-    //    var usrNumber = 0
     var areaForCell: AreaViewedFromACell = _
     var areaForUser: AreaViewedFromAUser = _
     var alarmMessage: String = _
     var isAlarmed: Boolean = false
 
-
     override protected def init(args: List[String]): Unit = {
         if (args.size != 2) throw IncorrectInitMessageException(this.name, args)
-
         uri = args.head
         serial = uri.split("uri")(1).toInt
         vertx = Vertx.vertx()
         wsServer = new WSServer(vertx, self, "/" + args.head, args(1).toInt)
         vertx.deployVerticle(wsServer)
-        log.info("Started User Manager")
-        //        initWSClient()
-    }
-
-    def initWSClient(): Unit = {
-        c = new WSClient(vertx)
-        vertx.deployVerticle(c)
-        Thread.sleep(1000)
-        c.sendMessageFirstConnection()
     }
 
     override protected def receptive: Receive = {
@@ -74,7 +62,6 @@ class UserManager extends TemplateActor with ActorLogging {
                     wsServer.sendAlarmToUsers(routeAsString)
                     isAlarmed = true
                     alarmMessage = routeAsString
-                    log.info(s"alarmMessage is ${RouteResponseShort(route).route.size}")
             }
         case AriadneMessage(Alarm, Alarm.Subtype.End, _, _) =>
             wsServer.sendAlarmEndToUsers()
@@ -82,19 +69,19 @@ class UserManager extends TemplateActor with ActorLogging {
     }
 
     protected def operationalForMobile: Receive = {
-        case MSGTAkkaVertx.FIRST_CONNECTION =>
+        case MSGTAkkaVertx.FirstConnection =>
             wsServer.sendAreaToNewUser(areaForUser.toJson.toString())
             sendCurrentPeopleUpdate()
-        case MSGTAkkaVertx.NORMAL_CONNECTION =>
-            wsServer.sendAckToNewUser(MSGTAkkaVertx.NORMAL_CONNECTION_RESPONSE)
+        case MSGTAkkaVertx.NormalConnection =>
+            wsServer.sendAckToNewUser(MSGTAkkaVertx.NormalConnectionResponse)
             sendCurrentPeopleUpdate()
-        case MSGTAkkaVertx.DISCONNECT =>
+        case MSGTAkkaVertx.Disconnect =>
             sendCurrentPeopleUpdate()
-        case MSGTAkkaVertx.ALARM_SETUP =>
-            log.info(s"is alarmed? $isAlarmed")
+        case MSGTAkkaVertx.AlarmSetup =>
             if (isAlarmed) wsServer.sendAlarmToUsers(alarmMessage)
         case msg: RouteRequestFromClient =>
-            parent ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell, RouteRequest(msg.userID, getCellWithUri(msg.fromCellUri), getCellWithUri(msg.toCellUri), isEscape = false))
+            parent ! AriadneMessage(MessageType.Route, MessageType.Route.Subtype.Request, Location.User >> Location.Cell,
+                RouteRequest(msg.userID, getCellWithUri(msg.fromCellUri), getCellWithUri(msg.toCellUri), isEscape = false))
         case _ => desist _
     }
 
@@ -103,20 +90,9 @@ class UserManager extends TemplateActor with ActorLogging {
         super.postStop()
     }
 
-    //    private def incrementUserNumber(): Unit = {
-    //        usrNumber = usrNumber + 1
-    //        sendCurrentPeopleUpdate(wsServer.getUserNumber())
-    //    }
-
-
-    //    private def decrementUserNumber(): Unit = {
-    //        usrNumber = if (usrNumber > 0) usrNumber - 1 else usrNumber
-    //        sendCurrentPeopleUpdate(wsServer.getUserNumber())
-    //    }
-
-
     private def sendCurrentPeopleUpdate(): Unit = {
-        parent ! AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell, CurrentPeopleUpdate(RoomID(serial, uri), wsServer.getUserNumber()))
+        parent ! AriadneMessage(Update, Update.Subtype.CurrentPeople, Location.User >> Location.Cell,
+            CurrentPeopleUpdate(RoomID(serial, uri), wsServer.getUserNumber))
     }
     
     private def getCellWithUri(uri: String): RoomID = {
