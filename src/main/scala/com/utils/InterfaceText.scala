@@ -7,7 +7,7 @@ object InterfaceText {
 
     val None: String = ""
 
-    val MainTitle: String = "Arianna system.admin Interface"
+    val MainTitle: String = "Arianna Administrator Interface"
 
     val ChartTitle: String = "Arianna Charts"
 

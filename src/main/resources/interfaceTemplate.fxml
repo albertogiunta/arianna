@@ -19,7 +19,7 @@
                 <Text id="fileName" fx:id="fileName" layoutX="991.0" layoutY="38.0" strokeType="OUTSIDE"
                       strokeWidth="0.0" wrappingWidth="113.0"/>
                 <Button fx:id="alarmButton" disable="true" layoutX="737.0" layoutY="27.0" mnemonicParsing="false"
-                        onAction="#triggerAlarm" prefHeight="49.0" prefWidth="130.0" text="SEND ALARM"/>
+                        onAction="#triggerAlarm" prefHeight="49.0" prefWidth="130.0" text="Send Alarm"/>
                 <Text layoutX="38.0" layoutY="60.0" strokeType="OUTSIDE" strokeWidth="0.0"
                       text="Arianna Administrator Panel">
                     <font>

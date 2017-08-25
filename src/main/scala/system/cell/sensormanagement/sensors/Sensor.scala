@@ -37,7 +37,7 @@ trait Sensor[A] {
   *
   * @tparam B the type of data managed by the sensor
   **/
-trait ScaleSensor[B] extends Sensor[B] {
+trait ScaledSensor[B] extends Sensor[B] {
 
     /**
       * Get the minimum value that the sensor can reach
@@ -56,7 +56,7 @@ trait ScaleSensor[B] extends Sensor[B] {
   *
   * @tparam C the type of data managed by the sensor
   */
-trait NumericSensor[C] extends ScaleSensor[C] {
+trait NumericSensor[C] extends ScaledSensor[C] {
     /**
       * Get the range of value that the sensor can assume
       **/
