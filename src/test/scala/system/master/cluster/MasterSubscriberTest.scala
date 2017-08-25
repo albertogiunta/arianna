@@ -111,8 +111,14 @@ class MasterSubscriberTest extends TestKit(ActorSystem("SubscriberTest", MasterS
     
             tester ! MasterSubscriber.TopologyLoadedACK
     
-            probe.expectNoMsg()
-
+            probe.expectMsg(ackHand)
+    
+            assert(probe.sender == tester.underlyingActor.publisher)
+    
+            probe.expectMsg(handshake)
+    
+            assert(probe.sender == tester.underlyingActor.supervisor)
+            
         }
         
         "Ignore everything that isn't an Handshake or an Update" in {
