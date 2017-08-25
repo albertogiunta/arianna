@@ -30,7 +30,7 @@ class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) 
     
         case AriadneMessage(Handshake, CellToMaster, `cellToMaster`, pkg: SensorsInfoUpdate) =>
             publisher() ! HACK()
-            if (stashedHandshakes.apply(pkg.cell.uri)) {
+            if (!stashedHandshakes(pkg.cell.uri)) {
                 log.info("Stashing handshake from {} for later administration...", sender.path.address)
                 stashedHandshakes.add(pkg.cell.uri)
                 stash
@@ -42,6 +42,7 @@ class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) 
             stashedHandshakes.clear
             context.become(behavior = sociable, discardOld = true)
             log.info("I've Become Sociable!")
+            log.debug("Unstashing cool'n preserved handshakes...")
             unstashAll
         
         case _ => desist _
@@ -51,6 +52,7 @@ class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) 
     
         case msg@AriadneMessage(Handshake, CellToMaster, `cellToMaster`, _) =>
             publisher() ! HACK()
+            log.debug("Forwarding Handshake to Supervisor...")
             topologySupervisor() forward msg
 
         case MasterSubscriber.TopologyMappedACK =>
@@ -59,6 +61,7 @@ class MasterSubscriber(mediator: ActorRef) extends TemplateSubscriber(mediator) 
             unstashAll
 
         case AriadneMessage(Update, _, _, _) => desist _
+
         case _ => stash
     }
     
