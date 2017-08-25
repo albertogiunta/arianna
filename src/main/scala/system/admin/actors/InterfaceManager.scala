@@ -86,7 +86,7 @@ class InterfaceManager extends TemplateActor {
             val updateCells: mutable.Map[RoomID, RoomDataUpdate] = new mutable.HashMap[RoomID, RoomDataUpdate]
             adminUpdate.list.foreach(update => updateCells += ((update.room, update)))
             interfaceController updateView updateCells.values.toList
-            chartActors.foreach(actor => actor._2 ! AriadneMessage(Interface, Interface.Subtype.UpdateChart, Location.Admin >> Location.Self, updateCells.key(actor._1)))
+            chartActors.foreach(actor => actor._2 ! AriadneMessage(Interface, Interface.Subtype.UpdateChart, Location.Admin >> Location.Self, updateCells(actor._1)))
 
 
         case msg@AriadneMessage(_, Alarm.Subtype.FromInterface, _, _) => parent ! msg

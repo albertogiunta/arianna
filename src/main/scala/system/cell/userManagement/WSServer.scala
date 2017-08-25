@@ -9,7 +9,6 @@ import system.ontologies.messages.{RouteRequestFromClient, RouteResponse}
 
 import scala.collection.mutable
 import scala.tools.jline_embedded.internal.Log
-import scala.util.matching.Regex
 
 class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Integer) extends AbstractVerticle {
 
@@ -19,8 +18,6 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
     var usersWaitingForArea: mutable.Map[String, ServerWebSocket] = new scala.collection.mutable.HashMap[String, ServerWebSocket]
     var usersReadyForAlarm: mutable.Map[String, ServerWebSocket] = new scala.collection.mutable.HashMap[String, ServerWebSocket]
     var usersWaitingForRoute: mutable.Map[String, ConcurrentHashSet[Pair[String, ServerWebSocket]]] = new scala.collection.mutable.HashMap[String, ConcurrentHashSet[Pair[String, ServerWebSocket]]]
-
-    val routePattern: Regex = "[1-9]+\\-[1-9]+".r
 
     @throws[Exception]
     override def start(): Unit = {
@@ -55,7 +52,7 @@ class WSServer(vertx: Vertx, userActor: ActorRef, val baseUrl: String, port: Int
                 case "/route" =>
                     ws.handler((data) => {
                         data.toString() match {
-                            case s if s.matches("[1-9]+-[1-9]+") =>
+                            case s if s.matches("uri[1-9]+-uri[1-9]+") =>
                                 val uriStart = data.toString().split("-")(0)
                                 val uriEnd = data.toString().split("-")(1)
                                 val uri = buildRouteId(uriStart, uriEnd)
