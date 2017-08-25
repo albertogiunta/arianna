@@ -32,7 +32,7 @@ class InterfaceManager extends TemplateActor {
     protected override def init(args: List[String]): Unit = {
         Platform.runLater(() => {
             val view: InterfaceView = new InterfaceView
-            view.start
+            view.start()
             interfaceController = view.controller
             interfaceController.interfaceActor = self
         })
@@ -46,31 +46,31 @@ class InterfaceManager extends TemplateActor {
       */
 
     override def receptive: Receive = {
-        case msg@AriadneMessage(_, Topology.Subtype.Planimetrics, _, area: Area) => {
+        case msg@AriadneMessage(_, Topology.Subtype.Planimetrics, _, area: Area) =>
             area.rooms.foreach(r => roomIDs += ((r.cell.info.uri, r.info.id)))
             parent ! msg
             println("Rooms " + roomIDs.toString)
             context.become(initializer)
-        }
+
 
         case _ => desist _
 
     }
 
-    def initializer(): Receive = {
-        case msg@AriadneMessage(Topology, Topology.Subtype.Acknowledgement, _, _) => interfaceController connected true
+    def initializer: Receive = {
+        case AriadneMessage(Topology, Topology.Subtype.Acknowledgement, _, _) => interfaceController connected true
 
-        case msg@AriadneMessage(Error, Error.Subtype.LostConnectionFromMaster, _, _) => interfaceController connected false
+        case AriadneMessage(Error, Error.Subtype.LostConnectionFromMaster, _, _) => interfaceController connected false
 
-        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) => {
+        case AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) =>
             log.info("Received an handshake with sensor data")
             counter.++
-            interfaceController.initializeSensors(sensorsInfo, roomIDs.get(sensorsInfo.cell.uri).get)
-            if (counter == roomIDs.size) {
+            interfaceController.initializeSensors(sensorsInfo, roomIDs(sensorsInfo.cell.uri))
+            if (counter.get == roomIDs.size) {
                 context.become(operational)
                 log.info("Finish initialize sensors, now become operational")
             }
-        }
+
 
         case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => parent ! msg
 
@@ -80,37 +80,36 @@ class InterfaceManager extends TemplateActor {
 
     def operational: Receive = {
 
-        case msg@AriadneMessage(Topology, Topology.Subtype.Acknowledgement, _, _) => interfaceController connected true
+        case AriadneMessage(Topology, Topology.Subtype.Acknowledgement, _, _) => interfaceController connected true
 
-        case msg@AriadneMessage(_, MessageType.Update.Subtype.Admin, _, adminUpdate: AdminUpdate) => {
-            log.info("Received update values")
+        case AriadneMessage(_, MessageType.Update.Subtype.Admin, _, adminUpdate: AdminUpdate) =>
             val updateCells: mutable.Map[RoomID, RoomDataUpdate] = new mutable.HashMap[RoomID, RoomDataUpdate]
             adminUpdate.list.foreach(update => updateCells += ((update.room, update)))
             interfaceController updateView updateCells.values.toList
-            chartActors.foreach(actor => actor._2 ! AriadneMessage(Interface, Interface.Subtype.UpdateChart, Location.Admin >> Location.Self, updateCells.get(actor._1).get))
-        }
+            chartActors.foreach(actor => actor._2 ! AriadneMessage(Interface, Interface.Subtype.UpdateChart, Location.Admin >> Location.Self, updateCells.key(actor._1)))
+
 
         case msg@AriadneMessage(_, Alarm.Subtype.FromInterface, _, _) => parent ! msg
 
-        case msg@AriadneMessage(_, Alarm.Subtype.FromCell, _, content: AlarmContent) => interfaceController triggerAlarm content
+        case AriadneMessage(_, Alarm.Subtype.FromCell, _, content: AlarmContent) => interfaceController triggerAlarm content
 
-        case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) => {
-            var chartActor = context.actorOf(Props[ChartManager], NamingSystem.ChartManager + chartActors.size.toString)
+        case msg@AriadneMessage(Interface, Interface.Subtype.OpenChart, _, cell: CellForChart) =>
+            val chartActor = context.actorOf(Props[ChartManager], NamingSystem.ChartManager + chartActors.size.toString)
             chartActors += ((cell.cell.id, chartActor))
             chartActor ! msg
-        }
 
-        case msg@AriadneMessage(Interface, Interface.Subtype.CloseChart, _, info: RoomInfo) => {
+
+        case AriadneMessage(Interface, Interface.Subtype.CloseChart, _, info: RoomInfo) =>
             sender ! PoisonPill
             chartActors.remove(info.id)
             interfaceController.enableButton(info.id)
-        }
+
 
         case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => parent ! msg
 
-        case msg@AriadneMessage(Error, Error.Subtype.MapIdentifierMismatch, _, _) => interfaceController.showErrorDialog
+        case AriadneMessage(Error, Error.Subtype.MapIdentifierMismatch, _, _) => interfaceController.showErrorDialog()
 
-        case msg@AriadneMessage(Error, Error.Subtype.LostConnectionFromMaster, _, _) => interfaceController connected false
+        case AriadneMessage(Error, Error.Subtype.LostConnectionFromMaster, _, _) => interfaceController connected false
 
         case msg@AriadneMessage(Alarm, Alarm.Subtype.End, _, _) => parent ! msg
 

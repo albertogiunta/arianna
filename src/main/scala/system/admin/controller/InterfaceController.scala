@@ -7,7 +7,7 @@ import javafx.scene.canvas.Canvas
 import javafx.scene.control.Alert.AlertType
 import javafx.scene.control.{Alert, Button, SplitPane}
 import javafx.scene.layout.{Pane, VBox}
-import javafx.scene.paint.Color
+import javafx.scene.paint.{Color, Paint}
 import javafx.scene.text.Text
 import javafx.stage.FileChooser
 import javafx.stage.FileChooser.ExtensionFilter
@@ -52,11 +52,10 @@ class InterfaceController extends ViewController {
       **/
     def updateView(update: List[RoomDataUpdate]): Unit = {
         Platform.runLater(() => {
-            checkStatus
+            checkStatus()
             update.foreach(update => {
                 if (cellControllers.contains(update.room)) {
-                    var cellController = cellControllers.get(update.room).get
-                    cellController setDynamicInformation update
+                    cellControllers(update.room) setDynamicInformation update
                 }
             })
         })
@@ -70,8 +69,8 @@ class InterfaceController extends ViewController {
     def handleFileLoad(): Unit = {
         loadButton setDisable true
         val fc = new FileChooser
-        fc setTitle InterfaceText.fileSelectionText
-        fc setSelectedExtensionFilter new ExtensionFilter(InterfaceText.extension, "*.json")
+        fc setTitle InterfaceText.FileSelectionText
+        fc setSelectedExtensionFilter new ExtensionFilter(InterfaceText.Extension, "*.json")
         val json: File = fc.showOpenDialog(null)
         parseFile(json)
     }
@@ -88,9 +87,8 @@ class InterfaceController extends ViewController {
       *
       **/
     def initializeSensors(sensorsInfo: SensorsInfoUpdate, roomID: RoomID): Unit = {
-        checkStatus
-        var cellController = cellControllers.get(roomID).get
-        Platform.runLater(() => cellController addSensors sensorsInfo)
+        checkStatus()
+        Platform.runLater(() => cellControllers(roomID) addSensors sensorsInfo)
     }
 
     /**
@@ -100,10 +98,10 @@ class InterfaceController extends ViewController {
       **/
     def triggerAlarm(alarmContent: AlarmContent): Unit = {
         Platform.runLater(() => {
-            cellControllers.get(alarmContent.room.id).get.handleAlarm
+            cellControllers(alarmContent.room.id).handleAlarm()
             canvasController handleAlarm alarmContent.info.uri
-            alarmButton setText InterfaceText.endAlarm
-            alarmButton setOnAction ((e) => endAlarm)
+            alarmButton setText InterfaceText.EndAlarm
+            alarmButton setOnAction ((e) => endAlarm())
         })
 
     }
@@ -114,13 +112,13 @@ class InterfaceController extends ViewController {
       **/
     @FXML
     def triggerAlarm(): Unit = {
-        interfaceActor ! new AriadneMessage(MessageType.Alarm, MessageType.Alarm.Subtype.FromInterface, Location.Admin >> Location.Self, Empty())
+        interfaceActor ! AriadneMessage(MessageType.Alarm, MessageType.Alarm.Subtype.FromInterface, Location.Admin >> Location.Self, Empty())
         Platform.runLater(() => {
-            cellControllers.values.foreach(cellController => cellController.handleAlarm)
-            canvasController.handleAlarm
+            cellControllers.values.foreach(cellController => cellController.handleAlarm())
+            canvasController.handleAlarm()
         })
-        alarmButton setText InterfaceText.endAlarm
-        alarmButton setOnAction ((e) => endAlarm)
+        alarmButton setText InterfaceText.EndAlarm
+        alarmButton setOnAction ((e) => endAlarm())
     }
 
     /**
@@ -128,7 +126,7 @@ class InterfaceController extends ViewController {
       *
       **/
     def enableButton(cellId: RoomID): Unit = {
-        Platform.runLater(() => cellControllers.get(cellId).get.enableChartButton)
+        Platform.runLater(() => cellControllers(cellId).enableChartButton())
     }
 
     /**
@@ -138,8 +136,8 @@ class InterfaceController extends ViewController {
       **/
     def showErrorDialog(): Unit = {
         Platform.runLater(() => {
-            cleanInterface
-            openAlert
+            cleanInterface()
+            openAlert()
             loadButton setDisable false
 
         })
@@ -151,11 +149,9 @@ class InterfaceController extends ViewController {
     def connected(isConnected: Boolean): Unit = {
         Platform.runLater(() => {
             if (isConnected) {
-                status setFill Color.GREEN
-                status setText InterfaceText.connected
+                setStatus(InterfaceText.Connected, Color.GREEN)
             } else {
-                status setFill Color.RED
-                status setText InterfaceText.disconnected
+                setStatus(InterfaceText.Disconnected, Color.RED)
             }
         })
 
@@ -163,9 +159,9 @@ class InterfaceController extends ViewController {
 
     private def parseFile(file: File): Unit = {
         val source = Source.fromFile(file).getLines.mkString
-        val area = Topology.Subtype.Planimetrics.unmarshal(source)
+        val area = Topology.Subtype.Planimetrics unmarshal source
         Platform.runLater(() => {
-            loadCanvas
+            loadCanvas()
             createCells(area.rooms)
             fileName setText file.getName
             interfaceActor ! AriadneMessage(MessageType.Topology, MessageType.Topology.Subtype.Planimetrics, Location.Admin >> Location.Self, area)
@@ -173,24 +169,24 @@ class InterfaceController extends ViewController {
     }
 
     private def loadCanvas(): Unit = {
-        var loader = new FXMLLoader(getClass.getResource(GraphicResources.canvas))
-        var canvas = loader.load[Canvas]
+        val loader = new FXMLLoader(getClass.getResource(GraphicResources.Canvas))
+        val canvas = loader.load[Canvas]
         canvasController = loader.getController[CanvasController]
         mapContainer.getChildren add canvas
     }
 
     private def createCells(initialConfiguration: List[Room]): Unit = {
         initialConfiguration.foreach(cell => {
-                var node = createCellTemplate(cell)
+            val node = createCellTemplate(cell)
                 vBoxPane.getChildren add node
                 canvasController drawOnMap cell
             })
     }
 
     private def createCellTemplate(cell: Room): SplitPane = {
-        var loader = new FXMLLoader(getClass.getResource(GraphicResources.cell))
-        var node = loader.load[SplitPane]
-        var controller = loader.getController[RoomTemplateController]
+        val loader = new FXMLLoader(getClass.getResource(GraphicResources.Cell))
+        val node = loader.load[SplitPane]
+        val controller = loader.getController[RoomTemplateController]
         controller.adminManager = interfaceActor
         cellControllers += ((cell.info.id, controller))
         controller setStaticInformation cell
@@ -199,37 +195,41 @@ class InterfaceController extends ViewController {
 
     private def cleanInterface(): Unit = {
         cellControllers.clear
-        vBoxPane.getChildren.clear
-        canvasController.cleanCanvas
-        fileName setText InterfaceText.none
+        vBoxPane.getChildren.clear()
+        canvasController.cleanCanvas()
+        fileName setText InterfaceText.None
     }
 
-    private def endAlarm: Unit = {
+    private def endAlarm(): Unit = {
         Platform.runLater(() => {
             interfaceActor ! AriadneMessage(Alarm, Alarm.Subtype.End, Location.Admin >> Location.Self, Empty())
-            alarmButton setText InterfaceText.sendAlarm
-            alarmButton setOnAction ((e) => triggerAlarm)
-            canvasController.redrawMap
-            cellControllers.values.foreach(cellController => cellController.endAlarm)
+            alarmButton setText InterfaceText.SendAlarm
+            alarmButton setOnAction ((e) => triggerAlarm())
+            canvasController.redrawMap()
+            cellControllers.values.foreach(cellController => cellController.endAlarm())
         })
     }
 
     private def openAlert(): Unit = {
         val alert = new Alert(AlertType.ERROR)
-        alert setTitle InterfaceText.errorTitle
-        alert setHeaderText InterfaceText.errorHeader
-        alert setContentText InterfaceText.errorText
-
+        alert setTitle InterfaceText.ErrorTitle
+        alert setHeaderText InterfaceText.ErrorHeader
+        alert setContentText InterfaceText.ErrorText
         alert.showAndWait
     }
 
     private def checkStatus(): Unit = {
-        if (status.getText.equals(InterfaceText.disconnected)) {
+        if (status.getText.equals(InterfaceText.Disconnected)) {
             connected(true)
         }
         if (alarmButton.isDisabled) {
             alarmButton setDisable false
         }
+    }
+
+    private def setStatus(text: String, color: Paint): Unit = {
+        status setFill color
+        status setText text
     }
 
 

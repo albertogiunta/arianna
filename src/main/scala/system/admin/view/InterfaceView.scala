@@ -23,22 +23,20 @@ class InterfaceView extends View {
       **/
     def start(): Unit = {
         val mainStage = new Stage
-        mainStage setTitle InterfaceText.mainTitle
+        mainStage setTitle InterfaceText.MainTitle
         mainStage setHeight 850
         mainStage setWidth 1200
         mainStage setResizable false
-        var loader: FXMLLoader = new FXMLLoader(getClass.getResource(GraphicResources.interface))
+        val loader: FXMLLoader = new FXMLLoader(getClass.getResource(GraphicResources.Interface))
         val root: SplitPane = loader.load[SplitPane]
         controller = loader.getController[InterfaceController]
         val scene: Scene = new Scene(root)
         mainStage.setOnCloseRequest((e) => {
-            Platform.exit
+            Platform.exit()
             System.exit(0)
         })
         mainStage setScene scene
-        mainStage.getScene.getWindow setHeight 850
-        mainStage.getScene.getWindow setWidth 1200
-        mainStage.show
+        mainStage.show()
     }
 
 }

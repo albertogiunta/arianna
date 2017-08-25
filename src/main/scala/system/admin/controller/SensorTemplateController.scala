@@ -15,7 +15,6 @@ class SensorTemplateController extends ViewController {
 
     @FXML
     private var sensorName: Label = _
-
     @FXML
     private var sensorValue: Text = _
 

@@ -8,7 +8,7 @@ import javafx.scene.paint.Color
 import javafx.scene.text.Text
 
 import akka.actor.ActorRef
-import com.utils.GraphicResources
+import com.utils.{GraphicResources, InterfaceText}
 import system.ontologies.messages.Location._
 import system.ontologies.messages.MessageType.Interface
 import system.ontologies.messages._
@@ -21,8 +21,6 @@ import scala.collection.mutable
 class RoomTemplateController extends ViewController {
 
     var adminManager: ActorRef = _
-    private val ONE: String = "1"
-    private val ZERO: String = "0"
     private var roomInfo: RoomInfo = _
     private val sensorsController: mutable.Map[Int, SensorTemplateController] = new mutable.HashMap[Int, SensorTemplateController]
     @FXML
@@ -65,7 +63,7 @@ class RoomTemplateController extends ViewController {
         currentPeopleValue setText update.currentPeople.toString + "/" + maxCapacityValue.getText
         update.cell.sensors.foreach(sensor => {
             if (sensorsController.contains(sensor.categoryId)) {
-                sensorsController.get(sensor.categoryId).get updateSensor sensor
+                sensorsController(sensor.categoryId) updateSensor sensor
             }
         })
     }
@@ -115,7 +113,7 @@ class RoomTemplateController extends ViewController {
     }
     
     private def loadSensor(sensor: SensorInfo): Unit = {
-        var loader = new FXMLLoader(getClass.getResource(GraphicResources.sensor))
+        var loader = new FXMLLoader(getClass.getResource(GraphicResources.Sensor))
         var sensorTemplate = loader.load[HBox]
         val sensorController = loader.getController[SensorTemplateController]
         sensorController createSensor sensor
@@ -127,7 +125,7 @@ class RoomTemplateController extends ViewController {
         roomName setText roomInfo.id.name
         maxCapacityValue setText roomInfo.capacity.toString
         sqrMetersValue setText roomInfo.squareMeters.toString
-        if (roomInfo.isEntryPoint) entranceValue setText ONE else entranceValue setText ZERO
-        if (roomInfo.isExitPoint) exitValue setText ONE else exitValue setText ZERO
+        if (roomInfo.isEntryPoint) entranceValue setText InterfaceText.One else entranceValue setText InterfaceText.Zero
+        if (roomInfo.isExitPoint) exitValue setText InterfaceText.One else exitValue setText InterfaceText.Zero
     }
 }

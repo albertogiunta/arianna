@@ -5,18 +5,18 @@ package com.utils
   **/
 object GraphicResources {
 
-    val interface: String = "/interfaceTemplate.fxml"
+    val Interface: String = "/interfaceTemplate.fxml"
 
-    val canvas: String = "/canvasTemplate.fxml"
+    val Canvas: String = "/canvasTemplate.fxml"
 
-    val cell: String = "/cellTemplate.fxml"
+    val Cell: String = "/cellTemplate.fxml"
 
-    val chartWindow: String = "/chartWindowTemplate.fxml"
+    val ChartWindow: String = "/chartWindowTemplate.fxml"
 
-    val chart: String = "/chartTemplate.fxml"
+    val Chart: String = "/chartTemplate.fxml"
 
-    val sensor: String = "/sensorTemplate.fxml"
+    val Sensor: String = "/sensorTemplate.fxml"
 
-    val loader: String = "/loaderTemplate.fxml"
+    val Loader: String = "/loaderTemplate.fxml"
 
 }

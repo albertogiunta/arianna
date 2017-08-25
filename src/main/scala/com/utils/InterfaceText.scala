@@ -5,31 +5,35 @@ package com.utils
   **/
 object InterfaceText {
 
-    val none: String = ""
-    
-    val mainTitle: String = "Arianna system.admin Interface"
+    val None: String = ""
 
-    val chartTitle: String = "Arianna Charts"
+    val MainTitle: String = "Arianna system.admin Interface"
 
-    val loadTitle: String = "Load configuration file"
+    val ChartTitle: String = "Arianna Charts"
 
-    val fileSelectionText: String = "Get JSON Map"
+    val LoadTitle: String = "Load configuration file"
 
-    val extension: String = "JSON Files"
+    val FileSelectionText: String = "Get JSON Map"
 
-    val errorTitle: String = "Fatal Error"
+    val Extension: String = "JSON Files"
 
-    val errorHeader: String = "Wrong Map loaded!"
+    val ErrorTitle: String = "Fatal Error"
 
-    val errorText: String = "The map loaded is different from the one already loaded in the System. Close and restart the System or load the correct map"
+    val ErrorHeader: String = "Wrong Map loaded!"
 
-    val sendAlarm: String = "SEND ALARM"
+    val ErrorText: String = "The map loaded is different from the one already loaded in the System. Close and restart the System or load the correct map"
 
-    val endAlarm: String = "END ALARM"
+    val SendAlarm: String = "Send Alarm"
 
-    val connected: String = "Connected"
+    val EndAlarm: String = "End Alarm"
 
-    val disconnected: String = "Disconnected"
+    val Connected: String = "Connected"
+
+    val Disconnected: String = "Disconnected"
+
+    val One: String = "1"
+
+    val Zero: String = "0"
 
 }
 

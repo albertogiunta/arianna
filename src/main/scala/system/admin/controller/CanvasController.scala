@@ -78,7 +78,7 @@ class CanvasController extends ViewController {
       *
       * */
     def handleAlarm(id: String): Unit = {
-        val roomData = rooms.get(id).get
+        val roomData = rooms(id)
         drawRoom(roomData, Color.RED, Color.WHITE)
 
     }
@@ -100,7 +100,7 @@ class CanvasController extends ViewController {
       **/
     def cleanCanvas(): Unit = {
         val gc = mapCanvas.getGraphicsContext2D
-        gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight())
+        gc.clearRect(0, 0, gc.getCanvas.getWidth, gc.getCanvas.getHeight)
     }
 
     /**
@@ -117,7 +117,7 @@ class CanvasController extends ViewController {
         drawRoomPerimeter(roomData, backgroundColor)
         drawPassages(roomData.passages)
         drawAntenna(roomData.antenna)
-        drawName(roomData.name, new Point(roomData.x, roomData.y), textColor)
+        drawName(roomData.name, Point(roomData.x, roomData.y), textColor)
     }
 
     private def drawRoomPerimeter(room: RoomData, color: Color): Unit = {

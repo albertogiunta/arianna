@@ -41,7 +41,7 @@ class ChartWindowController extends ViewController {
     
     private var data: XYChart.Series[Double, Double] = new XYChart.Series[Double, Double]
 
-    private var time = (0 to Int.MaxValue - 1).iterator
+    private val time: Iterator[Int] = ChartUtils.timeIterator()
 
     override def initialize(location: URL, resources: ResourceBundle): Unit = {
         Platform.runLater(() => peopleChart.getData add data)
@@ -67,7 +67,7 @@ class ChartWindowController extends ViewController {
     def initializeCharts(sensorsId: List[Int]): Unit = {
         val positions = ChartUtils.positionIterator
         sensorsId.foreach(sensorId => {
-            val loader = new FXMLLoader(getClass.getResource(GraphicResources.chart));
+            val loader = new FXMLLoader(getClass.getResource(GraphicResources.Chart))
             val template = loader.load[TitledPane]
             template setText SensorCategories.categoryWithId(sensorId).name
             sensorChartControllers += ((sensorId, loader.getController[SensorChartController]))
@@ -78,14 +78,14 @@ class ChartWindowController extends ViewController {
     }
 
     /**
-      * This method is called everytime the charts are updated with new values
+      * This method is called every time the charts are updated with new values
       *
       * @param update : CellForView object containing information about the room and all
       *               the new values coming from the sensors.
       *
       * */
     def updateCharts(update: RoomDataUpdate): Unit = {
-        update.cell.sensors.foreach(sensor => sensorChartControllers.get(sensor.categoryId).get.addValue(sensor.value))
+        update.cell.sensors.foreach(sensor => sensorChartControllers(sensor.categoryId) addValue sensor.value)
         data = ChartUtils.resizeIfNeeded(data)
         data.getData add new XYChart.Data(time.next.toDouble, update.currentPeople.toDouble)
 
