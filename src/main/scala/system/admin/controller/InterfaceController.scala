@@ -86,9 +86,14 @@ class InterfaceController extends ViewController {
       * @param sensorsInfo : SensorsInfoUpdate object containing sensors data of a cell
       *
       **/
-    def initializeSensors(sensorsInfo: SensorsInfoUpdate, roomID: RoomID): Unit = {
+    def initializeSensors(sensorsInfo: SensorsInfoUpdate, roomID: RoomID): Boolean = {
         checkStatus()
-        Platform.runLater(() => cellControllers(roomID) addSensors sensorsInfo)
+        Platform.runLater(() => {
+            if (cellControllers.contains(roomID)) {
+                cellControllers(roomID) addSensors sensorsInfo
+            }
+        })
+        cellControllers.contains(roomID)
     }
 
     /**

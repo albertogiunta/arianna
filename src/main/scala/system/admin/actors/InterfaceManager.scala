@@ -49,7 +49,6 @@ class InterfaceManager extends TemplateActor {
         case msg@AriadneMessage(_, Topology.Subtype.Planimetrics, _, area: Area) =>
             area.rooms.foreach(r => roomIDs += ((r.cell.info.uri, r.info.id)))
             parent ! msg
-            println("Rooms " + roomIDs.toString)
             context.become(initializer)
 
 
@@ -62,10 +61,13 @@ class InterfaceManager extends TemplateActor {
 
         case AriadneMessage(Error, Error.Subtype.LostConnectionFromMaster, _, _) => interfaceController connected false
 
-        case AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) =>
+        case msg@AriadneMessage(Handshake, Handshake.Subtype.CellToMaster, _, sensorsInfo: SensorsInfoUpdate) =>
             log.info("Received an handshake with sensor data")
-            counter.++
-            interfaceController.initializeSensors(sensorsInfo, roomIDs(sensorsInfo.cell.uri))
+            if (interfaceController.initializeSensors(sensorsInfo, roomIDs(sensorsInfo.cell.uri))) {
+                counter.++
+            } else {
+                self ! msg
+            }
             if (counter.get == roomIDs.size) {
                 context.become(operational)
                 log.info("Finish initialize sensors, now become operational")

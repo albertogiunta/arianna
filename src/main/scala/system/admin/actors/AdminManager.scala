@@ -25,12 +25,12 @@ class AdminManager extends TemplateActor {
     private var areaLoaded: Area = _
     private val toMaster: MessageDirection = Location.Admin >> Location.Master
     private val toSelf: MessageDirection = Location.Admin >> Location.Self
-    
+
+
     protected override def init(args: List[String]): Unit = {
         interfaceManager ! AriadneMessage(Init, Init.Subtype.Greetings, toSelf, Greetings(List.empty))
+        context.system.eventStream.subscribe(self, classOf[akka.remote.DisassociatedEvent])
     }
-
-    context.system.eventStream.subscribe(self, classOf[akka.remote.DisassociatedEvent])
 
     override def receptive: Receive = {
         case msg@AriadneMessage(_, Topology.Subtype.Planimetrics, _, area: Area) =>
@@ -53,7 +53,6 @@ class AdminManager extends TemplateActor {
 
         case msg@AriadneMessage(_, MessageType.Update.Subtype.Admin, _, _) => interfaceManager ! msg.copy(direction = toSelf)
 
-
         case msg@AriadneMessage(_, Alarm.Subtype.FromInterface, _, _) => adminSupervisor() ! msg.copy(direction = toMaster)
 
         case msg@AriadneMessage(_, Alarm.Subtype.FromCell, _, _) => interfaceManager ! msg.copy(direction = toSelf)
@@ -66,7 +65,7 @@ class AdminManager extends TemplateActor {
 
         case msg@AriadneMessage(Init, Init.Subtype.Goodbyes, _, _) => adminSupervisor() ! msg.copy(direction = toMaster)
 
-        case akka.remote.DisassociatedEvent =>
+        case event: akka.remote.DisassociatedEvent =>
             interfaceManager ! AriadneMessage(Error, Error.Subtype.LostConnectionFromMaster, toSelf, Empty())
             context.become(waitingForMaster)
             log.info("Lost connection with Master... Waiting for LookingForAMap message")
